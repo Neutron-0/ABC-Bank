@@ -1,9 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { colors, typography, spacing, radii } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
-import { Bell, Globe, Sparkles } from 'lucide-react-native';
+import { Bell, Globe, Sparkles, SlidersHorizontal } from 'lucide-react-native';
 
 export const AdaptiveHeader: React.FC = () => {
   const { profile, language, setLanguage, openJourney, currentState } = useCustomerStore();
@@ -33,25 +33,25 @@ export const AdaptiveHeader: React.FC = () => {
       <View style={styles.leftRow}>
         <View style={styles.avatarWrap}>
           <Image
-            source={{ uri: profile.avatarUrl }}
+            source={{ uri: profile.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120' }}
             style={styles.avatar}
           />
           <View style={styles.onlineDot} />
         </View>
         <View style={styles.textWrap}>
-          <Text style={styles.greetingText}>{getGreeting()},</Text>
+          <Text style={styles.greetingText}>{getGreeting()}</Text>
           <Text style={styles.nameText}>{profile.name}</Text>
         </View>
       </View>
 
       <View style={styles.rightRow}>
-        {/* Prototype Switcher Quick Shortcut */}
+        {/* Prototype Persona Switcher Shortcut */}
         <TouchableOpacity
           style={styles.protoButton}
           onPress={() => openJourney('prototype_lab')}
-          activeOpacity={0.7}
+          activeOpacity={0.8}
         >
-          <Sparkles size={14} color={colors.accentWarm} />
+          <Sparkles size={13} color="#D97706" />
           <Text style={styles.protoButtonText}>Lab</Text>
         </TouchableOpacity>
 
@@ -59,9 +59,8 @@ export const AdaptiveHeader: React.FC = () => {
         <TouchableOpacity
           style={styles.langButton}
           onPress={toggleLanguage}
-          activeOpacity={0.7}
+          activeOpacity={0.8}
         >
-          <Globe size={14} color={colors.primary} />
           <Text style={styles.langText}>{getLangLabel()}</Text>
         </TouchableOpacity>
 
@@ -69,9 +68,9 @@ export const AdaptiveHeader: React.FC = () => {
         <TouchableOpacity
           style={styles.iconButton}
           onPress={() => openJourney('prototype_lab')}
-          activeOpacity={0.7}
+          activeOpacity={0.8}
         >
-          <Bell size={18} color={colors.textSecondary} />
+          <Bell size={18} color="#0F172A" />
           {currentState !== 'normal' && <View style={styles.unreadBadge} />}
         </TouchableOpacity>
       </View>
@@ -85,33 +84,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.sm,
     backgroundColor: colors.bg,
   },
   leftRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
+    gap: 12,
   },
   avatarWrap: {
     position: 'relative',
   },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: radii.full,
-    borderWidth: 2,
-    borderColor: colors.primaryLight,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#F1F5F9',
   },
   onlineDot: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: colors.success,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#10B981',
     borderWidth: 2,
     borderColor: colors.bg,
   },
@@ -119,68 +119,68 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   greetingText: {
-    ...typography.caption,
-    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#64748B',
   },
   nameText: {
-    ...typography.h3,
-    color: colors.textPrimary,
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.3,
   },
   rightRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: 8,
   },
   protoButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.full,
+    backgroundColor: '#FFFBEB',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 99,
     gap: 4,
     borderWidth: 1,
     borderColor: '#FDE68A',
   },
   protoButtonText: {
-    ...typography.tiny,
-    color: '#92400E',
+    fontSize: 11,
     fontWeight: '700',
+    color: '#B45309',
   },
   langButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primarySubtle,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.full,
-    gap: 4,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 99,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#E2E8F0',
   },
   langText: {
-    ...typography.tiny,
-    color: colors.primary,
+    fontSize: 11,
     fontWeight: '700',
+    color: '#0F172A',
   },
   iconButton: {
     width: 36,
     height: 36,
-    borderRadius: radii.full,
-    backgroundColor: colors.cardBg,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#E2E8F0',
     position: 'relative',
   },
   unreadBadge: {
     position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.danger,
+    top: 7,
+    right: 7,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: '#EF4444',
   },
 });

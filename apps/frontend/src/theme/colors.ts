@@ -1,42 +1,52 @@
-﻿export const colors = {
-  // Brand / Theme
-  primary: '#1E3A8A', // Bharat Trust Navy
-  primaryLight: '#3B82F6',
-  primaryDark: '#172554',
-  primarySubtle: '#EFF6FF',
+export const colors = {
+  // Brand & High-Craft Obsidian Core
+  primary: '#0F172A', // Sleek Obsidian Ink
+  primaryLight: '#2563EB', // Electric Cobalt
+  primaryDark: '#0A0E17', // Deep Midnight
+  primarySubtle: '#F1F5F9', // Crisp Ice
 
-  // Accent & Action
-  accent: '#0D9488', // Teal
-  accentWarm: '#D97706', // Amber
-  accentGold: '#B45309',
+  // Dark Flagship Card Surfaces
+  obsidian: '#0A0E1A', // Ultra-sleek card canvas
+  surfaceDark: '#121726', // Elevated card surface
+  surfaceDarkElevated: '#1A2134', // Top surface
+  borderDark: 'rgba(255, 255, 255, 0.08)', // Hairline dark border
+  borderDarkHighlight: 'rgba(255, 255, 255, 0.16)',
+
+  // Accent & Actions
+  accent: '#2563EB', // Electric Blue
+  accentIndigo: '#4F46E5', // Iris
+  accentPurple: '#7C3AED', // Mitra AI Glow
+  accentEmerald: '#10B981', // Mint Cash Flow
+  accentWarm: '#F59E0B', // Amber
+  accentGold: '#D97706',
 
   // Semantic Statuses
   success: '#10B981', // Emerald
   successLight: '#ECFDF5',
   warning: '#F59E0B', // Amber
   warningLight: '#FFFBEB',
-  danger: '#EF4444', // Crimson / Alert
+  danger: '#EF4444', // Crimson Alert
   dangerLight: '#FEF2F2',
   info: '#0284C7',
   infoLight: '#F0F9FF',
 
-  // Neutral Palette
-  bg: '#F8FAFC', // Slate 50
+  // Clean Minimal Canvas
+  bg: '#F8FAFC', // Ultra-clean titanium
   cardBg: '#FFFFFF',
-  cardBgSecondary: '#F1F5F9',
-  border: '#E2E8F0',
+  cardBgSecondary: '#F8FAFC',
+  border: '#E2E8F0', // Hairline clean border
   borderLight: '#F1F5F9',
-  divider: '#CBD5E1',
+  divider: '#E2E8F0',
 
   // Typography
-  textPrimary: '#0F172A', // Slate 900
-  textSecondary: '#475569', // Slate 600
-  textMuted: '#94A3B8', // Slate 400
+  textPrimary: '#0F172A',
+  textSecondary: '#64748B',
+  textMuted: '#94A3B8',
   textWhite: '#FFFFFF',
 
-  // Attention Hierarchy Layers
-  layerDo: '#EFF6FF', // Blue-tinted
-  layerKnow: '#F0FDF4', // Green-tinted
-  layerPlan: '#FAF5FF', // Purple-tinted
-  layerConsider: '#FFF7ED', // Orange-tinted
+  // Attention Hierarchy Layers (Refined Modern Tints)
+  layerDo: '#EFF6FF',
+  layerKnow: '#F0FDF4',
+  layerPlan: '#FAF5FF',
+  layerConsider: '#FFF7ED',
 };

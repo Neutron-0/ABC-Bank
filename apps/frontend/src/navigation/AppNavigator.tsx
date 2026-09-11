@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -70,18 +70,17 @@ export const AppNavigator: React.FC = () => {
     }
   };
 
-  const tabs: { id: MainTabType; label: string; icon: any }[] = [
+  const tabs: { id: MainTabType; label: string; icon: any; isAi?: boolean }[] = [
     { id: 'home', label: t.tabs.home, icon: Home },
     { id: 'payments', label: t.tabs.payments, icon: Send },
     { id: 'activity', label: t.tabs.activity, icon: Clock },
-    { id: 'insights', label: t.tabs.insights, icon: Activity },
-    { id: 'assistant', label: t.tabs.assistant, icon: Bot },
+    { id: 'assistant', label: 'Mitra AI', icon: Bot, isAi: true },
     { id: 'profile', label: t.tabs.profile, icon: User },
   ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
+      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
       {/* Floating State Banner if not in normal */}
       {currentState !== 'normal' && (
@@ -96,7 +95,7 @@ export const AppNavigator: React.FC = () => {
       {/* Toast Banner */}
       {toastMessage && (
         <View style={styles.toastBanner}>
-          <CheckCircle2 size={16} color={colors.success} />
+          <CheckCircle2 size={16} color="#10B981" />
           <Text style={styles.toastText}>{toastMessage}</Text>
         </View>
       )}
@@ -104,36 +103,40 @@ export const AppNavigator: React.FC = () => {
       {/* Screen Container */}
       <View style={styles.screenContainer}>{renderActiveScreen()}</View>
 
-      {/* Bottom Navigation Bar */}
-      <View style={styles.tabBar}>
-        {tabs.map((tab) => {
-          const active = activeTab === tab.id;
-          const IconComp = tab.icon;
-          return (
-            <TouchableOpacity
-              key={tab.id}
-              style={styles.tabItem}
-              onPress={() => setActiveTab(tab.id)}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.tabIconWrap, active && styles.activeTabIconWrap]}>
-                <IconComp
-                  size={20}
-                  color={active ? colors.primary : colors.textSecondary}
-                />
-              </View>
-              <Text
-                style={[
-                  styles.tabLabel,
-                  active ? styles.activeTabLabel : styles.inactiveTabLabel,
-                ]}
-                numberOfLines={1}
+      {/* Sleek Floating Dock Tab Bar */}
+      <View style={styles.dockContainer}>
+        <View style={styles.tabBar}>
+          {tabs.map((tab) => {
+            const active = activeTab === tab.id;
+            const IconComp = tab.icon;
+            return (
+              <TouchableOpacity
+                key={tab.id}
+                style={[styles.tabItem, active && styles.activeTabItem]}
+                onPress={() => setActiveTab(tab.id)}
+                activeOpacity={0.75}
               >
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+                <View style={styles.iconContainer}>
+                  <IconComp
+                    size={20}
+                    color={active ? '#0F172A' : '#94A3B8'}
+                    strokeWidth={active ? 2.5 : 1.8}
+                  />
+                  {tab.isAi && <View style={styles.aiGlowDot} />}
+                </View>
+                <Text
+                  style={[
+                    styles.tabLabel,
+                    active ? styles.activeTabLabel : styles.inactiveTabLabel,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {tab.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
 
       {/* Global Modals & Journeys */}
@@ -157,20 +160,21 @@ export const AppNavigator: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.bg,
+    backgroundColor: '#F8FAFC',
   },
   stateNoticeStrip: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FEF3C7',
-    paddingVertical: 4,
+    paddingVertical: 5,
     gap: 6,
     borderBottomWidth: 1,
     borderBottomColor: '#FDE68A',
   },
   stateNoticeText: {
-    ...typography.tiny,
+    fontSize: 11,
+    fontWeight: '600',
     color: '#92400E',
   },
   toastBanner: {
@@ -178,58 +182,87 @@ const styles = StyleSheet.create({
     top: Platform.OS === 'ios' ? 50 : 20,
     left: spacing.lg,
     right: spacing.lg,
-    backgroundColor: colors.cardBg,
-    borderRadius: radii.md,
+    backgroundColor: '#0F172A',
+    borderRadius: 14,
     padding: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: 10,
     zIndex: 9999,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.lg,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
   },
   toastText: {
-    ...typography.captionMedium,
-    color: colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
     flex: 1,
   },
   screenContainer: {
     flex: 1,
   },
+  dockContainer: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 24 : 14,
+    left: 16,
+    right: 16,
+    alignItems: 'center',
+  },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: colors.cardBg,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: spacing.xs,
-    paddingBottom: Platform.OS === 'ios' ? 20 : spacing.xs,
-    paddingHorizontal: spacing.xs,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 32,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    width: '100%',
     justifyContent: 'space-around',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 10,
   },
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
     flex: 1,
-    paddingVertical: 2,
   },
-  tabIconWrap: {
-    padding: 4,
-    borderRadius: radii.full,
+  activeTabItem: {
+    backgroundColor: '#F1F5F9',
   },
-  activeTabIconWrap: {
-    backgroundColor: colors.primarySubtle,
+  iconContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aiGlowDot: {
+    position: 'absolute',
+    top: -2,
+    right: -3,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#6366F1',
   },
   tabLabel: {
-    ...typography.tiny,
-    marginTop: 2,
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 3,
   },
   activeTabLabel: {
-    color: colors.primary,
-    fontWeight: '700',
+    color: '#0F172A',
+    fontWeight: '800',
   },
   inactiveTabLabel: {
-    color: colors.textSecondary,
+    color: '#94A3B8',
   },
 });

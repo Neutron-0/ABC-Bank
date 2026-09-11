@@ -1,6 +1,18 @@
-﻿import { TextStyle, Platform } from 'react-native';
+import { TextStyle, Platform } from 'react-native';
 
 export const typography = {
+  balanceLarge: {
+    fontSize: 34,
+    fontWeight: '800' as const,
+    lineHeight: 40,
+    letterSpacing: -1,
+  },
+  balanceMedium: {
+    fontSize: 26,
+    fontWeight: '700' as const,
+    lineHeight: 32,
+    letterSpacing: -0.6,
+  },
   h1: {
     fontSize: 28,
     fontWeight: '700' as const,

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import {
   ShieldAlert,
   ArrowRight,
   TrendingUp,
+  HeartHandshake,
 } from 'lucide-react-native';
 
 export const AdaptiveHomeScreen: React.FC = () => {
@@ -48,8 +49,9 @@ export const AdaptiveHomeScreen: React.FC = () => {
   const getHeroRepeatedIntent = () => {
     if (currentState === 'normal') {
       return {
-        title: 'Your 8:40 AM Metro Commute',
-        subtitle: 'Tap to instantly pay ₹40 with 1-click UPI',
+        tag: 'ROUTINE COMMUTE',
+        title: 'Morning Delhi Metro Trip',
+        subtitle: 'Usual 8:40 AM Noida Sec 62 route • 1-Tap UPI recharge',
         actionLabel: 'Pay ₹40',
         action: () =>
           performPayment({
@@ -60,16 +62,60 @@ export const AdaptiveHomeScreen: React.FC = () => {
           }),
         icon: Train,
         accent: '#2563EB',
+        bg: '#F0F7FF',
+        borderColor: '#BFDBFE',
       };
     }
     if (currentState === 'fraud_alert') {
       return {
-        title: 'Security Alert: ₹31,800 Unverified Charge',
-        subtitle: 'Review this debit immediately or freeze your card',
-        actionLabel: 'Review Now',
+        tag: 'URGENT SECURITY ALERT',
+        title: '₹31,800 Unverified International Debit',
+        subtitle: 'Suspicious card charge flagged. Instant biometric freeze available.',
+        actionLabel: 'Freeze & Dispute',
         action: () => openJourney('fraud_alert'),
         icon: ShieldAlert,
-        accent: colors.danger,
+        accent: '#EF4444',
+        bg: '#FEF2F2',
+        borderColor: '#FECACA',
+      };
+    }
+    if (currentState === 'medical_event') {
+      return {
+        tag: 'ASSISTANCE & TAX RELIEF',
+        title: 'Max Healthcare ₹48,200 Expenditure',
+        subtitle: 'Hospital claim filing active. Section 80D tax receipt auto-tagged.',
+        actionLabel: 'Claim Assistance',
+        action: () => openJourney('medical_assistance'),
+        icon: HeartHandshake,
+        accent: '#0D9488',
+        bg: '#F0FDFA',
+        borderColor: '#99F6E4',
+      };
+    }
+    if (currentState === 'financial_stress') {
+      return {
+        tag: 'BUDGET SHIELD • ZERO LOAN NUDGES',
+        title: 'Upcoming EMI Burden: ₹32,000',
+        subtitle: 'Cashflow tighter than usual. Flexible repayment helper unlocked.',
+        actionLabel: 'Explore Relief',
+        action: () => openJourney('financial_stress'),
+        icon: ShieldAlert,
+        accent: '#D97706',
+        bg: '#FFFBEB',
+        borderColor: '#FDE68A',
+      };
+    }
+    if (currentState === 'surplus') {
+      return {
+        tag: 'IDLE SURPLUS OPPORTUNITY',
+        title: '₹62,000 Surplus Idle in Savings',
+        subtitle: 'Earning 3.0% base interest. Auto-sweep to 7.2% liquid deposit?',
+        actionLabel: 'Auto-Sweep',
+        action: () => openJourney('savings_invest'),
+        icon: TrendingUp,
+        accent: '#10B981',
+        bg: '#ECFDF5',
+        borderColor: '#A7F3D0',
       };
     }
     return null;
@@ -85,18 +131,24 @@ export const AdaptiveHomeScreen: React.FC = () => {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Balance Area */}
+        {/* Flagship Balance Card */}
         <BalanceHeader />
 
-        {/* Hero Repeated Intent / Urgent Alert Banner */}
+        {/* Hero Repeated Intent / Context Alert Banner */}
         {heroIntent && (
-          <View style={[styles.heroBox, { borderLeftColor: heroIntent.accent }]}>
-            <View style={styles.heroLeft}>
-              <View style={[styles.heroIconBox, { backgroundColor: `${heroIntent.accent}18` }]}>
+          <View style={[styles.heroBox, { backgroundColor: heroIntent.bg, borderColor: heroIntent.borderColor }]}>
+            <View style={styles.heroTopTagRow}>
+              <View style={[styles.heroTagPill, { backgroundColor: `${heroIntent.accent}20` }]}>
+                <Text style={[styles.heroTagText, { color: heroIntent.accent }]}>{heroIntent.tag}</Text>
+              </View>
+            </View>
+
+            <View style={styles.heroContentRow}>
+              <View style={[styles.heroIconBox, { backgroundColor: `${heroIntent.accent}22` }]}>
                 <heroIntent.icon size={20} color={heroIntent.accent} />
               </View>
               <View style={styles.heroTextWrap}>
@@ -104,45 +156,67 @@ export const AdaptiveHomeScreen: React.FC = () => {
                 <Text style={styles.heroSubtitle}>{heroIntent.subtitle}</Text>
               </View>
             </View>
-            <TouchableOpacity
-              style={[styles.heroActionBtn, { backgroundColor: heroIntent.accent }]}
-              onPress={heroIntent.action}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.heroActionText}>{heroIntent.actionLabel}</Text>
-            </TouchableOpacity>
+
+            <View style={styles.heroActionRow}>
+              <TouchableOpacity
+                style={[styles.heroActionBtn, { backgroundColor: heroIntent.accent }]}
+                onPress={heroIntent.action}
+                activeOpacity={0.82}
+              >
+                <Text style={styles.heroActionText}>{heroIntent.actionLabel}</Text>
+                <ArrowRight size={14} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
           </View>
         )}
 
         {/* AI-Composed Attention Hierarchy Stack */}
         <ContextCardStack cards={cards} />
 
-        {/* Floating Contextual Mitra Assistant Promo */}
-        <TouchableOpacity
-          style={styles.assistantPromoCard}
-          onPress={() => setActiveTab('assistant')}
-          activeOpacity={0.85}
-        >
-          <View style={styles.promoLeft}>
+        {/* Sleek Minimal Mitra Companion Box */}
+        <View style={styles.assistantPromoCard}>
+          <View style={styles.promoHeader}>
             <View style={styles.promoIcon}>
-              <Bot size={22} color={colors.primary} />
+              <Bot size={20} color="#4F46E5" />
             </View>
             <View style={styles.promoTextWrap}>
-              <Text style={styles.promoTitle}>Have a question, Rahul?</Text>
+              <Text style={styles.promoTitle}>Mitra Contextual AI</Text>
               <Text style={styles.promoSubtitle}>
-                Mitra understands your transactions, bills, and savings.
+                Ask about repeat payments, upcoming bills, or medical tax deductions.
               </Text>
             </View>
           </View>
-          <View style={styles.promoArrow}>
-            <ArrowRight size={18} color={colors.primary} />
+
+          {/* Quick Prompt Chips */}
+          <View style={styles.promptChipRow}>
+            <TouchableOpacity
+              style={styles.promptChip}
+              onPress={() => setActiveTab('assistant')}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.promptChipText}>🚇 Pay Metro</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.promptChip}
+              onPress={() => setActiveTab('assistant')}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.promptChipText}>📊 Check Runway</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.promptChip}
+              onPress={() => setActiveTab('assistant')}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.promptChipText}>🛡️ Hospital Bills</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </View>
 
         <View style={styles.footerNote}>
-          <Sparkles size={12} color={colors.textMuted} />
+          <Sparkles size={12} color="#94A3B8" />
           <Text style={styles.footerText}>
-            Personalized with privacy-first ethical rules for Bharat
+            Adaptive Banking for Bharat • Zero Predatory Loan Guardrails
           </Text>
         </View>
       </ScrollView>
@@ -153,7 +227,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.bg,
+    backgroundColor: '#F8FAFC',
   },
   scroll: {
     flex: 1,
@@ -162,29 +236,41 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   heroBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.cardBg,
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
-    padding: spacing.md,
-    borderRadius: radii.lg,
+    padding: spacing.md + 2,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderLeftWidth: 4,
-    ...shadows.sm,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
-  heroLeft: {
+  heroTopTagRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    flex: 1,
+    marginBottom: 8,
+  },
+  heroTagPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 99,
+  },
+  heroTagText: {
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  heroContentRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: spacing.md,
   },
   heroIconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: radii.md,
+    width: 40,
+    height: 40,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -192,49 +278,62 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   heroTitle: {
-    ...typography.bodyBold,
-    color: colors.textPrimary,
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.2,
+    lineHeight: 20,
   },
   heroSubtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#475569',
     marginTop: 2,
+    lineHeight: 18,
+  },
+  heroActionRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
   },
   heroActionBtn: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.md,
-    marginLeft: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 12,
+    gap: 6,
   },
   heroActionText: {
-    ...typography.captionMedium,
-    color: colors.textWhite,
+    fontSize: 13,
     fontWeight: '700',
+    color: '#FFFFFF',
   },
   assistantPromoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#F0FDF4',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#BBF7D0',
+    borderColor: '#E0E7FF',
     marginHorizontal: spacing.lg,
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
     marginBottom: spacing.lg,
-    padding: spacing.md,
-    borderRadius: radii.lg,
+    padding: spacing.md + 2,
+    borderRadius: 20,
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
   },
-  promoLeft: {
+  promoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    flex: 1,
+    gap: 12,
+    marginBottom: 12,
   },
   promoIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: radii.full,
-    backgroundColor: '#DCFCE7',
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: '#EEF2FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -242,16 +341,34 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   promoTitle: {
-    ...typography.bodyBold,
-    color: '#166534',
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1E1B4B',
+    letterSpacing: -0.2,
   },
   promoSubtitle: {
-    ...typography.caption,
-    color: '#15803D',
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#6366F1',
     marginTop: 2,
   },
-  promoArrow: {
-    paddingLeft: spacing.xs,
+  promptChipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  promptChip: {
+    backgroundColor: '#F5F3FF',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 99,
+    borderWidth: 1,
+    borderColor: '#DDD6FE',
+  },
+  promptChipText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#6D28D9',
   },
   footerNote: {
     flexDirection: 'row',
@@ -262,7 +379,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   footerText: {
-    ...typography.tiny,
-    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#94A3B8',
   },
 });

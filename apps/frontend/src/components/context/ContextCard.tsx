@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ContextCard as ContextCardType } from '../../types';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
@@ -202,19 +202,19 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
       {/* Action Buttons */}
       <View style={styles.buttonRow}>
         <TouchableOpacity
-          style={[styles.primaryBtn, { backgroundColor: card.accentColor || colors.primary }]}
+          style={[styles.primaryBtn, { backgroundColor: card.accentColor || '#0F172A' }]}
           onPress={handlePrimaryAction}
-          activeOpacity={0.85}
+          activeOpacity={0.82}
         >
           <Text style={styles.primaryBtnText}>{card.primaryAction.label}</Text>
-          <ArrowRight size={15} color={colors.textWhite} />
+          <ArrowRight size={14} color="#FFFFFF" />
         </TouchableOpacity>
 
         {card.secondaryAction && (
           <TouchableOpacity
             style={styles.secondaryBtn}
             onPress={handleSecondaryAction}
-            activeOpacity={0.7}
+            activeOpacity={0.8}
           >
             <Text style={styles.secondaryBtnText}>{card.secondaryAction.label}</Text>
           </TouchableOpacity>
@@ -226,123 +226,141 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardBg,
-    borderRadius: radii.lg,
-    padding: spacing.md,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: spacing.md + 2,
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
+    borderColor: '#E8EDF5',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   alertCard: {
-    borderColor: '#FCA5A5',
-    backgroundColor: '#FFF5F5',
+    borderColor: '#FECACA',
+    backgroundColor: '#FFFBFB',
+    shadowColor: '#EF4444',
+    shadowOpacity: 0.08,
   },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: 10,
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: 6,
   },
   layerPill: {
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 99,
   },
   layerPillText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   customBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: radii.full,
+    paddingVertical: 3,
+    borderRadius: 99,
   },
   customBadgeText: {
-    ...typography.tiny,
+    fontSize: 10,
     fontWeight: '700',
+    letterSpacing: 0.2,
   },
   actionIcons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: 8,
   },
   whyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: radii.full,
-    backgroundColor: colors.cardBgSecondary,
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 99,
+    backgroundColor: '#F1F5F9',
   },
   whyText: {
-    ...typography.tiny,
-    color: colors.textSecondary,
+    fontSize: 11,
+    color: '#64748B',
     fontWeight: '600',
   },
   dismissBtn: {
-    padding: 2,
+    padding: 3,
+    borderRadius: 99,
+    backgroundColor: '#F8FAFC',
   },
   mainRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: spacing.md,
+    gap: 12,
     marginBottom: spacing.md,
   },
   iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: radii.md,
+    width: 42,
+    height: 42,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 2,
   },
   textWrap: {
     flex: 1,
   },
   title: {
-    ...typography.h4,
-    color: colors.textPrimary,
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.2,
+    lineHeight: 20,
   },
   description: {
-    ...typography.body,
-    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#64748B',
     marginTop: 3,
+    lineHeight: 18,
   },
   buttonRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: 8,
   },
   primaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.md,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     gap: 6,
   },
   primaryBtnText: {
-    ...typography.bodyBold,
-    color: colors.textWhite,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.1,
   },
   secondaryBtn: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.md,
-    backgroundColor: colors.cardBgSecondary,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   secondaryBtnText: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#475569',
   },
 });
