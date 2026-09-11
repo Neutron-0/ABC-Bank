@@ -336,6 +336,37 @@ export const AdaptiveHomeScreen: React.FC = () => {
         {/* Upcoming Financial Obligations Strip */}
         {renderUpcomingCommitment()}
 
+        {/* Dynamic Contextual Mitra Quick Chat Bar (Personalized Space for Chatbot) */}
+        <TouchableOpacity
+          style={styles.ambientMitraBar}
+          onPress={() => setActiveTab('assistant')}
+          delayPressIn={0}
+          activeOpacity={0.8}
+        >
+          <View style={styles.ambientMitraLeft}>
+            <View style={styles.ambientMitraIconCircle}>
+              <Bot size={16} color="#4F46E5" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.ambientMitraTag}>
+                {language === 'hi' ? 'मित्रा से पूछें' : language === 'gu' ? 'મિત્રને પૂછો' : 'ASK MITRA'}
+              </Text>
+              <Text style={styles.ambientMitraPrompt} numberOfLines={1}>
+                {currentState === 'normal'
+                  ? (language === 'hi' ? '“सुबह की मेट्रो ₹40 रिचार्ज करें”' : language === 'gu' ? '“સવારની મેટ્રો ₹40 રિચાર્જ કરો”' : '“Recharge my ₹40 Delhi Metro card”')
+                  : currentState === 'medical_event'
+                  ? (language === 'hi' ? '“मैक्स अस्पताल बिल के लिए क्लेम सहायता”' : language === 'gu' ? '“મેક્સ હોસ્પિટલ બિલ માટે ક્લેમ સહાય”' : '“Help me file Max Hospital insurance claim”')
+                  : currentState === 'financial_stress'
+                  ? (language === 'hi' ? '“आगामी ₹32,000 ईएमआई को कैसे संभालें?”' : language === 'gu' ? '“આગામી ₹32,000 EMI કેવી રીતે સંભાળવી?”' : '“How do I safely manage upcoming ₹32k EMIs?”')
+                  : currentState === 'surplus'
+                  ? (language === 'hi' ? '“₹24,000 अतिरिक्त बचत को 7.2% पर लगाएं”' : language === 'gu' ? '“₹24,000 વધારાની બચત 7.2% માં રોકો”' : '“How much should I auto-sweep into 7.2%?”')
+                  : (language === 'hi' ? '“₹31,800 के डेबिट की जांच करें”' : language === 'gu' ? '“₹31,800 ના ડેબિટની તપાસ કરો”' : '“Review flagged ₹31,800 international debit”')}
+              </Text>
+            </View>
+          </View>
+          <ArrowRight size={14} color="#525866" />
+        </TouchableOpacity>
+
         {/* Adaptive Attention Hierarchy Stack (Different visual patterns per type) */}
         <ContextCardStack cards={cards} />
 
@@ -346,9 +377,19 @@ export const AdaptiveHomeScreen: React.FC = () => {
               <Bot size={18} color="#111318" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.assistantTitle}>Mitra understands your money</Text>
+              <Text style={styles.assistantTitle}>
+                {language === 'hi'
+                  ? 'मित्रा आपकी वित्तीय स्थिति समझता है'
+                  : language === 'gu'
+                  ? 'મિત્ર તમારી નાણાકીય સ્થિતિ સમજે છે'
+                  : 'Mitra understands your money'}
+              </Text>
               <Text style={styles.assistantSubtitle}>
-                Ask about repeat payments, upcoming bills, or hospital tax rebates.
+                {language === 'hi'
+                  ? 'नियमित भुगतान, आगामी बिलों या अस्पताल क्लेम के बारे में पूछें।'
+                  : language === 'gu'
+                  ? 'નિયમિત ચુકવણી, આગામી બિલ અથવા ક્લેમ વિશે પૂછો.'
+                  : 'Ask about repeat payments, upcoming bills, or hospital tax rebates.'}
               </Text>
             </View>
           </View>
@@ -357,23 +398,32 @@ export const AdaptiveHomeScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.chip}
               onPress={() => setActiveTab('assistant')}
+              delayPressIn={0}
               activeOpacity={0.75}
             >
-              <Text style={styles.chipText}>🚇 Metro Recharge</Text>
+              <Text style={styles.chipText}>
+                {language === 'hi' ? '🚇 मेट्रो रिचार्ज' : language === 'gu' ? '🚇 મેટ્રો રિચાર્જ' : '🚇 Metro Recharge'}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.chip}
               onPress={() => setActiveTab('assistant')}
+              delayPressIn={0}
               activeOpacity={0.75}
             >
-              <Text style={styles.chipText}>📊 Spending Review</Text>
+              <Text style={styles.chipText}>
+                {language === 'hi' ? '📊 खर्च समीक्षा' : language === 'gu' ? '📊 ખર્ચ સમીક્ષા' : '📊 Spending Review'}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.chip}
               onPress={() => setActiveTab('assistant')}
+              delayPressIn={0}
               activeOpacity={0.75}
             >
-              <Text style={styles.chipText}>🛡️ Hospital Assistance</Text>
+              <Text style={styles.chipText}>
+                {language === 'hi' ? '🛡️ अस्पताल सहायता' : language === 'gu' ? '🛡️ હોસ્પિટલ સહાય' : '🛡️ Hospital Assistance'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -800,13 +850,57 @@ const styles = StyleSheet.create({
   },
 
   // Conversational Assistant Surface
+  // Ambient Mitra Quick Chat Bar
+  ambientMitraBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    shadowColor: '#111318',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  ambientMitraLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  ambientMitraIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#EEF2FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ambientMitraTag: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#4F46E5',
+    letterSpacing: 0.5,
+  },
+  ambientMitraPrompt: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#111318',
+    marginTop: 1,
+  },
   assistantCard: {
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    padding: 16,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    padding: 18,
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: '#ECEEF2',
   },
