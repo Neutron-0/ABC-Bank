@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -65,8 +65,19 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
               })}
             </View>
 
-            <TouchableOpacity style={styles.continueBtn} onPress={() => setStep(2)}>
-              <Text style={styles.continueBtnText}>Continue to Privacy Consent</Text>
+            <TouchableOpacity
+              style={styles.continueBtn}
+              onPress={() => setStep(2)}
+              delayPressIn={0}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.continueBtnText}>
+                {language === 'hi'
+                  ? 'गोपनीयता सहमति पर आगे बढ़ें'
+                  : language === 'gu'
+                  ? 'ગોપનીયતા સંમતિ પર આગળ વધો'
+                  : 'Continue to Privacy Consent'}
+              </Text>
               <ArrowRight size={18} color={colors.textWhite} />
             </TouchableOpacity>
           </ScrollView>
@@ -100,7 +111,12 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.continueBtn} onPress={onFinish}>
+            <TouchableOpacity
+              style={styles.continueBtn}
+              onPress={onFinish}
+              delayPressIn={0}
+              activeOpacity={0.8}
+            >
               <Text style={styles.continueBtnText}>{t.onboarding.getStarted}</Text>
               <ArrowRight size={18} color={colors.textWhite} />
             </TouchableOpacity>
