@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -83,7 +83,11 @@ export const TransactionsScreen: React.FC = () => {
       </View>
 
       {/* Transaction Timeline */}
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 110 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.timelineHeader}>
           <Text style={styles.timelineTitle}>Transaction Feed ({filteredTransactions.length})</Text>
         </View>

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -93,7 +93,11 @@ export const PaymentsScreen: React.FC = () => {
         <Text style={styles.subtitle}>{t.payments.subtitle}</Text>
       </View>
 
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 110 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Balance Snapshot */}
         <View style={styles.balanceStrip}>
           <Text style={styles.balanceLabel}>UPI Linked Account Balance:</Text>

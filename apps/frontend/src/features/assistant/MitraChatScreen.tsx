@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import {
   Sparkles,
   ShieldCheck,
   ArrowRight,
+  ArrowLeft,
   User,
   HeartHandshake,
 } from 'lucide-react-native';
@@ -46,28 +47,62 @@ export const MitraChatScreen: React.FC = () => {
   }, [currentState, language]);
 
   const loadInitialGreeting = async () => {
-    const res = await BankingApi.getAssistantInit(language);
-    if (res && res.messages) {
-      setMessages(res.messages);
-    } else {
-      // Fallback
-      setMessages([
-        {
-          id: 'fallback_init',
-          sender: 'assistant',
+    const getContextGreeting = () => {
+      if (currentState === 'medical_event') {
+        return {
           text:
             language === 'hi'
-              ? 'नमस्ते राहुल! मैं मित्रा हूँ। मैं आपके लेन-देन और वित्तीय प्राथमिकताओं को समझकर सहायता करता हूँ।'
-              : 'Hello Rahul! I am Mitra, your contextual banking companion. How can I assist you with your day-to-day banking today?',
-          timestamp: new Date().toISOString(),
-          suggestedPrompts: [
-            'Pay my morning Metro',
-            'What payments are coming up?',
-            'How is my monthly budget?',
-          ],
-        },
-      ]);
-    }
+              ? 'नमस्ते राहुल, मैंने मैक्स अस्पताल में ₹48,200 का हालिया भुगतान देखा। क्या आप क्लेम रीइंबर्समेंट या टैक्स रसीद में सहायता चाहते हैं?'
+              : 'I noticed the recent ₹48,200 hospital payment at Max Super Speciality. Would you like help reviewing your insurance claim or emergency reserves?',
+          prompts: ['File Insurance Claim', 'View Section 80D Receipt', 'Review Upcoming Commitments'],
+        };
+      }
+      if (currentState === 'financial_stress') {
+        return {
+          text:
+            language === 'hi'
+              ? 'नमस्ते राहुल, इस महीने आपका नकदी प्रवाह सामान्य से थोड़ा तंग दिख रहा है। आगामी ईएमआई को प्रबंधित करने में मैं आपकी मदद कर सकता हूँ।'
+              : 'Hello Rahul, your cash flow looks tighter than usual with upcoming EMI commitments of ₹32,000. How can I assist you with budget stabilization?',
+          prompts: ['View Upcoming EMIs', 'Flexible Repayment Options', 'Review Monthly Outflows'],
+        };
+      }
+      if (currentState === 'fraud_alert') {
+        return {
+          text:
+            language === 'hi'
+              ? 'सुरक्षा चेतावनी: ₹31,800 का एक असत्यापित अंतर्राष्ट्रीय लेन-देन देखा गया है। क्या आप तुरंत कार्ड फ्रीज करना चाहते हैं?'
+              : 'Security Alert: An unverified charge of ₹31,800 was flagged. Would you like me to freeze your debit card or guide you through dispute resolution?',
+          prompts: ['Freeze Debit Card Now', 'Dispute Transaction', 'Verify Transaction Details'],
+        };
+      }
+      if (currentState === 'surplus') {
+        return {
+          text:
+            language === 'hi'
+              ? 'नमस्ते राहुल! वेतन आने के बाद आपके खाते में ₹24,000 की अधिशेष बचत उपलब्ध है। क्या आप ऑटो-स्वीप 7.2% योजना देखना चाहते हैं?'
+              : 'Hello Rahul! A surplus of ₹24,000 is available following salary credit. Would you like to review an auto-sweep liquid deposit earning 7.2%?',
+          prompts: ['Auto-Sweep to 7.2%', 'Start Emergency SIP', 'View Savings Velocity'],
+        };
+      }
+      return {
+        text:
+          language === 'hi'
+            ? 'नमस्ते राहुल! मैं मित्रा हूँ। आपकी सुबह 8:40 की ₹40 मेट्रो यात्रा तैयार है। मैं आपकी क्या सहायता करूँ?'
+            : "Hello Rahul! I'm Mitra. Your routine 8:40 AM Metro recharge of ₹40 is ready. How can I assist you with your day-to-day banking?",
+        prompts: ['Pay my morning Metro ₹40', 'Upcoming commitments', 'Monthly cash flow status'],
+      };
+    };
+
+    const ctx = getContextGreeting();
+    setMessages([
+      {
+        id: `init_${currentState}_${Date.now()}`,
+        sender: 'assistant',
+        text: ctx.text,
+        timestamp: new Date().toISOString(),
+        suggestedPrompts: ctx.prompts,
+      },
+    ]);
   };
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -146,8 +181,16 @@ export const MitraChatScreen: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => setActiveTab('home')}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <ArrowLeft size={20} color="#111318" />
+          </TouchableOpacity>
           <View style={styles.avatarBox}>
-            <Bot size={22} color={colors.primary} />
+            <Bot size={20} color={colors.primary} />
           </View>
           <View>
             <Text style={styles.title}>{t.assistant.name}</Text>
@@ -300,6 +343,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  backButton: {
+    padding: 6,
+    borderRadius: radii.full,
+    backgroundColor: colors.cardBgSecondary,
+    marginRight: 2,
   },
   avatarBox: {
     width: 38,

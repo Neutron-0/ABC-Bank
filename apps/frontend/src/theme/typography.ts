@@ -1,9 +1,15 @@
-import { TextStyle, Platform } from 'react-native';
+import { TextStyle } from 'react-native';
 
 export const typography = {
+  displayBalance: {
+    fontSize: 38,
+    fontWeight: '700' as const,
+    lineHeight: 46,
+    letterSpacing: -1.2,
+  },
   balanceLarge: {
     fontSize: 34,
-    fontWeight: '800' as const,
+    fontWeight: '700' as const,
     lineHeight: 40,
     letterSpacing: -1,
   },
@@ -29,6 +35,7 @@ export const typography = {
     fontSize: 18,
     fontWeight: '600' as const,
     lineHeight: 24,
+    letterSpacing: -0.2,
   },
   h4: {
     fontSize: 16,
@@ -60,9 +67,16 @@ export const typography = {
     fontWeight: '500' as const,
     lineHeight: 16,
   },
+  eyebrow: {
+    fontSize: 11,
+    fontWeight: '700' as const,
+    lineHeight: 14,
+    letterSpacing: 1.0,
+    textTransform: 'uppercase' as const,
+  },
   tiny: {
     fontSize: 10,
-    fontWeight: '500' as const,
+    fontWeight: '600' as const,
     lineHeight: 14,
     letterSpacing: 0.2,
   },

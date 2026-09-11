@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -42,7 +42,11 @@ export const InsightsScreen: React.FC = () => {
         <Text style={styles.subtitle}>{t.insights.subtitle}</Text>
       </View>
 
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 110 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Overall Status Card */}
         <View style={styles.statusCard}>
           <View style={styles.statusTop}>

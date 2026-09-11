@@ -38,8 +38,7 @@ import {
   Home,
   Send,
   Clock,
-  Activity,
-  Bot,
+  TrendingUp,
   User,
   Sparkles,
   CheckCircle2,
@@ -70,17 +69,17 @@ export const AppNavigator: React.FC = () => {
     }
   };
 
-  const tabs: { id: MainTabType; label: string; icon: any; isAi?: boolean }[] = [
+  const tabs: { id: MainTabType; label: string; icon: any }[] = [
     { id: 'home', label: t.tabs.home, icon: Home },
-    { id: 'payments', label: t.tabs.payments, icon: Send },
+    { id: 'payments', label: 'Pay', icon: Send },
     { id: 'activity', label: t.tabs.activity, icon: Clock },
-    { id: 'assistant', label: 'Mitra AI', icon: Bot, isAi: true },
+    { id: 'insights', label: 'Money', icon: TrendingUp },
     { id: 'profile', label: t.tabs.profile, icon: User },
   ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FBFBFB" />
 
       {/* Floating State Banner if not in normal */}
       {currentState !== 'normal' && (
@@ -103,7 +102,7 @@ export const AppNavigator: React.FC = () => {
       {/* Screen Container */}
       <View style={styles.screenContainer}>{renderActiveScreen()}</View>
 
-      {/* Sleek Floating Dock Tab Bar */}
+      {/* Calm Editorial Floating Dock Tab Bar */}
       <View style={styles.dockContainer}>
         <View style={styles.tabBar}>
           {tabs.map((tab) => {
@@ -114,15 +113,14 @@ export const AppNavigator: React.FC = () => {
                 key={tab.id}
                 style={[styles.tabItem, active && styles.activeTabItem]}
                 onPress={() => setActiveTab(tab.id)}
-                activeOpacity={0.75}
+                activeOpacity={0.7}
               >
                 <View style={styles.iconContainer}>
                   <IconComp
-                    size={20}
-                    color={active ? '#0F172A' : '#94A3B8'}
-                    strokeWidth={active ? 2.5 : 1.8}
+                    size={19}
+                    color={active ? '#111318' : '#8E8E93'}
+                    strokeWidth={active ? 2.4 : 1.7}
                   />
-                  {tab.isAi && <View style={styles.aiGlowDot} />}
                 </View>
                 <Text
                   style={[
@@ -160,7 +158,7 @@ export const AppNavigator: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FBFBFB',
   },
   stateNoticeStrip: {
     flexDirection: 'row',
@@ -182,7 +180,7 @@ const styles = StyleSheet.create({
     top: Platform.OS === 'ios' ? 50 : 20,
     left: spacing.lg,
     right: spacing.lg,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#111318',
     borderRadius: 14,
     padding: spacing.md,
     flexDirection: 'row',
@@ -191,7 +189,7 @@ const styles = StyleSheet.create({
     zIndex: 9999,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.2,
     shadowRadius: 16,
     elevation: 8,
   },
@@ -215,54 +213,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderRadius: 32,
-    paddingVertical: 8,
+    paddingVertical: 7,
     paddingHorizontal: 8,
     width: '100%',
     justifyContent: 'space-around',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    elevation: 10,
+    borderColor: '#ECECEC',
+    shadowColor: '#111318',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.07,
+    shadowRadius: 18,
+    elevation: 7,
   },
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     borderRadius: 20,
     flex: 1,
   },
   activeTabItem: {
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F5F5F7',
   },
   iconContainer: {
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  aiGlowDot: {
-    position: 'absolute',
-    top: -2,
-    right: -3,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#6366F1',
+    height: 22,
   },
   tabLabel: {
     fontSize: 10,
-    fontWeight: '600',
-    marginTop: 3,
+    fontWeight: '500',
+    marginTop: 2,
+    letterSpacing: 0.1,
   },
   activeTabLabel: {
-    color: '#0F172A',
-    fontWeight: '800',
+    color: '#111318',
+    fontWeight: '700',
   },
   inactiveTabLabel: {
-    color: '#94A3B8',
+    color: '#8E8E93',
   },
 });
