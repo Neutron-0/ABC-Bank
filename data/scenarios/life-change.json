@@ -1,0 +1,19 @@
+﻿{
+  "name": "life-change",
+  "title": "Major Life Change / Medical Surge",
+  "customer_id": "cust_bharat_001",
+  "balance": {
+    "available": 24800,
+    "savings": 142000,
+    "currency": "INR"
+  },
+  "signals": {
+    "transport_change": "medium",
+    "recurring_expense_change": "high",
+    "new_asset_activity": "low",
+    "medical_event_detected": true,
+    "medical_amount": 48200,
+    "hospital": "Max Super Speciality Hospital",
+    "anomaly_score": 12
+  }
+}

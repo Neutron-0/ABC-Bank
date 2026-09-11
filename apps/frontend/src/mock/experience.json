@@ -1,0 +1,18 @@
+﻿{
+  "primary_actions": ["metro", "upi", "fastag"],
+  "secondary_actions": ["bill_pay", "send_money"],
+  "priority_modules": ["upcoming_emi", "commute_habit"],
+  "deprioritized_modules": [],
+  "hero_card": {
+    "id": "hero_metro",
+    "title": "Your 8:40 AM Metro Commute",
+    "subtitle": "Tap to instantly pay ₹40 with 1-click UPI auto-confirm",
+    "action_label": "Pay ₹40",
+    "action_type": "INSTANT_METRO_PAY",
+    "badge": "ROUTINE HABIT",
+    "accent": "#2563EB",
+    "why": "Observed frequent weekday commute between 8:30 AM and 8:50 AM."
+  },
+  "language": "en",
+  "interaction_mode": "adaptive"
+}

@@ -1,0 +1,68 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExperienceConfig",
+  "type": "object",
+  "properties": {
+    "customer_id": { "type": "string" },
+    "primary_actions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "secondary_actions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "priority_modules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "deprioritized_modules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "hero_card": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "action_label": { "type": "string" },
+        "action_type": { "type": "string" },
+        "badge": { "type": "string" },
+        "accent": { "type": "string" },
+        "why": { "type": "string" }
+      }
+    },
+    "context_cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "layer": { "type": "string", "enum": ["DO", "KNOW", "PLAN", "CONSIDER"] },
+          "priority": { "type": "number" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "reason": { "type": "string" },
+          "primary_action": {
+            "type": "object",
+            "properties": {
+              "label": { "type": "string" },
+              "action_type": { "type": "string" }
+            },
+            "required": ["label", "action_type"]
+          },
+          "dismissible": { "type": "boolean" }
+        },
+        "required": ["id", "type", "layer", "priority", "title", "description", "reason"]
+      }
+    },
+    "language": { "type": "string", "default": "en" },
+    "interaction_mode": { "type": "string", "default": "standard" }
+  },
+  "required": [
+    "primary_actions",
+    "priority_modules"
+  ]
+}

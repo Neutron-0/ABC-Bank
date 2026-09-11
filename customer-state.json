@@ -1,0 +1,37 @@
+{
+  "customer_id": "cust_bharat_001",
+  "customer_name": "Rahul Sharma",
+  "state_type": "financial_stress",
+  "financial_health": "stress",
+  "signals": {
+    "savings_trend": "negative",
+    "emi_pressure": "high",
+    "spending_volatility": "high",
+    "upcoming_obligations": 34200,
+    "active_subscriptions": 7,
+    "anomaly_score": 8,
+    "debt_to_income_ratio": 0.58,
+    "stress_alert": true,
+    "suppress_promotions": true
+  },
+  "life_stage": [
+    "early_career",
+    "metro_commuter",
+    "home_owner"
+  ],
+  "balance": {
+    "available": 7850,
+    "savings": 32000,
+    "currency": "INR"
+  },
+  "recommendations": [
+    {
+      "id": "rec_cashflow_guidance",
+      "category": "guidance",
+      "title": "Cash Flow Looks Tighter Than Usual",
+      "reason": "Upcoming commitments are higher than available buffer. 1-tap subscription trimming offered.",
+      "priority": 92,
+      "suppressed": false
+    }
+  ]
+}

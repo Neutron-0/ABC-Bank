@@ -1,0 +1,54 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CustomerState",
+  "type": "object",
+  "properties": {
+    "customer_id": { "type": "string" },
+    "customer_name": { "type": "string" },
+    "state_type": {
+      "type": "string",
+      "enum": ["normal", "life_change", "financial_stress", "medical_event", "fraud_alert", "surplus"]
+    },
+    "financial_health": {
+      "type": "string",
+      "enum": ["thriving", "stable", "tight", "stress"]
+    },
+    "signals": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "life_stage": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "balance": {
+      "type": "object",
+      "properties": {
+        "available": { "type": "number" },
+        "savings": { "type": "number" },
+        "currency": { "type": "string", "default": "INR" }
+      },
+      "required": ["available"]
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "category": { "type": "string" },
+          "title": { "type": "string" },
+          "reason": { "type": "string" },
+          "priority": { "type": "number" },
+          "suppressed": { "type": "boolean", "default": false }
+        },
+        "required": ["id", "title", "priority"]
+      }
+    }
+  },
+  "required": [
+    "customer_id",
+    "financial_health",
+    "signals"
+  ]
+}

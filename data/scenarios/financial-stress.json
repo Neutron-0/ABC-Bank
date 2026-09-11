@@ -1,0 +1,19 @@
+﻿{
+  "name": "financial-stress",
+  "title": "Cash Flow Under Stress",
+  "customer_id": "cust_bharat_001",
+  "balance": {
+    "available": 7850,
+    "savings": 32000,
+    "currency": "INR"
+  },
+  "signals": {
+    "savings_trend": "negative",
+    "emi_pressure": "high",
+    "spending_volatility": "high",
+    "upcoming_obligations": 34200,
+    "active_subscriptions": 7,
+    "anomaly_score": 8,
+    "debt_to_income_ratio": 0.58
+  }
+}

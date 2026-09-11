@@ -1,0 +1,32 @@
+﻿[
+  {
+    "id": "cust_bharat_001",
+    "name": "Rahul Sharma",
+    "phone": "+91 98765 43210",
+    "email": "rahul.sharma@bharatmail.in",
+    "monthly_income": 75000,
+    "kyc_tier": 2,
+    "credit_score": 765,
+    "language": "en",
+    "accounts": {
+      "savings": "SB-10928374",
+      "available_balance": 42680,
+      "savings_reserve": 185000
+    }
+  },
+  {
+    "id": "cust_bharat_002",
+    "name": "Pooja Patel",
+    "phone": "+91 98234 56789",
+    "email": "pooja.patel@bharatmail.in",
+    "monthly_income": 95000,
+    "kyc_tier": 2,
+    "credit_score": 790,
+    "language": "gu",
+    "accounts": {
+      "savings": "SB-83746281",
+      "available_balance": 84200,
+      "savings_reserve": 210000
+    }
+  }
+]

@@ -1,0 +1,814 @@
+import { create } from 'zustand';
+import {
+  CustomerStateType,
+  LanguageCode,
+  ContextCard,
+  CustomerProfile,
+  AccountBalance,
+  Transaction,
+  LifeStageSignals,
+  FinancialHealth,
+  RiskSignals,
+  ConsentSettings,
+  MainTabType,
+} from '../types';
+import { BankingApi } from '../services/api';
+
+const baseProfile: CustomerProfile = {
+  id: 'cust_bharat_001',
+  name: 'Rahul Sharma',
+  avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=160&q=80',
+  phone: '+91 98765 43210',
+  email: 'rahul.sharma@abcbank.in',
+  kycStatus: 'verified',
+  creditScore: 765,
+  monthlyIncome: 75000,
+  riskProfile: 'moderate',
+  preferredLanguage: 'en',
+  joinedDate: '2023-04-15',
+};
+
+const defaultConsent: ConsentSettings = {
+  useTransactionData: true,
+  personalizedProducts: true,
+  financialInsights: true,
+  assistantContextAccess: true,
+  shareWithAffiliates: false,
+};
+
+// Complete offline fallback state database for 100% reliability on Expo Go
+export const OFFLINE_STATE_BUNDLES: Record<CustomerStateType, {
+  balance: AccountBalance;
+  signals: LifeStageSignals;
+  financialHealth: FinancialHealth;
+  risk: RiskSignals;
+  cards: ContextCard[];
+  transactions: Transaction[];
+}> = {
+  normal: {
+    balance: {
+      available: 42680,
+      savings: 185000,
+      fixedDeposits: 250000,
+      currency: 'INR',
+      lastSalaryDate: '2026-09-01',
+      lastSalaryAmount: 75000,
+      avgMonthlyBurn: 48000,
+      emergencyFundGoal: 200000,
+      emergencyFundCurrent: 185000,
+    },
+    signals: {
+      salaryRecentlyCredited: false,
+      surplusAmount: 6200,
+      medicalEventDetected: false,
+      emiStressLevel: 'low',
+      spendingSurgeRate: 4,
+      travelCommuteFrequency: 22,
+      subscriptionCount: 3,
+    },
+    financialHealth: {
+      status: 'stable',
+      cashFlowStabilityScore: 88,
+      savingsRatePercent: 24,
+      debtToIncomeRatio: 0.22,
+      monthlyCommitments: 16500,
+      emergencyFundMonths: 3.8,
+      statements: {
+        positive: [
+          'Salary credit is steady on the 1st of every month',
+          'Savings rate of 24% is above target',
+          'Emergency fund covers ~4 months of expenses',
+        ],
+        caution: ['Upcoming Home EMI of ₹16,500 due in 4 days'],
+        whatChanged: ['Commute spending via Metro is consistent at ₹40 twice daily'],
+      },
+    },
+    risk: {
+      anomalyDetected: false,
+      anomalyScore: 4,
+      suggestedAction: 'none',
+    },
+    transactions: [
+      {
+        id: 'tx_norm_001',
+        amount: 40,
+        type: 'debit',
+        category: 'transport',
+        merchant: 'Delhi Metro Smart Card',
+        recipient: 'DMRC Auto Top-up',
+        description: 'Morning weekday commute from Noida Sec 62 to Cyber City',
+        timestamp: '2026-09-12T08:38:00+05:30',
+        status: 'completed',
+        isRecurring: true,
+        recurringFrequency: 'daily',
+        confidenceScore: 0.98,
+        aiExplanation: 'Routine morning commute payment detected (typically occurs around 8:40 AM on weekdays).',
+        icon: 'train',
+      },
+      {
+        id: 'tx_norm_002',
+        amount: 280,
+        type: 'debit',
+        category: 'food',
+        merchant: 'Third Wave Coffee',
+        description: 'Filter Cold Brew & Croissant',
+        timestamp: '2026-09-11T16:15:00+05:30',
+        status: 'completed',
+        isRecurring: false,
+        confidenceScore: 0.82,
+        aiExplanation: 'Occasional afternoon cafe spend within your weekly discretionary budget.',
+        icon: 'coffee',
+      },
+      {
+        id: 'tx_norm_003',
+        amount: 1450,
+        type: 'debit',
+        category: 'bills',
+        merchant: 'Tata Power Electricity',
+        description: 'Monthly residential power utility',
+        timestamp: '2026-09-08T11:20:00+05:30',
+        status: 'completed',
+        isRecurring: true,
+        recurringFrequency: 'monthly',
+        confidenceScore: 0.95,
+        aiExplanation: 'Regular monthly utility bill. Consistent amount for the last 4 months.',
+        icon: 'zap',
+      },
+    ],
+    cards: [
+      {
+        id: 'card_morning_metro',
+        type: 'action',
+        layer: 'DO',
+        priority: 94,
+        confidence: 0.97,
+        title: '🚇 Your morning Metro',
+        description: 'You usually make this payment around 8:40 AM for your weekday commute.',
+        reason: 'Based on your frequent weekday travel pattern (22 times this month).',
+        whyDetails: [
+          'Regular morning time window (8:30 AM - 8:50 AM)',
+          'Frequent destination: Delhi Metro Smart Card',
+          '1-tap fast checkout with UPI auto-confirm',
+        ],
+        primaryAction: {
+          label: 'Pay ₹40 Again',
+          actionType: 'INSTANT_PAY',
+          payload: { merchant: 'Delhi Metro Smart Card', amount: 40, category: 'transport' },
+        },
+        secondaryAction: {
+          label: 'Auto-Topup Settings',
+          actionType: 'OPEN_SCREEN',
+          targetScreen: 'Payments',
+        },
+        dismissible: true,
+        category: 'transport',
+        badgeText: 'Usual Routine',
+        accentColor: '#2563EB',
+        iconName: 'train',
+      },
+      {
+        id: 'card_spending_insight',
+        type: 'insight',
+        layer: 'KNOW',
+        priority: 76,
+        confidence: 0.89,
+        title: 'Monthly spending on track',
+        description: 'You spent ₹24,320 so far this month (12% lower than last month at this point).',
+        reason: 'Comparison against your last 90-day moving expense baseline.',
+        whyDetails: [
+          'Food delivery expenses dropped by 8%',
+          'Utility bills remained stable at ₹1,450',
+          'Current balance is ₹42,680',
+        ],
+        primaryAction: {
+          label: 'Explore Spending Breakdown',
+          actionType: 'OPEN_SCREEN',
+          targetScreen: 'Insights',
+        },
+        dismissible: true,
+        category: 'insights',
+        accentColor: '#6366F1',
+        iconName: 'pie-chart',
+      },
+      {
+        id: 'card_upcoming_emi',
+        type: 'event',
+        layer: 'KNOW',
+        priority: 72,
+        confidence: 0.95,
+        title: 'Home Loan EMI in 4 days',
+        description: '₹16,500 will be auto-debited on Sep 16th. Your account has sufficient balance.',
+        reason: 'Automated recurring mandate schedule check.',
+        whyDetails: [
+          'Lender: HDFC Bank Home Loan',
+          'Available balance (₹42,680) comfortably covers this debit',
+        ],
+        primaryAction: {
+          label: 'View Schedule',
+          actionType: 'OPEN_SCREEN',
+          targetScreen: 'Activity',
+        },
+        dismissible: true,
+        category: 'emi',
+        accentColor: '#8B5CF6',
+        iconName: 'calendar',
+      },
+      {
+        id: 'card_tax_saving_fd',
+        type: 'product',
+        layer: 'CONSIDER',
+        priority: 50,
+        confidence: 0.75,
+        title: 'Smart Fixed Deposit @ 7.85% p.a.',
+        description: 'Lock in high returns with instant liquidity backing your account.',
+        reason: 'Why you’re seeing this: Based on your consistent monthly savings track record.',
+        whyDetails: ['Consistent savings additions over 6 months', 'Low risk preference match'],
+        primaryAction: {
+          label: 'Calculate Returns',
+          actionType: 'OPEN_SCREEN',
+          targetScreen: 'Profile',
+        },
+        dismissible: true,
+        category: 'savings',
+        accentColor: '#6366F1',
+        iconName: 'credit-card',
+      },
+    ],
+  },
+  surplus: {
+    balance: {
+      available: 84200,
+      savings: 210000,
+      fixedDeposits: 300000,
+      currency: 'INR',
+      lastSalaryDate: '2026-09-10',
+      lastSalaryAmount: 100000,
+      avgMonthlyBurn: 44000,
+      emergencyFundGoal: 200000,
+      emergencyFundCurrent: 210000,
+    },
+    signals: {
+      salaryRecentlyCredited: true,
+      salaryCreditDate: '2026-09-10',
+      surplusAmount: 38400,
+      medicalEventDetected: false,
+      emiStressLevel: 'low',
+      spendingSurgeRate: -12,
+      travelCommuteFrequency: 20,
+      subscriptionCount: 3,
+    },
+    financialHealth: {
+      status: 'thriving',
+      cashFlowStabilityScore: 96,
+      savingsRatePercent: 42,
+      debtToIncomeRatio: 0.20,
+      monthlyCommitments: 16500,
+      emergencyFundMonths: 4.7,
+      statements: {
+        positive: [
+          'Salary and quarterly bonus credited recently',
+          'Available balance is ₹38,400 above normal monthly buffer',
+          'Emergency fund target is 105% completed',
+        ],
+        caution: [],
+        whatChanged: ['Quarterly performance bonus added ₹25,000 on Sep 10th'],
+      },
+    },
+    risk: {
+      anomalyDetected: false,
+      anomalyScore: 2,
+      suggestedAction: 'none',
+    },
+    transactions: [
+      {
+        id: 'tx_surp_001',
+        amount: 100000,
+        type: 'credit',
+        category: 'salary',
+        merchant: 'Infosys Limited',
+        description: 'Salary + Q2 Performance Incentive',
+        timestamp: '2026-09-10T09:15:00+05:30',
+        status: 'completed',
+        isRecurring: true,
+        confidenceScore: 0.99,
+        aiExplanation: 'Major surplus credit detected: Regular salary (₹75k) + bonus (₹25k).',
+        icon: 'sparkles',
+      },
+    ],
+    cards: [
+      {
+        id: 'card_surplus_detected',
+        type: 'opportunity',
+        layer: 'DO',
+        priority: 92,
+        confidence: 0.95,
+        title: 'Surplus detected: ₹38,400',
+        description: 'Your balance is ₹84,200 with essential monthly bills covered. Put surplus funds to work!',
+        reason: 'Salary and incentive credited; balance is well above 30-day baseline burn rate.',
+        whyDetails: [
+          'Salary + bonus credited on Sep 10th',
+          'Monthly expenses budgeted',
+          'Grow funds with high-yield smart deposit',
+        ],
+        primaryAction: {
+          label: 'Move to Smart Savings',
+          actionType: 'OPEN_JOURNEY',
+          journeyId: 'savings_invest',
+          payload: { recommendedAmount: 25000 },
+        },
+        secondaryAction: {
+          label: 'Explore Auto-Sweep',
+          actionType: 'OPEN_SCREEN',
+          targetScreen: 'Insights',
+        },
+        dismissible: true,
+        category: 'savings',
+        badgeText: 'Growth Moment',
+        accentColor: '#059669',
+        iconName: 'trending-up',
+      },
+      {
+        id: 'card_emergency_milestone',
+        type: 'insight',
+        layer: 'PLAN',
+        priority: 78,
+        confidence: 0.92,
+        title: 'Emergency Fund Milestone: 105% of Goal',
+        description: 'You have ₹2,10,000 in reserve (~4.7 months of living expenses). Strong financial buffer!',
+        reason: 'Surplus deposits pushed emergency reserve above target.',
+        whyDetails: ['Target: ₹2,00,000 | Current: ₹2,10,000', 'Zero debt stress'],
+        primaryAction: {
+          label: 'View Health Report',
+          actionType: 'OPEN_SCREEN',
+          targetScreen: 'Insights',
+        },
+        dismissible: true,
+        category: 'milestone',
+        accentColor: '#10B981',
+        iconName: 'award',
+      },
+    ],
+  },
+  financial_stress: {
+    balance: {
+      available: 7850,
+      savings: 32000,
+      fixedDeposits: 50000,
+      currency: 'INR',
+      lastSalaryDate: '2026-09-01',
+      lastSalaryAmount: 75000,
+      avgMonthlyBurn: 71000,
+      emergencyFundGoal: 200000,
+      emergencyFundCurrent: 32000,
+    },
+    signals: {
+      salaryRecentlyCredited: false,
+      surplusAmount: -18500,
+      medicalEventDetected: false,
+      emiStressLevel: 'critical',
+      spendingSurgeRate: 48,
+      travelCommuteFrequency: 22,
+      subscriptionCount: 7,
+    },
+    financialHealth: {
+      status: 'stress',
+      cashFlowStabilityScore: 42,
+      savingsRatePercent: 4,
+      debtToIncomeRatio: 0.58,
+      monthlyCommitments: 43500,
+      emergencyFundMonths: 0.5,
+      statements: {
+        positive: ['Income inflow is verified'],
+        caution: [
+          'Monthly cash flow looks tighter than usual',
+          'Upcoming EMI commitments of ₹34,200 exceed liquid balance',
+          'Emergency buffer reduced to ~15 days',
+        ],
+        whatChanged: ['Emergency appliance repair (₹22,000) accelerated cash outflow'],
+      },
+    },
+    risk: {
+      anomalyDetected: false,
+      anomalyScore: 8,
+      suggestedAction: 'none',
+    },
+    transactions: [
+      {
+        id: 'tx_stress_001',
+        amount: 22000,
+        type: 'debit',
+        category: 'shopping',
+        merchant: 'Urban Company & Appliance Care',
+        description: 'Emergency HVAC Compressor Replacement',
+        timestamp: '2026-09-09T14:30:00+05:30',
+        status: 'completed',
+        isRecurring: false,
+        confidenceScore: 0.91,
+        aiExplanation: 'Unusual large one-time essential maintenance expense.',
+        icon: 'tool',
+      },
+    ],
+    cards: [
+      {
+        id: 'card_stress_guidance',
+        type: 'assistance',
+        layer: 'DO',
+        priority: 95,
+        confidence: 0.95,
+        title: 'Your monthly cash flow looks tighter than usual',
+        description: 'Upcoming obligations are higher this cycle. Let’s review commitments together and pause unused subscriptions safely.',
+        reason: 'Surge in repair debits narrowed liquid margin. LOANS AND PROMOTIONS ARE SUPPRESSED.',
+        whyDetails: [
+          'Upcoming commitments total ₹34,200',
+          'Liquid balance: ₹7,850',
+          'Strict ethical guardrail: Zero personal loan prompts',
+        ],
+        primaryAction: {
+          label: 'Review Commitments',
+          actionType: 'OPEN_JOURNEY',
+          journeyId: 'stress_intervention',
+        },
+        secondaryAction: {
+          label: 'Ask Mitra for Advice',
+          actionType: 'OPEN_ASSISTANT',
+        },
+        dismissible: false,
+        category: 'guidance',
+        badgeText: 'Care & Guidance',
+        accentColor: '#D97706',
+        iconName: 'life-buoy',
+      },
+      {
+        id: 'card_stress_subscriptions',
+        type: 'action',
+        layer: 'PLAN',
+        priority: 82,
+        confidence: 0.88,
+        title: 'Find potential savings in subscriptions',
+        description: 'We spotted 7 recurring subscriptions costing ₹4,800/month. Pausing unused ones frees up cash immediately.',
+        reason: 'Identified non-essential recurring outflows that can be paused with 1 tap.',
+        whyDetails: ['Streaming & fitness auto-debits detected', 'Potential savings: ~₹2,500/mo'],
+        primaryAction: {
+          label: 'Manage Subscriptions',
+          actionType: 'OPEN_JOURNEY',
+          journeyId: 'stress_intervention',
+        },
+        dismissible: true,
+        category: 'subscriptions',
+        accentColor: '#4F46E5',
+        iconName: 'layers',
+      },
+    ],
+  },
+  medical_event: {
+    balance: {
+      available: 24800,
+      savings: 142000,
+      fixedDeposits: 200000,
+      currency: 'INR',
+      lastSalaryDate: '2026-09-01',
+      lastSalaryAmount: 75000,
+      avgMonthlyBurn: 62000,
+      emergencyFundGoal: 200000,
+      emergencyFundCurrent: 142000,
+    },
+    signals: {
+      salaryRecentlyCredited: false,
+      surplusAmount: -22000,
+      medicalEventDetected: true,
+      medicalAmount: 48200,
+      hospitalName: 'Max Super Speciality Hospital',
+      emiStressLevel: 'moderate',
+      spendingSurgeRate: 65,
+      travelCommuteFrequency: 22,
+      subscriptionCount: 3,
+    },
+    financialHealth: {
+      status: 'tighter_than_usual',
+      cashFlowStabilityScore: 72,
+      savingsRatePercent: 12,
+      debtToIncomeRatio: 0.22,
+      monthlyCommitments: 16500,
+      emergencyFundMonths: 2.3,
+      statements: {
+        positive: ['Core emergency fund absorbed medical payment without debt defaults'],
+        caution: ['Hospital expenditure of ₹48,200 represents significant baseline deviation'],
+        whatChanged: ['₹48,200 paid to Max Super Speciality Hospital'],
+      },
+    },
+    risk: {
+      anomalyDetected: false,
+      anomalyScore: 12,
+      suggestedAction: 'none',
+    },
+    transactions: [
+      {
+        id: 'tx_med_001',
+        amount: 48200,
+        type: 'debit',
+        category: 'healthcare',
+        merchant: 'Max Super Speciality Hospital',
+        description: 'Emergency Inpatient Billing & Diagnostics',
+        timestamp: '2026-09-11T19:42:00+05:30',
+        status: 'completed',
+        isRecurring: false,
+        confidenceScore: 0.99,
+        aiExplanation: 'Significant healthcare expenditure detected. Assistance prioritized.',
+        icon: 'heart-pulse',
+      },
+    ],
+    cards: [
+      {
+        id: 'card_medical_assistance',
+        type: 'assistance',
+        layer: 'DO',
+        priority: 96,
+        confidence: 0.96,
+        title: 'Large medical expense detected',
+        description: 'You recently made a ₹48,200 payment at Max Super Speciality. Need help filing cashless insurance reimbursement?',
+        reason: 'Identified major healthcare transaction. Empathy desk prioritized before financial options.',
+        whyDetails: [
+          '₹48,200 hospital inpatient bill',
+          'Fast-track digital claim filing active',
+          'Emergency buffer remains stable',
+        ],
+        primaryAction: {
+          label: 'Get Claim Help',
+          actionType: 'OPEN_JOURNEY',
+          journeyId: 'medical_assistance',
+          payload: { hospital: 'Max Super Speciality Hospital', amount: 48200 },
+        },
+        secondaryAction: {
+          label: 'Talk to Mitra',
+          actionType: 'OPEN_ASSISTANT',
+        },
+        dismissible: true,
+        category: 'healthcare',
+        badgeText: 'Assistance Ready',
+        accentColor: '#0284C7',
+        iconName: 'heart-handshake',
+      },
+    ],
+  },
+  fraud_alert: {
+    balance: {
+      available: 16880,
+      savings: 185000,
+      fixedDeposits: 250000,
+      currency: 'INR',
+      lastSalaryDate: '2026-09-01',
+      lastSalaryAmount: 75000,
+      avgMonthlyBurn: 48000,
+      emergencyFundGoal: 200000,
+      emergencyFundCurrent: 185000,
+    },
+    signals: {
+      salaryRecentlyCredited: false,
+      surplusAmount: 0,
+      medicalEventDetected: false,
+      emiStressLevel: 'low',
+      spendingSurgeRate: 35,
+      travelCommuteFrequency: 22,
+      subscriptionCount: 3,
+    },
+    financialHealth: {
+      status: 'stable',
+      cashFlowStabilityScore: 84,
+      savingsRatePercent: 20,
+      debtToIncomeRatio: 0.22,
+      monthlyCommitments: 16500,
+      emergencyFundMonths: 3.8,
+      statements: {
+        positive: ['Baseline account metrics healthy'],
+        caution: ['High anomaly transaction flagged at 02:14 AM'],
+        whatChanged: ['₹31,800 charged by unknown overseas gaming merchant'],
+      },
+    },
+    risk: {
+      anomalyDetected: true,
+      flaggedTransactionId: 'tx_fraud_001',
+      anomalyScore: 94,
+      anomalyReason: 'Transaction occurred at 02:14 AM with unfamiliar merchant.',
+      suggestedAction: 'verify_transaction',
+    },
+    transactions: [
+      {
+        id: 'tx_fraud_001',
+        amount: 31800,
+        type: 'debit',
+        category: 'shopping',
+        merchant: 'GlobalTech Gaming Digital Ltd',
+        description: 'International E-Commerce Purchase via Virtual POS',
+        timestamp: '2026-09-12T02:14:18+05:30',
+        status: 'flagged',
+        isRecurring: false,
+        confidenceScore: 0.94,
+        aiExplanation: 'CRITICAL ANOMALY: Odd hours (02:14 AM) and unfamiliar merchant.',
+        icon: 'shield-alert',
+      },
+    ],
+    cards: [
+      {
+        id: 'card_fraud_alert',
+        type: 'warning',
+        layer: 'DO',
+        priority: 100,
+        confidence: 0.95,
+        title: 'We noticed something unusual',
+        description: '₹31,800 was spent at GlobalTech Gaming. This is significantly higher and unusual compared to your normal activity.',
+        reason: 'Flagged by behavioral anomaly engine due to unfamiliar merchant and timing.',
+        whyDetails: ['First-time transaction', 'Unusual hour (02:14 AM)', 'IP location mismatch'],
+        primaryAction: {
+          label: 'Review & Verify',
+          actionType: 'OPEN_JOURNEY',
+          journeyId: 'fraud_alert',
+          payload: { transactionId: 'tx_fraud_001', amount: 31800 },
+        },
+        secondaryAction: {
+          label: 'Freeze Card',
+          actionType: 'OPEN_JOURNEY',
+          journeyId: 'freeze_card',
+        },
+        dismissible: false,
+        category: 'security',
+        badgeText: 'Urgent Safety Alert',
+        accentColor: '#DC2626',
+        iconName: 'shield-alert',
+      },
+    ],
+  },
+};
+
+interface CustomerStateStore {
+  currentState: CustomerStateType;
+  language: LanguageCode;
+  profile: CustomerProfile;
+  balance: AccountBalance;
+  transactions: Transaction[];
+  signals: LifeStageSignals;
+  financialHealth: FinancialHealth;
+  risk: RiskSignals;
+  cards: ContextCard[];
+  consent: ConsentSettings;
+  activeTab: MainTabType;
+  activeJourney: string | null;
+  journeyPayload: Record<string, any> | null;
+  selectedWhyCard: ContextCard | null;
+  selectedTransaction: Transaction | null;
+  isBalanceHidden: boolean;
+  toastMessage: string | null;
+  isLoading: boolean;
+
+  setLanguage: (lang: LanguageCode) => void;
+  setActiveTab: (tab: MainTabType) => void;
+  switchCustomerState: (state: CustomerStateType) => Promise<void>;
+  fetchStateAndContext: () => Promise<void>;
+  dismissCard: (cardId: string) => Promise<void>;
+  performPayment: (data: { amount: number; merchant: string; category?: any; description?: string }) => Promise<boolean>;
+  openJourney: (journeyId: string, payload?: Record<string, any>) => void;
+  closeJourney: () => void;
+  setWhyCard: (card: ContextCard | null) => void;
+  setSelectedTransaction: (tx: Transaction | null) => void;
+  toggleBalanceHide: () => void;
+  updateConsent: (consent: Partial<ConsentSettings>) => void;
+  showToast: (msg: string) => void;
+}
+
+export const useCustomerStore = create<CustomerStateStore>((set, get) => {
+  const initialBundle = OFFLINE_STATE_BUNDLES.normal;
+
+  return {
+    currentState: 'normal',
+    language: 'en',
+    profile: { ...baseProfile },
+    balance: { ...initialBundle.balance },
+    signals: { ...initialBundle.signals },
+    financialHealth: { ...initialBundle.financialHealth },
+    risk: { ...initialBundle.risk },
+    transactions: [...initialBundle.transactions],
+    cards: [...initialBundle.cards],
+    consent: { ...defaultConsent },
+    activeTab: 'home',
+    activeJourney: null,
+    journeyPayload: null,
+    selectedWhyCard: null,
+    selectedTransaction: null,
+    isBalanceHidden: false,
+    toastMessage: null,
+    isLoading: false,
+
+    setLanguage: (lang: LanguageCode) => {
+      set({ language: lang });
+    },
+
+    setActiveTab: (tab: MainTabType) => {
+      set({ activeTab: tab });
+    },
+
+    switchCustomerState: async (state: CustomerStateType) => {
+      set({ isLoading: true });
+
+      // Apply offline bundle instantly so Expo Go transitions are immediate
+      const bundle = OFFLINE_STATE_BUNDLES[state] || OFFLINE_STATE_BUNDLES.normal;
+      set({
+        currentState: state,
+        balance: { ...bundle.balance },
+        signals: { ...bundle.signals },
+        financialHealth: { ...bundle.financialHealth },
+        risk: { ...bundle.risk },
+        cards: [...bundle.cards],
+        transactions: [...bundle.transactions],
+      });
+
+      // Also notify backend if reachable
+      try {
+        await BankingApi.switchScenario(state);
+      } catch (err) {
+        // Fallback already active
+      } finally {
+        set({ isLoading: false });
+      }
+    },
+
+    fetchStateAndContext: async () => {
+      try {
+        const exp = await BankingApi.getExperience(get().profile.id, get().language);
+        if (exp && exp.context_cards && exp.context_cards.length > 0) {
+          // Sync cards from backend experience contract if available
+          set({ cards: exp.context_cards });
+        }
+      } catch (err) {
+        // Guaranteed fallback cards already loaded
+      }
+    },
+
+    dismissCard: async (cardId: string) => {
+      set((state) => ({
+        cards: state.cards.filter((c) => c.id !== cardId),
+      }));
+    },
+
+    performPayment: async (data) => {
+      set({ isLoading: true });
+      const newTx: Transaction = {
+        id: `tx_live_${Date.now()}`,
+        amount: data.amount,
+        type: 'debit',
+        category: data.category || 'transport',
+        merchant: data.merchant,
+        description: data.description || `Payment to ${data.merchant}`,
+        timestamp: new Date().toISOString(),
+        status: 'completed',
+        isRecurring: false,
+        confidenceScore: 0.98,
+        aiExplanation: `Interactive UPI payment processed at ${new Date().toLocaleTimeString()}.`,
+        icon: 'arrow-up-right',
+      };
+
+      set((state) => {
+        const updatedBal = Math.max(0, state.balance.available - data.amount);
+        return {
+          balance: { ...state.balance, available: updatedBal },
+          transactions: [newTx, ...state.transactions],
+          toastMessage: `Paid ₹${data.amount} to ${data.merchant}!`,
+        };
+      });
+
+      set({ isLoading: false });
+      return true;
+    },
+
+    openJourney: (journeyId: string, payload?: Record<string, any>) => {
+      set({ activeJourney: journeyId, journeyPayload: payload || null });
+    },
+
+    closeJourney: () => {
+      set({ activeJourney: null, journeyPayload: null });
+    },
+
+    setWhyCard: (card: ContextCard | null) => {
+      set({ selectedWhyCard: card });
+    },
+
+    setSelectedTransaction: (tx: Transaction | null) => {
+      set({ selectedTransaction: tx });
+    },
+
+    toggleBalanceHide: () => {
+      set((state) => ({ isBalanceHidden: !state.isBalanceHidden }));
+    },
+
+    updateConsent: (consentUpdate: Partial<ConsentSettings>) => {
+      set((state) => ({
+        consent: { ...state.consent, ...consentUpdate },
+      }));
+    },
+
+    showToast: (msg: string) => {
+      set({ toastMessage: msg });
+      setTimeout(() => {
+        set({ toastMessage: null });
+      }, 3500);
+    },
+  };
+});

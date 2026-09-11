@@ -1,0 +1,18 @@
+﻿{
+  "name": "normal",
+  "title": "Normal Workday",
+  "customer_id": "cust_bharat_001",
+  "balance": {
+    "available": 42680,
+    "savings": 185000,
+    "currency": "INR"
+  },
+  "signals": {
+    "metro_usage": "high",
+    "upi_usage": "high",
+    "savings_trend": "positive",
+    "investment_interest": "medium",
+    "commute_time": "08:40",
+    "anomaly_score": 4
+  }
+}

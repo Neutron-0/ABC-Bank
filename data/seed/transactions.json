@@ -1,0 +1,46 @@
+﻿[
+  {
+    "id": "tx_seed_001",
+    "customer_id": "cust_bharat_001",
+    "amount": 40,
+    "type": "debit",
+    "category": "transport",
+    "merchant": "Delhi Metro Smart Card",
+    "timestamp": "2026-09-12T08:38:00+05:30",
+    "is_recurring": true,
+    "frequency": "daily"
+  },
+  {
+    "id": "tx_seed_002",
+    "customer_id": "cust_bharat_001",
+    "amount": 1450,
+    "type": "debit",
+    "category": "bills",
+    "merchant": "Tata Power Electricity",
+    "timestamp": "2026-09-08T11:20:00+05:30",
+    "is_recurring": true,
+    "frequency": "monthly"
+  },
+  {
+    "id": "tx_seed_003",
+    "customer_id": "cust_bharat_001",
+    "amount": 75000,
+    "type": "credit",
+    "category": "salary",
+    "merchant": "Infosys Limited",
+    "timestamp": "2026-09-01T09:00:00+05:30",
+    "is_recurring": true,
+    "frequency": "monthly"
+  },
+  {
+    "id": "tx_seed_004",
+    "customer_id": "cust_bharat_001",
+    "amount": 16500,
+    "type": "debit",
+    "category": "emi",
+    "merchant": "HDFC Bank Home Loan",
+    "timestamp": "2026-08-16T10:00:00+05:30",
+    "is_recurring": true,
+    "frequency": "monthly"
+  }
+]
