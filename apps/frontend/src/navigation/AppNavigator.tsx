@@ -93,7 +93,7 @@ export const AppNavigator: React.FC = () => {
 
       {/* Toast Banner */}
       {toastMessage && (
-        <View style={styles.toastBanner}>
+        <View style={styles.toastBanner} pointerEvents="none">
           <CheckCircle2 size={16} color="#10B981" />
           <Text style={styles.toastText}>{toastMessage}</Text>
         </View>
@@ -103,7 +103,7 @@ export const AppNavigator: React.FC = () => {
       <View style={styles.screenContainer}>{renderActiveScreen()}</View>
 
       {/* Calm Editorial Floating Dock Tab Bar */}
-      <View style={styles.dockContainer}>
+      <View style={styles.dockContainer} pointerEvents="box-none">
         <View style={styles.tabBar}>
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
@@ -113,6 +113,7 @@ export const AppNavigator: React.FC = () => {
                 key={tab.id}
                 style={[styles.tabItem, active && styles.activeTabItem]}
                 onPress={() => setActiveTab(tab.id)}
+                delayPressIn={0}
                 activeOpacity={0.7}
               >
                 <View style={styles.iconContainer}>

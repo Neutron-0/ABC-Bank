@@ -154,28 +154,33 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   if (card.type === 'event') {
     return (
       <Animated.View style={[styles.eventRowWrap, { transform: [{ scale: scaleAnim }] }]}>
-        <TouchableOpacity
-          style={styles.eventRow}
-          onPress={handlePrimaryAction}
-          onPressIn={onPressIn}
-          onPressOut={onPressOut}
-          activeOpacity={0.8}
-        >
-          <View style={styles.eventIconCircle}>
-            <CheckCircle2 size={16} color="#059669" />
-          </View>
-          <View style={styles.eventTextWrap}>
-            <Text style={styles.eventTitle}>{card.title}</Text>
-            <Text style={styles.eventSubtitle}>{card.description}</Text>
-          </View>
+        <View style={styles.eventRow}>
+          <TouchableOpacity
+            style={styles.eventMainArea}
+            onPress={handlePrimaryAction}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
+            delayPressIn={0}
+            activeOpacity={0.7}
+          >
+            <View style={styles.eventIconCircle}>
+              <CheckCircle2 size={16} color="#059669" />
+            </View>
+            <View style={styles.eventTextWrap}>
+              <Text style={styles.eventTitle}>{card.title}</Text>
+              <Text style={styles.eventSubtitle}>{card.description}</Text>
+            </View>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setWhyCard(card)}
             style={styles.whyChip}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            delayPressIn={0}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            activeOpacity={0.7}
           >
             <Text style={styles.whyChipText}>Why?</Text>
           </TouchableOpacity>
-        </TouchableOpacity>
+        </View>
       </Animated.View>
     );
   }
@@ -192,7 +197,9 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             <TouchableOpacity
               onPress={() => setWhyCard(card)}
               style={styles.whyChip}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              delayPressIn={0}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              activeOpacity={0.7}
             >
               <Text style={styles.whyChipText}>Why?</Text>
             </TouchableOpacity>
@@ -204,6 +211,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
           <TouchableOpacity
             style={styles.insightLink}
             onPress={handlePrimaryAction}
+            delayPressIn={0}
             activeOpacity={0.7}
           >
             <Text style={styles.insightLinkText}>{card.primaryAction.label}</Text>
@@ -232,7 +240,9 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             <TouchableOpacity
               onPress={() => setWhyCard(card)}
               style={styles.whyChip}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              delayPressIn={0}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              activeOpacity={0.7}
             >
               <Text style={styles.whyChipText}>Why?</Text>
             </TouchableOpacity>
@@ -244,6 +254,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             <TouchableOpacity
               style={styles.assistancePrimaryBtn}
               onPress={handlePrimaryAction}
+              delayPressIn={0}
               activeOpacity={0.8}
             >
               <Text style={styles.assistancePrimaryBtnText}>{card.primaryAction.label}</Text>
@@ -253,6 +264,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             <TouchableOpacity
               style={styles.assistanceSecondaryBtn}
               onPress={() => setActiveTab('assistant')}
+              delayPressIn={0}
               activeOpacity={0.8}
             >
               <Text style={styles.assistanceSecondaryBtnText}>Talk to Mitra</Text>
@@ -286,6 +298,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             <TouchableOpacity
               style={styles.securityPrimaryBtn}
               onPress={handlePrimaryAction}
+              delayPressIn={0}
               activeOpacity={0.8}
             >
               <Text style={styles.securityPrimaryBtnText}>{card.primaryAction.label}</Text>
@@ -295,6 +308,9 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             <TouchableOpacity
               onPress={() => setWhyCard(card)}
               style={styles.whyChip}
+              delayPressIn={0}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              activeOpacity={0.7}
             >
               <Text style={styles.whyChipText}>Why?</Text>
             </TouchableOpacity>
@@ -310,13 +326,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   if (card.type === 'action') {
     return (
       <Animated.View style={[styles.actionSurfaceWrap, { transform: [{ scale: scaleAnim }] }]}>
-        <TouchableOpacity
-          style={styles.actionSurface}
-          onPress={handlePrimaryAction}
-          onPressIn={onPressIn}
-          onPressOut={onPressOut}
-          activeOpacity={0.85}
-        >
+        <View style={styles.actionSurface}>
           <View style={styles.actionTopRow}>
             <View style={styles.actionIconBox}>
               {renderIcon('#111318', 22)}
@@ -325,7 +335,9 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               <TouchableOpacity
                 onPress={() => setWhyCard(card)}
                 style={styles.whyChip}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                delayPressIn={0}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                activeOpacity={0.7}
               >
                 <Text style={styles.whyChipText}>Why?</Text>
               </TouchableOpacity>
@@ -333,7 +345,9 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
                 <TouchableOpacity
                   onPress={handleDismiss}
                   style={styles.dismissCircle}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  delayPressIn={0}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  activeOpacity={0.7}
                 >
                   <X size={14} color="#8C95A6" />
                 </TouchableOpacity>
@@ -341,16 +355,29 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             </View>
           </View>
 
-          <Text style={styles.actionSurfaceTitle}>{card.title}</Text>
-          <Text style={styles.actionSurfaceDesc}>{card.description}</Text>
+          <TouchableOpacity
+            onPress={handlePrimaryAction}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
+            delayPressIn={0}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.actionSurfaceTitle}>{card.title}</Text>
+            <Text style={styles.actionSurfaceDesc}>{card.description}</Text>
+          </TouchableOpacity>
 
           <View style={styles.actionCtaRow}>
-            <View style={styles.actionCtaPill}>
+            <TouchableOpacity
+              style={styles.actionCtaPill}
+              onPress={handlePrimaryAction}
+              delayPressIn={0}
+              activeOpacity={0.8}
+            >
               <Text style={styles.actionCtaPillText}>{card.primaryAction.label}</Text>
               <ArrowRight size={14} color="#FFFFFF" />
-            </View>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </View>
       </Animated.View>
     );
   }
@@ -372,7 +399,9 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
           <TouchableOpacity
             onPress={() => setWhyCard(card)}
             style={styles.whyChip}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            delayPressIn={0}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            activeOpacity={0.7}
           >
             <Text style={styles.whyChipText}>Why?</Text>
           </TouchableOpacity>
@@ -384,6 +413,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
           <TouchableOpacity
             style={styles.defaultActionBtn}
             onPress={handlePrimaryAction}
+            delayPressIn={0}
             activeOpacity={0.8}
           >
             <Text style={styles.defaultActionBtnText}>{card.primaryAction.label}</Text>
@@ -394,6 +424,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             <TouchableOpacity
               style={styles.defaultSecondaryBtn}
               onPress={handleSecondaryAction}
+              delayPressIn={0}
               activeOpacity={0.8}
             >
               <Text style={styles.defaultSecondaryBtnText}>{card.secondaryAction.label}</Text>
@@ -420,6 +451,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#ECEEF2',
+    gap: 12,
+  },
+  eventMainArea: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
   },
   eventIconCircle: {
