@@ -674,6 +674,70 @@ interface CustomerStateStore {
   showToast: (msg: string) => void;
 }
 
+export const CARD_TRANSLATIONS: Record<string, Record<LanguageCode, { title: string; description: string; actionLabel?: string }>> = {
+  card_metro_commute: {
+    en: { title: 'Routine Commute Alert', description: 'Your usual Delhi Metro morning commute at 8:40 AM. 1-Tap recharge active.', actionLabel: 'Instant ₹40 UPI' },
+    hi: { title: 'दैनिक यात्रा अलर्ट', description: 'आपकी सामान्य दिल्ली मेट्रो सुबह 8:40 की यात्रा। 1-टैप रिचार्ज उपलब्ध है।', actionLabel: 'त्वरित ₹40 यूपीआई' },
+    gu: { title: 'દૈનિક મુસાફરી ચેતવણી', description: 'તમારી સામાન્ય દિલ્હી મેટ્રો સવારે 8:40 ની મુસાફરી. 1-ટેપ રિચાર્જ સક્રિય છે.', actionLabel: 'તરત ₹40 UPI' },
+  },
+  card_salary_credited: {
+    en: { title: 'Salary Credited Yesterday', description: '₹75,000 from Acme Corp received. Net liquidity is comfortably positive.', actionLabel: 'View Allocation' },
+    hi: { title: 'कल वेतन प्राप्त हुआ', description: 'एक्मे कॉर्प से ₹75,000 प्राप्त हुए। नेट लिक्विडिटी सुरक्षित और सकारात्मक है।', actionLabel: 'बचत आवंटन देखें' },
+    gu: { title: 'ગઈકાલે પગાર જમા થયો', description: 'એકમે કોર્પ તરફથી ₹75,000 મળ્યા. ઉપલબ્ધ લિક્વિડિટી સંતોષકારક છે.', actionLabel: 'ફાળવણી જુઓ' },
+  },
+  card_auto_sweep: {
+    en: { title: 'Auto-Sweep Surplus Savings', description: 'You have ₹24,000 idle cash above your emergency buffer. Earn 7.2% with zero lock-in.', actionLabel: 'Activate Auto-Sweep' },
+    hi: { title: 'अतिरिक्त बचत को ऑटो-स्वीप करें', description: 'आपके पास इमरजेंसी बफर से ऊपर ₹24,000 अतिरिक्त नकदी है। बिना किसी लॉक-इन के 7.2% ब्याज कमाएं।', actionLabel: 'ऑटो-स्वीप सक्रिय करें' },
+    gu: { title: 'વધારાની બચત ઑટો-સ્વીપ કરો', description: 'તમારી પાસે ઇમરજન્સી બફર કરતાં ₹24,000 વધારાના છે. ઝીરો લૉક-ઇન સાથે 7.2% કમાઓ.', actionLabel: 'ઑટો-સ્વીપ શરૂ કરો' },
+  },
+  card_flexi_sip: {
+    en: { title: 'Start a Small Flexi SIP', description: 'Consistent cash flow detected. Consider setting aside ₹2,000/mo into low-volatility index funds.', actionLabel: 'Explore Safe SIP' },
+    hi: { title: 'छोटी फ्लेक्सी सिप शुरू करें', description: 'निरंतर कैश फ्लो दर्ज किया गया। कम-जोखिम वाले इंडेक्स फंड में ₹2,000/माह सुरक्षित निवेश का विचार करें।', actionLabel: 'सुरक्षित सिप देखें' },
+    gu: { title: 'નાની ફ્લેક્સી SIP શરૂ કરો', description: 'સ્થિર રોકડ પ્રવાહ જણાયો. ઓછા જોખમવાળા ઇન્ડેક્સ ફંડમાં ₹2,000/મહિને રોકાણનો વિચાર કરો.', actionLabel: 'સલામત SIP જુઓ' },
+  },
+  card_emi_stress_mitra: {
+    en: { title: 'Mitra Budget Shield Active', description: 'You have ₹32,450 in commitments due within 10 days. We recommend freezing discretionary spend.', actionLabel: 'Get Safe Budget Plan' },
+    hi: { title: 'मित्रा बजट शील्ड सक्रिय', description: 'अगले 10 दिनों में ₹32,450 की देनदारियां देय हैं। हम विवेकाधीन खर्चों को रोकने की सलाह देते हैं।', actionLabel: 'सुरक्षित बजट योजना पाएं' },
+    gu: { title: 'મિત્ર બજેટ શિલ્ડ સક્રિય', description: 'આગામી 10 દિવસમાં ₹32,450 ની જવાબદારીઓ બાકી છે. બિનજરૂરી ખર્ચ અટકાવવાની સલાહ છે.', actionLabel: 'સુરક્ષિત બજેટ પ્લાન મેળવો' },
+  },
+  card_bill_moratorium: {
+    en: { title: 'Temporary EMI Relief Advisory', description: 'Review options to restructure upcoming utility commitments without late fee penalties.', actionLabel: 'Explore Relief Options' },
+    hi: { title: 'अस्थायी ईएमआई राहत सलाह', description: 'बिना किसी पेनल्टी के आगामी उपयोगिता बिलों को पुनर्गठित करने के विकल्प देखें।', actionLabel: 'राहत विकल्प देखें' },
+    gu: { title: 'કામચલાઉ EMI રાહત સલાહ', description: 'કોઈપણ લેટ ફી વગર આગામી બિલોને પુનર્ગઠિત કરવાના વિકલ્પો તપાસો.', actionLabel: 'રાહત વિકલ્પો જુઓ' },
+  },
+  card_medical_assistance: {
+    en: { title: 'Large medical expense detected', description: 'You recently made a ₹48,200 payment at Max Super Speciality. Need help filing cashless insurance reimbursement?', actionLabel: 'Get Claim Help' },
+    hi: { title: 'बड़ा चिकित्सा खर्च देखा गया', description: 'आपने हाल ही में मैक्स सुपर स्पेशियलिटी में ₹48,200 का भुगतान किया। क्या आप कैशलेस बीमा क्लेम में सहायता चाहते हैं?', actionLabel: 'क्लेम सहायता पाएं' },
+    gu: { title: 'મોટો તબીબી ખર્ચ જણાયો', description: 'તમે તાજેતરમાં મેક્સ સુપર સ્પેશિયાલિટીમાં ₹48,200 ચૂકવ્યા. કેશલેસ ક્લેમ ફાઇલ કરવામાં મદદ જોઈએ છે?', actionLabel: 'ક્લેમ સહાય મેળવો' },
+  },
+  card_unrecognized_debit: {
+    en: { title: 'Urgent: Verify Unusual Transaction', description: 'International online merchant debit for ₹31,800 detected from an unrecognized IP location.', actionLabel: 'Review & Dispute' },
+    hi: { title: 'अति आवश्यक: असामान्य लेनदेन की पुष्टि करें', description: 'अपरिचित आईपी लोकेशन से ₹31,800 का अंतरराष्ट्रीय ऑनलाइन डेबिट पाया गया है।', actionLabel: 'समीक्षा व विवाद दर्ज करें' },
+    gu: { title: 'તાત્કાલિક: અસામાન્ય વ્યવહાર ચકાસો', description: 'અજાણ્યા IP સ્થાન પરથી ₹31,800 નો આંતરરાષ્ટ્રીય ઑનલાઇન વ્યવહાર જણાયો છે.', actionLabel: 'સમીક્ષા અને વાંધો નોંધાવો' },
+  },
+  card_emergency_fund_nudge: {
+    en: { title: 'Strengthen Emergency Buffer', description: 'Your liquid buffer is 3.8 months of expenses. Target 6 months for complete family resilience.', actionLabel: 'Plan Reserve' },
+    hi: { title: 'इमरजेंसी बफर को मजबूत करें', description: 'आपका लिक्विड बफर 3.8 महीने के खर्च का है। परिवार की सुरक्षा के लिए 6 महीने का लक्ष्य रखें।', actionLabel: 'रिजर्व योजना बनाएं' },
+    gu: { title: 'ઇમરજન્સી બફર મજબૂત કરો', description: 'તમારું લિક્વિડ બફર 3.8 મહિનાના ખર્ચ જેટલું છે. સંપૂર્ણ સુરક્ષા માટે 6 મહિનાનું લક્ષ્ય રાખો.', actionLabel: 'રિઝર્વ આયોજન કરો' },
+  },
+};
+
+const localizeCardList = (cards: ContextCard[], lang: LanguageCode): ContextCard[] => {
+  return cards.map((card) => {
+    const tr = CARD_TRANSLATIONS[card.id]?.[lang];
+    if (!tr) return card;
+    return {
+      ...card,
+      title: tr.title,
+      description: tr.description,
+      primaryAction: {
+        ...card.primaryAction,
+        label: tr.actionLabel || card.primaryAction.label,
+      },
+    };
+  });
+};
+
 export const useCustomerStore = create<CustomerStateStore>((set, get) => {
   const initialBundle = OFFLINE_STATE_BUNDLES.normal;
 
@@ -698,7 +762,9 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     isLoading: false,
 
     setLanguage: (lang: LanguageCode) => {
-      set({ language: lang });
+      const currentCards = get().cards;
+      const localized = localizeCardList(currentCards, lang);
+      set({ language: lang, cards: localized });
     },
 
     setActiveTab: (tab: MainTabType) => {
@@ -710,13 +776,15 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
 
       // Apply offline bundle instantly so Expo Go transitions are immediate
       const bundle = OFFLINE_STATE_BUNDLES[state] || OFFLINE_STATE_BUNDLES.normal;
+      const currentLang = get().language;
+      const localized = localizeCardList(bundle.cards, currentLang);
       set({
         currentState: state,
         balance: { ...bundle.balance },
         signals: { ...bundle.signals },
         financialHealth: { ...bundle.financialHealth },
         risk: { ...bundle.risk },
-        cards: [...bundle.cards],
+        cards: localized,
         transactions: [...bundle.transactions],
       });
 

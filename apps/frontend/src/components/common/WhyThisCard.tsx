@@ -30,15 +30,14 @@ export const WhyThisCard: React.FC = () => {
               {/* Header */}
               <View style={styles.header}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.title}>Why this appeared</Text>
-                  <Text style={styles.subtitle}>
-                    Our system surfaces actions based on your real life, not fixed sales targets.
-                  </Text>
+                  <Text style={styles.title}>{t.whyModal.title}</Text>
+                  <Text style={styles.subtitle}>{t.whyModal.subtitle}</Text>
                 </View>
                 <TouchableOpacity
                   onPress={() => setWhyCard(null)}
                   style={styles.closeCircle}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  delayPressIn={0}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <X size={16} color="#525866" />
                 </TouchableOpacity>
@@ -47,14 +46,14 @@ export const WhyThisCard: React.FC = () => {
               <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Surfaced Action Preview */}
                 <View style={styles.previewBox}>
-                  <Text style={styles.previewEyebrow}>CURRENT CONTEXT</Text>
+                  <Text style={styles.previewEyebrow}>{t.whyModal.currentContext}</Text>
                   <Text style={styles.previewTitle}>{selectedWhyCard.title}</Text>
                   <Text style={styles.previewDesc}>{selectedWhyCard.description}</Text>
                 </View>
 
                 {/* Primary Trigger Statement */}
                 <View style={styles.section}>
-                  <Text style={styles.sectionHeading}>We noticed:</Text>
+                  <Text style={styles.sectionHeading}>{t.whyModal.weNoticed}</Text>
                   {selectedWhyCard.whyDetails && selectedWhyCard.whyDetails.length > 0 ? (
                     selectedWhyCard.whyDetails.map((detail, idx) => (
                       <View key={idx} style={styles.checkRow}>
@@ -78,7 +77,11 @@ export const WhyThisCard: React.FC = () => {
                 <View style={styles.ethicalNote}>
                   <ShieldCheck size={16} color="#0D9488" />
                   <Text style={styles.ethicalText}>
-                    Protection Before Promotion: If cash flow stress or medical shocks are detected, product nudges are automatically suppressed.
+                    {language === 'hi'
+                      ? 'प्रमोशन से पहले सुरक्षा: यदि कैश फ्लो तनाव या चिकित्सा आपातकाल पाया जाता है, तो लोन और उत्पाद ऑफ़र पूरी तरह दबा दिए जाते हैं।'
+                      : language === 'gu'
+                      ? 'પ્રમોશન પહેલાં સુરક્ષા: જો રોકડ પ્રવાહની કટોકટી અથવા તબીબી આંચકો જણાય, તો લોન ઑફર્સ આપમેળે અટકાવી દેવાય છે.'
+                      : 'Protection Before Promotion: If cash flow stress or medical shocks are detected, product nudges are automatically suppressed.'}
                   </Text>
                 </View>
               </ScrollView>
@@ -88,9 +91,10 @@ export const WhyThisCard: React.FC = () => {
                 <TouchableOpacity
                   style={styles.doneBtn}
                   onPress={() => setWhyCard(null)}
+                  delayPressIn={0}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.doneBtnText}>Understood</Text>
+                  <Text style={styles.doneBtnText}>{t.common.done}</Text>
                 </TouchableOpacity>
               </View>
             </View>

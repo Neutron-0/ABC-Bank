@@ -97,34 +97,34 @@ export const AdaptiveHomeScreen: React.FC = () => {
     if (currentState === 'fraud_alert') {
       return (
         <View style={styles.heroSection}>
-          <Text style={styles.sectionEyebrow}>URGENT SECURITY ATTENTION</Text>
+          <Text style={styles.sectionEyebrow}>{t.heroes.securityTag}</Text>
           <View style={styles.fraudBox}>
             <View style={styles.fraudHeader}>
               <View style={styles.fraudIconWrap}>
                 <ShieldAlert size={20} color="#DC2626" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.fraudMerchant}>Unrecognized International Debit</Text>
-                <Text style={styles.fraudAmount}>₹31,800 · New Merchant</Text>
+                <Text style={styles.fraudMerchant}>{t.heroes.fraudMerchant}</Text>
+                <Text style={styles.fraudAmount}>{t.heroes.fraudAmount}</Text>
               </View>
             </View>
-            <Text style={styles.fraudText}>
-              This transaction is significantly different from your usual activity in Noida.
-            </Text>
+            <Text style={styles.fraudText}>{t.heroes.fraudDesc}</Text>
             <View style={styles.fraudActionRow}>
               <TouchableOpacity
                 style={styles.freezeBtn}
                 onPress={() => openJourney('fraud_alert')}
+                delayPressIn={0}
                 activeOpacity={0.8}
               >
-                <Text style={styles.freezeBtnText}>Secure & Freeze Card</Text>
+                <Text style={styles.freezeBtnText}>{t.heroes.freezeBtn}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.verifyBtn}
                 onPress={() => openJourney('fraud_alert')}
+                delayPressIn={0}
                 activeOpacity={0.8}
               >
-                <Text style={styles.verifyBtnText}>Yes, was me</Text>
+                <Text style={styles.verifyBtnText}>{t.heroes.verifyBtn}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -136,35 +136,37 @@ export const AdaptiveHomeScreen: React.FC = () => {
     if (currentState === 'medical_event') {
       return (
         <View style={styles.heroSection}>
-          <Text style={styles.sectionEyebrow}>EMERGENCY ASSISTANCE</Text>
+          <Text style={styles.sectionEyebrow}>{t.heroes.medicalTag}</Text>
           <View style={styles.medicalBox}>
             <View style={styles.medicalHeader}>
               <View style={styles.medicalIconWrap}>
                 <HeartHandshake size={20} color="#0D9488" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.medicalHospital}>Max Super Speciality Hospital</Text>
-                <Text style={styles.medicalAmount}>₹48,200 · Today</Text>
+                <Text style={styles.medicalHospital}>{t.heroes.medicalHospital}</Text>
+                <Text style={styles.medicalAmount}>{t.heroes.medicalAmount}</Text>
               </View>
             </View>
-            <Text style={styles.medicalText}>
-              We noticed a significant medical payment. Need help filing insurance reimbursement or reviewing emergency reserves?
-            </Text>
+            <Text style={styles.medicalText}>{t.heroes.medicalDesc}</Text>
             <View style={styles.medicalActionRow}>
               <TouchableOpacity
                 style={styles.medicalPrimaryBtn}
                 onPress={() => openJourney('medical_assistance')}
+                delayPressIn={0}
                 activeOpacity={0.8}
               >
-                <Text style={styles.medicalPrimaryBtnText}>Get Assistance</Text>
+                <Text style={styles.medicalPrimaryBtnText}>{t.heroes.getAssistance}</Text>
                 <ArrowRight size={14} color="#FFFFFF" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.medicalSecondaryBtn}
                 onPress={() => setActiveTab('assistant')}
+                delayPressIn={0}
                 activeOpacity={0.8}
               >
-                <Text style={styles.medicalSecondaryBtnText}>Talk to Mitra</Text>
+                <Text style={styles.medicalSecondaryBtnText}>
+                  {language === 'hi' ? 'मित्रा से बात करें' : language === 'gu' ? 'મિત્ર સાથે વાત કરો' : 'Talk to Mitra'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -176,27 +178,28 @@ export const AdaptiveHomeScreen: React.FC = () => {
     if (currentState === 'financial_stress') {
       return (
         <View style={styles.heroSection}>
-          <Text style={styles.sectionEyebrow}>FINANCIAL GUIDANCE</Text>
+          <Text style={styles.sectionEyebrow}>{t.heroes.stressTag}</Text>
           <View style={styles.stressBox}>
             <View style={styles.stressHeader}>
               <View style={styles.stressIconWrap}>
                 <AlertCircle size={20} color="#D97706" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.stressTitle}>Cash flow tighter than usual</Text>
-                <Text style={styles.stressSubtitle}>Upcoming obligations: ₹32,000</Text>
+                <Text style={styles.stressTitle}>{t.heroes.stressTitle}</Text>
+                <Text style={styles.stressSubtitle}>
+                  {language === 'hi' ? 'आगामी जिम्मेदारियां: ₹32,000' : language === 'gu' ? 'આગામી જવાબદારીઓ: ₹32,000' : 'Upcoming obligations: ₹32,000'}
+                </Text>
               </View>
             </View>
-            <Text style={styles.stressText}>
-              Your upcoming EMI commitments are higher this cycle. We've temporarily suppressed credit promotions to help you preserve emergency buffers.
-            </Text>
+            <Text style={styles.stressText}>{t.heroes.stressDesc}</Text>
             <View style={styles.stressActionRow}>
               <TouchableOpacity
                 style={styles.stressPrimaryBtn}
                 onPress={() => openJourney('financial_stress')}
+                delayPressIn={0}
                 activeOpacity={0.8}
               >
-                <Text style={styles.stressPrimaryBtnText}>Review Commitments</Text>
+                <Text style={styles.stressPrimaryBtnText}>{t.heroes.reviewCashFlow}</Text>
                 <ArrowRight size={14} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
@@ -209,27 +212,26 @@ export const AdaptiveHomeScreen: React.FC = () => {
     if (currentState === 'surplus') {
       return (
         <View style={styles.heroSection}>
-          <Text style={styles.sectionEyebrow}>OPPORTUNITY</Text>
+          <Text style={styles.sectionEyebrow}>{t.heroes.surplusTag}</Text>
           <View style={styles.surplusBox}>
             <View style={styles.surplusHeader}>
               <View style={styles.surplusIconWrap}>
                 <TrendingUp size={20} color="#059669" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.surplusTitle}>₹24,000 surplus available</Text>
-                <Text style={styles.surplusSubtitle}>Salary credited • Higher buffer than usual</Text>
+                <Text style={styles.surplusTitle}>{t.heroes.surplusTitle}</Text>
+                <Text style={styles.surplusSubtitle}>{t.heroes.surplusSubtitle}</Text>
               </View>
             </View>
-            <Text style={styles.surplusText}>
-              You have extra liquidity above your 4.2-month reserve. Put it to work in high-yield auto-sweep or start a flexible SIP.
-            </Text>
+            <Text style={styles.surplusText}>{t.heroes.surplusDesc}</Text>
             <View style={styles.surplusActionRow}>
               <TouchableOpacity
                 style={styles.surplusPrimaryBtn}
                 onPress={() => openJourney('savings_invest')}
+                delayPressIn={0}
                 activeOpacity={0.8}
               >
-                <Text style={styles.surplusPrimaryBtnText}>Auto-Sweep to 7.2%</Text>
+                <Text style={styles.surplusPrimaryBtnText}>{t.heroes.autoSweep}</Text>
                 <ArrowRight size={14} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
@@ -242,30 +244,29 @@ export const AdaptiveHomeScreen: React.FC = () => {
     if (!isMetroPaid) {
       return (
         <Animated.View style={[styles.heroSection, { transform: [{ scale: heroScaleAnim }] }]}>
-          <Text style={styles.sectionEyebrow}>YOUR REPEATED INTENT</Text>
+          <Text style={styles.sectionEyebrow}>{t.heroes.metroTag}</Text>
           <View style={styles.metroBox}>
             <View style={styles.metroTopRow}>
               <View style={styles.metroIconWrap}>
                 <Train size={20} color="#111318" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.metroTitle}>Your usual Metro</Text>
-                <Text style={styles.metroSubtitle}>₹40 · Daily 8:40 AM Commute</Text>
+                <Text style={styles.metroTitle}>{t.heroes.metroTitle}</Text>
+                <Text style={styles.metroSubtitle}>{t.heroes.metroSubtitle}</Text>
               </View>
             </View>
 
-            <Text style={styles.metroDesc}>
-              You normally recharge around this time before boarding Noida Sec 62.
-            </Text>
+            <Text style={styles.metroDesc}>{t.heroes.metroDesc}</Text>
 
             <TouchableOpacity
               style={styles.metroActionBtn}
               onPress={handlePayMetro}
               disabled={isPayingMetro}
+              delayPressIn={0}
               activeOpacity={0.82}
             >
               <Text style={styles.metroActionBtnText}>
-                {isPayingMetro ? 'Recharging...' : 'Pay again ₹40 →'}
+                {isPayingMetro ? t.heroes.recharging : t.heroes.payAgain}
               </Text>
             </TouchableOpacity>
           </View>
@@ -278,7 +279,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
       <View style={styles.heroSection}>
         <View style={styles.paidMetroRow}>
           <CheckCircle2 size={16} color="#059669" />
-          <Text style={styles.paidMetroText}>Metro recharge ₹40 completed for 8:40 AM</Text>
+          <Text style={styles.paidMetroText}>{t.heroes.metroDone}</Text>
         </View>
       </View>
     );
@@ -292,21 +293,22 @@ export const AdaptiveHomeScreen: React.FC = () => {
 
     return (
       <View style={styles.upcomingSection}>
-        <Text style={styles.sectionEyebrow}>UPCOMING OBLIGATION</Text>
+        <Text style={styles.sectionEyebrow}>{t.heroes.upcomingTag}</Text>
         <View style={styles.upcomingRow}>
           <View style={styles.upcomingIconCircle}>
             <Calendar size={16} color="#525866" />
           </View>
           <View style={styles.upcomingTextWrap}>
-            <Text style={styles.upcomingTitle}>HDFC Home Loan EMI</Text>
-            <Text style={styles.upcomingSubtitle}>₹12,500 · Due in 3 days</Text>
+            <Text style={styles.upcomingTitle}>{t.heroes.emiTitle}</Text>
+            <Text style={styles.upcomingSubtitle}>{t.heroes.emiSubtitle}</Text>
           </View>
           <TouchableOpacity
             style={styles.upcomingPayBtn}
             onPress={() => setActiveTab('payments')}
+            delayPressIn={0}
             activeOpacity={0.8}
           >
-            <Text style={styles.upcomingPayBtnText}>Pay / Schedule →</Text>
+            <Text style={styles.upcomingPayBtnText}>{t.heroes.manageAutoDebit} →</Text>
           </TouchableOpacity>
         </View>
       </View>
