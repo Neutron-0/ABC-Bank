@@ -1,182 +1,120 @@
-﻿from typing import Dict, Any, List
-from apps.backend.app.models.customer_state import CustomerStateModel
+from typing import Dict, Any, List, Optional
+from apps.backend.app.models.customer_state import CustomerStateModel, Recommendation
 from apps.backend.app.models.experience import (
     ExperienceConfigModel,
     ContextCardModel,
     CardAction,
     HeroCard
 )
+from apps.backend.app.services.safety_policy import SafetyPolicyFilter
 
 class ExperienceComposer:
-    """Translates CustomerState into ExperienceConfig adhering to contracts/experience.schema.json."""
+    """
+    Experience Composer — Translates CustomerState into ExperienceConfig
+    strictly adhering to contracts/experience.schema.json.
+
+    Architecture Principles:
+    - Purely recommendation & signal driven; NO hardcoded event/scenario ladders.
+    - Operates on generic attention layers (DO, KNOW, PLAN, CONSIDER).
+    - Derives HeroCard from the highest-priority active recommendation.
+    - Derives primary actions from actionable recommendations or declared candidate actions.
+    - Enforces Backend SafetyPolicyFilter (anti-predatory suppression during financial stress).
+    - NEVER fabricates loans, merchants, or financial amounts.
+    - Supports arbitrary future categories (e.g. education, agriculture, tax, small_business)
+      without backend code changes.
+    """
+
+    # Attention layer heuristics based on priority & urgency
+    @staticmethod
+    def _determine_layer(priority: int, category: Optional[str] = None) -> str:
+        """
+        Maps a recommendation to an attention layer based on its priority weight.
+        Priority >= 90: Urgent / Immediate action required -> 'DO'
+        Priority >= 70: Timely contextual knowledge / awareness -> 'KNOW'
+        Priority >= 50: Forward-looking budgeting / planning -> 'PLAN'
+        Priority <  50: Optional discovery / growth -> 'CONSIDER'
+        """
+        if priority >= 90:
+            return "DO"
+        elif priority >= 70:
+            return "KNOW"
+        elif priority >= 50:
+            return "PLAN"
+        else:
+            return "CONSIDER"
 
     @staticmethod
-    def compose(state: CustomerStateModel, lang: str = "en") -> ExperienceConfigModel:
-        signals = state.signals
-        health = state.financial_health
-        state_type = state.state_type or "normal"
-
-        primary_actions = []
-        secondary_actions = []
-        priority_modules = []
-        deprioritized_modules = []
-        context_cards = []
-        hero_card = None
-
-        # ----------------------------------------------------
-        # Scenario 1: FRAUD ALERT (Highest Priority)
-        # ----------------------------------------------------
-        if signals.get("anomaly_score", 0) > 80 or state_type == "fraud_alert":
-            primary_actions = ["verify_charge", "freeze_card"]
-            secondary_actions = ["call_fraud_desk"]
-            priority_modules = ["security_intervention", "recent_activity"]
-            deprioritized_modules = ["marketing", "loans", "investments"]
-
-            hero_card = HeroCard(
-                id="hero_fraud",
-                title="Security Alert: ₹31,800 Debit",
-                subtitle="Review charge from GlobalTech Gaming or freeze card",
-                action_label="Review Now",
-                action_type="OPEN_FRAUD_MODAL",
-                badge="URGENT SAFETY",
-                accent="#DC2626",
-                why="High behavioral deviation detected at odd hours (02:14 AM)."
-            )
-
-            context_cards.append(ContextCardModel(
-                id="card_fraud_guard",
-                type="warning",
-                layer="DO",
-                priority=100,
-                title="Unusual ₹31,800 Debit Detected",
-                description="Spent at unfamiliar online merchant. Verify if this was you.",
-                reason="Flagged by real-time anomaly detector.",
-                primary_action=CardAction(label="Verify or Freeze", action_type="OPEN_FRAUD_MODAL"),
-                dismissible=False,
-                badge="Action Required",
-                accent="#DC2626",
-                why_details=["New merchant category", "Unusual hour (02:14 AM)", "IP location mismatch"]
-            ))
-
-        # ----------------------------------------------------
-        # Scenario 2: FINANCIAL STRESS
-        # ----------------------------------------------------
-        elif health == "stress" or state_type == "financial_stress":
-            primary_actions = ["review_commitments", "pause_subscriptions"]
-            secondary_actions = ["speak_with_mitra", "view_cashflow"]
-            priority_modules = ["cashflow_advisory", "obligations_planner"]
-            # STRICT ETHICAL RULE: Suppress loan promotion
-            deprioritized_modules = ["personal_loans", "credit_cards", "discretionary_spend"]
-
-            hero_card = HeroCard(
-                id="hero_stress",
-                title="Cash Flow Guidance Active",
-                subtitle="Upcoming obligations are higher this cycle. Review commitments safely.",
-                action_label="Review Plan",
-                action_type="OPEN_STRESS_MODAL",
-                badge="CARE & GUIDANCE",
-                accent="#D97706",
-                why="Liquid reserve dropped to ~15 days due to emergency home repair debit."
-            )
-
-            context_cards.append(ContextCardModel(
-                id="card_stress_advisory",
-                type="assistance",
-                layer="DO",
-                priority=92,
-                title="Monthly cash flow looks tighter than usual",
-                description="Upcoming obligations total ₹34,200. Pause unused subscriptions to free liquidity.",
-                reason="Ethical safeguard: loans are strictly suppressed during financial strain.",
-                primary_action=CardAction(label="Review Commitments", action_type="OPEN_STRESS_MODAL"),
-                dismissible=False,
-                badge="Ethical Care",
-                accent="#D97706",
-                why_details=["Upcoming EMIs: ₹31,300", "Liquid balance: ₹7,850", "Zero predatory credit nudges"]
-            ))
-
-        # ----------------------------------------------------
-        # Scenario 3: LARGE MEDICAL EVENT
-        # ----------------------------------------------------
-        elif signals.get("medical_surge") or state_type == "medical_event":
-            primary_actions = ["claim_assistance", "hospital_receipts"]
-            secondary_actions = ["cashflow_buffer", "ask_mitra"]
-            priority_modules = ["medical_support", "emergency_fund"]
-            deprioritized_modules = ["aggressive_investments"]
-
-            hero_card = HeroCard(
-                id="hero_medical",
-                title="Hospital Bill Support Desk",
-                subtitle="Max Super Speciality ₹48,200. Tap for cashless claim help.",
-                action_label="Get Claim Help",
-                action_type="OPEN_MEDICAL_MODAL",
-                badge="REIMBURSEMENT READY",
-                accent="#0284C7",
-                why="Large non-routine inpatient medical expense detected."
-            )
-
-            context_cards.append(ContextCardModel(
-                id="card_medical_reimburse",
-                type="assistance",
-                layer="DO",
-                priority=95,
-                title="Medical Reimbursement Assistance",
-                description="Upload your hospital discharge bill for 1-click insurance filing.",
-                reason="Empathy first: assistance prioritized before any protection options.",
-                primary_action=CardAction(label="Start Claim Help", action_type="OPEN_MEDICAL_MODAL"),
-                dismissible=True,
-                badge="Care First",
-                accent="#0284C7",
-                why_details=["₹48,200 hospital transaction detected", "Cashless claim desk activated"]
-            ))
-
-        # ----------------------------------------------------
-        # Scenario 4: NORMAL WORKDAY (Repeated Intent)
-        # ----------------------------------------------------
+    def _determine_badge(layer: str, priority: int, suppressed: bool = False) -> str:
+        if suppressed:
+            return "Suppressed"
+        if layer == "DO":
+            return "Action Required" if priority >= 95 else "Priority"
+        elif layer == "KNOW":
+            return "Context"
+        elif layer == "PLAN":
+            return "Planning"
         else:
-            primary_actions = ["metro", "upi", "fastag"]
-            secondary_actions = ["bill_pay", "send_money"]
-            priority_modules = ["commute_habit", "upcoming_emi", "smart_savings"]
-            deprioritized_modules = []
+            return "Explore"
 
-            hero_card = HeroCard(
-                id="hero_metro",
-                title="Your 8:40 AM Metro Commute",
-                subtitle="Tap to instantly pay ₹40 with 1-click UPI auto-confirm",
-                action_label="Pay ₹40",
-                action_type="INSTANT_METRO_PAY",
-                badge="ROUTINE HABIT",
-                accent="#2563EB",
-                why="Observed frequent weekday commute between 8:30 AM and 8:50 AM."
-            )
+    @staticmethod
+    def _determine_accent(category: Optional[str], layer: str) -> str:
+        """Determines visual accent color based on layer/category palette."""
+        cat = (category or "").lower()
+        if cat in ["security", "fraud"]:
+            return "#DC2626"
+        if cat in ["guidance", "support"]:
+            return "#D97706"
+        if cat in ["healthcare", "medical"]:
+            return "#0284C7"
+        if cat in ["savings", "investment", "growth"]:
+            return "#059669"
+        if cat in ["transport", "commute"]:
+            return "#2563EB"
+        if cat in ["education", "learning"]:
+            return "#4F46E5"
+        if cat in ["agriculture", "rural"]:
+            return "#16A34A"
 
-            context_cards.append(ContextCardModel(
-                id="card_morning_metro",
-                type="action",
-                layer="DO",
-                priority=94,
-                title="🚇 Your morning Metro",
-                description="You usually make this payment around 8:40 AM for your weekday commute.",
-                reason="Based on your repeated weekday commute pattern.",
-                primary_action=CardAction(label="Pay ₹40 Again", action_type="INSTANT_METRO_PAY"),
-                dismissible=True,
-                badge="Usual Routine",
-                accent="#2563EB",
-                why_details=["22 trips this month", "Standard amount: ₹40", "1-tap biometric UPI"]
-            ))
+        # Layer-based fallback palette
+        if layer == "DO":
+            return "#2563EB"
+        elif layer == "KNOW":
+            return "#6366F1"
+        elif layer == "PLAN":
+            return "#7C3AED"
+        else:
+            return "#64748B"
 
-            context_cards.append(ContextCardModel(
-                id="card_upcoming_emi",
-                type="event",
-                layer="KNOW",
-                priority=74,
-                title="Home Loan EMI in 4 days",
-                description="₹16,500 will be auto-debited on Sep 16th. Your account has sufficient balance.",
-                reason="Automated loan mandate schedule reminder.",
-                primary_action=CardAction(label="View Mandate", action_type="VIEW_SCHEDULE"),
-                dismissible=True,
-                accent="#7C3AED",
-                why_details=["HDFC Home Loan auto-debit", "Balance comfortably covers amount"]
-            ))
+    @classmethod
+    def compose(cls, state: CustomerStateModel, lang: str = "en") -> ExperienceConfigModel:
+        signals = state.signals or {}
+        health = state.financial_health or "stable"
+        raw_recommendations = state.recommendations or []
+
+        # 1. Determine financial stress state
+        is_stress = SafetyPolicyFilter.evaluate_financial_stress(health, signals)
+
+        # 2. Filter recommendations via Backend Safety Policy (deterministic safeguard)
+        safe_recommendations = SafetyPolicyFilter.filter_recommendations(
+            raw_recommendations,
+            is_stress=is_stress
+        )
+
+        # 3. Active recommendations sorted by priority descending
+        active_recs = [r for r in safe_recommendations if not r.suppressed]
+        active_recs.sort(key=lambda x: x.priority, reverse=True)
+
+        # 4. Compose HeroCard from highest priority active recommendation
+        hero_card = cls._build_hero_card(active_recs, signals, is_stress)
+
+        # 5. Compose primary and secondary actions from active recommendations
+        primary_actions, secondary_actions = cls._resolve_actions(active_recs, is_stress)
+
+        # 6. Compose prioritized modules
+        priority_modules, deprioritized_modules = cls._resolve_modules(active_recs, is_stress)
+
+        # 7. Compose ContextCards from all safe active recommendations
+        context_cards = cls._build_context_cards(active_recs, signals, is_stress)
 
         return ExperienceConfigModel(
             customer_id=state.customer_id,
@@ -189,3 +127,183 @@ class ExperienceComposer:
             language=lang,
             interaction_mode="adaptive"
         )
+
+    @classmethod
+    def _build_hero_card(
+        cls,
+        active_recs: List[Recommendation],
+        signals: Dict[str, Any],
+        is_stress: bool
+    ) -> HeroCard:
+        """
+        Generic HeroCard construction:
+        Always elevates the highest-priority active recommendation to the hero slot.
+        If no recommendations are present, provides a neutral status baseline.
+        Does NOT hardcode branches for medical, fraud, metro, or surplus.
+        """
+        if active_recs:
+            top_rec = active_recs[0]
+            cat = top_rec.category or "general"
+            layer = cls._determine_layer(top_rec.priority, cat)
+            accent = cls._determine_accent(cat, layer)
+            badge = cls._determine_badge(layer, top_rec.priority)
+
+            # Extract declared action or provide generic fallback
+            action_label = top_rec.action_label or "View Details"
+            action_type = top_rec.action_type or "OPEN_DETAILS"
+
+            return HeroCard(
+                id=f"hero_{top_rec.id}",
+                title=top_rec.title,
+                subtitle=top_rec.reason or "Priority banking update based on your latest account signals.",
+                action_label=action_label,
+                action_type=action_type,
+                badge=badge,
+                accent=accent,
+                why=top_rec.reason or f"Evaluated by AI ranking engine with priority {top_rec.priority}."
+            )
+
+        # Neutral fallback when no recommendations exist
+        return HeroCard(
+            id="hero_account_status",
+            title="Account Overview",
+            subtitle="Your accounts and payments are up to date with no urgent actions required.",
+            action_label="View Insights",
+            action_type="OPEN_SCREEN",
+            badge="ACCOUNT STATUS",
+            accent="#2563EB",
+            why="Standard baseline account review."
+        )
+
+    @classmethod
+    def _resolve_actions(
+        cls,
+        active_recs: List[Recommendation],
+        is_stress: bool
+    ) -> (List[str], List[str]):
+        """
+        Generic action resolver:
+        Derives actions from declared recommendation metadata or candidate categories.
+        """
+        primary: List[str] = []
+        secondary: List[str] = ["bill_pay", "send_money"]
+
+        for rec in active_recs:
+            # If recommendation declares an explicit action type or category action
+            action_identifier = None
+            if rec.action_type:
+                action_identifier = rec.action_type.lower()
+            elif rec.category:
+                cat = rec.category.lower()
+                if cat in ["transport", "commute"] or "metro" in (rec.id or "").lower():
+                    action_identifier = "metro"
+                else:
+                    action_identifier = cat
+
+            if action_identifier and action_identifier not in primary:
+                primary.append(action_identifier)
+
+            if len(primary) >= 4:
+                break
+
+        # If primary actions list is short, complement with neutral baseline actions
+        if is_stress:
+            if "review_commitments" not in primary:
+                primary.append("review_commitments")
+            if "pause_subscriptions" not in primary:
+                primary.append("pause_subscriptions")
+            secondary = ["speak_with_mitra", "view_cashflow", "support"]
+        else:
+            default_candidates = ["upi", "fastag", "pay_bills"]
+            for cand in default_candidates:
+                if cand not in primary and len(primary) < 3:
+                    primary.append(cand)
+
+        return primary[:4], secondary[:3]
+
+    @classmethod
+    def _resolve_modules(
+        cls,
+        active_recs: List[Recommendation],
+        is_stress: bool
+    ) -> (List[str], List[str]):
+        """
+        Derives active priority and deprioritized modules dynamically from recommendations,
+        governed by the Backend Safety Policy.
+        """
+        base_priority: List[str] = []
+        base_deprioritized: List[str] = []
+
+        # Populate priority modules based on categories in active recommendations
+        for rec in active_recs:
+            mod_name = f"{rec.category}_module" if rec.category else "overview_module"
+            if mod_name not in base_priority:
+                base_priority.append(mod_name)
+
+        if not base_priority:
+            base_priority = ["account_overview", "recent_activity", "insights"]
+
+        # Apply deterministic safety policy filter
+        return SafetyPolicyFilter.apply_module_policies(
+            priority_modules=base_priority,
+            deprioritized_modules=base_deprioritized,
+            is_stress=is_stress
+        )
+
+    @classmethod
+    def _build_context_cards(
+        cls,
+        active_recs: List[Recommendation],
+        signals: Dict[str, Any],
+        is_stress: bool
+    ) -> List[ContextCardModel]:
+        """
+        Translates safe recommendations into standardized ContextCardModel items.
+        Does NOT inject fabricated cards.
+        Handles arbitrary categories seamlessly with generic fallbacks.
+        """
+        cards: List[ContextCardModel] = []
+
+        for rec in active_recs:
+            cat = (rec.category or "general").lower()
+            layer = cls._determine_layer(rec.priority, cat)
+            accent = cls._determine_accent(cat, layer)
+            badge = cls._determine_badge(layer, rec.priority)
+
+            # Resolve primary action from recommendation metadata or safe generic fallback
+            action_label = rec.action_label or "View Details"
+            action_type = rec.action_type or "OPEN_DETAILS"
+            journey_id = rec.journey_id
+            payload = rec.payload
+
+            primary_action = CardAction(
+                label=action_label,
+                action_type=action_type,
+                journey_id=journey_id,
+                payload=payload
+            )
+
+            why_details = [
+                rec.reason or "Identified by customer intelligence model",
+                f"Priority score: {rec.priority}/100",
+            ]
+            if is_stress:
+                why_details.append("Anti-predatory safety policy active: borrowing options suppressed")
+
+            card = ContextCardModel(
+                id=f"card_{rec.id}",
+                type=cat,
+                layer=layer,
+                priority=rec.priority,
+                title=rec.title,
+                description=rec.reason or "",
+                reason=rec.reason or "Based on verified customer transaction and account patterns",
+                primary_action=primary_action,
+                dismissible=(layer != "DO"),
+                badge=badge,
+                accent=accent,
+                why_details=why_details
+            )
+            cards.append(card)
+
+        return cards

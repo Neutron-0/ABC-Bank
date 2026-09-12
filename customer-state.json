@@ -4,13 +4,12 @@
   "state_type": "financial_stress",
   "financial_health": "stress",
   "signals": {
+    "anomaly_score": 94,
+    "flagged_amount": 31800,
+    "flagged_merchant": "GlobalTech Gaming London",
+    "odd_hour": "02:14 AM",
     "savings_trend": "negative",
-    "emi_pressure": "high",
-    "spending_volatility": "high",
-    "upcoming_obligations": 34200,
-    "active_subscriptions": 7,
-    "anomaly_score": 8,
-    "debt_to_income_ratio": 0.58,
+    "emi_pressure": "low",
     "stress_alert": true,
     "suppress_promotions": true
   },
@@ -20,11 +19,19 @@
     "home_owner"
   ],
   "balance": {
-    "available": 7850,
-    "savings": 32000,
+    "available": 10880,
+    "savings": 185000,
     "currency": "INR"
   },
   "recommendations": [
+    {
+      "id": "rec_fraud_guard",
+      "category": "security",
+      "title": "Unusual \u20b931,800 Debit Detected",
+      "reason": "Anomalous early morning international charge at unfamiliar merchant.",
+      "priority": 100,
+      "suppressed": false
+    },
     {
       "id": "rec_cashflow_guidance",
       "category": "guidance",

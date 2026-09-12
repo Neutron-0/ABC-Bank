@@ -1,158 +1,148 @@
-# 🏛️ ABC Bank — Adaptive Banking for Bharat
+# 🏛️ VZEYA — Adaptive Banking for Bharat
 
-AI-Powered Hyper-Personalized Mobile Banking Prototype for Bharat. Designed with **hard ownership boundaries**, **contracts-first architecture**, and **100% Expo Go compatibility**.
+**AI-Powered Hyper-Personalized Banking Experience Layer** for HackOut'26 at DA-IICT.
 
-> **AI AGENTS**: Read [`AI_SYSTEM_GUIDE.md`](./AI_SYSTEM_GUIDE.md) for complete technical architecture, contracts, state machines, and execution instructions.
+> *"Instead of asking customers to learn their bank, make the bank learn the customer."*
+
+VZEYA is a banking intelligence and experience layer that dynamically adapts the customer's mobile banking interface based on transaction history, financial health, life-stage signals, risk indicators, and interaction preferences — designed for Tier 2/3/4, rural, and vernacular-first users across Bharat.
 
 ---
 
-## 👥 Team Ownership Structure
+## 🧭 Architecture at a Glance
 
 ```text
-LAKSHYA
-apps/frontend/**
+Bank Data → Feature Extraction → Signals → Customer State → Recommendations → Experience Config → Adaptive UI
+```
 
-HARSH
-apps/backend/**
+Three interconnected systems:
 
-UBAID
-ai/**
+| Layer | What it does | Tech |
+|---|---|---|
+| **Backend Intelligence** | Customer 360, signals, recommendations, experience orchestration | Python, FastAPI, Pydantic |
+| **Adaptive Frontend** | Renders dynamic UI from ExperienceConfig | React Native, Expo 52, TypeScript, Zustand |
+| **Voice Layer** | Vernacular intent detection (Hindi, Gujarati, English) | Python (MiniCPM5 planned) |
 
-SHARED
-contracts/**    ← Frozen JSON Schemas (Do not modify casually)
-data/**         ← Seed files & Scenario definitions
-docs/**         ← Architecture & API specifications
-scripts/**      ← Automation & Demo runners
+---
+
+## 📁 Repository Structure
+
+```text
+apps/frontend/    → Lakshya (UI/UX, adaptive interface)
+apps/backend/     → Harsh   (API, experience orchestration)
+ai/               → Ubaid   (AI/ML, signals, voice)
+contracts/        → Shared  (frozen JSON Schema interfaces)
+data/             → Shared  (synthetic seed data & scenarios)
+docs/             → Shared  (documentation)
+scripts/          → Shared  (automation & demo runners)
 ```
 
 ---
 
-## 📁 Repository Layout
+## 👥 Team
 
-```text
-.
-├── README.md
-├── .gitignore
-├── .env.example
-├── docker-compose.yml
-├── .github/
-│   └── CODEOWNERS                # Hard ownership declarations
-│
-├── apps/
-│   ├── frontend/                 # LAKSHYA ONLY (React Native / Expo)
-│   │   ├── src/
-│   │   │   ├── components/       # AdaptiveHeader, BalanceHeader, ContextCard
-│   │   │   ├── screens/          # Home, Payments, Activity, Insights, Mitra, Profile
-│   │   │   ├── animations/       # Fluid layout & card transitions
-│   │   │   ├── hooks/            # useExperience hook
-│   │   │   ├── api/              # experienceApi client
-│   │   │   ├── mock/
-│   │   │   │   └── experience.json # Decoupled mock contract for zero-dependency UI dev
-│   │   │   └── styles/           # Centralized Bharat fintech theme
-│   │   └── package.json
-│   │
-│   └── backend/                  # HARSH ONLY (FastAPI / Python)
-│       ├── app/
-│       │   ├── api/              # REST routes (/experience, /customer, /scenario, /voice)
-│       │   ├── services/         # StateService
-│       │   ├── models/           # Pydantic models from contracts
-│       │   ├── db/               # DataLoader for seeds and scenarios
-│       │   ├── experience/       # ExperienceComposer (translates State -> UI config)
-│       │   └── main.py           # FastAPI entrypoint
-│       ├── tests/                # Contract verification tests
-│       └── requirements.txt
-│
-├── ai/                            # UBAID ONLY (Python AI & Voice)
-│   ├── intelligence/
-│   │   ├── features/             # FeatureExtractor (transaction metrics)
-│   │   ├── signals/              # SignalDetector (commute, medical, stress)
-│   │   ├── customer_state/       # CustomerStateGenerator
-│   │   ├── recommendations/      # Ethical RecommendationRanker (loan suppression)
-│   │   ├── explanations/         # Explainer ("Why am I seeing this?")
-│   │   └── run.py                # CLI runner: scenario -> customer-state.json
-│   │
-│   ├── voice/
-│   │   ├── model/                # Voice model adapter
-│   │   ├── inference/            # Intent classifier
-│   │   ├── intents/              # Intent handlers (PAY_METRO, CHECK_EMI, etc.)
-│   │   ├── prompts/              # Vernacular prompts (EN, HI, GU)
-│   │   └── run_voice.py          # CLI runner: utterance -> voice-intent.json
-│   │
-│   └── requirements.txt
-│
-├── contracts/                     # SHARED FROZEN INTERFACES
-│   ├── customer-state.schema.json # Ubaid -> Harsh contract
-│   ├── experience.schema.json     # Harsh -> Lakshya contract
-│   └── voice-intent.schema.json   # Ubaid -> Harsh contract
-│
-├── data/
-│   ├── seed/
-│   │   ├── customers.json
-│   │   └── transactions.json
-│   └── scenarios/
-│       ├── normal.json           # Metro 8:40 AM habit, stable surplus
-│       ├── life-change.json      # Large ₹48.2k hospital expense
-│       └── financial-stress.json # High EMI burden, loans suppressed
-│
-├── docs/
-│   ├── architecture.md           # Deep dive into one-way data flow
-│   ├── api.md                    # FastAPI endpoints reference
-│   └── demo-flow.md              # Judge presentation script & state walkthrough
-│
-└── scripts/
-    ├── seed-data.py              # Data initialization script
-    ├── run-demo.sh               # Bash demo execution script
-    └── run-demo.ps1              # Windows PowerShell demo script
+| Member | Role | Ownership |
+|---|---|---|
+| **Harsh Solanki** | Team Lead, Backend | `apps/backend/`, system architecture, integration |
+| **Panchal Lakshya** | Frontend | `apps/frontend/`, adaptive UI, animations, voice UI |
+| **Ubaid Khan** | AI/ML | `ai/`, feature extraction, signals, recommendations, voice SLM |
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- Expo Go app on phone (for mobile testing)
+
+### 1. Backend (Harsh)
+```bash
+pip install -r apps/backend/requirements.txt
+uvicorn apps.backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+- API Docs: http://localhost:8000/docs
+- Health: http://localhost:8000/health
+
+### 2. Frontend (Lakshya)
+```bash
+cd apps/frontend
+npm install
+npx expo start
+```
+Scan QR code with Expo Go on your phone.
+
+### 3. AI Pipeline (Ubaid)
+```bash
+pip install -r ai/requirements.txt
+python ai/intelligence/run.py --scenario normal
+python ai/voice/run_voice.py --query "Pay Metro" --lang en
 ```
 
----
-
-## 📜 The Core Contracts
-
-1. **`contracts/customer-state.schema.json`**:
-   - **Producer**: Ubaid (`ai/`)
-   - **Consumer**: Harsh (`apps/backend/`)
-   - Validates customer financial health, behavioral signals, and ethical recommendations.
-
-2. **`contracts/experience.schema.json`**:
-   - **Producer**: Harsh (`apps/backend/`)
-   - **Consumer**: Lakshya (`apps/frontend/`)
-   - Defines `primary_actions`, `priority_modules`, `deprioritized_modules`, and `hero_card`.
-
-3. **`contracts/voice-intent.schema.json`**:
-   - **Producer**: Ubaid (`ai/voice/`)
-   - **Consumer**: Harsh (`apps/backend/`)
-   - Handles multi-lingual voice requests (`PAY_METRO`, `CHECK_EMI`, `MEDICAL_CLAIM_HELP`).
-
----
-
-## 🚦 How to Run
-
-### 1. Run Data & Contract Validation
+### 4. Full Validation
 ```bash
 python scripts/seed-data.py
 python ai/intelligence/run.py --scenario normal
 python ai/intelligence/run.py --scenario financial-stress
-python ai/voice/run_voice.py --query "मेरी मेट्रो का भुगतान करो" --lang hi
+python ai/voice/run_voice.py --query "Pay Metro" --lang en
 python apps/backend/tests/test_experience.py
+cd apps/frontend && npx tsc --noEmit
 ```
 
-### 2. Start Backend (Harsh)
-```bash
-uvicorn apps.backend.app.main:app --host 0.0.0.0 --port 8000 --reload
-```
-- API Docs: `http://localhost:8000/docs`
-- Health: `http://localhost:8000/health`
-- Experience Endpoint: `http://localhost:8000/api/v1/experience/cust_bharat_001`
+---
 
-### 3. Start Frontend Mobile App (Lakshya)
-```bash
-cd apps/frontend
+## 📜 Core Contracts
 
-# For Mobile Testing on Physical Phone (Expo Go)
-npx expo start
-# -> Scan the QR code using the Expo Go app on iOS/Android
+| Contract | Producer → Consumer | Schema |
+|---|---|---|
+| CustomerState | Ubaid (AI) → Harsh (Backend) | [`customer-state.schema.json`](contracts/customer-state.schema.json) |
+| ExperienceConfig | Harsh (Backend) → Lakshya (Frontend) | [`experience.schema.json`](contracts/experience.schema.json) |
+| VoiceIntent | Ubaid (Voice) → Harsh (Backend) | [`voice-intent.schema.json`](contracts/voice-intent.schema.json) |
 
-# Or for Web Browser Testing
-npm run web
-```
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|---|---|
+| [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md) | Problem statement, product vision, target users, principles |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Full system architecture with Mermaid diagrams |
+| [REPOSITORY_STRUCTURE.md](docs/REPOSITORY_STRUCTURE.md) | Folder ownership, dependency rules, merge-conflict avoidance |
+| [DEVELOPMENT_WORKFLOW.md](docs/DEVELOPMENT_WORKFLOW.md) | Git workflow, branches, commit conventions, PR rules |
+| [CONTRACTS.md](docs/CONTRACTS.md) | Interface contracts with example payloads |
+| [DATA_MODEL.md](docs/DATA_MODEL.md) | Conceptual entities and relationships |
+| [AI_ARCHITECTURE.md](docs/AI_ARCHITECTURE.md) | AI/ML pipeline, voice SLM, ethical guardrails |
+| [DEMO_FLOW.md](docs/DEMO_FLOW.md) | Hackathon demo presentation script |
+| [api.md](docs/api.md) | REST API endpoint reference |
+| [AI_SYSTEM_GUIDE.md](AI_SYSTEM_GUIDE.md) | Complete AI agent reference guide |
+
+---
+
+## 📊 Implementation Status
+
+| Component | Status | Owner |
+|---|---|---|
+| JSON Schema Contracts | ✅ Complete | Shared |
+| Seed Data & Scenarios | ✅ Complete (5 scenarios) | Shared |
+| AI Feature Extraction | ✅ Implemented (rule-based) | Ubaid |
+| AI Signal Detection | ✅ Implemented (rule-based) | Ubaid |
+| AI Recommendation Ranking | ✅ Implemented (with ethical suppression) | Ubaid |
+| Voice Intent Classification | ✅ Implemented (rule-based, 3 languages) | Ubaid |
+| Backend API (FastAPI) | ✅ Implemented | Harsh |
+| Experience Composer | ✅ Implemented | Harsh |
+| Backend Tests | ✅ Basic contract tests | Harsh |
+| Frontend App (Expo) | ✅ Full UI with 5 scenario states | Lakshya |
+| Offline State Bundles | ✅ Complete for all scenarios | Lakshya |
+| MiniCPM5 SLM Integration | 🔲 Not started | Ubaid |
+| Real ML Models | 🔲 Not started | Ubaid |
+| Authentication | 🔲 Not started | Harsh |
+| Database Integration | 🔲 Not started (using JSON files) | Harsh |
+
+---
+
+## ⚠️ Important Notes
+
+- All customer data is **synthetic** — no real banking data is used
+- The voice SLM is currently **rule-based** — MiniCPM5 integration is planned
+- This is an **intelligence layer** over existing banking infrastructure, not a replacement
+- When financial stress is detected, **loan promotions are strictly suppressed** (ethical guardrail)
+- We do **not** claim full RBI/DPDP compliance — we demonstrate awareness and design intent

@@ -1,4 +1,4 @@
-﻿from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 
 class Balance(BaseModel):
@@ -13,6 +13,15 @@ class Recommendation(BaseModel):
     reason: Optional[str] = ""
     priority: int
     suppressed: Optional[bool] = False
+    # Task 4: Explicit action metadata (optional, backward compatible)
+    action_label: Optional[str] = None
+    action_type: Optional[str] = None
+    journey_id: Optional[str] = None
+    payload: Optional[Dict[str, Any]] = None
+    # Task 5: Structured ethical classification attributes (optional, backward compatible)
+    product_type: Optional[str] = None
+    risk_class: Optional[str] = None
+    is_debt_product: Optional[bool] = None
 
 class CustomerStateModel(BaseModel):
     customer_id: str

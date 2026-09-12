@@ -21,7 +21,7 @@
 The repository is structured with hard ownership boundaries to enable parallel multi-agent development:
 
 ```text
-d:/Vault/dau/
+ABC-Bank/   (project root)
 │
 ├── README.md                  # Project overview and quickstart
 ├── AI_SYSTEM_GUIDE.md         # THIS FILE: Master AI reference guide

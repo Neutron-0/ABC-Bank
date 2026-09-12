@@ -1,0 +1,19 @@
+{
+  "name": "surplus",
+  "title": "High Liquidity & Surplus Growth",
+  "customer_id": "cust_bharat_001",
+  "balance": {
+    "available": 84200,
+    "savings": 210000,
+    "currency": "INR"
+  },
+  "signals": {
+    "savings_trend": "positive",
+    "surplus_detected": true,
+    "surplus_amount": 41520,
+    "metro_usage": "medium",
+    "upi_usage": "high",
+    "investment_interest": "high",
+    "anomaly_score": 2
+  }
+}
