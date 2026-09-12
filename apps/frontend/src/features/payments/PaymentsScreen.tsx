@@ -189,7 +189,7 @@ export const PaymentsScreen: React.FC = () => {
           <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
             Direct zero-fee IMPS & UPI transfers across all Indian banks
           </Text>
-          <View style={[styles.actionsGrid, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+          <View style={[styles.actionsGrid, { borderTopColor: colors.borderLight, borderBottomColor: colors.borderLight }]}>
             <SmartAction
               label={t.payments.scanPay}
               sublabel="Any QR"
@@ -272,17 +272,17 @@ export const PaymentsScreen: React.FC = () => {
         <View style={styles.modalOverlay}>
           <View style={[styles.modalSheet, { backgroundColor: colors.cardBg }]}>
             {/* Modal Header */}
-            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: colors.borderLight }]}>
               <View>
                 <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
                   {payStep === 'input'
-                    ? 'Send UPI Payment'
+                    ? 'Send Payment'
                     : payStep === 'pin'
-                    ? 'Authorize Payment'
-                    : 'Payment Confirmation'}
+                    ? 'Authorize Transfer'
+                    : 'Transfer Receipt'}
                 </Text>
                 <Text style={[styles.modalSubtitle, { color: colors.textMuted }]}>
-                  ABC Bank Immediate Payment Service
+                  ABC Payments Bank • Instant IMPS / UPI
                 </Text>
               </View>
               <TouchableOpacity onPress={closePayModal} style={[styles.closeBtn, { backgroundColor: colors.cardBgSecondary }]}>
@@ -290,25 +290,38 @@ export const PaymentsScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
 
-            {/* STEP 1: Enter Amount */}
+            {/* STEP 1: Editorial Payment Form */}
             {payStep === 'input' && (
               <View style={styles.stepBox}>
-                <View style={styles.recipientHeader}>
-                  <Text style={[styles.recipientLabel, { color: colors.textMuted }]}>{t.payments.payingTo}</Text>
-                  <Text style={[styles.recipientName, { color: colors.textPrimary }]}>{payRecipient}</Text>
+                <View style={styles.editorialField}>
+                  <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>RECIPIENT</Text>
+                  <Text style={[styles.fieldValue, { color: colors.textPrimary }]}>{payRecipient}</Text>
                 </View>
 
-                <View style={[styles.amountInputWrap, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
-                  <Text style={[styles.amountPrefix, { color: colors.textPrimary }]}>₹</Text>
-                  <TextInput
-                    style={[styles.amountInput, { color: colors.textPrimary }]}
-                    placeholder="0"
-                    placeholderTextColor={colors.textMuted}
-                    keyboardType="numeric"
-                    value={payAmount}
-                    onChangeText={(val) => setPayAmount(val.replace(/[^0-9.]/g, ''))}
-                    autoFocus
-                  />
+                <View style={[styles.editorialField, { marginTop: spacing.md }]}>
+                  <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>AMOUNT</Text>
+                  <View style={[styles.amountInputWrap, { backgroundColor: colors.cardBgSecondary, borderColor: colors.borderLight }]}>
+                    <Text style={[styles.amountPrefix, { color: colors.textPrimary }]}>₹</Text>
+                    <TextInput
+                      style={[styles.amountInput, { color: colors.textPrimary }]}
+                      placeholder="0"
+                      placeholderTextColor={colors.textMuted}
+                      keyboardType="numeric"
+                      value={payAmount}
+                      onChangeText={(val) => setPayAmount(val.replace(/[^0-9.]/g, ''))}
+                      autoFocus
+                    />
+                  </View>
+                </View>
+
+                <View style={[styles.editorialField, { marginTop: spacing.md }]}>
+                  <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>FROM</Text>
+                  <Text style={[styles.fieldValue, { color: colors.textPrimary }]}>
+                    ABC Bank Savings · •••• 4092
+                  </Text>
+                  <Text style={[styles.fieldSubValue, { color: colors.textSecondary }]}>
+                    Available balance: ₹{balance.available.toLocaleString('en-IN')}
+                  </Text>
                 </View>
 
                 {/* Quick Chips */}
@@ -316,26 +329,13 @@ export const PaymentsScreen: React.FC = () => {
                   {['100', '500', '1000', '2000', '5000'].map((chip) => (
                     <TouchableOpacity
                       key={chip}
-                      style={[styles.chip, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}
+                      style={[styles.chip, { backgroundColor: colors.cardBgSecondary, borderColor: colors.borderLight }]}
                       onPress={() => setPayAmount(chip)}
                       activeOpacity={0.7}
                     >
-                      <Text style={[styles.chipText, { color: colors.primary }]}>+₹{Number(chip).toLocaleString('en-IN')}</Text>
+                      <Text style={[styles.chipText, { color: colors.textPrimary }]}>+₹{Number(chip).toLocaleString('en-IN')}</Text>
                     </TouchableOpacity>
                   ))}
-                </View>
-
-                <View style={[styles.accountChoice, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
-                  <View style={styles.accountChoiceRow}>
-                    <Text style={[styles.accountChoiceLabel, { color: colors.textMuted }]}>Debiting From</Text>
-                    <Text style={[styles.accountChoiceType, { color: colors.success }]}>Active • Primary</Text>
-                  </View>
-                  <Text style={[styles.accountChoiceValue, { color: colors.textPrimary }]}>
-                    ABC Bank Savings A/c •••• 4092
-                  </Text>
-                  <Text style={[styles.accountChoiceBalance, { color: colors.textSecondary }]}>
-                    Available: ₹{balance.available.toLocaleString('en-IN')}
-                  </Text>
                 </View>
 
                 {(() => {
@@ -345,7 +345,7 @@ export const PaymentsScreen: React.FC = () => {
                     <TouchableOpacity
                       style={[
                         styles.primaryActionBtn,
-                        { backgroundColor: colors.primary },
+                        { backgroundColor: colors.primary, marginTop: spacing.lg },
                         isInvalid && styles.disabledBtn,
                       ]}
                       onPress={handleProceedToPin}
@@ -563,38 +563,38 @@ const styles = StyleSheet.create({
   actionsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    borderRadius: radii.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    ...shadows.sm,
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(20, 20, 20, 0.45)',
     justifyContent: 'flex-end',
   },
   modalSheet: {
-    borderTopLeftRadius: radii.xl,
-    borderTopRightRadius: radii.xl,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
     padding: spacing.lg,
     maxHeight: '92%',
-    ...shadows.lg,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingBottom: spacing.sm,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     marginBottom: spacing.md,
   },
   modalTitle: {
-    ...typography.h3,
-    fontSize: 17,
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: -0.3,
   },
   modalSubtitle: {
-    ...typography.tiny,
+    fontSize: 11,
+    fontWeight: '400',
     marginTop: 2,
   },
   closeBtn: {
@@ -604,16 +604,24 @@ const styles = StyleSheet.create({
   stepBox: {
     paddingVertical: spacing.xs,
   },
-  recipientHeader: {
-    marginBottom: spacing.md,
+  editorialField: {
+    marginBottom: 4,
   },
-  recipientLabel: {
-    ...typography.tiny,
+  fieldLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    marginBottom: 3,
   },
-  recipientName: {
-    ...typography.h3,
+  fieldValue: {
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+  },
+  fieldSubValue: {
+    fontSize: 12,
+    fontWeight: '400',
     marginTop: 2,
   },
   amountInputWrap: {

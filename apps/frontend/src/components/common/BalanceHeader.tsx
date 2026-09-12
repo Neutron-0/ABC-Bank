@@ -48,345 +48,262 @@ export const BalanceHeader: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Signature Institutional Banking Luxury Account Card */}
-      <View style={[styles.heroCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
-        {/* Top Account Identifier Row */}
-        <View style={styles.cardTopRow}>
-          <View style={styles.bankTagGroup}>
-            <View style={[styles.shieldIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
-              <ShieldCheck size={14} color={themeColors.primary} />
-            </View>
-            <View>
-              <Text style={[styles.bankTagTitle, { color: themeColors.primary }]}>ABC PAYMENTS BANK</Text>
-              <Text style={[styles.accountNumberText, { color: themeColors.textSecondary }]}>Savings A/C •••• 4092</Text>
-            </View>
-          </View>
-
-          {/* UPI ID Pill with Copy */}
+      {/* Financial Anchor - Content-First Editorial Typography */}
+      <View style={styles.anchorSection}>
+        {/* Label & Privacy Row */}
+        <View style={styles.labelRow}>
+          <Text style={[styles.balanceLabel, { color: themeColors.textSecondary }]}>
+            {language === 'hi' ? 'उपलब्ध शेष राशि' : language === 'gu' ? 'ઉપલબ્ધ બેલેન્સ' : 'AVAILABLE BALANCE'}
+          </Text>
           <TouchableOpacity
-            style={[styles.upiPill, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}
-            onPress={handleCopyUpiId}
+            onPress={toggleBalanceHide}
+            style={styles.eyeBtn}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             activeOpacity={0.7}
           >
-            <Text style={[styles.upiPillText, { color: themeColors.textSecondary }]}>rahul@abcbank</Text>
-            <Copy size={11} color={themeColors.iconNeutral} />
+            {isBalanceHidden ? (
+              <EyeOff size={15} color={themeColors.textSecondary} />
+            ) : (
+              <Eye size={15} color={themeColors.textSecondary} />
+            )}
           </TouchableOpacity>
         </View>
 
-        {/* Available Balance Figure */}
-        <View style={styles.balanceContainer}>
-          <View style={styles.balanceLabelRow}>
-            <Text style={[styles.balanceLabel, { color: themeColors.textSecondary }]}>
-              {language === 'hi' ? 'उपलब्ध शेष राशि' : language === 'gu' ? 'ઉપલબ્ધ બેલેન્સ' : 'AVAILABLE BALANCE'}
-            </Text>
-            <TouchableOpacity
-              onPress={toggleBalanceHide}
-              style={styles.eyeBtn}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              activeOpacity={0.7}
-            >
-              {isBalanceHidden ? (
-                <EyeOff size={15} color={themeColors.textSecondary} />
-              ) : (
-                <Eye size={15} color={themeColors.textSecondary} />
-              )}
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.balanceRowWithAdd}>
-            <View style={styles.balanceAmountWrap}>
-              <AnimatedBalance
-                value={balance.available}
-                isPrivacyHidden={isBalanceHidden}
-                currencyPrefix="₹"
-                fractionSuffix=".00"
-              />
-            </View>
-
-            <TouchableOpacity
-              style={[
-                styles.addMoneyPill,
-                {
-                  backgroundColor: themeColors.cardBgSecondary,
-                  borderColor: themeColors.border,
-                },
-              ]}
-              onPress={() => setActiveTab('payments')}
-              activeOpacity={0.8}
-            >
-              <Plus size={13} color={themeColors.primary} />
-              <Text style={[styles.addMoneyPillText, { color: themeColors.primary }]}>
-                {language === 'hi' ? 'पैसे जोड़ें' : language === 'gu' ? 'પૈસા ઉમેરો' : 'Add Money'}
-              </Text>
-            </TouchableOpacity>
+        {/* Large Financial Figure */}
+        <View style={styles.amountRow}>
+          <View style={styles.balanceAmountWrap}>
+            <AnimatedBalance
+              value={balance.available}
+              isPrivacyHidden={isBalanceHidden}
+              currencyPrefix="₹"
+              fractionSuffix=".00"
+            />
           </View>
         </View>
 
-        {/* Secondary Ledger Metrics Row */}
-        <View style={[styles.ledgerRow, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight }]}>
-          <View style={styles.ledgerCol}>
-            <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>
-              {language === 'hi' ? 'कुल बैलेंस' : language === 'gu' ? 'કુલ બેલેન્સ' : 'Total Deposits'}
+        {/* Account Meta & Copyable UPI ID */}
+        <View style={styles.accountMetaRow}>
+          <Text style={[styles.accountMetaText, { color: themeColors.textSecondary }]}>
+            Savings · •••• 4092
+          </Text>
+          <Text style={[styles.metaDot, { color: themeColors.border }]}>·</Text>
+          <TouchableOpacity
+            style={styles.upiInlineBtn}
+            onPress={handleCopyUpiId}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.upiInlineText, { color: themeColors.textSecondary }]}>rahul@abcbank</Text>
+            <Copy size={11} color={themeColors.textMuted} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Structured Financial Metadata Strip */}
+        <View style={[styles.metricsStrip, { borderTopColor: themeColors.borderLight }]}>
+          <View style={styles.metricItem}>
+            <Text style={[styles.metricLabel, { color: themeColors.textMuted }]}>
+              {language === 'hi' ? 'कुल जमा' : language === 'gu' ? 'કુલ ડિપોઝિટ' : 'Total Deposits'}
             </Text>
-            <Text style={[styles.ledgerValue, { color: themeColors.textPrimary }]}>
+            <Text style={[styles.metricVal, { color: themeColors.textPrimary }]}>
               {isBalanceHidden ? '••••••' : '₹72,500'}
             </Text>
           </View>
-          <View style={[styles.ledgerDivider, { backgroundColor: themeColors.divider }]} />
-          <View style={styles.ledgerCol}>
-            <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>
-              {language === 'hi' ? 'ऑटो-स्वीप एफडी' : language === 'gu' ? 'ઑટો-સ્વીપ FD' : 'Auto-Sweep FD'}
+          <View style={[styles.metricDivider, { backgroundColor: themeColors.borderLight }]} />
+          <View style={styles.metricItem}>
+            <Text style={[styles.metricLabel, { color: themeColors.textMuted }]}>
+              {language === 'hi' ? 'ऑटो-स्वीप' : language === 'gu' ? 'ઑટો-સ્વીપ' : 'Auto-Sweep FD'}
             </Text>
-            <Text style={[styles.ledgerValue, { color: themeColors.brandSecondary }]}>
+            <Text style={[styles.metricVal, { color: themeColors.brandSecondary }]}>
               {isBalanceHidden ? '••••••' : '₹18,000 (7.2%)'}
             </Text>
           </View>
-          <View style={[styles.ledgerDivider, { backgroundColor: themeColors.divider }]} />
-          <View style={styles.ledgerCol}>
-            <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>
-              {language === 'hi' ? 'आईएफएससी' : language === 'gu' ? 'IFSC' : 'IFSC Code'}
-            </Text>
-            <Text style={[styles.ledgerValue, { color: themeColors.textPrimary }]}>ABCD0001048</Text>
+          <View style={[styles.metricDivider, { backgroundColor: themeColors.borderLight }]} />
+          <View style={styles.metricItem}>
+            <Text style={[styles.metricLabel, { color: themeColors.textMuted }]}>IFSC</Text>
+            <Text style={[styles.metricVal, { color: themeColors.textPrimary }]}>ABCD0001048</Text>
           </View>
         </View>
       </View>
 
-      {/* 4-Column Primary Transfer Hub (Monochromatic Banking Actions) */}
-      <View style={[styles.quickActionsBar, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
-        {/* 1. Scan QR */}
+      {/* Action Band: Send · Receive · Pay · More */}
+      <View style={[styles.actionBand, { borderTopColor: themeColors.borderLight, borderBottomColor: themeColors.borderLight }]}>
+        {/* 1. Send */}
         <TouchableOpacity
-          style={styles.quickActionItem}
+          style={styles.actionBandItem}
           onPress={() => setActiveTab('payments')}
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight, borderWidth: 1 }]}>
-            <QrCode size={19} color={themeColors.primary} />
+          <View style={[styles.actionIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+            <Send size={17} color={themeColors.primary} />
           </View>
-          <Text style={[styles.quickActionLabel, { color: themeColors.textPrimary }]}>
-            {language === 'hi' ? 'स्कैन क्यूआर' : language === 'gu' ? 'સ્કેન QR' : 'Scan QR'}
+          <Text style={[styles.actionBandLabel, { color: themeColors.textPrimary }]}>
+            {language === 'hi' ? 'भेजें' : language === 'gu' ? 'મોકલો' : 'Send'}
           </Text>
         </TouchableOpacity>
 
-        {/* 2. To Mobile / Contact */}
+        {/* 2. Receive / QR */}
         <TouchableOpacity
-          style={styles.quickActionItem}
+          style={styles.actionBandItem}
           onPress={() => setActiveTab('payments')}
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight, borderWidth: 1 }]}>
-            <Smartphone size={19} color={themeColors.iconNeutral} />
+          <View style={[styles.actionIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+            <QrCode size={17} color={themeColors.primary} />
           </View>
-          <Text style={[styles.quickActionLabel, { color: themeColors.textPrimary }]}>
-            {language === 'hi' ? 'मोबाइल पे' : language === 'gu' ? 'મોબાઇલ પે' : 'To Mobile'}
+          <Text style={[styles.actionBandLabel, { color: themeColors.textPrimary }]}>
+            {language === 'hi' ? 'प्राप्त करें' : language === 'gu' ? 'મેળવો' : 'Receive'}
           </Text>
         </TouchableOpacity>
 
-        {/* 3. To Bank Account */}
+        {/* 3. Pay */}
         <TouchableOpacity
-          style={styles.quickActionItem}
+          style={styles.actionBandItem}
           onPress={() => setActiveTab('payments')}
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight, borderWidth: 1 }]}>
-            <Building2 size={19} color={themeColors.iconNeutral} />
+          <View style={[styles.actionIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+            <Receipt size={17} color={themeColors.primary} />
           </View>
-          <Text style={[styles.quickActionLabel, { color: themeColors.textPrimary }]}>
-            {language === 'hi' ? 'बैंक खाता' : language === 'gu' ? 'બેંક ખાતું' : 'To Bank'}
+          <Text style={[styles.actionBandLabel, { color: themeColors.textPrimary }]}>
+            {language === 'hi' ? 'भुगतान' : language === 'gu' ? 'ચુકવો' : 'Pay'}
           </Text>
         </TouchableOpacity>
 
-        {/* 4. To Self / UPI ID */}
+        {/* 4. More */}
         <TouchableOpacity
-          style={styles.quickActionItem}
+          style={styles.actionBandItem}
           onPress={() => setActiveTab('payments')}
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight, borderWidth: 1 }]}>
-            <ArrowLeftRight size={19} color={themeColors.iconNeutral} />
+          <View style={[styles.actionIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+            <Building2 size={17} color={themeColors.primary} />
           </View>
-          <Text style={[styles.quickActionLabel, { color: themeColors.textPrimary }]}>
-            {language === 'hi' ? 'यूपीआई आईडी' : language === 'gu' ? 'UPI ID' : 'To UPI ID'}
+          <Text style={[styles.actionBandLabel, { color: themeColors.textPrimary }]}>
+            {language === 'hi' ? 'अन्य' : language === 'gu' ? 'વધુ' : 'More'}
           </Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-
 };
 
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.sm,
   },
-  heroCard: {
-    backgroundColor: colors.cardBg,
-    borderRadius: radii.card,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    ...shadows.soft,
-    borderWidth: 1,
-    borderColor: colors.border,
+  // Financial Anchor
+  anchorSection: {
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.md,
   },
-  cardTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  bankTagGroup: {
+  labelRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-  },
-  shieldIconWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.cardBgSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bankTagTitle: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: colors.primary,
-    letterSpacing: 0.5,
-  },
-  accountNumberText: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: colors.textSecondary,
-    marginTop: 1,
-  },
-  upiPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: colors.cardBgSecondary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: radii.pill,
-  },
-  upiPillText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.textSecondary,
-  },
-  balanceContainer: {
-    marginBottom: 0,
-  },
-  balanceLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   balanceLabel: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 0.8,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
   eyeBtn: {
     padding: 2,
   },
-  balanceRowWithAdd: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  amountRow: {
+    marginVertical: 4,
   },
   balanceAmountWrap: {
     marginVertical: 2,
   },
-  addMoneyPill: {
+  accountMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: colors.primarySubtle,
-    paddingVertical: 7,
-    paddingHorizontal: 14,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
+    gap: 8,
+    marginTop: 4,
+    marginBottom: spacing.md,
   },
-  addMoneyPillText: {
+  accountMetaText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  metaDot: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  upiInlineBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  upiInlineText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: colors.primary,
+    fontWeight: '500',
   },
 
-  // Secondary Ledger Metrics
-  ledgerRow: {
+  // Structured Metadata Strip
+  metricsStrip: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.cardBgSecondary,
-    borderRadius: radii.md,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginTop: 14,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    marginTop: 2,
   },
-  ledgerCol: {
+  metricItem: {
     flex: 1,
-    alignItems: 'center',
   },
-  ledgerDivider: {
-    width: 1,
-    height: 22,
-    backgroundColor: colors.divider,
-  },
-  ledgerLabel: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 0.3,
+  metricLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 0.5,
     textTransform: 'uppercase',
-    marginBottom: 2,
+    marginBottom: 3,
   },
-  ledgerValue: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -0.1,
+  metricVal: {
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+  },
+  metricDivider: {
+    width: 1,
+    height: 24,
+    marginHorizontal: 12,
   },
 
-  // 4-Column Quick Actions Bar
-  quickActionsBar: {
+  // Compact Action Band: Send · Receive · Pay · More
+  actionBand: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: colors.cardBg,
-    borderRadius: radii.card,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    ...shadows.soft,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingVertical: spacing.md,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
   },
-  quickActionItem: {
-    alignItems: 'center',
+  actionBandItem: {
     flex: 1,
+    alignItems: 'center',
+    gap: 6,
   },
-  quickActionCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+  actionIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
   },
-  quickActionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textPrimary,
+  actionBandLabel: {
+    fontSize: 12,
+    fontWeight: '600',
     textAlign: 'center',
+    letterSpacing: 0.1,
   },
 });

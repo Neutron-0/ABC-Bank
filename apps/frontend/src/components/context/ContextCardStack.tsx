@@ -58,10 +58,10 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm + 4,
   },
   eyebrow: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#8C95A6',
-    letterSpacing: 1.2,
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#737373',
+    letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
   stackList: {

@@ -64,109 +64,109 @@ export const InsightsScreen: React.FC = () => {
         contentContainerStyle={{ paddingBottom: 110, paddingTop: spacing.md }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Premier Bespoke Financial Cash Flow Graph */}
-        <View style={styles.graphContainer}>
-          <BespokeFinancialGraph />
-        </View>
+      {/* Premier Bespoke Financial Cash Flow Graph */}
+      <View style={styles.graphContainer}>
+        <BespokeFinancialGraph />
+      </View>
 
-        {/* Overall Health Status Card */}
-        <View style={[styles.statusCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
-          <View style={styles.statusTop}>
-            <Text style={[styles.statusCardLabel, { color: colors.textSecondary }]}>
-              {t.insights.overallPicture}
-            </Text>
-            <View style={[styles.statusBadge, { backgroundColor: badge.bg }]}>
-              <Text style={[styles.statusBadgeText, { color: badge.color }]}>{badge.label}</Text>
-            </View>
-          </View>
-
-          {/* Key Metrics Grid */}
-          <View style={styles.metricsGrid}>
-            <View style={[styles.metricItem, { backgroundColor: colors.cardBgSecondary }]}>
-              <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
-                {t.insights.cashFlowStability}
-              </Text>
-              <Text style={[styles.metricVal, { color: colors.textPrimary }]}>
-                {financialHealth.cashFlowStabilityScore} / 100
-              </Text>
-            </View>
-
-            <View style={[styles.metricItem, { backgroundColor: colors.cardBgSecondary }]}>
-              <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
-                {t.insights.savingsRate}
-              </Text>
-              <Text style={[styles.metricVal, { color: colors.primary }]}>
-                {financialHealth.savingsRatePercent}%
-              </Text>
-            </View>
-
-            <View style={[styles.metricItem, { backgroundColor: colors.cardBgSecondary }]}>
-              <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
-                {t.insights.debtToIncome}
-              </Text>
-              <Text
-                style={[
-                  styles.metricVal,
-                  financialHealth.debtToIncomeRatio > 0.4
-                    ? { color: colors.brandSecondary }
-                    : { color: colors.textPrimary },
-                ]}
-              >
-                {Math.round(financialHealth.debtToIncomeRatio * 100)}%
-              </Text>
-            </View>
-
-            <View style={[styles.metricItem, { backgroundColor: colors.cardBgSecondary }]}>
-              <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
-                {t.insights.emergencyFund}
-              </Text>
-              <Text style={[styles.metricVal, { color: colors.textPrimary }]}>
-                {financialHealth.emergencyFundMonths} Months
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Positive & Caution Statements */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-            {t.insights.positiveFactors}
+      {/* Overall Health Status & Metrics Table */}
+      <View style={styles.statusSection}>
+        <View style={styles.statusTop}>
+          <Text style={[styles.statusCardLabel, { color: colors.textSecondary }]}>
+            {t.insights.overallPicture}
           </Text>
+          <View style={[styles.statusBadge, { borderColor: colors.borderLight }]}>
+            <Text style={[styles.statusBadgeText, { color: badge.color }]}>{badge.label}</Text>
+          </View>
+        </View>
+
+        {/* 4-Pillars Aligned Metric Grid */}
+        <View style={[styles.metricsGrid, { borderTopColor: colors.borderLight }]}>
+          <View style={[styles.metricItem, { borderBottomColor: colors.borderLight, borderRightColor: colors.borderLight }]}>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
+              {t.insights.cashFlowStability}
+            </Text>
+            <Text style={[styles.metricVal, { color: colors.textPrimary }]}>
+              {financialHealth.cashFlowStabilityScore} / 100
+            </Text>
+          </View>
+
+          <View style={[styles.metricItem, { borderBottomColor: colors.borderLight }]}>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
+              {t.insights.savingsRate}
+            </Text>
+            <Text style={[styles.metricVal, { color: colors.primary }]}>
+              {financialHealth.savingsRatePercent}%
+            </Text>
+          </View>
+
+          <View style={[styles.metricItem, { borderRightColor: colors.borderLight }]}>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
+              {t.insights.debtToIncome}
+            </Text>
+            <Text
+              style={[
+                styles.metricVal,
+                financialHealth.debtToIncomeRatio > 0.4
+                  ? { color: colors.brandSecondary }
+                  : { color: colors.textPrimary },
+              ]}
+            >
+              {Math.round(financialHealth.debtToIncomeRatio * 100)}%
+            </Text>
+          </View>
+
+          <View style={styles.metricItem}>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
+              {t.insights.emergencyFund}
+            </Text>
+            <Text style={[styles.metricVal, { color: colors.textPrimary }]}>
+              {financialHealth.emergencyFundMonths} Months
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Positive & Caution Statements */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+          {t.insights.positiveFactors}
+        </Text>
+        <View style={[styles.statementList, { borderTopColor: colors.borderLight }]}>
           {financialHealth.statements.positive.map((stmt, idx) => (
             <View
               key={idx}
               style={[
                 styles.statementRow,
-                { backgroundColor: colors.cardBg, borderColor: colors.border },
+                { borderBottomColor: colors.borderLight },
               ]}
             >
-              <CheckCircle2 size={16} color={colors.primary} style={styles.iconOffset} />
+              <CheckCircle2 size={14} color={colors.primary} style={styles.iconOffset} />
               <Text style={[styles.statementText, { color: colors.textPrimary }]}>{stmt}</Text>
             </View>
           ))}
+        </View>
 
-          {financialHealth.statements.caution.length > 0 && (
-            <>
-              <Text
-                style={[
-                  styles.sectionHeading,
-                  { color: colors.textSecondary, marginTop: spacing.md },
-                ]}
-              >
-                {t.insights.cautionFactors}
-              </Text>
+        {financialHealth.statements.caution.length > 0 && (
+          <>
+            <Text
+              style={[
+                styles.sectionHeading,
+                { color: colors.textSecondary, marginTop: spacing.lg },
+              ]}
+            >
+              {t.insights.cautionFactors}
+            </Text>
+            <View style={[styles.statementList, { borderTopColor: colors.borderLight }]}>
               {financialHealth.statements.caution.map((stmt, idx) => (
                 <View
                   key={idx}
                   style={[
                     styles.statementRowCaution,
-                    {
-                      backgroundColor: colors.cardBgSecondary,
-                      borderColor: colors.border,
-                    },
+                    { borderBottomColor: colors.borderLight },
                   ]}
                 >
-                  <AlertTriangle size={16} color={colors.brandSecondary} style={styles.iconOffset} />
+                  <AlertTriangle size={14} color={colors.brandSecondary} style={styles.iconOffset} />
                   <Text
                     style={[
                       styles.statementTextCaution,
@@ -177,68 +177,20 @@ export const InsightsScreen: React.FC = () => {
                   </Text>
                 </View>
               ))}
-            </>
-          )}
-        </View>
-
-        {/* What Changed Section */}
-        <View style={styles.section}>
-          <View
-            style={[
-              styles.whatChangedCard,
-              {
-                backgroundColor: colors.cardBg,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <View style={styles.whatChangedHeader}>
-              <Activity size={18} color={colors.primary} />
-              <Text
-                style={[
-                  styles.whatChangedTitle,
-                  { color: colors.textPrimary },
-                ]}
-              >
-                {t.insights.whatChanged}
-              </Text>
             </View>
-            {financialHealth.statements.whatChanged.map((change, idx) => (
-              <View key={idx} style={styles.changeItem}>
-                <Text
-                  style={[
-                    styles.changeBullet,
-                    { color: colors.primary },
-                  ]}
-                >
-                  •
-                </Text>
-                <Text
-                  style={[
-                    styles.changeText,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  {change}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
+          </>
+        )}
+      </View>
 
-        {/* Natural Language Digest Cards */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>
-            Natural-Language Digest
-          </Text>
+      {/* Natural Language Digest */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+          Financial Insights & Habits
+        </Text>
 
-          <View
-            style={[
-              styles.digestCard,
-              { backgroundColor: colors.cardBg, borderColor: colors.border },
-            ]}
-          >
-            <Text style={[styles.digestTag, { color: colors.primary }]}>
+        <View style={[styles.digestList, { borderTopColor: colors.borderLight }]}>
+          <View style={[styles.digestItem, { borderBottomColor: colors.borderLight }]}>
+            <Text style={[styles.digestTag, { color: colors.textMuted }]}>
               COMMUTE & HABITS
             </Text>
             <Text style={[styles.digestTitle, { color: colors.textPrimary }]}>
@@ -249,13 +201,8 @@ export const InsightsScreen: React.FC = () => {
             </Text>
           </View>
 
-          <View
-            style={[
-              styles.digestCard,
-              { backgroundColor: colors.cardBg, borderColor: colors.border },
-            ]}
-          >
-            <Text style={[styles.digestTag, { color: colors.primary }]}>
+          <View style={[styles.digestItem, { borderBottomColor: colors.borderLight }]}>
+            <Text style={[styles.digestTag, { color: colors.textMuted }]}>
               UTILITIES & BILLS
             </Text>
             <Text style={[styles.digestTitle, { color: colors.textPrimary }]}>
@@ -266,9 +213,10 @@ export const InsightsScreen: React.FC = () => {
             </Text>
           </View>
         </View>
-      </ScrollView>
-    </View>
-  );
+      </View>
+    </ScrollView>
+  </View>
+);
 };
 
 const styles = StyleSheet.create({
@@ -292,136 +240,121 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   graphContainer: {
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
-  statusCard: {
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    marginHorizontal: spacing.md,
-    marginTop: spacing.xs,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    ...shadows.md,
+  statusSection: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
   statusTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   statusCardLabel: {
-    ...typography.captionMedium,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
     textTransform: 'uppercase',
   },
   statusBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-    borderRadius: radii.full,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
   },
   statusBadgeText: {
-    ...typography.tiny,
+    fontSize: 10,
     fontWeight: '700',
   },
   metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   metricItem: {
-    width: '46%',
-    padding: spacing.md,
-    borderRadius: radii.md,
+    width: '50%',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   metricLabel: {
-    ...typography.caption,
+    fontSize: 10,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
   metricVal: {
-    ...typography.h3,
-    marginTop: 4,
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+    marginTop: 2,
   },
   section: {
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.md,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
   sectionHeading: {
-    ...typography.captionMedium,
+    fontSize: 10,
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
     marginBottom: spacing.xs,
+  },
+  statementList: {
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   statementRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    padding: spacing.md,
-    borderRadius: radii.md,
-    borderWidth: 1,
-    marginBottom: spacing.xs,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     gap: spacing.sm,
   },
   statementRowCaution: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    padding: spacing.md,
-    borderRadius: radii.md,
-    borderWidth: 1,
-    marginBottom: spacing.xs,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     gap: spacing.sm,
   },
   iconOffset: {
     marginTop: 2,
   },
   statementText: {
-    ...typography.body,
+    fontSize: 13,
+    lineHeight: 18,
     flex: 1,
   },
   statementTextCaution: {
-    ...typography.body,
+    fontSize: 13,
+    lineHeight: 18,
     flex: 1,
   },
-  whatChangedCard: {
-    borderRadius: radii.lg,
-    padding: spacing.md,
-    borderWidth: 1,
+  digestList: {
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
-  whatChangedHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginBottom: spacing.xs,
-  },
-  whatChangedTitle: {
-    ...typography.bodyBold,
-  },
-  changeItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 4,
-    gap: 6,
-  },
-  changeBullet: {
-    fontSize: 16,
-  },
-  changeText: {
-    ...typography.caption,
-    flex: 1,
-  },
-  digestCard: {
-    borderRadius: radii.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    marginBottom: spacing.sm,
+  digestItem: {
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   digestTag: {
-    ...typography.tiny,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-    marginBottom: 2,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 3,
   },
   digestTitle: {
-    ...typography.bodyBold,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+    marginBottom: 2,
   },
   digestDesc: {
-    ...typography.caption,
-    marginTop: 2,
+    fontSize: 12,
+    lineHeight: 17,
   },
 });

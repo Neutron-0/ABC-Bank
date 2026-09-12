@@ -75,41 +75,30 @@ export const AdaptiveHeader: React.FC = () => {
       </View>
 
       <View style={styles.rightRow}>
-        {/* Universal Search Shortcut */}
-        <TouchableOpacity
-          style={[styles.iconButton, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
-          onPress={() => setActiveTab('assistant')}
-          activeOpacity={0.75}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Search size={18} color={themeColors.iconNeutral} />
-        </TouchableOpacity>
-
         {/* Quick QR Scanner Shortcut */}
         <TouchableOpacity
-          style={[styles.iconButton, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
+          style={styles.quietIconButton}
           onPress={() => setActiveTab('payments')}
-          activeOpacity={0.75}
+          activeOpacity={0.7}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <QrCode size={18} color={themeColors.iconNeutral} />
+          <QrCode size={18} color={themeColors.primary} />
         </TouchableOpacity>
 
         {/* Vernacular Language Selector */}
         <TouchableOpacity
-          style={[styles.langButton, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
+          style={[styles.langButton, { borderColor: themeColors.borderLight }]}
           onPress={toggleLanguage}
-          activeOpacity={0.8}
+          activeOpacity={0.75}
         >
-          <Globe size={13} color={themeColors.iconNeutral} />
           <Text style={[styles.langText, { color: themeColors.textPrimary }]}>{getLangLabel()}</Text>
         </TouchableOpacity>
 
-        {/* Notifications */}
+        {/* Simulator & Sandbox Trigger */}
         <TouchableOpacity
-          style={[styles.iconButton, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
+          style={styles.quietIconButton}
           onPress={() => openJourney('prototype_lab')}
-          activeOpacity={0.8}
+          activeOpacity={0.7}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Bell size={18} color={themeColors.iconNeutral} />
@@ -191,45 +180,31 @@ const styles = StyleSheet.create({
   rightRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
-  iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+  quietIconButton: {
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    ...shadows.sm,
   },
   unreadBadge: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: '#DC2626',
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
+    top: 6,
+    right: 6,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   langButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    height: 36,
-    paddingHorizontal: 10,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#ECEEF2',
-    ...shadows.sm,
   },
   langText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700',
-    color: '#0F172A',
+    letterSpacing: 0.5,
   },
 });

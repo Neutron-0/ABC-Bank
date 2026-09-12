@@ -24,104 +24,87 @@ export const FrequentContact: React.FC<FrequentContactProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
+      style={[styles.row, { borderBottomColor: themeColors.borderLight }]}
       onPress={onPress}
       delayPressIn={0}
-      activeOpacity={0.75}
+      activeOpacity={0.65}
     >
-      <View style={styles.leftRow}>
-        <View style={[styles.iconBox, { backgroundColor: themeColors.cardBgSecondary }]}>
-          <Icon size={20} color={themeColors.iconNeutral} />
+      <View style={styles.left}>
+        <View style={styles.titleRow}>
+          <Text style={[styles.title, { color: themeColors.textPrimary }]} numberOfLines={1}>
+            {title}
+          </Text>
+          {badge && (
+            <View style={[styles.badge, { borderColor: themeColors.borderLight }]}>
+              <Text style={[styles.badgeText, { color: themeColors.brandSecondary }]}>{badge}</Text>
+            </View>
+          )}
         </View>
-        <View style={styles.info}>
-          <View style={styles.titleRow}>
-            <Text style={[styles.title, { color: themeColors.textPrimary }]}>{title}</Text>
-            {badge && (
-              <View style={[styles.badge, { backgroundColor: themeColors.brandSecondarySubtle }]}>
-                <Text style={[styles.badgeText, { color: themeColors.brandSecondary }]}>{badge}</Text>
-              </View>
-            )}
-          </View>
-          <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>{subtitle}</Text>
-        </View>
+        <Text style={[styles.subtitle, { color: themeColors.textSecondary }]} numberOfLines={1}>
+          {subtitle}
+        </Text>
       </View>
 
-      <View style={styles.rightSide}>
+      <View style={styles.right}>
         {amount ? (
-          <Text style={[styles.amount, { color: themeColors.textPrimary }]}>₹{amount}</Text>
+          <Text style={[styles.amount, { color: themeColors.textPrimary }]}>₹{amount.toLocaleString('en-IN')}</Text>
         ) : (
-          <Text style={[styles.payCta, { color: themeColors.primary }]}>Repeat</Text>
+          <Text style={[styles.payCta, { color: themeColors.primary }]}>Pay →</Text>
         )}
       </View>
     </TouchableOpacity>
   );
 };
 
-
 const styles = StyleSheet.create({
-  card: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.cardBg,
-    padding: spacing.md,
-    borderRadius: radii.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.sm,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  leftRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
+  left: {
     flex: 1,
-  },
-  iconBox: {
-    width: 42,
-    height: 42,
-    borderRadius: radii.md,
-    backgroundColor: colors.primarySubtle,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  info: {
-    flex: 1,
+    paddingRight: spacing.md,
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: 6,
+    marginBottom: 2,
   },
   title: {
-    ...typography.bodyBold,
-    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: -0.2,
   },
   badge: {
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 6,
+    paddingHorizontal: 4,
     paddingVertical: 1,
-    borderRadius: radii.full,
+    borderRadius: 3,
+    borderWidth: 1,
   },
   badgeText: {
-    ...typography.tiny,
-    color: '#92400E',
+    fontSize: 9,
     fontWeight: '700',
+    letterSpacing: 0.3,
   },
   subtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
+    fontSize: 12,
+    fontWeight: '400',
   },
-  rightSide: {
+  right: {
     alignItems: 'flex-end',
   },
   amount: {
-    ...typography.bodyBold,
-    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.2,
   },
   payCta: {
-    ...typography.captionMedium,
-    color: colors.primary,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });

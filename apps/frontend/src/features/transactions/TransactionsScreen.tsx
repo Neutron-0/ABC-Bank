@@ -81,14 +81,14 @@ export const TransactionsScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: themeColors.cardBg, borderBottomColor: themeColors.border }]}>
+      {/* Editorial Header */}
+      <View style={[styles.header, { backgroundColor: themeColors.bg }]}>
         <Text style={[styles.title, { color: themeColors.textPrimary }]}>{t.activity.title}</Text>
         <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>{t.activity.subtitle}</Text>
 
-        {/* Search Bar */}
-        <View style={[styles.searchBar, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
-          <Search size={18} color={themeColors.textSecondary} />
+        {/* Minimal Search Bar */}
+        <View style={[styles.searchBar, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight }]}>
+          <Search size={16} color={themeColors.textSecondary} />
           <TextInput
             style={[styles.searchInput, { color: themeColors.textPrimary }]}
             placeholder="Search merchant, category, bills..."
@@ -98,7 +98,7 @@ export const TransactionsScreen: React.FC = () => {
           />
         </View>
 
-        {/* Filter Pills */}
+        {/* Editorial Filter Chips */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -111,7 +111,7 @@ export const TransactionsScreen: React.FC = () => {
                 key={cat.id}
                 style={[
                   styles.pill,
-                  { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                  { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight },
                   active && [styles.activePill, { backgroundColor: themeColors.primary, borderColor: themeColors.primary }]
                 ]}
                 onPress={() => handleFilterChange(cat.id)}
@@ -133,16 +133,16 @@ export const TransactionsScreen: React.FC = () => {
         contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.timelineHeader, { backgroundColor: themeColors.bg }]}>
-          <Text style={[styles.timelineTitle, { color: themeColors.textSecondary }]}>
-            PASSBOOK LEDGER ({filteredTransactions.length})
+        <View style={[styles.timelineHeader, { backgroundColor: themeColors.bg, borderBottomColor: themeColors.borderLight }]}>
+          <Text style={[styles.timelineTitle, { color: themeColors.textMuted }]}>
+            PASSBOOK LEDGER · {filteredTransactions.length} ENTRIES
           </Text>
         </View>
 
         {grouped.map((grp) => (
           <View key={grp.title} style={styles.dateGroup}>
-            <View style={[styles.dateGroupHeader, { backgroundColor: themeColors.cardBgSecondary, borderBottomColor: themeColors.borderLight }]}>
-              <Text style={[styles.dateGroupTitle, { color: themeColors.textSecondary }]}>{grp.title.toUpperCase()}</Text>
+            <View style={[styles.dateGroupHeader, { borderBottomColor: themeColors.borderLight }]}>
+              <Text style={[styles.dateGroupTitle, { color: themeColors.textPrimary }]}>{grp.title.toUpperCase()}</Text>
               <Text style={[styles.dateGroupCount, { color: themeColors.textMuted }]}>{grp.items.length} {grp.items.length === 1 ? 'entry' : 'entries'}</Text>
             </View>
             {grp.items.map((tx) => (
@@ -222,23 +222,17 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xs,
   },
   pill: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: 6,
-    borderRadius: radii.full,
-    backgroundColor: colors.cardBgSecondary,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: colors.border,
   },
-  activePill: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
+  activePill: {},
   pillText: {
-    ...typography.captionMedium,
-    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '500',
   },
   activePillText: {
-    color: colors.textWhite,
     fontWeight: '700',
   },
   scroll: {
@@ -247,11 +241,12 @@ const styles = StyleSheet.create({
   timelineHeader: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.bg,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   timelineTitle: {
-    ...typography.captionMedium,
-    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
     textTransform: 'uppercase',
   },
   emptyWrap: {
@@ -270,7 +265,7 @@ const styles = StyleSheet.create({
   clearBtn: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
-    borderRadius: radii.pill,
+    borderRadius: 6,
   },
   clearBtnText: {
     ...typography.captionMedium,
@@ -285,13 +280,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
+    paddingTop: spacing.md,
+    paddingBottom: 6,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   dateGroupTitle: {
     fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.8,
+    fontWeight: '800',
+    letterSpacing: 1,
   },
   dateGroupCount: {
     fontSize: 10,

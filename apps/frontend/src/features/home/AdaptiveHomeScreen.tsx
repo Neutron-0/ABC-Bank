@@ -74,6 +74,9 @@ export const AdaptiveHomeScreen: React.FC = () => {
     performPayment,
     requestPaymentAuth,
     showToast,
+    transactions,
+    balance,
+    setSelectedTransaction,
   } = useCustomerStore();
   const t = getTranslation(language);
   const [refreshing, setRefreshing] = useState(false);
@@ -759,20 +762,20 @@ export const AdaptiveHomeScreen: React.FC = () => {
   };
 
   // =========================================================================
-  // RECENT TRANSACTIONS / PASSBOOK SNIPPET (Authentic Live Passbook Feed)
+  // 1. EDITORIAL ACTIVITY LEDGER (Paper & Ink Financial Record)
   // =========================================================================
-  const renderRecentTransactionsPeek = () => {
-    const recentTx = [
-      { id: 'tx_1', name: 'Delhi Metro Smart Card', time: 'Today, 08:45 AM', amount: '-₹40.00', icon: Train },
-      { id: 'tx_2', name: 'BESCOM Electricity Bill', time: 'Yesterday, 18:20', amount: '-₹1,450.00', icon: Zap },
-    ];
+  const renderActivityLedger = () => {
+    const displayTx = transactions.slice(0, 4);
 
     return (
-      <View style={styles.recentSection}>
+      <View style={styles.activityLedgerSection}>
         <View style={styles.sectionHeaderRow}>
-          <View style={styles.sectionTitleGroup}>
+          <View>
             <Text style={[styles.sectionTitleText, { color: themeColors.textSecondary }]}>
-              {language === 'hi' ? 'हालिया लेनदेन' : language === 'gu' ? 'તાજેતરના વ્યવહારો' : 'RECENT TRANSACTIONS'}
+              {language === 'hi' ? 'हालिया गतिविधि' : language === 'gu' ? 'તાજેતરની પ્રવૃત્તિ' : 'RECENT ACTIVITY'}
+            </Text>
+            <Text style={[styles.ledgerSubLabel, { color: themeColors.textMuted }]}>
+              {language === 'hi' ? 'आज' : language === 'gu' ? 'આજે' : 'TODAY'}
             </Text>
           </View>
           <TouchableOpacity
@@ -781,30 +784,118 @@ export const AdaptiveHomeScreen: React.FC = () => {
             activeOpacity={0.7}
           >
             <Text style={[styles.viewAllText, { color: themeColors.primary }]}>
-              {language === 'hi' ? 'पासबुक देखें →' : language === 'gu' ? 'પાસબુક જુઓ →' : 'Passbook →'}
+              {language === 'hi' ? 'पासबुक →' : language === 'gu' ? 'પાસબુક →' : 'Passbook →'}
             </Text>
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.recentCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
-          {recentTx.map((tx, idx) => {
-            const IconComp = tx.icon;
+        <View style={[styles.ledgerFeed, { borderTopColor: themeColors.borderLight }]}>
+          {displayTx.map((tx) => {
+            const isCredit = tx.type === 'credit';
+            const timeStr = new Date(tx.timestamp).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            });
             return (
-              <View key={tx.id}>
-                <View style={styles.recentTxRow}>
-                  <View style={[styles.recentIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
-                    <IconComp size={16} color={themeColors.iconNeutral} />
-                  </View>
-                  <View style={styles.recentTextWrap}>
-                    <Text style={[styles.recentTxName, { color: themeColors.textPrimary }]} numberOfLines={1}>{tx.name}</Text>
-                    <Text style={[styles.recentTxTime, { color: themeColors.textMuted }]}>{tx.time}</Text>
-                  </View>
-                  <Text style={[styles.recentTxAmount, { color: themeColors.textPrimary }]}>{tx.amount}</Text>
+              <TouchableOpacity
+                key={tx.id}
+                style={[styles.ledgerRow, { borderBottomColor: themeColors.borderLight }]}
+                onPress={() => {
+                  setSelectedTransaction(tx);
+                }}
+                activeOpacity={0.65}
+              >
+                <View style={styles.ledgerLeft}>
+                  <Text style={[styles.ledgerMerchant, { color: themeColors.textPrimary }]} numberOfLines={1}>
+                    {tx.merchant}
+                  </Text>
+                  <Text style={[styles.ledgerMeta, { color: themeColors.textSecondary }]}>
+                    {tx.category === 'transport' ? 'UPI · Commute' :
+                     tx.category === 'food' ? 'UPI · Food' :
+                     tx.category === 'bills' ? 'BBPS · Utility' :
+                     tx.category === 'salary' ? 'NEFT · Salary' :
+                     tx.category === 'emi' ? 'NACH · Auto-Debit' : 'UPI Transfer'}
+                  </Text>
                 </View>
-                {idx < recentTx.length - 1 && <View style={[styles.recentDivider, { backgroundColor: themeColors.borderLight }]} />}
-              </View>
+                <View style={styles.ledgerRight}>
+                  <Text
+                    style={[
+                      styles.ledgerAmount,
+                      { color: themeColors.textPrimary },
+                      tx.status === 'flagged' && { color: themeColors.danger },
+                    ]}
+                  >
+                    {isCredit ? '+' : '−'}₹{tx.amount.toLocaleString('en-IN')}
+                  </Text>
+                  <Text style={[styles.ledgerTime, { color: themeColors.textMuted }]}>{timeStr}</Text>
+                </View>
+              </TouchableOpacity>
             );
           })}
+        </View>
+      </View>
+    );
+  };
+
+  // =========================================================================
+  // 2. FINANCIAL OBSERVATION (Concise Editorial Intelligence, No AI Card)
+  // =========================================================================
+  const renderFinancialObservation = () => {
+    return (
+      <View style={[styles.observationSection, { borderTopColor: themeColors.borderLight, borderBottomColor: themeColors.borderLight }]}>
+        <Text style={[styles.observationLabel, { color: themeColors.textMuted }]}>
+          {language === 'hi' ? 'इस महीने का अवलोकन' : language === 'gu' ? 'આ મહિનાનું અવલોકન' : 'THIS MONTH'}
+        </Text>
+        <Text style={[styles.observationAmount, { color: themeColors.textPrimary }]}>
+          ₹18,420 spent
+        </Text>
+        <Text style={[styles.observationDesc, { color: themeColors.textSecondary }]}>
+          8% below your typical spending pace. Liquid buffer preserved.
+        </Text>
+      </View>
+    );
+  };
+
+  // =========================================================================
+  // 3. STRUCTURED ACCOUNT GROUP (Typography & Hairline Dividers)
+  // =========================================================================
+  const renderAccountGroup = () => {
+    return (
+      <View style={styles.accountsSection}>
+        <View style={styles.sectionHeaderRow}>
+          <Text style={[styles.sectionTitleText, { color: themeColors.textSecondary }]}>
+            {language === 'hi' ? 'आपके खाते' : language === 'gu' ? 'તમારા ખાતાઓ' : 'YOUR ACCOUNTS'}
+          </Text>
+        </View>
+
+        <View style={[styles.accountsList, { borderTopColor: themeColors.borderLight }]}>
+          <TouchableOpacity
+            style={[styles.accountItemRow, { borderBottomColor: themeColors.borderLight }]}
+            onPress={() => openJourney('kyc')}
+            activeOpacity={0.7}
+          >
+            <View>
+              <Text style={[styles.accountNameText, { color: themeColors.textPrimary }]}>Savings A/C · •••• 4092</Text>
+              <Text style={[styles.accountSubText, { color: themeColors.textMuted }]}>ABC Payments Bank · Primary</Text>
+            </View>
+            <Text style={[styles.accountBalanceText, { color: themeColors.textPrimary }]}>
+              ₹{balance.available.toLocaleString('en-IN')}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.accountItemRow, { borderBottomColor: themeColors.borderLight }]}
+            onPress={() => openJourney('savings_invest')}
+            activeOpacity={0.7}
+          >
+            <View>
+              <Text style={[styles.accountNameText, { color: themeColors.textPrimary }]}>Auto-Sweep FD · 7.2% p.a.</Text>
+              <Text style={[styles.accountSubText, { color: themeColors.textMuted }]}>Linked Liquid Growth Account</Text>
+            </View>
+            <Text style={[styles.accountBalanceText, { color: themeColors.brandSecondary }]}>
+              ₹18,000
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -863,26 +954,34 @@ export const AdaptiveHomeScreen: React.FC = () => {
           </View>
         )}
 
-        {/* Calm Editorial Balance Header with Animated Counter */}
+        {/* Calm Editorial Balance Header & Action Band */}
         <BalanceHeader />
 
-        {/* Highest-Priority Contextual Experience: Smart Routine Payments Carousel */}
-        <Animated.View
-          style={{
-            opacity: heroFadeAnim,
-            transform: [{ translateY: heroTranslateY }],
-          }}
-        >
-          {renderHighestPriorityContext()}
-        </Animated.View>
+        {/* 1. Dense Activity Ledger (Financial Record) */}
+        {renderActivityLedger()}
 
-        {/* Recent Transactions / Passbook Peek - Financial Truth */}
-        {renderRecentTransactionsPeek()}
+        {/* 2. Quiet Financial Observation */}
+        {renderFinancialObservation()}
 
-        {/* Recharge & Pay Bills Hub */}
+        {/* 3. Structured Accounts Group */}
+        {renderAccountGroup()}
+
+        {/* Contextual Experience (if active state: medical, financial stress, surplus) */}
+        {currentState !== 'normal' && (
+          <Animated.View
+            style={{
+              opacity: heroFadeAnim,
+              transform: [{ translateY: heroTranslateY }],
+            }}
+          >
+            {renderHighestPriorityContext()}
+          </Animated.View>
+        )}
+
+        {/* Recharge & Pay Bills Utility Row */}
         {renderRechargeAndBillPay()}
 
-        {/* Financial Products 2x2 Showcase */}
+        {/* Financial Products & Services */}
         {renderDirectBankingHub()}
 
         {/* Upcoming Financial Obligations Strip */}
@@ -1655,19 +1754,15 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 
-  // Recharge & Pay Bills Hub (JioFinance Iconic Grid)
+  // Recharge & Pay Bills Hub
   rechargeSection: {
     paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md + 4,
+    marginBottom: spacing.lg,
   },
   rechargeCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radii.card,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    ...shadows.sm,
+    paddingVertical: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   rechargeRow: {
     flexDirection: 'row',
@@ -1679,155 +1774,203 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   rechargeIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: radii.md,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,
   },
   rechargeTitle: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#0F172A',
+    fontWeight: '600',
     textAlign: 'center',
   },
   rechargeSub: {
     fontSize: 9,
-    fontWeight: '500',
-    color: '#94A3B8',
+    fontWeight: '400',
     marginTop: 1,
     textAlign: 'center',
   },
 
-  // Financial Products 2x2 Rich Showcase
+  // Financial Products & Services List
   servicesSection: {
     paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md + 4,
+    marginBottom: spacing.lg,
   },
   productsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 10,
     justifyContent: 'space-between',
   },
   productCard: {
-    width: '48%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: radii.card,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    ...shadows.sm,
+    width: '48.5%',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   productCardTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   productIconCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   productBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1.5,
+    borderRadius: 3,
   },
   productBadgeText: {
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 0.2,
   },
   productTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
     letterSpacing: -0.2,
     marginBottom: 2,
   },
   productSub: {
     fontSize: 10,
-    fontWeight: '500',
-    color: '#64748B',
+    fontWeight: '400',
     lineHeight: 14,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   productActionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingTop: 6,
-    borderTopWidth: 1,
-    borderTopColor: '#F8FAFC',
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   productActionText: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#141414',
+    fontWeight: '600',
   },
 
-  // Recent Transactions Passbook Snippet
-  recentSection: {
+  // 1. Editorial Activity Ledger Styles
+  activityLedgerSection: {
     paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md + 4,
+    marginBottom: spacing.lg,
   },
-  viewAllText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#141414',
-  },
-  recentCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radii.card,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    ...shadows.sm,
-  },
-  recentTxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 6,
-    gap: 12,
-  },
-  recentIconCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  recentTextWrap: {
-    flex: 1,
-  },
-  recentTxName: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0F172A',
-    letterSpacing: -0.1,
-  },
-  recentTxTime: {
+  ledgerSubLabel: {
     fontSize: 10,
-    fontWeight: '500',
-    color: '#94A3B8',
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
     marginTop: 2,
   },
-  recentTxAmount: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#0F172A',
-    letterSpacing: -0.2,
+  viewAllText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
-  recentDivider: {
-    height: 1,
-    backgroundColor: '#F1F5F9',
-    marginVertical: 6,
+  ledgerFeed: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    marginTop: spacing.xs,
+  },
+  ledgerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  ledgerLeft: {
+    flex: 1,
+    paddingRight: spacing.md,
+  },
+  ledgerMerchant: {
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+    marginBottom: 2,
+  },
+  ledgerMeta: {
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  ledgerRight: {
+    alignItems: 'flex-end',
+  },
+  ledgerAmount: {
+    fontSize: 14,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.2,
+    marginBottom: 2,
+  },
+  ledgerTime: {
+    fontSize: 11,
+    fontWeight: '400',
+  },
+
+  // 2. Financial Observation Styles
+  observationSection: {
+    marginHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    marginBottom: spacing.lg,
+  },
+  observationLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  observationAmount: {
+    fontSize: 20,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+    marginBottom: 4,
+  },
+  observationDesc: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '400',
+  },
+
+  // 3. Structured Accounts Styles
+  accountsSection: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+  },
+  accountsList: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    marginTop: spacing.xs,
+  },
+  accountItemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  accountNameText: {
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+    marginBottom: 2,
+  },
+  accountSubText: {
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  accountBalanceText: {
+    fontSize: 14,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.2,
   },
 
   // Quiet Institutional Banking Footer
