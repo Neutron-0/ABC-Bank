@@ -99,9 +99,9 @@ class DialogueManager:
     )
 
     _DIRECT_ACTIVITY_REGEX = re.compile(
-        r"(?i)\b(passbook|transactions|history|statement|recent\s*payments|kharcha|account\s*statement)\b"
-        r"|(पासबुक|लेनदेन|हिसाब|स्टेटमेंट|खर्च)"
-        r"|(પાસબુક|વ્યવહાર|સ્ટેટમેન્ટ|ખર્ચ)"
+        r"(?i)\b(passbook|transactions|history|statement|recent\s*payments|kharcha|account\s*statement|spending|monthly\s*spending|spend|expenses|expense|outflow|outflows)\b"
+        r"|(पासबुक|लेनदेन|हिसाब|स्टेटमेंट|खर्च|मासिक खर्च)"
+        r"|(પાસબુક|વ્યવહાર|સ્ટેટમેન્ટ|ખર્ચ|માસિક ખર્ચ)"
     )
 
     _DIRECT_SAVINGS_REGEX = re.compile(
@@ -111,7 +111,7 @@ class DialogueManager:
     )
 
     _DIRECT_KYC_REGEX = re.compile(
-        r"(?i)\b(kyc|video\s*kyc|aadhaar|pan\s*card|identity\s*verify|update\s*kyc)\b"
+        r"(?i)\b(kyc|video\s*kyc|aadhaar|pan\s*card|identity\s*verify|update\s*kyc|complete\s*kyc|verify\s*account)\b"
         r"|(केवाईसी|वीडियो केवाईसी|आधार|पैन कार्ड)"
         r"|(કેવાયસી|વિડિયો કેવાયસી|આધાર|પાન કાર્ડ)"
     )
@@ -414,15 +414,27 @@ class DialogueManager:
 
         # 5. Activity & Passbook
         if cls._DIRECT_ACTIVITY_REGEX.search(q):
-            if detected_lang == "hi":
-                resp_text = "आपकी पासबुक और हालिया लेन-देन खोले जा रहे हैं..."
-                chip_label = "पासबुक देखें"
-            elif detected_lang == "gu":
-                resp_text = "તમારી પાસબુક અને તાજેતરના વ્યવહારો ખોલી રહ્યા છીએ..."
-                chip_label = "પાસબુક જુઓ"
+            is_spending = bool(re.search(r"(?i)\b(spending|monthly\s*spending|spend|expenses|expense|outflow|kharcha|खर्च)\b", q))
+            if is_spending:
+                if detected_lang == "hi":
+                    resp_text = "इस महीने का आपका कुल खर्च ₹34,969 है। पासबुक और विस्तृत विवरण देखने के लिए नीचे टैप करें।"
+                    chip_label = "मासिक खर्च और पासबुक"
+                elif detected_lang == "gu":
+                    resp_text = "આ મહિનાનો તમારો કુલ ખર્ચ ₹34,969 છે. પાસબુક અને વિગતો જોવા માટે નીચે ટેપ કરો."
+                    chip_label = "માસિક ખર્ચ અને પાસબુક"
+                else:
+                    resp_text = "Your total monthly spending is ₹34,969 across all categories. You can review your transaction passbook below."
+                    chip_label = "View Monthly Spending"
             else:
-                resp_text = "Opening your Passbook and Transaction statement..."
-                chip_label = "View Passbook"
+                if detected_lang == "hi":
+                    resp_text = "आपकी पासबुक और हालिया लेन-देन खोले जा रहे हैं..."
+                    chip_label = "पासबुक देखें"
+                elif detected_lang == "gu":
+                    resp_text = "તમારી પાસબુક અને તાજેતરના વ્યવહારો ખોલી રહ્યા છીએ..."
+                    chip_label = "પાસબુક જુઓ"
+                else:
+                    resp_text = "Opening your Passbook and Transaction statement..."
+                    chip_label = "View Passbook"
 
             return DialogueResponse(
                 intent="NAVIGATE_ACTIVITY",
@@ -473,13 +485,13 @@ class DialogueManager:
         # 7. Digital KYC
         if cls._DIRECT_KYC_REGEX.search(q):
             if detected_lang == "hi":
-                resp_text = "डिजिटल वीडियो केवाईसी सत्यापन डेस्क खोला जा रहा है..."
-                chip_label = "केवाईसी सत्यापन"
+                resp_text = "आप वीडियो केवाईसी या आधार के माध्यम से ऑनलाइन अपना केवाईसी पूरा या अपडेट कर सकते हैं। शुरू करने के लिए नीचे टैप करें।"
+                chip_label = "केवाईसी शुरू करें"
             elif detected_lang == "gu":
-                resp_text = "ડિજિટલ વિડિયો કેવાયસી ડેસ્ક ખોલી રહ્યા છીએ..."
-                chip_label = "કેવાયસી ચકાસણી"
+                resp_text = "તમે વિડિયો કેવાયસી અથવા આધાર દ્વારા ઓનલાઇન કેવાયસી પૂર્ણ અથવા અપડેટ કરી શકો છો. શરૂ કરવા માટે નીચે ટેપ કરો."
+                chip_label = "કેવાયસી શરૂ કરો"
             else:
-                resp_text = "Opening Digital Video KYC verification desk..."
+                resp_text = "You can complete or update your KYC verification online using Video KYC or Aadhaar. Tap below to begin."
                 chip_label = "Start KYC"
 
             return DialogueResponse(

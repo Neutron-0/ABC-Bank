@@ -91,9 +91,13 @@ class MiniCPM5Runner:
         detected_intent = prediction["intent"]
         confidence = prediction["confidence"]
         latency_ms = prediction["latency_ms"]
+        is_relevant = prediction.get("is_relevant", True)
 
         # Dynamic entity and spoken numeral extraction
         entities = IndicEntityParser.extract_entities(detected_intent, clean_q)
+        entities["is_relevant"] = is_relevant
+        if not is_relevant:
+            entities["query_type"] = "irrelevant"
 
         return {
             "intent": detected_intent,
@@ -115,6 +119,13 @@ class MiniCPM5Runner:
         stress_level: str = "normal"
     ) -> str:
         """Verbalizes trusted backend facts into natural vernacular language with stress-adaptive empathy."""
+        if trusted_data.get("is_relevant") is False or trusted_data.get("query_type") == "irrelevant":
+            if lang == "gu":
+                return "હું આ પ્રશ્નનો જવાબ આપી શકતો નથી. હું માત્ર એબીસી બેંકનો બેંકિંગ સહાયક છું. તમે મને બેંક બેલેન્સ, બિલ પેમેન્ટ, મેટ્રો અથવા કાર્ડ લોક વિશે પૂછી શકો છો."
+            elif lang == "hi":
+                return "मैं इस प्रश्न का उत्तर नहीं दे सकता। मैं केवल एबीसी बैंक का वित्तीय बैंकिंग सहायक हूँ। आप मुझसे बैंक बैलेंस, बिजली बिल, मेट्रो रिचार्ज, ईएमआई या कार्ड ब्लॉक करने के बारे में पूछ सकते हैं।"
+            return "I can't answer to this question. I am an on-device Bharat banking assistant for ABC Bank. You can ask me about your account balance, metro recharge, electricity bill, card controls, or EMI due dates."
+
         is_stressed = stress_level in ["stress", "tight"] or trusted_data.get("financial_health") in ["stress", "tight"]
 
         if intent == "CHECK_EMI":

@@ -73,9 +73,12 @@ class IndicSubwordTokenizer:
 
         # 2: CHECK_BALANCE
         "balance": (2, 4.0), "available balance": (2, 4.5), "account balance": (2, 4.5), "savings": (2, 2.5),
-        "khata": (2, 3.0), "funds": (2, 2.5), "paisa": (2, 2.0), "statement": (2, 2.5), "money": (2, 2.0),
-        "बैलेंस": (2, 4.0), "खाता": (2, 3.0), "रुपया": (2, 2.0), "पैसे": (2, 2.0), "जमा": (2, 2.0), "जांचें": (2, 2.5),
-        "બેલેન્સ": (2, 4.0), "ખાતું": (2, 3.0), "રૂપિયા": (2, 2.0), "તપાસો": (2, 2.5), "કેટલા": (2, 2.0),
+        "khata": (2, 3.0), "funds": (2, 2.5), "paisa": (2, 2.0), "statement": (2, 3.5), "money": (2, 2.0),
+        "spending": (2, 4.0), "monthly spending": (2, 4.5), "spend": (2, 3.5), "expenses": (2, 3.5), "expense": (2, 3.0),
+        "outflow": (2, 3.5), "outflows": (2, 3.5), "passbook": (2, 4.0), "transactions": (2, 4.0), "transaction": (2, 3.5),
+        "history": (2, 3.5), "recent payments": (2, 4.0), "account statement": (2, 4.0),
+        "बैलेंस": (2, 4.0), "खाता": (2, 3.0), "रुपया": (2, 2.0), "पैसे": (2, 2.0), "जमा": (2, 2.0), "जांचें": (2, 2.5), "पासबुक": (2, 4.0), "खर्च": (2, 3.5),
+        "બેલેન્સ": (2, 4.0), "ખાતું": (2, 3.0), "રૂપિયા": (2, 2.0), "તપાસો": (2, 2.5), "કેટલા": (2, 2.0), "પાસબુક": (2, 4.0), "ખર્ચ": (2, 3.5),
 
         # 3: PAY_BILL
         "electricity": (3, 4.0), "bijli": (3, 4.0), "power": (3, 3.0), "gas": (3, 3.0), "water": (3, 2.5),
@@ -111,9 +114,26 @@ class IndicSubwordTokenizer:
         # 8: GENERAL_QUERY
         "hello": (8, 3.0), "hi": (8, 2.5), "namaste": (8, 3.0), "kem cho": (8, 3.0), "kaise ho": (8, 3.0),
         "mitra": (8, 2.5), "help": (8, 2.5), "thanks": (8, 2.5), "thank you": (8, 2.5), "good morning": (8, 3.0),
+        "good afternoon": (8, 3.0), "good evening": (8, 3.0), "hey": (8, 2.5), "who are you": (8, 3.5),
+        "what can you do": (8, 3.5), "kya kar sakte ho": (8, 3.5), "options": (8, 2.5), "services": (8, 2.5),
         "score": (8, 3.0), "credit score": (8, 3.5), "cibil": (8, 3.5), "yes": (8, 2.5), "haan": (8, 2.5),
-        "नमस्ते": (8, 3.0), "धन्यवाद": (8, 2.5), "કેમ છો": (8, 3.0), "આભાર": (8, 2.5), "સ્કોર": (8, 3.0)
+        "kyc": (8, 4.5), "update kyc": (8, 5.0), "video kyc": (8, 5.0), "aadhaar": (8, 4.0), "pan card": (8, 4.0),
+        "pan": (8, 3.5), "verify": (8, 3.5), "verification": (8, 3.5), "profile": (8, 3.0), "account": (8, 2.5),
+        "complete kyc": (8, 5.0), "re-kyc": (8, 5.0), "identity": (8, 3.5),
+        "नमस्ते": (8, 3.0), "धन्यवाद": (8, 2.5), "કેમ છો": (8, 3.0), "આભાર": (8, 2.5), "સ્કોર": (8, 3.0), "મદદ": (8, 2.5),
+        "केवाईसी": (8, 4.5), "आधार": (8, 4.0), "पैन": (8, 3.5), "કેવાયસી": (8, 4.5), "આધાર": (8, 4.0), "પાન": (8, 3.5)
     }
+
+    @classmethod
+    def is_relevant_banking_query(cls, text: str) -> bool:
+        """Determines if input contains any recognized banking or conversational intent keywords."""
+        clean_t = text.lower().strip()
+        if not clean_t:
+            return True
+        for kw in cls.KEYWORD_WEIGHTS.keys():
+            if kw in clean_t:
+                return True
+        return False
 
     @classmethod
     def embed_text(cls, text: str) -> np.ndarray:
@@ -272,6 +292,7 @@ class MiniCPM5ONNXModel:
         t_end = time.perf_counter()
 
         intent_name = IndicSubwordTokenizer.INTENT_CLASSES[pred_idx]
+        is_relevant = IndicSubwordTokenizer.is_relevant_banking_query(clean_text)
         prob_dict = {
             cls_name: round(float(probabilities[i]), 4)
             for i, cls_name in enumerate(IndicSubwordTokenizer.INTENT_CLASSES)
@@ -281,7 +302,8 @@ class MiniCPM5ONNXModel:
             "intent": intent_name,
             "confidence": round(confidence, 4),
             "probabilities": prob_dict,
-            "latency_ms": round((t_end - t_start) * 1000, 3)
+            "latency_ms": round((t_end - t_start) * 1000, 3),
+            "is_relevant": is_relevant
         }
 
 
