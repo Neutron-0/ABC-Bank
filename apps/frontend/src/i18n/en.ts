@@ -99,6 +99,11 @@ export const en = {
     send: 'Send',
     suggestedTopics: 'Suggested for right now',
     disclaimer: 'Mitra uses deterministic contextual rules and ethical safeguards to assist you.',
+    voiceListening: 'Listening...',
+    voiceSpeakNow: 'Listening... speak in English, Hindi, or Gujarati',
+    voiceTapToSpeak: 'Tap microphone to speak',
+    voicePillsLabel: 'Quick Voice & Text Shortcuts',
+    navigatingTo: 'Navigating to',
   },
   products: {
     title: 'Financial Products',

@@ -19,3 +19,6 @@ class AssistantChatMessageRequest(BaseModel):
     query: str
     language: Optional[str] = "en"
     customer_id: Optional[str] = "cust_bharat_001"
+    pending_clarification: Optional[str] = None
+    conversation_context: Optional[Dict[str, Any]] = Field(default_factory=dict)
+

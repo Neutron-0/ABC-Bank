@@ -425,3 +425,43 @@ $$H_n = \text{SHA-256}(H_{n-1} \,\|\, \text{CustomerUUID} \,\|\, \text{DecisionT
 * **Block Integrity**: Any tampering with past recommendations or eligibility flags instantly invalidates subsequent hashes (`verify_chain_integrity() == False`).
 * **Plain-Language Customer Explanation Cards**: Generates transparent, human-readable explanations (e.g., *"Why was I offered this?"* or *"Why was this loan not offered?"* with specific counterfactual debt-reduction targets).
 
+---
+
+## 14. Mitra Multi-Turn Vernacular Voice & Conversational Navigation Engine (`ai/voice/dialogue/manager.py`)
+
+To deliver an accessible banking experience across Bharat, ABC Bank features **Mitra**, a context-aware voice and conversational assistant supporting **English, Hinglish (Latin letters), Hindi (Devanagari), Gujarati script, and Gujlish**.
+
+```mermaid
+flowchart TD
+    UserQuery["User Input (Spoken Voice / Text in EN, Hinglish, HI, GU)"] --> LangDetect["Vernacular Language & Script Detector"]
+    LangDetect --> CheckClarification{"Is there an active pending clarification?"}
+    
+    CheckClarification -->|Yes: e.g. CONFIRM_CREDIT_SCORE| CheckAffirmative{"Is user response affirmative?"}
+    CheckAffirmative -->|Yes: 'yes', 'haan', 'ha', 'हाँ', 'હા'| NavCreditScore["Auto-Navigate to Credit Score Journey (0.01ms)"]
+    CheckAffirmative -->|No: 'no', 'nahi', 'ना'| ClearClarification["Reset State: 'Understood. How else can I assist you?'"]
+    
+    CheckClarification -->|No| CheckAmbiguous{"Is query ambiguous? (e.g. 'score', 'mera score', 'સ્કોર')"}
+    CheckAmbiguous -->|Yes: Bare 'score'| AskClarification["Minimal Follow-Up: 'Do you mean your Credit Score (CIBIL)?'\nAction Chips: ['Yes, Credit Score', 'No']\nSet pending_clarification='CONFIRM_CREDIT_SCORE'"]
+    CheckAmbiguous -->|No| CheckDirect{"Is query direct & unambiguous?"}
+    
+    CheckDirect -->|'debit card', 'atm card', 'ડેબિટ કાર્ડ'| NavDebitCard["Direct Auto-Navigate to Debit Card Management (Zero Follow-up)"]
+    CheckDirect -->|'credit score', 'cibil score', 'क्रेडिट स्कोर'| NavCreditScoreDirect["Direct Auto-Navigate to Credit Score Journey (Zero Follow-up)"]
+    CheckDirect -->|'metro', 'मेट्रो', 'મેટ્રો'| FastMetroPay["1-Tap Metro Quick Recharge"]
+    CheckDirect -->|General Inquiry| ConversationalReply["Context-Aware Banking Assistance"]
+```
+
+### Key Dialogue Invariants:
+1. **Minimal Follow-Up Guarantee for Ambiguous Terms**:
+   - When a customer says or types `"score"`, `"mera score"`, `"સ્કોર"`, or `"स्कोर"`, the engine **never dumps a generic search list**.
+   - It responds with a single, respectful clarification question: *"Do you mean your Credit Score (CIBIL)?"* (localized in Hindi/Gujarati).
+   - Upon confirmation (`"yes"`, `"haan"`, `"ha"`, `"हाँ"`, `"હા"`), it seamlessly auto-navigates directly to the institutional **Credit Score (CIBIL)** modal.
+2. **Direct Navigation Guarantee for Unambiguous Terms**:
+   - When a customer asks for `"debit card"`, `"atm card"`, `"कार्ड लॉक કરો"`, or `"ડેબિટ કાર્ડ"`, the engine asks **zero follow-up questions**.
+   - It directly opens the **Debit Card Management** screen with lock/freeze toggles, ATM withdrawal limits, and contactless controls.
+3. **Voice UI with Native Audio Waveform**:
+   - Pulsing visual recording feedback, Web Speech API integration, and quick vernacular voice transcription shortcuts.
+   - 100% resilient client-side offline fallback ensures unbroken execution even if backend connectivity fluctuates.
+4. **Zero Emoji Standard**:
+   - Absolute strict institutional standard: zero emojis across all chatbot dialogues, buttons, and state indicators.
+
+

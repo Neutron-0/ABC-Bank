@@ -1,4 +1,4 @@
-﻿export type CustomerStateType = 'normal' | 'surplus' | 'financial_stress' | 'medical_event' | 'fraud_alert';
+export type CustomerStateType = 'normal' | 'surplus' | 'financial_stress' | 'medical_event' | 'fraud_alert';
 
 export type LanguageCode = 'en' | 'hi' | 'gu';
 
@@ -156,6 +156,13 @@ export interface AssistantMessage {
   suggestedPrompts?: string[];
   actionChips?: { label: string; action: string; payload?: any }[];
   contextCard?: ContextCard;
+  pendingClarification?: string | null;
+  navigation?: {
+    type: string;
+    target: string;
+    auto_navigate: boolean;
+    action_label?: string;
+  } | null;
 }
 
 export type MainTabType = 'home' | 'payments' | 'activity' | 'insights' | 'assistant' | 'profile';

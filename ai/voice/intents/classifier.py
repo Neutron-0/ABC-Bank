@@ -6,8 +6,11 @@ from ai.voice.model.minicpm5_runner import MiniCPM5Runner
 from ai.voice.prompts.vernacular import VERNACULAR_PROMPTS
 
 
+from ai.voice.dialogue.manager import DialogueManager
+
+
 class VoiceIntentClassifier:
-    """Classifies spoken/text vernacular queries into VoiceIntent contracts using MiniCPM-5 logic."""
+    """Classifies spoken/text vernacular queries into VoiceIntent contracts using MiniCPM-5 logic and DialogueManager."""
 
     @classmethod
     def normalize_language_code(cls, lang: Optional[str]) -> str:
@@ -22,17 +25,46 @@ class VoiceIntentClassifier:
         return "en"
 
     @classmethod
-    @classmethod
-    def classify(cls, query: Optional[str], lang: str = "en", stress_level: str = "normal") -> Dict[str, Any]:
+    def classify(
+        cls,
+        query: Optional[str],
+        lang: str = "en",
+        stress_level: str = "normal",
+        pending_clarification: Optional[str] = None
+    ) -> Dict[str, Any]:
         normalized_lang = cls.normalize_language_code(lang)
-        parsed = MiniCPM5Runner.parse_intent(query, preferred_lang=normalized_lang)
-        intent = parsed["intent"]
-        resolved_lang = cls.normalize_language_code(parsed.get("language", normalized_lang))
-        confidence = parsed["confidence"]
-        entities = parsed["entities"]
+        clean_q = str(query or "").strip()
 
-        # Verbalize response using MiniCPM5Runner with fallback to prompt dictionary
-        response_text = MiniCPM5Runner.verbalize(intent, entities, lang=resolved_lang, stress_level=stress_level)
+        # Step 1: Check multi-turn DialogueManager for smart disambiguation & direct navigation
+        dialogue_turn = DialogueManager.process_turn(
+            clean_q,
+            language=normalized_lang,
+            pending_clarification=pending_clarification
+        )
+
+        parsed = MiniCPM5Runner.parse_intent(clean_q, preferred_lang=normalized_lang)
+        entities = parsed["entities"]
+        resolved_lang = cls.normalize_language_code(parsed.get("language", normalized_lang))
+
+        # Check if query matches specific voice intents in MiniCPM-5
+        is_direct_score = dialogue_turn.intent in ["CLARIFY_CREDIT_SCORE", "NAVIGATE_CREDIT_SCORE", "DECLINED_CLARIFICATION"]
+        is_direct_card = dialogue_turn.intent == "NAVIGATE_DEBIT_CARD"
+
+        if is_direct_score:
+            intent = "GENERAL_QUERY"
+            response_text = dialogue_turn.response_text
+            confidence = 0.96
+            resolved_lang = cls.normalize_language_code(dialogue_turn.language)
+        elif is_direct_card and clean_q.lower() in ["debit card", "atm card", "डेबिट कार्ड", "ડેબિટ કાર્ડ"]:
+            intent = "LOCK_CARD"
+            response_text = dialogue_turn.response_text
+            confidence = 0.96
+            resolved_lang = cls.normalize_language_code(dialogue_turn.language)
+        else:
+            intent = parsed["intent"]
+            confidence = parsed["confidence"]
+            resolved_lang = cls.normalize_language_code(parsed.get("language", normalized_lang))
+            response_text = MiniCPM5Runner.verbalize(intent, entities, lang=resolved_lang, stress_level=stress_level)
 
         # Exhaustive domain-specific suggested actions
         suggested_actions = ["CONFIRM", "DISMISS", "DETAILS"]
@@ -65,5 +97,9 @@ class VoiceIntentClassifier:
             "confidence": confidence,
             "entities": entities,
             "response_text": response_text,
-            "suggested_actions": suggested_actions
+            "suggested_actions": suggested_actions,
+            "suggested_prompts": dialogue_turn.suggested_prompts or ["Debit Card", "Score", "Pay Metro", "Send Money"],
+            "pending_clarification": dialogue_turn.pending_clarification,
+            "navigation": dialogue_turn.navigation.model_dump() if dialogue_turn.navigation else None,
+            "action_chips": dialogue_turn.action_chips
         }

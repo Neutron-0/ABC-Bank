@@ -33,6 +33,8 @@ import { MedicalAssistanceModal } from '../features/journeys/MedicalAssistanceMo
 import { SavingsInvestModal } from '../features/journeys/SavingsInvestModal';
 import { FraudAlertModal } from '../features/journeys/FraudAlertModal';
 import { FinancialStressModal } from '../features/journeys/FinancialStressModal';
+import { CreditScoreModal } from '../features/journeys/CreditScoreModal';
+import { DebitCardModal } from '../features/journeys/DebitCardModal';
 import { OnboardingModal } from '../features/onboarding/OnboardingModal';
 
 // Icons
@@ -255,6 +257,8 @@ export const AppNavigator: React.FC = () => {
       <SavingsInvestModal />
       <FraudAlertModal />
       <FinancialStressModal />
+      <CreditScoreModal />
+      <DebitCardModal />
       <OnboardingModal
         visible={showOnboarding}
         onFinish={() => setShowOnboarding(false)}
