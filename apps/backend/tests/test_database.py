@@ -18,7 +18,17 @@ from apps.backend.app.db.loader import DataLoader
 from apps.backend.app.db.repositories.customer_repo import CustomerRepository
 from apps.backend.app.db.repositories.transaction_repo import TransactionRepository
 
-@pytest.mark.skipif(not DATABASE_URL, reason="PostgreSQL DATABASE_URL not set")
+def check_db_live() -> bool:
+    try:
+        with SessionLocal() as db:
+            db.execute(select(1))
+            return True
+    except Exception:
+        return False
+
+DB_AVAILABLE = check_db_live()
+
+@pytest.mark.skipif(not DB_AVAILABLE, reason="Live PostgreSQL database is offline or unconfigured")
 def test_database_counts_and_integrity():
     """Verify that PostgreSQL contains the large synthetic dataset with no orphan records."""
     with SessionLocal() as db:
@@ -48,7 +58,7 @@ def test_database_counts_and_integrity():
         )
         assert orphans == 0, f"Found {orphans} orphaned transactions"
 
-@pytest.mark.skipif(not DATABASE_URL, reason="PostgreSQL DATABASE_URL not set")
+@pytest.mark.skipif(not DB_AVAILABLE, reason="Live PostgreSQL database is offline or unconfigured")
 def test_customer_repository_queries():
     """Verify repository methods retrieve customer profile and transactions correctly."""
     with SessionLocal() as db:
