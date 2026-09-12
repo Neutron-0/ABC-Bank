@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { LucideIcon } from 'lucide-react-native';
@@ -19,7 +19,13 @@ export const SmartAction: React.FC<SmartActionProps> = ({
   onPress,
 }) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.75}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
+      delayPressIn={0}
+      activeOpacity={0.7}
+      hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+    >
       <View style={[styles.iconWrap, { backgroundColor: `${color}15` }]}>
         <Icon size={22} color={color} />
       </View>

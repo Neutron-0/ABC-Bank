@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { colors, typography, spacing, radii } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
+import { motion } from '../../motion';
 import { TransactionItem } from '../../components/transactions/TransactionItem';
 import { TransactionDetailModal } from './TransactionDetailModal';
 import { Search, Filter, Sparkles } from 'lucide-react-native';
@@ -21,6 +22,11 @@ export const TransactionsScreen: React.FC = () => {
 
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleFilterChange = (id: string) => {
+    motion.reorderLayout();
+    setSelectedFilter(id);
+  };
 
   const filterCategories: { id: string; label: string }[] = [
     { id: 'all', label: t.activity.filterAll },
@@ -71,7 +77,9 @@ export const TransactionsScreen: React.FC = () => {
               <TouchableOpacity
                 key={cat.id}
                 style={[styles.pill, active && styles.activePill]}
-                onPress={() => setSelectedFilter(cat.id)}
+                onPress={() => handleFilterChange(cat.id)}
+                delayPressIn={0}
+                activeOpacity={0.75}
               >
                 <Text style={[styles.pillText, active && styles.activePillText]}>
                   {cat.label}
@@ -83,7 +91,11 @@ export const TransactionsScreen: React.FC = () => {
       </View>
 
       {/* Transaction Timeline */}
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 110 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.timelineHeader}>
           <Text style={styles.timelineTitle}>Transaction Feed ({filteredTransactions.length})</Text>
         </View>

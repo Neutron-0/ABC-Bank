@@ -1,24 +1,30 @@
-﻿import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { ContextCard as ContextCardType } from '../../types';
 import { ContextCard } from './ContextCard';
 import { colors, typography, spacing } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
-import { Layers, Sparkles } from 'lucide-react-native';
+import { motion } from '../../motion';
+import { Check } from 'lucide-react-native';
 
 interface Props {
   cards: ContextCardType[];
 }
 
 export const ContextCardStack: React.FC<Props> = ({ cards }) => {
-  const { language, isLoading } = useCustomerStore();
+  const { language, isLoading, currentState } = useCustomerStore();
   const t = getTranslation(language);
+
+  // Trigger smooth layout reordering animation when cards array or persona changes
+  useEffect(() => {
+    motion.reorderLayout();
+  }, [cards.length, currentState]);
 
   if (isLoading && cards.length === 0) {
     return (
       <View style={styles.loadingBox}>
-        <ActivityIndicator size="small" color={colors.primary} />
+        <ActivityIndicator size="small" color="#111318" />
         <Text style={styles.loadingText}>{t.common.loading}</Text>
       </View>
     );
@@ -27,9 +33,11 @@ export const ContextCardStack: React.FC<Props> = ({ cards }) => {
   if (cards.length === 0) {
     return (
       <View style={styles.emptyBox}>
-        <Sparkles size={28} color={colors.textMuted} />
-        <Text style={styles.emptyTitle}>All Caught Up!</Text>
-        <Text style={styles.emptyDesc}>Your banking priorities are fully organized for today.</Text>
+        <View style={styles.emptyIconCircle}>
+          <Check size={18} color="#059669" />
+        </View>
+        <Text style={styles.emptyTitle}>You're all caught up</Text>
+        <Text style={styles.emptyDesc}>Nothing needs your immediate attention right now.</Text>
       </View>
     );
   }
@@ -37,14 +45,8 @@ export const ContextCardStack: React.FC<Props> = ({ cards }) => {
   return (
     <View style={styles.container}>
       <View style={styles.sectionHeader}>
-        <View style={styles.sectionHeaderLeft}>
-          <Layers size={16} color={colors.primary} />
-          <Text style={styles.sectionTitle}>{t.home.attentionStackTitle}</Text>
-        </View>
-        <Text style={styles.cardCount}>{cards.length} Priority Actions</Text>
+        <Text style={styles.eyebrow}>ORGANIZED FOR TODAY</Text>
       </View>
-
-      <Text style={styles.sectionSubtitle}>{t.home.attentionStackSubtitle}</Text>
 
       <View style={styles.stackList}>
         {cards.map((card) => (
@@ -60,60 +62,61 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    marginBottom: 2,
+    marginBottom: spacing.sm + 4,
   },
-  sectionHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  sectionTitle: {
-    ...typography.h4,
-    color: colors.textPrimary,
-  },
-  cardCount: {
-    ...typography.tiny,
-    color: colors.primary,
+  eyebrow: {
+    fontSize: 11,
     fontWeight: '700',
-    backgroundColor: colors.primarySubtle,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 999,
-  },
-  sectionSubtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md,
+    color: '#8C95A6',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
   stackList: {
     paddingBottom: spacing.sm,
   },
   loadingBox: {
-    padding: spacing.xxl,
+    padding: spacing.xl,
     alignItems: 'center',
+    justifyContent: 'center',
     gap: spacing.sm,
   },
   loadingText: {
-    ...typography.caption,
-    color: colors.textSecondary,
+    fontSize: 13,
+    color: '#8C95A6',
   },
   emptyBox: {
-    padding: spacing.xxl,
+    paddingVertical: 36,
+    paddingHorizontal: spacing.xl,
     alignItems: 'center',
-    gap: spacing.xs,
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    marginHorizontal: spacing.lg,
+    marginVertical: spacing.md,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+  },
+  emptyIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#ECFDF5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
   },
   emptyTitle: {
-    ...typography.h4,
-    color: colors.textPrimary,
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111318',
+    letterSpacing: -0.2,
   },
   emptyDesc: {
-    ...typography.caption,
-    color: colors.textSecondary,
+    fontSize: 13,
+    color: '#525866',
     textAlign: 'center',
+    marginTop: 4,
+    lineHeight: 18,
   },
 });

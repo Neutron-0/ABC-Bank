@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -44,7 +44,11 @@ export const ProfileScreen: React.FC = () => {
         <Text style={styles.title}>{t.profile.title}</Text>
       </View>
 
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 110 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* User Card */}
         <View style={styles.userCard}>
           <Image source={{ uri: profile.avatarUrl }} style={styles.avatar} />

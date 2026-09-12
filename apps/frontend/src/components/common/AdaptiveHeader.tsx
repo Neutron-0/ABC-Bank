@@ -3,10 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { colors, typography, spacing, radii } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
-import { Bell, Globe, Sparkles, SlidersHorizontal } from 'lucide-react-native';
+import { motion } from '../../motion';
+import { Bell, Globe, Sparkles, SlidersHorizontal, Bot } from 'lucide-react-native';
 
 export const AdaptiveHeader: React.FC = () => {
-  const { profile, language, setLanguage, openJourney, currentState } = useCustomerStore();
+  const { profile, language, setLanguage, openJourney, currentState, setActiveTab } = useCustomerStore();
   const t = getTranslation(language);
 
   const getGreeting = () => {
@@ -17,6 +18,7 @@ export const AdaptiveHeader: React.FC = () => {
   };
 
   const toggleLanguage = () => {
+    motion.gentleLayout();
     if (language === 'en') setLanguage('hi');
     else if (language === 'hi') setLanguage('gu');
     else setLanguage('en');
@@ -53,6 +55,16 @@ export const AdaptiveHeader: React.FC = () => {
         >
           <Sparkles size={13} color="#D97706" />
           <Text style={styles.protoButtonText}>Lab</Text>
+        </TouchableOpacity>
+
+        {/* Ambient Mitra Assistant Trigger */}
+        <TouchableOpacity
+          style={styles.mitraButton}
+          onPress={() => setActiveTab('assistant')}
+          activeOpacity={0.8}
+        >
+          <Bot size={13} color="#4F46E5" />
+          <Text style={styles.mitraButtonText}>Mitra</Text>
         </TouchableOpacity>
 
         {/* Vernacular Language Selector */}
@@ -149,6 +161,22 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: '#B45309',
+  },
+  mitraButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EEF2FF',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 99,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
+  },
+  mitraButtonText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#4338CA',
   },
   langButton: {
     paddingHorizontal: 9,

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, typography, spacing, radii } from '../../theme';
 import { LucideIcon } from 'lucide-react-native';
@@ -21,7 +21,12 @@ export const FrequentContact: React.FC<FrequentContactProps> = ({
   onPress,
 }) => {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      delayPressIn={0}
+      activeOpacity={0.75}
+    >
       <View style={styles.leftRow}>
         <View style={styles.iconBox}>
           <Icon size={20} color={colors.primary} />

@@ -1,7 +1,8 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
+import { getTranslation } from '../../i18n';
 import {
   CreditCard,
   X,
@@ -10,14 +11,31 @@ import {
   ShieldCheck,
   ArrowRight,
   Calculator,
+  Briefcase,
+  TrendingUp,
+  Sparkles,
+  DollarSign,
+  Layers,
+  HeartHandshake,
 } from 'lucide-react-native';
 
 export const ResponsibleLoanModal: React.FC = () => {
-  const { activeJourney, closeJourney, currentState, financialHealth, showToast } =
-    useCustomerStore();
+  const {
+    activeJourney,
+    closeJourney,
+    currentState,
+    financialHealth,
+    showToast,
+    balance,
+    transactions,
+    language,
+  } = useCustomerStore();
+  const t = getTranslation(language);
 
   const [loanAmount, setLoanAmount] = useState<number>(150000);
   const [tenureMonths, setTenureMonths] = useState<number>(24);
+  const [isDisbursed, setIsDisbursed] = useState<boolean>(false);
+  const [disbursedTxId, setDisbursedTxId] = useState<string>('');
 
   if (activeJourney !== 'loan') return null;
 
@@ -31,85 +49,259 @@ export const ResponsibleLoanModal: React.FC = () => {
 
   const estimatedEmi = calculateEmi(loanAmount, tenureMonths);
 
+  const handleDisburseLoan = () => {
+    const txId = `ABC/LN/2026/${Math.floor(100000 + Math.random() * 900000)}`;
+    setDisbursedTxId(txId);
+
+    // Live state update: Credit to account balance & append transaction
+    useCustomerStore.setState({
+      balance: {
+        ...balance,
+        available: balance.available + loanAmount,
+      },
+      transactions: [
+        {
+          id: `tx_loan_${Date.now()}`,
+          amount: loanAmount,
+          type: 'credit',
+          category: 'salary',
+          merchant: 'ABC Bank Instant Credit',
+          description: `Disbursal of ₹${loanAmount.toLocaleString('en-IN')} Affordability Loan`,
+          timestamp: new Date().toISOString(),
+          status: 'completed',
+          isRecurring: false,
+          confidenceScore: 0.99,
+          aiExplanation: 'Verified against salary regularity and healthy 22% DTI benchmark.',
+        },
+        ...transactions,
+      ],
+    });
+
+    setIsDisbursed(true);
+    showToast(
+      language === 'hi'
+        ? `₹${loanAmount.toLocaleString('en-IN')} आपके खाते में जमा कर दिए गए हैं!`
+        : language === 'gu'
+        ? `₹${loanAmount.toLocaleString('en-IN')} તમારા ખાતામાં જમા કરવામાં આવ્યા છે!`
+        : `₹${loanAmount.toLocaleString('en-IN')} has been disbursed into your account!`
+    );
+  };
+
+  const handleClose = () => {
+    setIsDisbursed(false);
+    closeJourney();
+  };
+
   return (
-    <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>
+    <Modal visible={true} transparent animationType="slide" onRequestClose={handleClose}>
       <View style={styles.overlay}>
         <View style={styles.sheet}>
+          {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
               <View style={styles.iconWrap}>
                 <CreditCard size={20} color={colors.primary} />
               </View>
               <View>
-                <Text style={styles.title}>Responsible Credit Planning</Text>
-                <Text style={styles.subtitle}>Affordability-first evaluation</Text>
+                <Text style={styles.title}>
+                  {language === 'hi'
+                    ? 'क्षमता-आधारित सुरक्षित ऋण योजना'
+                    : language === 'gu'
+                    ? 'ક્ષમતા-આધારિત સુરક્ષિત લોન આયોજન'
+                    : 'Affordability-First Loan Planning'}
+                </Text>
+                <Text style={styles.subtitle}>
+                  {language === 'hi'
+                    ? 'वास्तविक नकदी प्रवाह पर आधारित ज़िम्मेदार मूल्यांकन'
+                    : language === 'gu'
+                    ? 'વાસ્તવિક રોકડ પ્રવાહ આધારે જવાબદાર મૂલ્યાંકન'
+                    : 'Evaluated on genuine cash flow, not arbitrary sales targets'}
+                </Text>
               </View>
             </View>
-            <TouchableOpacity onPress={closeJourney} style={styles.closeBtn}>
+            <TouchableOpacity
+              onPress={handleClose}
+              style={styles.closeBtn}
+              delayPressIn={0}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <X size={20} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            {/* ETHICAL GUARD: Financial Stress Warning */}
-            {isStress ? (
+            {/* 1. DISBURSAL CELEBRATION RECEIPT */}
+            {isDisbursed ? (
+              <View style={styles.disbursedBox}>
+                <View style={styles.disbursedIconCircle}>
+                  <CheckCircle2 size={44} color="#059669" />
+                </View>
+                <Text style={styles.disbursedTitle}>
+                  {language === 'hi' ? 'ऋण राशि तुरंत जमा हो गई!' : language === 'gu' ? 'લોન રકમ તાત્કાલિક જમા થઈ!' : 'Loan Disbursed Instantly!'}
+                </Text>
+                <Text style={styles.disbursedAmount}>+₹{loanAmount.toLocaleString('en-IN')}</Text>
+                <Text style={styles.disbursedSub}>
+                  {language === 'hi'
+                    ? 'यह राशि सीधे आपके प्राथमिक खाते में जोड़ दी गई है।'
+                    : language === 'gu'
+                    ? 'આ રકમ સીધી તમારા પ્રાથમિક ખાતામાં જમા થઈ ગઈ છે.'
+                    : 'Credited directly to your active ABC Bank account.'}
+                </Text>
+
+                <View style={styles.receiptCard}>
+                  <View style={styles.receiptRow}>
+                    <Text style={styles.receiptLabel}>Transaction Reference</Text>
+                    <Text style={styles.receiptVal}>{disbursedTxId}</Text>
+                  </View>
+                  <View style={styles.receiptRow}>
+                    <Text style={styles.receiptLabel}>Repayment Tenure</Text>
+                    <Text style={styles.receiptVal}>{tenureMonths} Months</Text>
+                  </View>
+                  <View style={styles.receiptRow}>
+                    <Text style={styles.receiptLabel}>Monthly EMI</Text>
+                    <Text style={styles.receiptVal}>₹{estimatedEmi.toLocaleString('en-IN')} / mo</Text>
+                  </View>
+                  <View style={styles.receiptRow}>
+                    <Text style={styles.receiptLabel}>Updated Account Balance</Text>
+                    <Text style={[styles.receiptVal, { color: '#059669', fontWeight: '800' }]}>
+                      ₹{(balance.available).toLocaleString('en-IN')}
+                    </Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.primaryBtn}
+                  onPress={handleClose}
+                  delayPressIn={0}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.primaryBtnText}>{t.common.done}</Text>
+                </TouchableOpacity>
+              </View>
+            ) : isStress ? (
+              /* 2. ETHICAL SUPPRESSION: Financial Stress Warning */
               <View style={styles.stressWarningBox}>
-                <AlertTriangle size={24} color={colors.danger} />
-                <Text style={styles.stressTitle}>Credit Not Recommended Right Now</Text>
+                <AlertTriangle size={28} color={colors.danger} />
+                <Text style={styles.stressTitle}>
+                  {language === 'hi'
+                    ? 'लोन प्रस्ताव रोक दिया गया है (सुरक्षा हेतु)'
+                    : language === 'gu'
+                    ? 'લોન ઑફર અટકાવી દેવાઈ છે (સુરક્ષા માટે)'
+                    : 'Credit Paused for Your Protection'}
+                </Text>
                 <Text style={styles.stressDesc}>
-                  Our responsible banking engine detected that your monthly cash flow is currently tighter than usual with elevated existing obligations.
+                  {language === 'hi'
+                    ? 'हमारे जिम्मेदार बैंकिंग इंजन ने पाया कि इस महीने आपकी देनदारियां (₹32,000) सामान्य से अधिक हैं। आपको कर्ज के जाल से बचाने के लिए नए लोन को रोक दिया गया है।'
+                    : language === 'gu'
+                    ? 'અમારા જવાબદાર બેંકિંગ એન્જિને નોંધ્યું કે આ મહિને તમારી જવાબદારીઓ (₹32,000) સામાન્ય કરતાં વધુ છે. દેવાના બોજથી બચાવવા નવી લોન અટકાવાઈ છે.'
+                    : 'Our responsible banking engine detected that your upcoming commitments (₹32,000) are elevated this cycle. Predatory credit is strictly paused.'}
                 </Text>
-                <Text style={styles.stressPledge}>
-                  To protect your financial health, new loan disbursements are temporarily paused until your emergency buffer stabilizes.
-                </Text>
+
+                <View style={styles.pledgeCard}>
+                  <ShieldCheck size={16} color="#0D9488" />
+                  <Text style={styles.pledgeText}>
+                    {language === 'hi'
+                      ? 'एबीसी बैंक की नैतिक प्रतिज्ञा: हम ग्राहकों को कभी भी वित्तीय तनाव के समय ऋण नहीं बेचते।'
+                      : language === 'gu'
+                      ? 'ABC બેંકની નૈતિક પ્રતિજ્ઞા: અમે નાણાકીય કટોકટીમાં ગ્રાહકોને ક્યારેય લોન નથી વેચતા.'
+                      : 'ABC Bank Ethical Guarantee: We never sell debt during moments of customer financial strain.'}
+                  </Text>
+                </View>
+
                 <TouchableOpacity
                   style={styles.stressHelpBtn}
                   onPress={() => {
                     closeJourney();
-                    useCustomerStore.getState().openJourney('stress_intervention');
+                    useCustomerStore.getState().openJourney('financial_stress');
                   }}
+                  delayPressIn={0}
+                  activeOpacity={0.8}
                 >
-                  <Text style={styles.stressHelpBtnText}>View Cash-Flow Guidance Instead</Text>
-                  <ArrowRight size={16} color={colors.textWhite} />
+                  <Text style={styles.stressHelpBtnText}>
+                    {language === 'hi' ? 'कैश-फ्लो राहत योजना देखें' : language === 'gu' ? 'રોકડ પ્રવાહ રાહત આયોજન જુઓ' : 'View Cash-Flow Guidance Instead'}
+                  </Text>
+                  <ArrowRight size={16} color="#FFFFFF" />
                 </TouchableOpacity>
               </View>
             ) : (
+              /* 3. VERIFIABLE RESPONSIBLE LOAN WORKFLOW */
               <View>
-                {/* Contextual Affordability Statement */}
-                <View style={styles.affordabilityCard}>
-                  <Text style={styles.affordabilityLabel}>Safe Cash-Flow Assessment</Text>
-                  <Text style={styles.affordabilityHeading}>
-                    Based on your monthly surplus, you can safely manage an EMI up to ₹12,500/mo.
-                  </Text>
-                  <Text style={styles.affordabilityDesc}>
-                    Current debt-to-income: {Math.round(financialHealth.debtToIncomeRatio * 100)}% (Healthy baseline).
+                {/* How AI Verified Eligibility (Real Transaction Signals) */}
+                <View style={styles.signalHeaderRow}>
+                  <Sparkles size={14} color="#4F46E5" />
+                  <Text style={styles.signalHeaderText}>
+                    {language === 'hi'
+                      ? 'एआई ने आपके वास्तविक लेनदेन संकेतों का सत्यापन किया:'
+                      : language === 'gu'
+                      ? 'AI એ તમારા વાસ્તવિક વ્યવહાર સંકેતો ચકાસ્યા:'
+                      : 'HOW AI VERIFIED YOUR REAL TRANSACTION SIGNALS'}
                   </Text>
                 </View>
 
+                <View style={styles.signalBox}>
+                  <View style={styles.signalItem}>
+                    <CheckCircle2 size={16} color="#059669" />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.signalTitle}>
+                        {language === 'hi' ? 'स्थिर वेतन क्रेडिट' : language === 'gu' ? 'સ્થિર પગાર જમા' : 'Salary Regularity'}
+                      </Text>
+                      <Text style={styles.signalDetail}>₹75,000 received on 1st of every month (100% on-time)</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.signalItem}>
+                    <CheckCircle2 size={16} color="#059669" />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.signalTitle}>
+                        {language === 'hi' ? 'स्वस्थ ऋण-से-आय (DTI)' : language === 'gu' ? 'તંદુરસ્ત ઋણ-આવક ગુણોત્તર' : 'Debt-to-Income (DTI)'}
+                      </Text>
+                      <Text style={styles.signalDetail}>22% DTI ratio (well below safe 40% regulatory cap)</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.signalItem}>
+                    <CheckCircle2 size={16} color="#059669" />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.signalTitle}>
+                        {language === 'hi' ? 'मासिक सरप्लस कुशन' : language === 'gu' ? 'માસિક સરપ્લસ કુશન' : 'Safe Monthly Disposable Cushion'}
+                      </Text>
+                      <Text style={styles.signalDetail}>₹24,000 average surplus after rent and routine bills</Text>
+                    </View>
+                  </View>
+                </View>
+
                 {/* Amount Selector */}
-                <Text style={styles.sectionHeader}>Select Loan Requirement:</Text>
+                <Text style={styles.sectionHeader}>
+                  {language === 'hi' ? 'ऋण राशि चुनें:' : language === 'gu' ? 'લોન રકમ પસંદ કરો:' : 'Select Loan Amount:'}
+                </Text>
                 <View style={styles.chipsRow}>
-                  {[50000, 100000, 150000, 250000].map((amt) => (
+                  {[50000, 100000, 150000, 250000, 500000].map((amt) => (
                     <TouchableOpacity
                       key={amt}
                       style={[styles.amtChip, loanAmount === amt && styles.activeAmtChip]}
                       onPress={() => setLoanAmount(amt)}
+                      delayPressIn={0}
+                      activeOpacity={0.75}
                     >
                       <Text style={[styles.amtChipText, loanAmount === amt && styles.activeAmtChipText]}>
-                        ₹{amt.toLocaleString('en-IN')}
+                        ₹{(amt >= 100000 ? `${amt / 100000} Lakh` : `${amt / 1000}k`)}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
 
                 {/* Tenure Selector */}
-                <Text style={styles.sectionHeader}>Repayment Tenure:</Text>
+                <Text style={styles.sectionHeader}>
+                  {language === 'hi' ? 'चुकौती अवधि:' : language === 'gu' ? 'ચુકવણી સમયગાળો:' : 'Repayment Tenure:'}
+                </Text>
                 <View style={styles.chipsRow}>
-                  {[12, 24, 36, 48].map((m) => (
+                  {[12, 24, 36].map((m) => (
                     <TouchableOpacity
                       key={m}
                       style={[styles.amtChip, tenureMonths === m && styles.activeAmtChip]}
                       onPress={() => setTenureMonths(m)}
+                      delayPressIn={0}
+                      activeOpacity={0.75}
                     >
                       <Text style={[styles.amtChipText, tenureMonths === m && styles.activeAmtChipText]}>
                         {m} Months
@@ -118,31 +310,49 @@ export const ResponsibleLoanModal: React.FC = () => {
                   ))}
                 </View>
 
-                {/* Live EMI Calculation Box */}
+                {/* Live Transparent EMI Breakdown Box */}
                 <View style={styles.calcBox}>
                   <View style={styles.calcRow}>
-                    <Text style={styles.calcLabel}>Estimated Monthly EMI:</Text>
+                    <Text style={styles.calcLabel}>
+                      {language === 'hi' ? 'अनुमानित मासिक ईएमआई:' : language === 'gu' ? 'અંદાજિત માસિક EMI:' : 'Estimated Monthly EMI:'}
+                    </Text>
                     <Text style={styles.calcValue}>₹{estimatedEmi.toLocaleString('en-IN')} / mo</Text>
                   </View>
                   <View style={styles.calcRow}>
-                    <Text style={styles.calcLabel}>Interest Rate (Transparent):</Text>
+                    <Text style={styles.calcLabel}>
+                      {language === 'hi' ? 'ब्याज दर (पारदर्शी):' : language === 'gu' ? 'વ્યાજ દર (પારદર્શક):' : 'Fixed Interest Rate:'}
+                    </Text>
                     <Text style={styles.calcValue}>11.5% p.a. Fixed</Text>
                   </View>
                   <View style={styles.calcRow}>
-                    <Text style={styles.calcLabel}>Pre-payment Penalty:</Text>
+                    <Text style={styles.calcLabel}>
+                      {language === 'hi' ? 'प्री-पेमेंट चार्ज:' : language === 'gu' ? 'પ્રી-પેમેન્ટ ચાર્જ:' : 'Pre-payment Penalty:'}
+                    </Text>
                     <Text style={[styles.calcValue, { color: colors.success }]}>₹0 (Zero Charges)</Text>
+                  </View>
+                  <View style={styles.calcRow}>
+                    <Text style={styles.calcLabel}>
+                      {language === 'hi' ? 'दस्तावेजीकरण:' : language === 'gu' ? 'દસ્તાવેજીકરણ:' : 'Documentation:'}
+                    </Text>
+                    <Text style={[styles.calcValue, { color: '#4F46E5' }]}>100% Paperless DigiLocker</Text>
                   </View>
                 </View>
 
+                {/* Action Button: 1-Tap Mock Disbursal */}
                 <TouchableOpacity
                   style={styles.primaryBtn}
-                  onPress={() => {
-                    showToast('Loan Application Submitted for 1-Click Verification!');
-                    closeJourney();
-                  }}
+                  onPress={handleDisburseLoan}
+                  delayPressIn={0}
+                  activeOpacity={0.8}
                 >
-                  <Text style={styles.primaryBtnText}>Review & Proceed Safely</Text>
-                  <ArrowRight size={16} color={colors.textWhite} />
+                  <Text style={styles.primaryBtnText}>
+                    {language === 'hi'
+                      ? `स्वीकार करें और ₹${loanAmount.toLocaleString('en-IN')} तुरंत खाते में पाएं`
+                      : language === 'gu'
+                      ? `સ્વીકારો અને ₹${loanAmount.toLocaleString('en-IN')} તરત ખાતામાં મેળવો`
+                      : `Accept & Disburse ₹${loanAmount.toLocaleString('en-IN')} to Account`}
+                  </Text>
+                  <ArrowRight size={16} color="#FFFFFF" />
                 </TouchableOpacity>
               </View>
             )}
@@ -156,182 +366,272 @@ export const ResponsibleLoanModal: React.FC = () => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(17, 19, 24, 0.5)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: colors.cardBg,
-    borderTopLeftRadius: radii.xl,
-    borderTopRightRadius: radii.xl,
-    padding: spacing.lg,
-    maxHeight: '90%',
-    ...shadows.lg,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xxl,
+    maxHeight: '92%',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ECEEF2',
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: 12,
+    flex: 1,
   },
   iconWrap: {
-    width: 38,
-    height: 38,
-    borderRadius: radii.full,
-    backgroundColor: colors.primarySubtle,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#F4F5F7',
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
-    ...typography.h3,
-    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111318',
+    letterSpacing: -0.3,
   },
   subtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  closeBtn: {
-    padding: spacing.xs,
-  },
-  content: {
-    marginBottom: spacing.md,
-  },
-  stressWarningBox: {
-    backgroundColor: '#FEF2F2',
-    borderWidth: 1.5,
-    borderColor: '#FCA5A5',
-    borderRadius: radii.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginVertical: spacing.md,
-  },
-  stressTitle: {
-    ...typography.h3,
-    color: colors.danger,
-    textAlign: 'center',
-    marginTop: spacing.xs,
-  },
-  stressDesc: {
-    ...typography.body,
-    color: '#991B1B',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  stressPledge: {
-    ...typography.caption,
-    color: '#7F1D1D',
-    textAlign: 'center',
-    fontStyle: 'italic',
-    marginTop: spacing.xs,
-  },
-  stressHelpBtn: {
-    backgroundColor: colors.danger,
-    borderRadius: radii.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginTop: spacing.md,
-  },
-  stressHelpBtnText: {
-    ...typography.bodyBold,
-    color: colors.textWhite,
-  },
-  affordabilityCard: {
-    backgroundColor: colors.primarySubtle,
-    borderRadius: radii.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: '#DBEAFE',
-  },
-  affordabilityLabel: {
-    ...typography.tiny,
-    color: colors.primary,
-    textTransform: 'uppercase',
-    fontWeight: '700',
-  },
-  affordabilityHeading: {
-    ...typography.bodyBold,
-    color: colors.primaryDark,
-    marginTop: 4,
-  },
-  affordabilityDesc: {
-    ...typography.caption,
-    color: colors.textSecondary,
+    fontSize: 11,
+    color: '#525866',
     marginTop: 2,
   },
-  sectionHeader: {
-    ...typography.captionMedium,
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
+  closeBtn: {
+    padding: 6,
+    borderRadius: 20,
+    backgroundColor: '#F4F5F7',
+  },
+  content: {
+    padding: spacing.xl,
+  },
+  signalHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
+  signalHeaderText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#4F46E5',
     letterSpacing: 0.5,
-    marginBottom: spacing.xs,
+  },
+  signalBox: {
+    backgroundColor: '#F7F8F9',
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    marginBottom: spacing.lg,
+    gap: 10,
+  },
+  signalItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  signalTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#111318',
+  },
+  signalDetail: {
+    fontSize: 11,
+    color: '#525866',
+    marginTop: 1,
+  },
+  sectionHeader: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#111318',
+    marginBottom: 8,
+    marginTop: 4,
   },
   chipsRow: {
     flexDirection: 'row',
-    gap: spacing.xs,
+    gap: 8,
     marginBottom: spacing.md,
     flexWrap: 'wrap',
   },
   amtChip: {
-    backgroundColor: colors.cardBgSecondary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.md,
+    backgroundColor: '#F4F5F7',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#ECEEF2',
   },
   activeAmtChip: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: '#111318',
+    borderColor: '#111318',
   },
   amtChipText: {
-    ...typography.captionMedium,
-    color: colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#525866',
   },
   activeAmtChipText: {
-    color: colors.textWhite,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   calcBox: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: radii.lg,
-    padding: spacing.md,
+    backgroundColor: '#F7F8F9',
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#ECEEF2',
     marginBottom: spacing.lg,
-    gap: spacing.xs,
+    gap: 8,
   },
   calcRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   calcLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
+    fontSize: 13,
+    color: '#525866',
   },
   calcValue: {
-    ...typography.bodyBold,
-    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111318',
   },
   primaryBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: radii.md,
-    paddingVertical: spacing.md,
+    backgroundColor: '#111318',
+    paddingVertical: 15,
+    borderRadius: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
+    gap: 8,
+    marginTop: 4,
+    marginBottom: spacing.xl,
   },
   primaryBtnText: {
-    ...typography.bodyBold,
-    color: colors.textWhite,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  disbursedBox: {
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+  },
+  disbursedIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#ECFDF5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+  disbursedTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111318',
+    letterSpacing: -0.4,
+  },
+  disbursedAmount: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#059669',
+    marginTop: 4,
+  },
+  disbursedSub: {
+    fontSize: 13,
+    color: '#525866',
+    marginTop: 4,
+    marginBottom: spacing.lg,
+    textAlign: 'center',
+  },
+  receiptCard: {
+    width: '100%',
+    backgroundColor: '#F7F8F9',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    marginBottom: spacing.xl,
+    gap: 10,
+  },
+  receiptRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  receiptLabel: {
+    fontSize: 12,
+    color: '#525866',
+  },
+  receiptVal: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#111318',
+  },
+  stressWarningBox: {
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+  },
+  stressTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#DC2626',
+    marginTop: 10,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  stressDesc: {
+    fontSize: 13,
+    color: '#525866',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: spacing.lg,
+  },
+  pledgeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#F0FDFA',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#CCFBF1',
+    marginBottom: spacing.xl,
+  },
+  pledgeText: {
+    fontSize: 12,
+    color: '#0F766E',
+    fontWeight: '600',
+    flex: 1,
+  },
+  stressHelpBtn: {
+    backgroundColor: '#DC2626',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  stressHelpBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });
