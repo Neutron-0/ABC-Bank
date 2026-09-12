@@ -142,7 +142,7 @@ export const OFFLINE_STATE_BUNDLES: Record<CustomerStateType, {
         layer: 'DO',
         priority: 94,
         confidence: 0.97,
-        title: '🚇 Your morning Metro',
+        title: 'Transit Mandate: Delhi Metro (DMRC)',
         description: 'You usually make this payment around 8:40 AM for your weekday commute.',
         reason: 'Based on your frequent weekday travel pattern (22 times this month).',
         whyDetails: [
@@ -675,6 +675,11 @@ interface CustomerStateStore {
 }
 
 export const CARD_TRANSLATIONS: Record<string, Record<LanguageCode, { title: string; description: string; actionLabel?: string }>> = {
+  card_morning_metro: {
+    en: { title: 'Transit Mandate: Delhi Metro (DMRC)', description: 'Scheduled weekday commute around 8:40 AM. 1-Tap fast checkout with UPI auto-confirm.', actionLabel: 'Pay ₹40 Again' },
+    hi: { title: 'पारगमन अधिदेश: दिल्ली मेट्रो (DMRC)', description: 'सुबह 8:40 बजे का नियमित कार्यदिवस आवागमन। यूपीआई ऑटो-पुष्टि के साथ 1-टैप चेकआउट।', actionLabel: 'पुनः ₹40 भुगतान करें' },
+    gu: { title: 'ટ્રાન્ઝિટ આદેશ: દિલ્હી મેટ્રો (DMRC)', description: 'સવારે 8:40 વાગ્યે નિયમિત મુસાફરી. UPI ઓટો-પુષ્ટિ સાથે 1-ટેપ ચુકવણી.', actionLabel: 'ફરીથી ₹40 ચૂકવો' },
+  },
   card_metro_commute: {
     en: { title: 'Routine Commute Alert', description: 'Your usual Delhi Metro morning commute at 8:40 AM. 1-Tap recharge active.', actionLabel: 'Instant ₹40 UPI' },
     hi: { title: 'दैनिक यात्रा अलर्ट', description: 'आपकी सामान्य दिल्ली मेट्रो सुबह 8:40 की यात्रा। 1-टैप रिचार्ज उपलब्ध है।', actionLabel: 'त्वरित ₹40 यूपीआई' },

@@ -41,8 +41,8 @@ import {
   Send,
   Clock,
   TrendingUp,
-  User,
-  Sparkles,
+  ShieldCheck,
+  ShieldAlert,
   CheckCircle2,
 } from 'lucide-react-native';
 
@@ -51,11 +51,6 @@ export const AppNavigator: React.FC = () => {
   const t = getTranslation(language);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [dockWidth, setDockWidth] = useState(0);
-
-  // Motion refs for sliding indicator pill
-  const pillTranslateX = useRef(new Animated.Value(0)).current;
-  const pillOpacity = useRef(new Animated.Value(0)).current;
 
   // Motion refs for individual tab icon bouncing
   const iconScales = useRef<{ [key: string]: Animated.Value }>({
@@ -73,11 +68,11 @@ export const AppNavigator: React.FC = () => {
   const prevTabRef = useRef<MainTabType>(activeTab);
 
   const tabs: { id: MainTabType; label: string; icon: any }[] = [
-    { id: 'home', label: t.tabs.home, icon: Home },
-    { id: 'payments', label: 'Pay', icon: Send },
-    { id: 'activity', label: t.tabs.activity, icon: Clock },
-    { id: 'insights', label: 'Money', icon: TrendingUp },
-    { id: 'profile', label: t.tabs.profile, icon: User },
+    { id: 'home', label: t.tabs.home || 'Home', icon: Home },
+    { id: 'payments', label: language === 'hi' ? 'भुगतान' : language === 'gu' ? 'ચુકવણી' : 'Pay & Transfer', icon: Send },
+    { id: 'activity', label: language === 'hi' ? 'पासबुक' : language === 'gu' ? 'પાસબુક' : 'Passbook', icon: Clock },
+    { id: 'insights', label: language === 'hi' ? 'संपत्ति' : language === 'gu' ? 'સંપત્તિ' : 'Wealth', icon: TrendingUp },
+    { id: 'profile', label: language === 'hi' ? 'सेवाएं' : language === 'gu' ? 'સેવાઓ' : 'Services', icon: ShieldCheck },
   ];
 
   const TAB_ORDER: Record<string, number> = {
@@ -89,51 +84,20 @@ export const AppNavigator: React.FC = () => {
     assistant: 5,
   };
 
-  const activeTabIndex = tabs.findIndex((t) => t.id === activeTab);
-  const tabItemWidth = dockWidth > 0 ? (dockWidth - 12) / tabs.length : 0;
-
-  // Animate sliding indicator pill when activeTab or dockWidth changes
-  useEffect(() => {
-    if (dockWidth > 0 && activeTabIndex >= 0) {
-      const targetX = 6 + activeTabIndex * tabItemWidth;
-
-      Animated.parallel([
-        Animated.spring(pillTranslateX, {
-          toValue: targetX,
-          friction: 8,
-          tension: 75,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pillOpacity, {
-          toValue: 1,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else if (activeTabIndex === -1) {
-      // If in assistant or another non-dock tab, gently hide pill
-      Animated.timing(pillOpacity, {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [activeTab, dockWidth, activeTabIndex, tabItemWidth]);
-
   // Animate tab icon bounce & screen transition when activeTab changes
   useEffect(() => {
     // 1. Icon spring bounce for newly active tab
     if (iconScales[activeTab]) {
       Animated.sequence([
         Animated.timing(iconScales[activeTab], {
-          toValue: 1.24,
-          duration: 110,
+          toValue: 1.2,
+          duration: 100,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.spring(iconScales[activeTab], {
           toValue: 1.0,
-          friction: 5,
+          friction: 6,
           tension: 110,
           useNativeDriver: true,
         }),
@@ -198,12 +162,12 @@ export const AppNavigator: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FBFBFB" />
 
-      {/* Floating State Banner if not in normal */}
+      {/* Discreet Institutional Sandbox Strip if state is simulated */}
       {currentState !== 'normal' && (
         <View style={styles.stateNoticeStrip}>
-          <Sparkles size={13} color="#92400E" />
+          <ShieldAlert size={12} color="#475569" />
           <Text style={styles.stateNoticeText}>
-            Simulated Persona: <Text style={{ fontWeight: '800' }}>{currentState.toUpperCase()}</Text>
+            AUDIT SANDBOX: <Text style={{ fontWeight: '700', color: '#0F172A' }}>{currentState.toUpperCase().replace('_', ' ')}</Text>
           </Text>
         </View>
       )}
@@ -232,27 +196,9 @@ export const AppNavigator: React.FC = () => {
         {renderActiveScreen()}
       </Animated.View>
 
-      {/* Fluid Floating Dock Tab Bar with Sliding Indicator Pill */}
-      <View style={styles.dockContainer} pointerEvents="box-none">
-        <View
-          style={styles.tabBar}
-          onLayout={(e) => setDockWidth(e.nativeEvent.layout.width)}
-        >
-          {/* Sliding Pill Indicator */}
-          {dockWidth > 0 && tabItemWidth > 0 && (
-            <Animated.View
-              style={[
-                styles.slidingPill,
-                {
-                  width: tabItemWidth,
-                  opacity: pillOpacity,
-                  transform: [{ translateX: pillTranslateX }],
-                },
-              ]}
-              pointerEvents="none"
-            />
-          )}
-
+      {/* Anchored Institutional Banking Navigation Bar */}
+      <View style={styles.dockContainer}>
+        <View style={styles.tabBar}>
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
             const IconComp = tab.icon;
@@ -264,8 +210,14 @@ export const AppNavigator: React.FC = () => {
                 style={styles.tabItem}
                 onPress={() => setActiveTab(tab.id)}
                 delayPressIn={0}
-                activeOpacity={0.75}
+                activeOpacity={0.7}
               >
+                <View
+                  style={[
+                    styles.activePip,
+                    active ? styles.activePipVisible : styles.activePipHidden,
+                  ]}
+                />
                 <Animated.View
                   style={[
                     styles.iconContainer,
@@ -273,9 +225,9 @@ export const AppNavigator: React.FC = () => {
                   ]}
                 >
                   <IconComp
-                    size={19}
-                    color={active ? '#111318' : '#8E8E93'}
-                    strokeWidth={active ? 2.4 : 1.7}
+                    size={20}
+                    color={active ? '#0F294A' : '#64748B'}
+                    strokeWidth={active ? 2.3 : 1.7}
                   />
                 </Animated.View>
                 <Text
@@ -320,33 +272,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#F1F5F9',
     paddingVertical: 5,
     gap: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#FDE68A',
+    borderBottomColor: '#E2E8F0',
   },
   stateNoticeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#92400E',
+    color: '#475569',
+    letterSpacing: 0.2,
   },
   toastBanner: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 50 : 20,
     left: spacing.lg,
     right: spacing.lg,
-    backgroundColor: '#111318',
-    borderRadius: 14,
+    backgroundColor: '#0F172A',
+    borderRadius: 12,
     padding: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     zIndex: 9999,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
     elevation: 8,
   },
   toastText: {
@@ -359,47 +312,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dockContainer: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 24 : 14,
-    left: 16,
-    right: 16,
-    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 8,
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 32,
-    paddingVertical: 7,
-    paddingHorizontal: 6,
-    width: '100%',
-    justifyContent: 'space-around',
+    height: Platform.OS === 'ios' ? 76 : 60,
+    paddingBottom: Platform.OS === 'ios' ? 18 : 6,
+    paddingTop: 2,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ECECEC',
-    shadowColor: '#111318',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.07,
-    shadowRadius: 18,
-    elevation: 7,
-    position: 'relative',
-  },
-  slidingPill: {
-    position: 'absolute',
-    top: 6,
-    bottom: 6,
-    borderRadius: 24,
-    backgroundColor: '#F3F4F6',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    justifyContent: 'space-around',
+    width: '100%',
   },
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 4,
-    borderRadius: 20,
     flex: 1,
-    zIndex: 2,
+    paddingVertical: 2,
+  },
+  activePip: {
+    width: 22,
+    height: 3,
+    borderRadius: 1.5,
+    marginBottom: 4,
+  },
+  activePipVisible: {
+    backgroundColor: '#0F294A',
+  },
+  activePipHidden: {
+    backgroundColor: 'transparent',
   },
   iconContainer: {
     position: 'relative',
@@ -414,10 +361,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
   activeTabLabel: {
-    color: '#111318',
+    color: '#0F294A',
     fontWeight: '700',
   },
   inactiveTabLabel: {
-    color: '#8E8E93',
+    color: '#64748B',
   },
 });

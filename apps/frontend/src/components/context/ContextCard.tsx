@@ -280,7 +280,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               <HeartHandshake size={18} color="#0D9488" />
             </View>
             <View style={styles.assistanceTextWrap}>
-              <Text style={styles.assistanceTag}>ASSISTANCE</Text>
+              <Text style={styles.assistanceTag}>HEALTHCARE EXPENDITURE SUPPORT</Text>
               <Text style={styles.assistanceTitle}>{card.title}</Text>
             </View>
             <TouchableOpacity
@@ -313,7 +313,9 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               delayPressIn={0}
               activeOpacity={0.8}
             >
-              <Text style={styles.assistanceSecondaryBtnText}>Talk to Mitra</Text>
+              <Text style={styles.assistanceSecondaryBtnText}>
+                {language === 'hi' ? 'सहायता केंद्र' : language === 'gu' ? 'સહાય કેન્દ્ર' : 'Assistance Desk'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -439,7 +441,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             {renderIcon('#111318', 18)}
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.defaultEyebrow}>RECOMMENDED FOR YOUR CONTEXT</Text>
+            <Text style={styles.defaultEyebrow}>ACCOUNT MANDATE & ADVISORY</Text>
             <Text style={styles.defaultTitle}>{card.title}</Text>
           </View>
           <TouchableOpacity

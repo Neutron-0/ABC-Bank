@@ -376,18 +376,18 @@ export const AdaptiveHomeScreen: React.FC = () => {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.ambientMitraTag}>
-                {language === 'hi' ? 'मित्रा से पूछें' : language === 'gu' ? 'મિત્રને પૂછો' : 'ASK MITRA'}
+                {language === 'hi' ? 'बैंकिंग सलाहकार' : language === 'gu' ? 'નાણાકીય સલાહકાર' : 'FINANCIAL CONCIERGE'}
               </Text>
               <Text style={styles.ambientMitraPrompt} numberOfLines={1}>
                 {currentState === 'normal'
-                  ? (language === 'hi' ? '“सुबह की मेट्रो ₹40 रिचार्ज करें”' : language === 'gu' ? '“સવારની મેટ્રો ₹40 રિચાર્જ કરો”' : '“Recharge my ₹40 Delhi Metro card”')
+                  ? (language === 'hi' ? 'मेट्रो स्मार्ट कार्ड रिचार्ज (₹40)' : language === 'gu' ? 'મેટ્રો સ્માર્ટ કાર્ડ રિચાર્જ (₹40)' : 'Recharge Metro Smart Card (₹40)')
                   : currentState === 'medical_event'
-                  ? (language === 'hi' ? '“मैक्स अस्पताल बिल के लिए क्लेम सहायता”' : language === 'gu' ? '“મેક્સ હોસ્પિટલ બિલ માટે ક્લેમ સહાય”' : '“Help me file Max Hospital insurance claim”')
+                  ? (language === 'hi' ? 'मैक्स अस्पताल क्लेम व धारा 80D टैक्स रसीद' : language === 'gu' ? 'મેક્સ હોસ્પિટલ ક્લેમ અને કલમ 80D ટેક્સ રસીદ' : 'Max Hospital Claim & Sec 80D Tax Paperwork')
                   : currentState === 'financial_stress'
-                  ? (language === 'hi' ? '“आगामी ₹32,000 ईएमआई को कैसे संभालें?”' : language === 'gu' ? '“આગામી ₹32,000 EMI કેવી રીતે સંભાળવી?”' : '“How do I safely manage upcoming ₹32k EMIs?”')
+                  ? (language === 'hi' ? 'आगामी देनदारियां व अधिस्थगन विकल्प देखें' : language === 'gu' ? 'આગામી જવાબદારીઓ અને મોરેટોરિયમ વિકલ્પો જુઓ' : 'Review Scheduled Commitments & Moratorium Options')
                   : currentState === 'surplus'
-                  ? (language === 'hi' ? '“₹24,000 अतिरिक्त बचत को 7.2% पर लगाएं”' : language === 'gu' ? '“₹24,000 વધારાની બચત 7.2% માં રોકો”' : '“How much should I auto-sweep into 7.2%?”')
-                  : (language === 'hi' ? '“₹31,800 के डेबिट की जांच करें”' : language === 'gu' ? '“₹31,800 ના ડેબિટની તપાસ કરો”' : '“Review flagged ₹31,800 international debit”')}
+                  ? (language === 'hi' ? 'अतिरिक्त नकदी को 7.2% ऑटो-स्वीप डिपॉजिट में लगाएं' : language === 'gu' ? 'વધારાની રોકડ 7.2% ઑટો-સ્વીપ ડિપોઝિટમાં મૂકો' : 'Auto-Sweep Idle Cash into 7.2% Multi-Option Deposit')
+                  : (language === 'hi' ? 'संदिग्ध विदेशी लेनदेन की जांच करें (संदर्भ: SEC-8921)' : language === 'gu' ? 'શંકાસ્પદ વિદેશી વ્યવહાર તપાસો (સંદર્ભ: SEC-8921)' : 'Review Flagged Overseas Transaction (Ref: SEC-8921)')}
               </Text>
             </View>
           </View>
@@ -406,17 +406,17 @@ export const AdaptiveHomeScreen: React.FC = () => {
             <View style={{ flex: 1 }}>
               <Text style={styles.assistantTitle}>
                 {language === 'hi'
-                  ? 'मित्रा आपकी वित्तीय स्थिति समझता है'
+                  ? 'एबीसी बैंक वित्तीय सहायक'
                   : language === 'gu'
-                  ? 'મિત્ર તમારી નાણાકીય સ્થિતિ સમજે છે'
-                  : 'Mitra understands your money'}
+                  ? 'એબીસી બેંક નાણાકીય સહાયક'
+                  : 'ABC Bank Financial Assistant'}
               </Text>
               <Text style={styles.assistantSubtitle}>
                 {language === 'hi'
-                  ? 'नियमित भुगतान, आगामी बिलों या अस्पताल क्लेम के बारे में पूछें।'
+                  ? 'भारतीय रिज़र्व बैंक के डिजिटल दिशानिर्देशों के अनुरूप 256-बिट एन्क्रिप्टेड सहायक।'
                   : language === 'gu'
-                  ? 'નિયમિત ચુકવણી, આગામી બિલ અથવા ક્લેમ વિશે પૂછો.'
-                  : 'Ask about repeat payments, upcoming bills, or hospital tax rebates.'}
+                  ? 'ભારતીય રિઝર્વ બેંકના ડિજિટલ માર્ગદર્શિકા અનુસાર 256-બીટ એન્ક્રિપ્ટેડ સહાયક.'
+                  : '256-bit encrypted banking assistant compliant with RBI digital guidelines.'}
               </Text>
             </View>
           </View>
@@ -429,7 +429,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
               activeOpacity={0.75}
             >
               <Text style={styles.chipText}>
-                {language === 'hi' ? '🚇 मेट्रो रिचार्ज' : language === 'gu' ? '🚇 મેટ્રો રિચાર્જ' : '🚇 Metro Recharge'}
+                {language === 'hi' ? 'पारगमन अधिदेश' : language === 'gu' ? 'ટ્રાન્ઝિટ આદેશ' : 'Transit Mandate'}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -439,7 +439,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
               activeOpacity={0.75}
             >
               <Text style={styles.chipText}>
-                {language === 'hi' ? '📊 खर्च समीक्षा' : language === 'gu' ? '📊 ખર્ચ સમીક્ષા' : '📊 Spending Review'}
+                {language === 'hi' ? 'व्यय लेखापरीक्षा' : language === 'gu' ? 'ખર્ચ ઓડિટ' : 'Expense Audit'}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -449,16 +449,16 @@ export const AdaptiveHomeScreen: React.FC = () => {
               activeOpacity={0.75}
             >
               <Text style={styles.chipText}>
-                {language === 'hi' ? '🛡️ अस्पताल सहायता' : language === 'gu' ? '🛡️ હોસ્પિટલ સહાય' : '🛡️ Hospital Assistance'}
+                {language === 'hi' ? 'चिकित्सा क्लेम' : language === 'gu' ? 'તબીબી ક્લેમ' : 'Medical Claims'}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Quiet Editorial Footer */}
+        {/* Quiet Institutional Banking Footer */}
         <View style={styles.footerNote}>
           <Text style={styles.footerText}>
-            Personalized with calm, privacy-first ethical rules for Bharat
+            ABC Bank Ltd. • Regulated by the Reserve Bank of India • DICGC Insured up to ₹5,00,000
           </Text>
         </View>
       </ScrollView>
