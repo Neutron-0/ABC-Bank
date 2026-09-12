@@ -65,7 +65,7 @@ The demo showcases how the SAME generic engine seamlessly adapts to radically di
 
 ## Current Tech Stack
 - **Backend:** Python, FastAPI, Pydantic
-- **Frontend:** React Native, Expo (SDK 54), TypeScript, Zustand
+- **Frontend:** React Native, Expo (SDK 57), TypeScript, Zustand
 - **AI:** Python (rule-based with placeholder for MiniCPM5)
 - **Contracts:** JSON Schema (Draft-07)
 - **Infrastructure:** Docker Compose for containerization
