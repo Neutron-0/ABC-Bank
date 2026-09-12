@@ -41,20 +41,20 @@ This maps `127.0.0.1:5433` on your workstation securely to port `5432` on the re
 Set your local database URL to target the tunneled port using the dedicated `abc_bank` role (never the PostgreSQL superuser):
 
 ### Using a `.env` File (Recommended)
-Create a `.env` file in the project root (this file is already in `.gitignore`):
+Copy `.env.example` to `.env` or create `.env`:
 ```ini
-DATABASE_URL="postgresql://abc_bank:<strong_password>@127.0.0.1:5433/abc_bank"
+DATABASE_URL="postgresql://abc_bank:AbcBank_Secure2026_KeyDB!@localhost:5433/abc_bank"
 ```
 Both `dotenv-cli` and Prisma will automatically read `DATABASE_URL` from `.env`.
 
 ### Setting in Terminal Session Directly
 - **PowerShell (Windows)**:
   ```powershell
-  $env:DATABASE_URL = "postgresql://abc_bank:<strong_password>@127.0.0.1:5433/abc_bank"
+  $env:DATABASE_URL = "postgresql://abc_bank:AbcBank_Secure2026_KeyDB!@localhost:5433/abc_bank"
   ```
 - **Bash / Linux / macOS**:
   ```bash
-  export DATABASE_URL="postgresql://abc_bank:<strong_password>@127.0.0.1:5433/abc_bank"
+  export DATABASE_URL="postgresql://abc_bank:AbcBank_Secure2026_KeyDB!@localhost:5433/abc_bank"
   ```
 
 > **Security Note**: Never commit actual database passwords or `.env` to version control.
