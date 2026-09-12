@@ -61,6 +61,7 @@ export const AppNavigator: React.FC = () => {
   const iconScales = useRef<{ [key: string]: Animated.Value }>({
     home: new Animated.Value(1),
     payments: new Animated.Value(1),
+    assistant: new Animated.Value(1),
     activity: new Animated.Value(1),
     insights: new Animated.Value(1),
     profile: new Animated.Value(1),
@@ -75,6 +76,7 @@ export const AppNavigator: React.FC = () => {
   const tabs: { id: MainTabType; label: string; icon: any }[] = [
     { id: 'home', label: t.tabs.home || 'Home', icon: Home },
     { id: 'payments', label: language === 'hi' ? 'भुगतान' : language === 'gu' ? 'ચુકવણી' : 'Pay & Transfer', icon: Send },
+    { id: 'assistant', label: language === 'hi' ? 'मित्तर AI' : language === 'gu' ? 'મિત્તર AI' : 'Mittar AI', icon: Bot },
     { id: 'activity', label: language === 'hi' ? 'पासबुक' : language === 'gu' ? 'પાસબુક' : 'Passbook', icon: Clock },
     { id: 'insights', label: language === 'hi' ? 'संपत्ति' : language === 'gu' ? 'સંપત્તિ' : 'Wealth', icon: TrendingUp },
     { id: 'profile', label: language === 'hi' ? 'सेवाएं' : language === 'gu' ? 'સેવાઓ' : 'Services', icon: ShieldCheck },
@@ -83,10 +85,10 @@ export const AppNavigator: React.FC = () => {
   const TAB_ORDER: Record<string, number> = {
     home: 0,
     payments: 1,
-    activity: 2,
-    insights: 3,
-    profile: 4,
-    assistant: 5,
+    assistant: 2,
+    activity: 3,
+    insights: 4,
+    profile: 5,
   };
 
   // Animate tab icon bounce & screen transition when activeTab changes
@@ -167,92 +169,114 @@ export const AppNavigator: React.FC = () => {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: themeColors.bg }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={themeColors.bg} />
 
-      {/* Discreet Institutional Sandbox Strip if state is simulated */}
-      {currentState !== 'normal' && (
-        <View style={[styles.stateNoticeStrip, { backgroundColor: themeColors.cardBgSecondary, borderBottomColor: themeColors.border }]}>
-          <ShieldAlert size={12} color={themeColors.textSecondary} />
-          <Text style={[styles.stateNoticeText, { color: themeColors.textSecondary }]}>
-            AUDIT SANDBOX: <Text style={{ fontWeight: '700', color: themeColors.textPrimary }}>{currentState.toUpperCase().replace('_', ' ')}</Text>
-          </Text>
-        </View>
-      )}
+      <View style={[styles.responsiveShell, { backgroundColor: themeColors.bg, borderColor: themeColors.border }]}>
+        {/* Discreet Institutional Sandbox Strip if state is simulated */}
+        {currentState !== 'normal' && (
+          <View style={[styles.stateNoticeStrip, { backgroundColor: themeColors.cardBgSecondary, borderBottomColor: themeColors.border }]}>
+            <ShieldAlert size={12} color={themeColors.textSecondary} />
+            <Text style={[styles.stateNoticeText, { color: themeColors.textSecondary }]}>
+              AUDIT SANDBOX: <Text style={{ fontWeight: '700', color: themeColors.textPrimary }}>{currentState.toUpperCase().replace('_', ' ')}</Text>
+            </Text>
+          </View>
+        )}
 
-      {/* Toast Banner */}
-      {toastMessage && (
-        <View style={[styles.toastBanner, { backgroundColor: isDark ? '#1E293B' : '#0F172A' }]} pointerEvents="none">
-          <CheckCircle2 size={16} color="#10B981" />
-          <Text style={styles.toastText}>{toastMessage}</Text>
-        </View>
-      )}
+        {/* Toast Banner */}
+        {toastMessage && (
+          <View style={[styles.toastBanner, { backgroundColor: isDark ? '#1C1C1E' : themeColors.primaryDark }]} pointerEvents="none">
+            <CheckCircle2 size={16} color={themeColors.success} />
+            <Text style={styles.toastText}>{toastMessage}</Text>
+          </View>
+        )}
 
-      {/* Smooth Directional Screen Transition Container */}
-      <Animated.View
-        style={[
-          styles.screenContainer,
-          {
-            opacity: screenOpacity,
-            transform: [
-              { translateX: screenTranslateX },
-              { scale: screenScale },
-            ],
-          },
-        ]}
-      >
-        {renderActiveScreen()}
-      </Animated.View>
+        {/* Smooth Directional Screen Transition Container */}
+        <Animated.View
+          style={[
+            styles.screenContainer,
+            {
+              opacity: screenOpacity,
+              transform: [
+                { translateX: screenTranslateX },
+                { scale: screenScale },
+              ],
+            },
+          ]}
+        >
+          {renderActiveScreen()}
+        </Animated.View>
 
-      {/* Anchored Institutional Banking Navigation Bar */}
-      <View style={[styles.dockContainer, { backgroundColor: themeColors.cardBg, borderTopColor: themeColors.border }]}>
-        <View style={styles.tabBar}>
-          {tabs.map((tab) => {
-            const active = activeTab === tab.id;
-            const IconComp = tab.icon;
-            const scaleValue = iconScales[tab.id] || new Animated.Value(1);
+        {/* Floating Mittar AI Chatbot Button (Quick Jump) */}
+        {activeTab !== 'assistant' && (
+          <TouchableOpacity
+            style={[styles.floatingChatButton, { backgroundColor: themeColors.primary }]}
+            onPress={() => setActiveTab('assistant')}
+            activeOpacity={0.85}
+          >
+            <View style={styles.floatingChatInner}>
+              <View style={[styles.floatingChatIconCircle, { backgroundColor: isDark ? '#1D4ED8' : '#001A4D' }]}>
+                <Bot size={15} color="#FFFFFF" />
+              </View>
+              <View style={styles.floatingChatTextWrap}>
+                <Text style={styles.floatingChatTitle}>Mittar AI</Text>
+                <Text style={[styles.floatingChatSub, { color: '#E0E7FF' }]}>Edge SLM</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
 
-            return (
-              <TouchableOpacity
-                key={tab.id}
-                style={styles.tabItem}
-                onPress={() => setActiveTab(tab.id)}
-                delayPressIn={0}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[
-                    styles.activePip,
-                    active
-                      ? [styles.activePipVisible, { backgroundColor: isDark ? themeColors.accent : '#002970' }]
-                      : styles.activePipHidden,
-                  ]}
-                />
-                <Animated.View
-                  style={[
-                    styles.iconContainer,
-                    { transform: [{ scale: scaleValue }] },
-                  ]}
+        {/* Anchored Institutional Banking Navigation Bar */}
+        <View style={[styles.dockContainer, { backgroundColor: themeColors.cardBg, borderTopColor: themeColors.border }]}>
+          <View style={styles.tabBar}>
+            {tabs.map((tab) => {
+              const active = activeTab === tab.id;
+              const IconComp = tab.icon;
+              const scaleValue = iconScales[tab.id] || new Animated.Value(1);
+
+              return (
+                <TouchableOpacity
+                  key={tab.id}
+                  style={styles.tabItem}
+                  onPress={() => setActiveTab(tab.id)}
+                  delayPressIn={0}
+                  activeOpacity={0.7}
                 >
-                  <IconComp
-                    size={20}
-                    color={active ? (isDark ? themeColors.accent : '#002970') : (isDark ? '#64748B' : '#94A3B8')}
-                    strokeWidth={active ? 2.3 : 1.7}
+                  <View
+                    style={[
+                      styles.activePip,
+                      active
+                        ? [styles.activePipVisible, { backgroundColor: themeColors.primary }]
+                        : styles.activePipHidden,
+                    ]}
                   />
-                </Animated.View>
-                <Text
-                  style={[
-                    styles.tabLabel,
-                    active
-                      ? [styles.activeTabLabel, { color: isDark ? themeColors.accent : '#002970' }]
-                      : [styles.inactiveTabLabel, { color: isDark ? '#64748B' : '#94A3B8' }],
-                  ]}
-                  numberOfLines={1}
-                >
-                  {tab.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+                  <Animated.View
+                    style={[
+                      styles.iconContainer,
+                      { transform: [{ scale: scaleValue }] },
+                    ]}
+                  >
+                    <IconComp
+                      size={20}
+                      color={active ? themeColors.primary : themeColors.iconNeutral}
+                      strokeWidth={active ? 2.3 : 1.7}
+                    />
+                  </Animated.View>
+                  <Text
+                    style={[
+                      styles.tabLabel,
+                      active
+                        ? [styles.activeTabLabel, { color: themeColors.primary }]
+                        : [styles.inactiveTabLabel, { color: themeColors.textSecondary }],
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {tab.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
       </View>
+
 
       {/* Global Modals & Journeys */}
       <WhyThisCard />
@@ -282,6 +306,16 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.bg,
+    alignItems: 'center',
+  },
+  responsiveShell: {
+    flex: 1,
+    width: '100%',
+    maxWidth: Platform.OS === 'web' ? 520 : undefined,
+    borderLeftWidth: Platform.OS === 'web' ? 1 : 0,
+    borderRightWidth: Platform.OS === 'web' ? 1 : 0,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
   },
   stateNoticeStrip: {
     flexDirection: 'row',
@@ -293,6 +327,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
   },
+
   stateNoticeText: {
     fontSize: 11,
     fontWeight: '600',
@@ -358,7 +393,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   activePipVisible: {
-    backgroundColor: '#0F294A',
+    backgroundColor: colors.primary,
   },
   activePipHidden: {
     backgroundColor: 'transparent',
@@ -376,10 +411,54 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
   activeTabLabel: {
-    color: '#0F294A',
+    color: colors.primary,
     fontWeight: '700',
   },
   inactiveTabLabel: {
-    color: '#64748B',
+    color: colors.textSecondary,
+  },
+  floatingChatButton: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 84 : 70,
+    right: 16,
+    borderRadius: 22,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  floatingChatInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  floatingChatIconCircle: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  floatingChatTextWrap: {
+    flexDirection: 'column',
+  },
+  floatingChatTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
+  },
+  floatingChatSub: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#E0E7FF',
+    letterSpacing: 0.1,
   },
 });

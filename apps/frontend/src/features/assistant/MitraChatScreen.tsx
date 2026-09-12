@@ -12,6 +12,7 @@ import {
   Modal,
 } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { useAppTheme } from '../../theme/ThemeContext';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { BankingApi } from '../../services/api';
@@ -19,7 +20,6 @@ import { AssistantMessage } from '../../types';
 import {
   Bot,
   Send,
-  Sparkles,
   ShieldCheck,
   ArrowRight,
   ArrowLeft,
@@ -36,6 +36,7 @@ import {
 } from 'lucide-react-native';
 
 export const MitraChatScreen: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const {
     currentState,
     language,
@@ -201,6 +202,10 @@ export const MitraChatScreen: React.FC = () => {
               ? 'નમસ્તે રાહુલ, મેં મેક્સ હોસ્પિટલમાં ₹48,200 નો તાજેતરનો ખર્ચ જોયો. શું તમને કેશલેસ ક્લેમ અથવા ઇમરજન્સી ફંડ સમીક્ષામાં મદદ જોઈએ છે?'
               : 'I noticed the recent ₹48,200 hospital payment at Max Super Speciality. Would you like help reviewing your insurance claim or emergency reserves?',
           prompts: ['File Insurance Claim', 'View Section 80D Receipt', 'Review Upcoming Commitments'],
+          actionChips: [
+            { label: 'Open Claim Desk', action: 'OPEN_JOURNEY', payload: { journeyId: 'medical_assistance' } },
+            { label: 'View Passbook', action: 'OPEN_SCREEN', payload: { targetScreen: 'Activity' } },
+          ],
         };
       }
       if (currentState === 'financial_stress') {
@@ -212,6 +217,10 @@ export const MitraChatScreen: React.FC = () => {
               ? 'નમસ્તે રાહુલ, આ મહિને તમારો રોકડ પ્રવાહ સામાન્ય કરતાં ચુસ્ત દેખાય છે. આગામી EMI સંભાળવામાં હું મદદ કરી શકું છું.'
               : 'Hello Rahul, your cash flow looks tighter than usual with upcoming EMI commitments of ₹32,000. How can I assist you with budget stabilization?',
           prompts: ['View Upcoming EMIs', 'Flexible Repayment Options', 'Review Monthly Outflows'],
+          actionChips: [
+            { label: 'Budget Shield Plan', action: 'OPEN_JOURNEY', payload: { journeyId: 'stress_intervention' } },
+            { label: 'View Passbook', action: 'OPEN_SCREEN', payload: { targetScreen: 'Activity' } },
+          ],
         };
       }
       if (currentState === 'fraud_alert') {
@@ -223,6 +232,10 @@ export const MitraChatScreen: React.FC = () => {
               ? 'સુરક્ષા ચેતવણી: ₹31,800 નો અજાણ્યો વ્યવહાર જણાયો છે. શું તમે તાત્કાલિક કાર્ડ ફ્રીઝ કરવા માંગો છો?'
               : 'Security Alert: An unverified charge of ₹31,800 was flagged. Would you like me to freeze your debit card or guide you through dispute resolution?',
           prompts: ['Freeze Debit Card Now', 'Dispute Transaction', 'Verify Transaction Details'],
+          actionChips: [
+            { label: 'Freeze Card Instantly', action: 'OPEN_JOURNEY', payload: { journeyId: 'debit_card' } },
+            { label: 'View Passbook', action: 'OPEN_SCREEN', payload: { targetScreen: 'Activity' } },
+          ],
         };
       }
       if (currentState === 'surplus') {
@@ -234,16 +247,24 @@ export const MitraChatScreen: React.FC = () => {
               ? 'નમસ્તે રાહુલ! પગાર પછી ખાતામાં ₹24,000 વધારાનો સરપ્લસ છે. શું તમે 7.2% ઑટો-સ્વીપ પ્લાન જોવા માંગો છો?'
               : 'Hello Rahul! A surplus of ₹24,000 is available following salary credit. Would you like to review an auto-sweep liquid deposit earning 7.2%?',
           prompts: ['Auto-Sweep to 7.2%', 'Start Emergency SIP', 'View Savings Velocity'],
+          actionChips: [
+            { label: 'Explore Smart FD', action: 'OPEN_JOURNEY', payload: { journeyId: 'surplus' } },
+            { label: 'View Passbook', action: 'OPEN_SCREEN', payload: { targetScreen: 'Activity' } },
+          ],
         };
       }
       return {
         text:
           language === 'hi'
-            ? 'नमस्ते राहुल! मैं मित्रा हूँ। आपकी सुबह 8:40 की ₹40 मेट्रो यात्रा तैयार है। मैं आपकी क्या सहायता करूँ?'
+            ? 'नमस्ते राहुल! मैं मित्तर (Mittar) हूँ। आपकी सुबह 8:40 की ₹40 मेट्रो यात्रा तैयार है। मैं आपकी क्या सहायता करूँ?'
             : language === 'gu'
-            ? 'નમસ્તે રાહુલ! હું મિત્ર છું. તમારી સવારે 8:40 ની ₹40 મેટ્રો યાત્રા તૈયાર છે. હું શી મદદ કરી શકું?'
-            : "Hello Rahul! I'm Mitra. Your routine 8:40 AM Metro recharge of ₹40 is ready. How can I assist you with your day-to-day banking?",
-        prompts: ['Pay my morning Metro ₹40', 'Upcoming commitments', 'Monthly cash flow status'],
+            ? 'નમસ્તે રાહુલ! હું મિત્તર (Mittar) છું. તમારી સવારે 8:40 ની ₹40 મેટ્રો યાત્રા તૈયાર છે. હું શી મદદ કરી શકું?'
+            : "Hello Rahul! I'm Mittar (Mitra AI). Your routine 8:40 AM Metro recharge of ₹40 is ready. How can I assist you with your banking today?",
+        prompts: ['Check Balance', 'Pay my morning Metro ₹40', 'Pay Electricity Bill', 'Freeze Debit Card'],
+        actionChips: [
+          { label: 'Pay ₹40 Metro Now', action: 'INSTANT_PAY', payload: { amount: 40, merchant: 'Delhi Metro Smart Card', category: 'transport' } },
+          { label: 'View Passbook', action: 'OPEN_SCREEN', payload: { targetScreen: 'Activity' } },
+        ],
       };
     };
 
@@ -255,6 +276,7 @@ export const MitraChatScreen: React.FC = () => {
         text: ctx.text,
         timestamp: new Date().toISOString(),
         suggestedPrompts: ctx.prompts,
+        actionChips: ctx.actionChips,
       },
     ]);
   };
@@ -385,12 +407,12 @@ export const MitraChatScreen: React.FC = () => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: themeColors.bg }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: themeColors.cardBg, borderBottomColor: themeColors.border }]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity
             style={styles.backButton}
@@ -398,29 +420,31 @@ export const MitraChatScreen: React.FC = () => {
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <ArrowLeft size={20} color="#111318" />
+            <ArrowLeft size={20} color={themeColors.textPrimary} />
           </TouchableOpacity>
-          <View style={styles.avatarBox}>
-            <Bot size={20} color={colors.primary} />
+          <View style={[styles.avatarBox, { backgroundColor: themeColors.cardBgSecondary }]}>
+            <Bot size={20} color={isDark ? '#FFFFFF' : themeColors.primary} />
           </View>
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={styles.title}>{t.assistant.name}</Text>
-              <View style={styles.miniCpmPill}>
-                <Cpu size={10} color="#4F46E5" />
-                <Text style={styles.miniCpmPillText}>MiniCPM-5 Edge</Text>
+              <Text style={[styles.title, { color: themeColors.textPrimary }]}>
+                {language === 'hi' ? 'मित्तर (Mittar) AI' : language === 'gu' ? 'મિત્તર (Mittar) AI' : 'Mittar (Mitra) AI'}
+              </Text>
+              <View style={[styles.miniCpmPill, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                <Cpu size={10} color={isDark ? '#FFFFFF' : themeColors.primary} />
+                <Text style={[styles.miniCpmPillText, { color: themeColors.textSecondary }]}>Edge SLM Active</Text>
               </View>
             </View>
             <View style={styles.statusRow}>
               <View style={styles.statusDot} />
-              <Text style={styles.statusText}>On-Device Active • 0ms Latency</Text>
+              <Text style={[styles.statusText, { color: themeColors.textSecondary }]}>Private On-Device • Bank-Grade NPU</Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.ethicsBadge}>
-          <ShieldCheck size={12} color={colors.success} />
-          <Text style={styles.ethicsText}>Privacy NPU</Text>
+        <View style={[styles.ethicsBadge, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+          <ShieldCheck size={12} color={isDark ? '#FFFFFF' : themeColors.primary} />
+          <Text style={[styles.ethicsText, { color: isDark ? '#FFFFFF' : themeColors.primary }]}>RBI Encrypted</Text>
         </View>
       </View>
 
@@ -433,10 +457,10 @@ export const MitraChatScreen: React.FC = () => {
       >
         {/* Context Banner */}
         <View style={styles.contextPillWrap}>
-          <View style={styles.contextPill}>
-            <Sparkles size={12} color={colors.primary} />
-            <Text style={styles.contextPillText}>
-              Active State Context: {currentState.toUpperCase()}
+          <View style={[styles.contextPill, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}>
+            <ShieldCheck size={12} color={isDark ? '#FFFFFF' : themeColors.primary} />
+            <Text style={[styles.contextPillText, { color: themeColors.textSecondary }]}>
+              Verified Context: {currentState.toUpperCase().replace('_', ' ')}
             </Text>
           </View>
         </View>
@@ -449,19 +473,26 @@ export const MitraChatScreen: React.FC = () => {
               style={[styles.messageBubbleWrap, isUser ? styles.userWrap : styles.assistantWrap]}
             >
               {!isUser && (
-                <View style={styles.mitraBubbleAvatar}>
-                  <Bot size={14} color={colors.primary} />
+                <View style={[styles.mitraBubbleAvatar, { backgroundColor: themeColors.cardBgSecondary }]}>
+                  <Bot size={14} color={isDark ? '#FFFFFF' : themeColors.primary} />
                 </View>
               )}
 
               <View
                 style={[
                   styles.messageBubble,
-                  isUser ? styles.userBubble : styles.assistantBubble,
+                  isUser
+                    ? [styles.userBubble, { backgroundColor: isDark ? '#27272A' : themeColors.primary }]
+                    : [styles.assistantBubble, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }],
                 ]}
               >
                 <Text
-                  style={[styles.messageText, isUser ? styles.userText : styles.assistantText]}
+                  style={[
+                    styles.messageText,
+                    isUser
+                      ? styles.userText
+                      : [styles.assistantText, { color: themeColors.textPrimary }],
+                  ]}
                 >
                   {msg.text}
                 </Text>
@@ -472,6 +503,7 @@ export const MitraChatScreen: React.FC = () => {
                     <TouchableOpacity
                       style={[
                         styles.voiceListenBtn,
+                        { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
                         speakingMsgId === msg.id && styles.voiceListenBtnActive,
                       ]}
                       onPress={() => toggleSpeech(msg.id, msg.text)}
@@ -479,13 +511,14 @@ export const MitraChatScreen: React.FC = () => {
                       accessibilityLabel="Listen to message"
                     >
                       {speakingMsgId === msg.id ? (
-                        <VolumeX size={12} color="#EF4444" />
+                        <VolumeX size={12} color={themeColors.danger} />
                       ) : (
-                        <Volume2 size={12} color={colors.primary} />
+                        <Volume2 size={12} color={themeColors.iconNeutral} />
                       )}
                       <Text
                         style={[
                           styles.voiceListenText,
+                          { color: themeColors.textSecondary },
                           speakingMsgId === msg.id && styles.voiceListenTextActive,
                         ]}
                       >
@@ -501,12 +534,12 @@ export const MitraChatScreen: React.FC = () => {
                     {msg.actionChips.map((chip, idx) => (
                       <TouchableOpacity
                         key={idx}
-                        style={styles.actionChip}
+                        style={[styles.actionChip, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
                         onPress={() => handleChipAction(chip.action, chip.payload)}
                         activeOpacity={0.8}
                       >
-                        <Text style={styles.actionChipText}>{chip.label}</Text>
-                        <ArrowRight size={12} color={colors.primary} />
+                        <Text style={[styles.actionChipText, { color: themeColors.primary }]}>{chip.label}</Text>
+                        <ArrowRight size={12} color={themeColors.primary} />
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -514,16 +547,16 @@ export const MitraChatScreen: React.FC = () => {
 
                 {/* Suggested Prompts */}
                 {msg.suggestedPrompts && msg.suggestedPrompts.length > 0 && (
-                  <View style={styles.suggestedWrap}>
-                    <Text style={styles.suggestedLabel}>{t.assistant.suggestedTopics}:</Text>
+                  <View style={[styles.suggestedWrap, { borderTopColor: themeColors.borderLight }]}>
+                    <Text style={[styles.suggestedLabel, { color: themeColors.textMuted }]}>{t.assistant.suggestedTopics}:</Text>
                     {msg.suggestedPrompts.map((p, idx) => (
                       <TouchableOpacity
                         key={idx}
-                        style={styles.promptBtn}
+                        style={[styles.promptBtn, { backgroundColor: themeColors.cardBgSecondary }]}
                         onPress={() => handleSendMessage(p)}
                         activeOpacity={0.7}
                       >
-                        <Text style={styles.promptBtnText}>“{p}”</Text>
+                        <Text style={[styles.promptBtnText, { color: themeColors.textSecondary }]}>“{p}”</Text>
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -535,35 +568,35 @@ export const MitraChatScreen: React.FC = () => {
 
         {isSending && (
           <View style={[styles.messageBubbleWrap, styles.assistantWrap]}>
-            <View style={styles.mitraBubbleAvatar}>
-              <Bot size={14} color={colors.primary} />
+            <View style={[styles.mitraBubbleAvatar, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <Bot size={14} color={themeColors.primary} />
             </View>
-            <View style={[styles.messageBubble, styles.assistantBubble]}>
-              <ActivityIndicator size="small" color={colors.primary} />
+            <View style={[styles.messageBubble, styles.assistantBubble, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
+              <ActivityIndicator size="small" color={themeColors.primary} />
             </View>
           </View>
         )}
       </ScrollView>
 
       {/* Quick Action Suggestion Chips for MiniCPM Pipeline */}
-      <View style={styles.quickChipsBar}>
+      <View style={[styles.quickChipsBar, { backgroundColor: themeColors.cardBg, borderTopColor: themeColors.border }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickChipsContent}>
           {[
             { label: language === 'hi' ? 'बैलेंस जांचें' : language === 'gu' ? 'બેલેન્સ તપાસો' : 'Check Balance', query: 'Mera khata balance kitna hai?' },
             { label: language === 'hi' ? 'मेट्रो ₹40' : language === 'gu' ? 'મેટ્રો ₹40' : 'Pay Metro ₹40', query: 'Subah ki metro ka kitna lagega?' },
-            { label: language === 'hi' ? 'बिजली बिल' : language === 'gu' ? 'વીજળી બિલ' : 'Electricity Bill', query: 'Bijli ka bill bhar do' },
+            { label: language === 'hi' ? 'बिजली बिल' : language === 'gu' ? 'વીજળી बિલ' : 'Electricity Bill', query: 'Bijli ka bill bhar do' },
             { label: language === 'hi' ? 'कार्ड लॉक करें' : language === 'gu' ? 'કાર્ડ બ્લોક કરો' : 'Lock My Card', query: 'Lock my card immediately' },
             { label: language === 'hi' ? 'आगामी ईएमआई' : language === 'gu' ? 'આગામી EMI' : 'EMI Due Date', query: 'Mara EMI nu payment kyare che?' },
           ].map((chip, idx) => (
             <TouchableOpacity
               key={idx}
-              style={styles.quickChip}
+              style={[styles.quickChip, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
               onPress={() => handleSendMessage(chip.query)}
               disabled={isSending}
               activeOpacity={0.75}
             >
-              <Sparkles size={11} color="#4F46E5" />
-              <Text style={styles.quickChipText}>{chip.label}</Text>
+              <Bot size={11} color={themeColors.primary} />
+              <Text style={[styles.quickChipText, { color: themeColors.textPrimary }]}>{chip.label}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -587,11 +620,11 @@ export const MitraChatScreen: React.FC = () => {
       )}
 
       {/* Input Composer */}
-      <View style={styles.composer}>
+      <View style={[styles.composer, { backgroundColor: themeColors.cardBg, borderTopColor: themeColors.border }]}>
         <TextInput
-          style={styles.composerInput}
+          style={[styles.composerInput, { backgroundColor: themeColors.cardBgSecondary, color: themeColors.textPrimary, borderColor: themeColors.border }]}
           placeholder={isListening ? 'Listening...' : t.assistant.placeholder}
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={themeColors.textMuted}
           value={inputText}
           onChangeText={setInputText}
           onSubmitEditing={() => handleSendMessage()}
@@ -600,7 +633,11 @@ export const MitraChatScreen: React.FC = () => {
 
         {/* Voice Option Mic Button */}
         <TouchableOpacity
-          style={[styles.voiceButton, isListening && styles.voiceButtonActive]}
+          style={[
+            styles.voiceButton,
+            { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+            isListening && styles.voiceButtonActive,
+          ]}
           onPress={toggleVoiceInput}
           activeOpacity={0.8}
           accessibilityLabel="Voice input"
@@ -608,18 +645,22 @@ export const MitraChatScreen: React.FC = () => {
           {isListening ? (
             <MicOff size={18} color="#FFFFFF" />
           ) : (
-            <Mic size={18} color={colors.primary} />
+            <Mic size={18} color={isDark ? '#FFFFFF' : themeColors.primary} />
           )}
         </TouchableOpacity>
 
         {/* Send Button */}
         <TouchableOpacity
-          style={[styles.sendButton, !inputText.trim() && styles.sendDisabled]}
+          style={[
+            styles.sendButton,
+            { backgroundColor: isDark ? '#27272A' : '#002970' },
+            !inputText.trim() && styles.sendDisabled,
+          ]}
           onPress={() => handleSendMessage()}
           disabled={!inputText.trim() || isSending}
           activeOpacity={0.85}
         >
-          <Send size={18} color={colors.textWhite} />
+          <Send size={18} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 
@@ -631,42 +672,42 @@ export const MitraChatScreen: React.FC = () => {
         onRequestClose={() => setShowVoiceStudio(false)}
       >
         <View style={styles.voiceModalOverlay}>
-          <View style={styles.voiceStudioSheet}>
+          <View style={[styles.voiceStudioSheet, { backgroundColor: themeColors.cardBg }]}>
             {/* Top Bar */}
             <View style={styles.voiceStudioTopRow}>
-              <View style={styles.voiceStudioTag}>
-                <Radio size={13} color="#059669" />
-                <Text style={styles.voiceStudioTagText}>
+              <View style={[styles.voiceStudioTag, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <Radio size={13} color={isDark ? themeColors.textPrimary : themeColors.primary} />
+                <Text style={[styles.voiceStudioTagText, { color: isDark ? themeColors.textPrimary : themeColors.primary }]}>
                   MINICPM-5 VERNACULAR VOICE SLM
                 </Text>
               </View>
               <TouchableOpacity
-                style={styles.voiceStudioClose}
+                style={[styles.voiceStudioClose, { backgroundColor: themeColors.cardBgSecondary }]}
                 onPress={() => setShowVoiceStudio(false)}
                 hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               >
-                <X size={18} color="#64748B" />
+                <X size={18} color={themeColors.iconNeutral} />
               </TouchableOpacity>
             </View>
 
             {/* Visualizer & Mic Pulse */}
-            <View style={styles.soundwaveBox}>
+            <View style={[styles.soundwaveBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.soundwaveBarsRow}>
-                <View style={[styles.soundwaveBar, { height: 26 }]} />
-                <View style={[styles.soundwaveBar, { height: 42 }]} />
-                <View style={[styles.soundwaveBar, { height: 58 }]} />
-                <View style={[styles.soundwaveBar, { height: 38 }]} />
-                <View style={[styles.soundwaveBar, { height: 48 }]} />
-                <View style={[styles.soundwaveBar, { height: 24 }]} />
+                <View style={[styles.soundwaveBar, { height: 26, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 42, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 58, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 38, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 48, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 24, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
               </View>
-              <Text style={styles.voiceStudioHeading}>
+              <Text style={[styles.voiceStudioHeading, { color: themeColors.textPrimary }]}>
                 {language === 'hi'
                   ? 'मित्रा वॉइस एसएलएम सुन रहा है'
                   : language === 'gu'
                   ? 'મિત્રા વૉઇસ SLM સાંભળી રહ્યો છે'
                   : 'Mitra Voice SLM is Listening'}
               </Text>
-              <Text style={styles.voiceStudioSub}>
+              <Text style={[styles.voiceStudioSub, { color: themeColors.textSecondary }]}>
                 {language === 'hi'
                   ? 'अपनी भाषा में बोलें या तुरंत आज़माने के लिए नीचे दिए गए वाक्य पर टैप करें'
                   : language === 'gu'
@@ -677,7 +718,7 @@ export const MitraChatScreen: React.FC = () => {
 
             {/* Spoken Prompt Simulation Chips */}
             <View style={styles.voicePromptsSection}>
-              <Text style={styles.voicePromptsLabel}>
+              <Text style={[styles.voicePromptsLabel, { color: themeColors.textMuted }]}>
                 {language === 'hi'
                   ? 'त्वरित वॉयस कमांड (1-टैप से बोलें)'
                   : language === 'gu'
@@ -708,15 +749,15 @@ export const MitraChatScreen: React.FC = () => {
                 ).map((spokenPhrase, idx) => (
                   <TouchableOpacity
                     key={idx}
-                    style={styles.voicePromptCard}
+                    style={[styles.voicePromptCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
                     onPress={() => {
                       setShowVoiceStudio(false);
                       handleSendMessage(spokenPhrase, true);
                     }}
                     activeOpacity={0.75}
                   >
-                    <Mic size={14} color="#0F294A" />
-                    <Text style={styles.voicePromptCardText} numberOfLines={1}>
+                    <Mic size={14} color={themeColors.iconNeutral} />
+                    <Text style={[styles.voicePromptCardText, { color: themeColors.textPrimary }]} numberOfLines={1}>
                       "{spokenPhrase}"
                     </Text>
                   </TouchableOpacity>
@@ -725,9 +766,9 @@ export const MitraChatScreen: React.FC = () => {
             </View>
 
             {/* Direct Dictation Submit */}
-            <View style={styles.voiceDictationRow}>
+            <View style={[styles.voiceDictationRow, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <TextInput
-                style={styles.voiceDictationInput}
+                style={[styles.voiceDictationInput, { color: themeColors.textPrimary }]}
                 placeholder={
                   language === 'hi'
                     ? 'या यहाँ बोलकर / टाइप करके पूछें...'
@@ -735,7 +776,7 @@ export const MitraChatScreen: React.FC = () => {
                     ? 'અથવા અહીં બોલીને / ટાઈપ કરીને પૂછો...'
                     : 'Or speak / type any banking command here...'
                 }
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={themeColors.textMuted}
                 value={inputText}
                 onChangeText={setInputText}
                 onSubmitEditing={() => {
@@ -746,7 +787,7 @@ export const MitraChatScreen: React.FC = () => {
                 }}
               />
               <TouchableOpacity
-                style={[styles.voiceDictationSend, !inputText.trim() && { opacity: 0.5 }]}
+                style={[styles.voiceDictationSend, { backgroundColor: isDark ? '#27272A' : '#0F294A' }, !inputText.trim() && { opacity: 0.5 }]}
                 onPress={() => {
                   if (inputText.trim()) {
                     setShowVoiceStudio(false);

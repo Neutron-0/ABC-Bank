@@ -14,6 +14,7 @@
  */
 
 import { LanguageCode, AssistantMessage } from '../types';
+import { useCustomerStore } from '../state/customerStore';
 
 export interface MiniCPMIntentResult {
   intent: string;
@@ -256,13 +257,17 @@ export class MiniCPM5EdgeEngine {
   }
 
   /**
-   * Verbalize response into natural dialect based on intent and entities
-   */
+    * Verbalize response into natural dialect based on intent and entities
+    */
   public static verbalize(
     intent: string,
     entities: Record<string, any>,
     lang: LanguageCode
   ): string {
+    const state = typeof useCustomerStore !== 'undefined' ? useCustomerStore.getState() : null;
+    const balanceNum = state?.balance?.available ?? 124680;
+    const creditScoreNum = state?.profile?.creditScore ?? 782;
+    const surplusNum = state?.signals?.surplusAmount || 38400;
     const amount = entities.amount || 40;
     const merchant = entities.merchant || 'Merchant';
 
@@ -287,75 +292,84 @@ export class MiniCPM5EdgeEngine {
 
       case 'CHECK_BALANCE':
         if (lang === 'hi') {
-          return 'मैं आपके अनुरोध को ऑफलाइन समझ सकता हूँ, लेकिन आपका सटीक खाता बैलेंस देखने के लिए बैंक सर्वर से सुरक्षित कनेक्शन आवश्यक है।';
+          return `आपके एबीसी बैंक बचत खाते (•••• 4092) में वर्तमान उपलब्ध बैलेंस ₹${balanceNum.toLocaleString('en-IN')}.00 है। सभी जमा डीआईसीजीसी द्वारा ₹5,00,000 तक सुरक्षित हैं।`;
         }
         if (lang === 'gu') {
-          return 'હું તમારી વિનંતીને ઑફલાઇન સમજી શકું છું, પરંતુ તમારા ખાતાનું બેલેન્સ જોવા માટે બેંક સર્વર સાથે સુરક્ષિત જોડાણ આવશ્યક છે.';
+          return `તમારા એબીસી બેંક બચત ખાતા (•••• 4092) માં ઉપલબ્ધ બેલેન્સ ₹${balanceNum.toLocaleString('en-IN')}.00 છે. તમામ ડિપોઝિટ DICGC દ્વારા વીમાકૃત છે.`;
         }
-        return 'I can understand your request offline, but I need a secure connection to the bank to retrieve your account information.';
+        return `Your available ABC Bank balance is ₹${balanceNum.toLocaleString('en-IN')}.00 in Savings Account (•••• 4092). All deposits are DICGC insured up to ₹5,00,000.`;
 
       case 'CHECK_EMI':
         if (lang === 'hi') {
-          return 'ईएमआई विवरण की जांच के लिए बैंक सर्वर से सुरक्षित कनेक्टिविटी आवश्यक है। कृपया नेटवर्क उपलब्ध होने पर पुनः प्रयास करें।';
+          return 'आपका आगामी होम लोन ईएमआई ₹32,000 दिनांक 15 सितंबर 2026 को देय है। आपके बचत खाते में पर्याप्त बैलेंस उपलब्ध है।';
         }
         if (lang === 'gu') {
-          return 'EMI વિગતો મેળવવા માટે બેંક સર્વર જોડાણ આવશ્યક છે. કૃપા કરીને નેટવર્ક કનેક્ટ થયા પછી ફરી પ્રયાસ કરો.';
+          return 'તમારો આગામી હોમ લોન EMI ₹32,000 તારીખ 15 સપ્ટેમ્બર 2026 ના રોજ કપાશે. ખાતામાં પૂરતું બેલેન્સ છે.';
         }
-        return 'Checking your EMI schedule requires a secure connection to the bank. Please reconnect to view your active mandate details.';
+        return 'Your upcoming Home Loan EMI of ₹32,000 is scheduled for auto-debit on 15 September 2026. Account balance is sufficient.';
 
       case 'LOCK_CARD':
         if (lang === 'hi') {
-          return 'सुरक्षा निर्देश: कार्ड ब्लॉक अनुरोध दर्ज किया गया। केंद्रीय स्विच पर तुरंत कार्ड फ्रीज करने के लिए बैंक नेटवर्क कनेक्टिविटी आवश्यक है।';
+          return 'सुरक्षा अलर्ट: आपका रुपे प्लेटिनम डेबिट कार्ड (•••• 8821) सक्रिय है। कार्ड को तुरंत फ्रीज करने या ऑनलाइन सीमाएं बदलने के लिए नीचे कार्ड सुरक्षा खोलें।';
         }
         if (lang === 'gu') {
-          return 'સુરક્ષા સૂચના: કાર્ડ બ્લોક વિનંતી નોંધાઈ. સેન્ટ્રલ સિસ્ટમમાં કાર્ડ ફ્રીઝ પૂર્ણ કરવા નેટવર્ક કનેક્શન જરૂરી છે.';
+          return 'સુરક્ષા ચેતવણી: તમારું RuPay પ્લેટિનમ ડેબિટ કાર્ડ (•••• 8821) સક્રિય છે. કાર્ડને તુરંત ફ્રીઝ કરવા નીચે ટેપ કરો.';
         }
-        return 'Card Security: Freeze command recognized offline. Bank connectivity is required to freeze your card on the core network.';
+        return 'Security Protocol: Your RuPay Platinum Debit Card (•••• 8821) is active. Tap below to freeze your card instantly or manage transaction limits.';
 
       case 'MEDICAL_CLAIM_HELP':
         if (lang === 'hi') {
-          return 'मेडिकल क्लेम सहायता अनुरोध दर्ज किया गया। अस्पताल और पॉलिसी विवरण लोड करने के लिए नेटवर्क कनेक्टिविटी आवश्यक है।';
+          return 'मैक्स सुपर स्पेशियलिटी अस्पताल के ₹48,200 बिल के लिए कैशलेस क्लेम डेस्क और सेक्शन 80D रसीद उपलब्ध है। क्लेम शुरू करने के लिए नीचे टैप करें।';
         }
         if (lang === 'gu') {
-          return 'મેડિકલ ક્લેમ સહાય વિનંતી નોંધાઈ. પોલિસી વિગતો ચકાસવા નેટવર્ક જોડાણ જરૂરી છે.';
+          return 'મેક્સ હોસ્પિટલના ₹48,200 બિલ માટે કેશલેસ ક્લેમ ડેસ્ક અને સેક્શન 80D રસીદ ઉપલબ્ધ છે.';
         }
-        return 'Medical claim assistance recognized. Live banking connectivity is required to inspect eligible claims.';
+        return 'Insurance Claim Desk is ready for your recent Max Super Speciality hospital payment of ₹48,200. Tap below to access the claim portal.';
 
       case 'SAVE_SURPLUS':
         if (lang === 'hi') {
-          return 'वर्तमान खाता जानकारी और अधिशेष बचत विकल्पों की जांच के लिए बैंक सर्वर से कनेक्टिविटी आवश्यक है।';
+          return `अधिशेष पाया गया: आपके खाते में ₹${surplusNum.toLocaleString('en-IN')} की अतिरिक्त तरलता है। 7.2% वार्षिक ब्याज के लिए ऑटो-स्वीप स्मार्ट एफडी देखें।`;
         }
         if (lang === 'gu') {
-          return 'હાલના ખાતાની માહિતી અને સરપ્લસ બચત વિકલ્પો ચકાસવા માટે બેંક સર્વર સાથે કનેક્ટિવિટી આવશ્યક છે.';
+          return `સરપ્લસ મળ્યો: તમારા ખાતામાં ₹${surplusNum.toLocaleString('en-IN')} વધારાનું ફંડ છે. 7.2% વળતર મેળવવા ઑટો-સ્વીપ સ્માર્ટ FD જુઓ.`;
         }
-        return 'Reviewing surplus funds and savings opportunities requires a live connection to your current account records.';
+        return `Surplus detected: You have ₹${surplusNum.toLocaleString('en-IN')} in idle liquidity. Earn 7.2% p.a. returns with our 100% liquid Smart FD auto-sweep.`;
 
       case 'NAVIGATE_KYC':
         if (lang === 'hi') {
-          return 'डिजिटल केवाईसी स्थिति देखने और दस्तावेज सत्यापित करने के लिए बैंक सर्वर से कनेक्शन आवश्यक है।';
+          return 'आपका डिजिटल केवाईसी टियर-2 सत्यापित है। नया पैन या आधार अपडेट करने के लिए डिजिटल केवाईसी पोर्टल खोलें।';
         }
         if (lang === 'gu') {
-          return 'ડિજિટલ KYC સ્થિતિ તપાસવા અને દસ્તાવેજો અપડેટ કરવા બેંક કનેક્શન આવશ્યક છે.';
+          return 'તમારું ડિજિટલ KYC ટાયર-2 ચકાસાયેલ છે. આધાર અથવા પાન અપડેટ કરવા KYC પોર્ટલ ખોલો.';
         }
-        return 'Viewing your KYC status and updating verification documents requires a live banking connection.';
+        return 'Your ABC Bank Digital KYC is Tier-2 verified. You can update Aadhaar, PAN, or address details in the verification portal.';
 
       case 'CHECK_CREDIT_SCORE':
         if (lang === 'hi') {
-          return 'आपका नवीनतम क्रेडिट स्कोर लोड करने के लिए बैंक नेटवर्क कनेक्टिविटी आवश्यक है।';
+          return `आपका वर्तमान सिबिल क्रेडिट स्कोर ${creditScoreNum} (उत्कृष्ट) है। समय पर ईएमआई भुगतान से क्रेडिट रिकॉर्ड स्वस्थ है।`;
         }
         if (lang === 'gu') {
-          return 'તમારો લેટેસ્ટ ક્રેડિટ સ્કોર ચકાસવા માટે બેંક નેટવર્ક કનેક્શન આવશ્યક છે.';
+          return `તમારો વર્તમાન CIBIL ક્રેડિટ સ્કોર ${creditScoreNum} (ઉત્કૃષ્ટ) છે. તમામ EMI ચુકવણી રેકોર્ડ્સ સ્વસ્થ છે.`;
         }
-        return 'Retrieving your updated credit score requires a secure connection to institutional bureau records.';
+        return `Your verified credit score is ${creditScoreNum} (Excellent). Credit utilization is healthy at 18% with zero late payments.`;
+
+      case 'REVIEW_COMMITMENTS':
+        if (lang === 'hi') {
+          return 'इस महीने आपके कुल वित्तीय दायित्व ₹47,450 (किराया और ईएमआई) हैं। आपकी वर्तमान तरलता पर्याप्त है।';
+        }
+        if (lang === 'gu') {
+          return 'આ મહિને તમારી કુલ નાણાકીય જવાબદારીઓ ₹47,450 છે. ખાતામાં પૂરતી રકમ ઉપલબ્ધ છે.';
+        }
+        return 'Your total commitments this month are ₹47,450 across Rent and EMIs. Your available liquidity is sufficient.';
 
       default:
         if (lang === 'hi') {
-          return `मैंने आपका अनुरोध समझा: "${entities.cleanQuery || 'बैंकिंग सहायता'}"। मैं आपकी क्या मदद कर सकता हूँ?`;
+          return `नमस्ते! मैं मित्तर (Mittar), आपका एबीसी बैंक एआई वित्तीय सहायक हूँ। मैं बैलेंस जांचने, बिल भुगतान, ईएमआई ट्रैक करने या कार्ड सुरक्षा में आपकी मदद कर सकता हूँ।`;
         }
         if (lang === 'gu') {
-          return `મેં તમારી પૂછપરછ સમજી: "${entities.cleanQuery || 'બેંકિંગ સહાય'}"। હું તમને કેવી રીતે મદદ કરી શકું?`;
+          return `નમસ્તે! હું મિત્તર (Mittar), તમારો એબીસી બેંક AI નાણાકીય સહાયક છું. હું બેલેન્સ તપાસવા, બિલ ચુકવણી, EMI ટ્રેકિંગ અથવા કાર્ડ સુરક્ષામાં મદદ કરી શકું છું.`;
         }
-        return `I understood your query regarding banking services. How would you like to proceed?`;
+        return `Hello! I am Mittar, your ABC Bank AI financial concierge. I can help you check balances, transfer funds, pay utility bills, track EMIs, or manage card security.`;
     }
   }
 
@@ -449,6 +463,24 @@ export class MiniCPM5EdgeEngine {
         label: lang === 'hi' ? 'क्रेडिट स्कोर' : lang === 'gu' ? 'ક્રેડિટ સ્કોર' : 'View Full Credit Report',
         action: 'OPEN_JOURNEY',
         payload: { journeyId: 'credit_score' },
+      });
+    }
+
+    if (actionChips.length === 0) {
+      actionChips.push({
+        label: lang === 'hi' ? 'बैलेंस जांचें' : lang === 'gu' ? 'બેલેન્સ તપાસો' : 'Check Balance',
+        action: 'OPEN_SCREEN',
+        payload: { targetScreen: 'Activity' },
+      });
+      actionChips.push({
+        label: lang === 'hi' ? 'मेट्रो ₹40 भरें' : lang === 'gu' ? 'મેટ્રો ₹40 ભરો' : 'Pay Metro ₹40',
+        action: 'INSTANT_PAY',
+        payload: { amount: 40, merchant: 'Delhi Metro Smart Card', category: 'transport', description: 'Daily Commute' },
+      });
+      actionChips.push({
+        label: lang === 'hi' ? 'कार्ड सुरक्षा' : lang === 'gu' ? 'કાર્ડ સુરક્ષા' : 'Card Security',
+        action: 'OPEN_JOURNEY',
+        payload: { journeyId: 'debit_card' },
       });
     }
 
