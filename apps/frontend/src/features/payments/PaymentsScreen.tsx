@@ -29,10 +29,19 @@ import {
   X,
   Lock,
   ArrowRight,
+  Fingerprint,
 } from 'lucide-react-native';
 
 export const PaymentsScreen: React.FC = () => {
-  const { balance, language, performPayment, transactions } = useCustomerStore();
+  const {
+    balance,
+    language,
+    performPayment,
+    transactions,
+    validatePin,
+    triggerBiometricAuth,
+    biometricsEnabled,
+  } = useCustomerStore();
   const t = getTranslation(language);
 
   // Payment Modal State
@@ -76,7 +85,44 @@ export const PaymentsScreen: React.FC = () => {
       return;
     }
 
+    if (!validatePin(pin)) {
+      alert('Incorrect PIN. Please try again (default PIN is 1234).');
+      return;
+    }
+
     setIsProcessing(true);
+    const ok = await performPayment({
+      amount: amountNum,
+      merchant: payRecipient,
+      category: payCategory,
+      description: `UPI Payment to ${payRecipient}`,
+    });
+
+    setIsProcessing(false);
+    if (ok) {
+      setLastTxId(`UPI/2026/${Math.floor(10000000 + Math.random() * 90000000)}`);
+      setPayStep('success');
+    } else {
+      alert('Payment failed. Please check available balance.');
+    }
+  };
+
+  const handleBiometricPayment = async () => {
+    const trimmed = payAmount.trim();
+    const amountNum = parseFloat(trimmed);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      alert('Invalid payment amount.');
+      return;
+    }
+
+    setIsProcessing(true);
+    const bioOk = await triggerBiometricAuth();
+    if (!bioOk) {
+      setIsProcessing(false);
+      alert('Biometric authentication failed. Please enter your 4-digit PIN.');
+      return;
+    }
+
     const ok = await performPayment({
       amount: amountNum,
       merchant: payRecipient,
@@ -310,9 +356,29 @@ export const PaymentsScreen: React.FC = () => {
                   {isProcessing ? (
                     <ActivityIndicator color={colors.textWhite} />
                   ) : (
-                    <Text style={styles.primaryActionBtnText}>Confirm & Pay</Text>
+                    <Text style={styles.primaryActionBtnText}>Confirm with PIN</Text>
                   )}
                 </TouchableOpacity>
+
+                {biometricsEnabled && (
+                  <>
+                    <View style={styles.orDividerRow}>
+                      <View style={styles.orDividerLine} />
+                      <Text style={styles.orDividerText}>OR</Text>
+                      <View style={styles.orDividerLine} />
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.paymentsBioBtn}
+                      onPress={handleBiometricPayment}
+                      disabled={isProcessing}
+                      activeOpacity={0.8}
+                    >
+                      <Fingerprint size={20} color="#0F294A" />
+                      <Text style={styles.paymentsBioBtnText}>Authorize via Fingerprint / Face ID</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
               </View>
             )}
 
@@ -623,5 +689,38 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.lg,
+  },
+  orDividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginVertical: spacing.md,
+  },
+  orDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
+  },
+  orDividerText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.textMuted,
+    letterSpacing: 0.5,
+  },
+  paymentsBioBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#F1F5F9',
+    borderRadius: radii.md,
+    paddingVertical: spacing.md,
+    borderWidth: 1.5,
+    borderColor: '#CBD5E1',
+  },
+  paymentsBioBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F294A',
   },
 });

@@ -33,7 +33,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
     dismissCard,
     openJourney,
     setActiveTab,
-    performPayment,
+    requestPaymentAuth,
     setWhyCard,
     language,
   } = useCustomerStore();
@@ -126,7 +126,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
     const payload = action.payload;
 
     if (rawActionType === 'INSTANT_PAY' || rawActionType === 'INSTANT_METRO_PAY' || rawActionType === 'QUICK_PAY') {
-      await performPayment({
+      requestPaymentAuth({
         amount: payload?.amount || 40,
         merchant: payload?.merchant || card.title || 'Instant Payment',
         category: payload?.category || card.category || 'transport',
@@ -171,7 +171,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
 
     // Default card ID routing
     if (card.id.includes('metro')) {
-      await performPayment({
+      requestPaymentAuth({
         amount: 40,
         merchant: 'Delhi Metro Smart Card',
         category: 'transport',
