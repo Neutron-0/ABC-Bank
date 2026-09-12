@@ -26,6 +26,8 @@ web-build/
 Thumbs.db
 
 # Reference Repositories
+ref/
+ref*/
 reference repos/
 reference-repos/
 
