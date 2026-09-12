@@ -24,6 +24,10 @@ import {
   ArrowLeft,
   User,
   HeartHandshake,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
 } from 'lucide-react-native';
 
 export const MitraChatScreen: React.FC = () => {
@@ -39,7 +43,146 @@ export const MitraChatScreen: React.FC = () => {
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
+  const recognitionRef = useRef<any>(null);
+
+  // Clean up speech synthesis & recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined') {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+        if (recognitionRef.current) {
+          try {
+            recognitionRef.current.abort();
+          } catch {}
+        }
+      }
+    };
+  }, []);
+
+  // Text-to-Speech playback
+  const toggleSpeech = (msgId: string, text: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    if (speakingMsgId === msgId) {
+      window.speechSynthesis.cancel();
+      setSpeakingMsgId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    // Clean symbols and markdown for smooth Indic/English speech
+    const clean = text
+      .replace(/₹\s*(\d+(?:,\d+)*(?:\.\d+)?)/g, (_match, p1) => {
+        return language === 'hi' ? `${p1} रुपये` : language === 'gu' ? `${p1} રૂપિયા` : `${p1} rupees`;
+      })
+      .replace(/[•*#_`]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.lang = language === 'hi' ? 'hi-IN' : language === 'gu' ? 'gu-IN' : 'en-IN';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    utterance.onend = () => {
+      setSpeakingMsgId(null);
+    };
+
+    utterance.onerror = () => {
+      setSpeakingMsgId(null);
+    };
+
+    setSpeakingMsgId(msgId);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Voice Input via Web Speech API
+  const toggleVoiceInput = () => {
+    if (typeof window === 'undefined') return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert(
+        language === 'hi'
+          ? 'आपके ब्राउज़र में वॉयस इनपुट समर्थित नहीं है। कृपया लिखकर पूछें।'
+          : language === 'gu'
+          ? 'તમારા બ્રાઉઝરમાં વૉઇસ ઇનપુટ સપોર્ટેડ નથી. કૃપા કરીને ટાઇપ કરો.'
+          : 'Voice recognition is not supported in this browser. Please type your query.'
+      );
+      return;
+    }
+
+    if (isListening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      // Cancel TTS before listening
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        setSpeakingMsgId(null);
+      }
+
+      const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = language === 'hi' ? 'hi-IN' : language === 'gu' ? 'gu-IN' : 'en-IN';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+
+        const spokenText = finalTranscript || interimTranscript;
+        if (spokenText) {
+          setInputText(spokenText);
+        }
+
+        if (finalTranscript.trim()) {
+          setIsListening(false);
+          handleSendMessage(finalTranscript.trim(), true);
+        }
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
 
   // Load initial contextual greeting
   useEffect(() => {
@@ -115,7 +258,7 @@ export const MitraChatScreen: React.FC = () => {
     ]);
   };
 
-  const handleSendMessage = async (textToSend?: string) => {
+  const handleSendMessage = async (textToSend?: string, wasSpoken: boolean = false) => {
     const text = textToSend || inputText;
     if (!text.trim()) return;
 
@@ -140,17 +283,22 @@ export const MitraChatScreen: React.FC = () => {
 
     if (res && res.reply) {
       setMessages((prev) => [...prev, res.reply]);
+      if (wasSpoken) {
+        toggleSpeech(res.reply.id, res.reply.text);
+      }
     } else {
       // Offline fallback reply
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `asst_${Date.now()}`,
-          sender: 'assistant',
-          text: `I understood your inquiry: "${text}". Your account data and contextual signals are active and up-to-date.`,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
+      const fallbackText = `I understood your inquiry: "${text}". Your account data and contextual signals are active and up-to-date.`;
+      const fallbackMsg: AssistantMessage = {
+        id: `asst_${Date.now()}`,
+        sender: 'assistant',
+        text: fallbackText,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, fallbackMsg]);
+      if (wasSpoken) {
+        toggleSpeech(fallbackMsg.id, fallbackText);
+      }
     }
 
     setTimeout(() => {
@@ -203,17 +351,22 @@ export const MitraChatScreen: React.FC = () => {
             <Bot size={20} color={colors.primary} />
           </View>
           <View>
-            <Text style={styles.title}>{t.assistant.name}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={styles.title}>{t.assistant.name}</Text>
+              <View style={styles.miniCpmPill}>
+                <Text style={styles.miniCpmPillText}>MiniCPM-5</Text>
+              </View>
+            </View>
             <View style={styles.statusRow}>
               <View style={styles.statusDot} />
-              <Text style={styles.statusText}>{t.assistant.status}</Text>
+              <Text style={styles.statusText}>Edge NLU Pipeline • On-Device</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.ethicsBadge}>
           <ShieldCheck size={12} color={colors.success} />
-          <Text style={styles.ethicsText}>Ethical AI</Text>
+          <Text style={styles.ethicsText}>Lightweight</Text>
         </View>
       </View>
 
@@ -258,6 +411,35 @@ export const MitraChatScreen: React.FC = () => {
                 >
                   {msg.text}
                 </Text>
+
+                {/* Voice Read-Aloud for Assistant Messages */}
+                {!isUser && (
+                  <View style={styles.bubbleVoiceBar}>
+                    <TouchableOpacity
+                      style={[
+                        styles.voiceListenBtn,
+                        speakingMsgId === msg.id && styles.voiceListenBtnActive,
+                      ]}
+                      onPress={() => toggleSpeech(msg.id, msg.text)}
+                      activeOpacity={0.7}
+                      accessibilityLabel="Listen to message"
+                    >
+                      {speakingMsgId === msg.id ? (
+                        <VolumeX size={12} color="#EF4444" />
+                      ) : (
+                        <Volume2 size={12} color={colors.primary} />
+                      )}
+                      <Text
+                        style={[
+                          styles.voiceListenText,
+                          speakingMsgId === msg.id && styles.voiceListenTextActive,
+                        ]}
+                      >
+                        {speakingMsgId === msg.id ? 'Stop' : 'Voice'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
 
                 {/* Action Chips */}
                 {msg.actionChips && msg.actionChips.length > 0 && (
@@ -309,17 +491,74 @@ export const MitraChatScreen: React.FC = () => {
         )}
       </ScrollView>
 
+      {/* Quick Action Suggestion Chips for MiniCPM Pipeline */}
+      <View style={styles.quickChipsBar}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickChipsContent}>
+          {[
+            { label: language === 'hi' ? 'बैलेंस जांचें' : language === 'gu' ? 'બેલેન્સ તપાસો' : 'Check Balance', query: 'Mera khata balance kitna hai?' },
+            { label: language === 'hi' ? 'मेट्रो ₹40' : language === 'gu' ? 'મેટ્રો ₹40' : 'Pay Metro ₹40', query: 'Subah ki metro ka kitna lagega?' },
+            { label: language === 'hi' ? 'बिजली बिल' : language === 'gu' ? 'વીજળી બિલ' : 'Electricity Bill', query: 'Bijli ka bill bhar do' },
+            { label: language === 'hi' ? 'कार्ड लॉक करें' : language === 'gu' ? 'કાર્ડ બ્લોક કરો' : 'Lock My Card', query: 'Lock my card immediately' },
+            { label: language === 'hi' ? 'आगामी ईएमआई' : language === 'gu' ? 'આગામી EMI' : 'EMI Due Date', query: 'Mara EMI nu payment kyare che?' },
+          ].map((chip, idx) => (
+            <TouchableOpacity
+              key={idx}
+              style={styles.quickChip}
+              onPress={() => handleSendMessage(chip.query)}
+              disabled={isSending}
+              activeOpacity={0.75}
+            >
+              <Sparkles size={11} color="#4F46E5" />
+              <Text style={styles.quickChipText}>{chip.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Listening Status Banner */}
+      {isListening && (
+        <View style={styles.listeningBanner}>
+          <View style={styles.pulseDot} />
+          <Text style={styles.listeningBannerText}>
+            {language === 'hi'
+              ? 'सुन रहा हूँ... बोलिए (हिंदी / English)'
+              : language === 'gu'
+              ? 'સાંભળી રહ્યો છું... બોલો (ગુજરાતી / English)'
+              : 'Listening... Speak in English, Hindi, or Gujarati'}
+          </Text>
+          <TouchableOpacity onPress={toggleVoiceInput} style={styles.stopListeningBtn}>
+            <Text style={styles.stopListeningText}>Stop</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Input Composer */}
       <View style={styles.composer}>
         <TextInput
           style={styles.composerInput}
-          placeholder={t.assistant.placeholder}
+          placeholder={isListening ? 'Listening...' : t.assistant.placeholder}
           placeholderTextColor={colors.textMuted}
           value={inputText}
           onChangeText={setInputText}
           onSubmitEditing={() => handleSendMessage()}
           returnKeyType="send"
         />
+
+        {/* Voice Option Mic Button */}
+        <TouchableOpacity
+          style={[styles.voiceButton, isListening && styles.voiceButtonActive]}
+          onPress={toggleVoiceInput}
+          activeOpacity={0.8}
+          accessibilityLabel="Voice input"
+        >
+          {isListening ? (
+            <MicOff size={18} color="#FFFFFF" />
+          ) : (
+            <Mic size={18} color={colors.primary} />
+          )}
+        </TouchableOpacity>
+
+        {/* Send Button */}
         <TouchableOpacity
           style={[styles.sendButton, !inputText.trim() && styles.sendDisabled]}
           onPress={() => handleSendMessage()}
@@ -548,5 +787,121 @@ const styles = StyleSheet.create({
   },
   sendDisabled: {
     opacity: 0.4,
+  },
+  miniCpmPill: {
+    backgroundColor: 'rgba(99, 102, 241, 0.12)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.25)',
+  },
+  miniCpmPillText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#4F46E5',
+  },
+  quickChipsBar: {
+    backgroundColor: colors.cardBg,
+    paddingVertical: 6,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+  },
+  quickChipsContent: {
+    paddingHorizontal: spacing.md,
+    gap: 8,
+  },
+  quickChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.cardBgSecondary,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 5,
+  },
+  quickChipText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  voiceButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primarySubtle,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.25)',
+  },
+  voiceButtonActive: {
+    backgroundColor: '#EF4444',
+    borderColor: '#DC2626',
+  },
+  listeningBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.2)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
+    gap: 8,
+  },
+  pulseDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#EF4444',
+  },
+  listeningBannerText: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#DC2626',
+  },
+  stopListeningBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+  },
+  stopListeningText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#DC2626',
+  },
+  bubbleVoiceBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    paddingTop: 4,
+  },
+  voiceListenBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.cardBgSecondary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  voiceListenBtnActive: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+  },
+  voiceListenText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  voiceListenTextActive: {
+    color: '#EF4444',
   },
 });

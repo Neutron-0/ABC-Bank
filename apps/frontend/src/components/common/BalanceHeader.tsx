@@ -23,6 +23,7 @@ export const BalanceHeader: React.FC = () => {
     financialHealth,
     currentState,
     setActiveTab,
+    openJourney,
   } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -146,7 +147,7 @@ export const BalanceHeader: React.FC = () => {
 
         <TouchableOpacity
           style={styles.actionBtn}
-          onPress={() => setActiveTab('profile')}
+          onPress={() => openJourney('debit_card')}
           delayPressIn={0}
           activeOpacity={0.75}
         >

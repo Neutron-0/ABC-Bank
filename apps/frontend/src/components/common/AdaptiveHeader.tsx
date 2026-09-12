@@ -4,7 +4,7 @@ import { colors, typography, spacing, radii } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { motion } from '../../motion';
-import { Bell, Globe, SlidersHorizontal, ShieldCheck, User } from 'lucide-react-native';
+import { Bell, Globe, SlidersHorizontal, ShieldCheck, User, Bot } from 'lucide-react-native';
 
 export const AdaptiveHeader: React.FC = () => {
   const { profile, language, setLanguage, openJourney, currentState, setActiveTab } = useCustomerStore();
@@ -45,6 +45,16 @@ export const AdaptiveHeader: React.FC = () => {
       </View>
 
       <View style={styles.rightRow}>
+        {/* Chat Bot Button (MiniCPM-5 Pipeline) */}
+        <TouchableOpacity
+          style={styles.chatButton}
+          onPress={() => setActiveTab('assistant')}
+          activeOpacity={0.8}
+        >
+          <Bot size={13} color="#FFFFFF" />
+          <Text style={styles.chatButtonText}>Mitra AI</Text>
+        </TouchableOpacity>
+
         {/* Sandbox Simulation Drawer Shortcut */}
         <TouchableOpacity
           style={styles.sandboxButton}
@@ -154,6 +164,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 7,
+  },
+  chatButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4338CA',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 8,
+    gap: 4,
+  },
+  chatButtonText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.1,
   },
   sandboxButton: {
     flexDirection: 'row',

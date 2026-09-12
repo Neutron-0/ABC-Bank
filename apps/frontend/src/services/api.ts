@@ -47,7 +47,7 @@ export class BankingApi {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1200); // 1.2s timeout for instant non-blocking UI response
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout for reliable neural SLM pipeline response
 
       const res = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,

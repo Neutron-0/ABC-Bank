@@ -46,6 +46,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   CheckCircle2,
+  Bot,
 } from 'lucide-react-native';
 
 export const AppNavigator: React.FC = () => {
@@ -197,6 +198,25 @@ export const AppNavigator: React.FC = () => {
       >
         {renderActiveScreen()}
       </Animated.View>
+
+      {/* Floating Mitra Chatbot Button (MiniCPM-5 Pipeline) */}
+      {activeTab !== 'assistant' && (
+        <TouchableOpacity
+          style={styles.floatingChatButton}
+          onPress={() => setActiveTab('assistant')}
+          activeOpacity={0.85}
+        >
+          <View style={styles.floatingChatInner}>
+            <View style={styles.floatingChatIconCircle}>
+              <Bot size={17} color="#FFFFFF" />
+            </View>
+            <View style={styles.floatingChatTextWrap}>
+              <Text style={styles.floatingChatTitle}>Mitra AI</Text>
+              <Text style={styles.floatingChatSub}>MiniCPM-5</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      )}
 
       {/* Anchored Institutional Banking Navigation Bar */}
       <View style={styles.dockContainer}>
@@ -370,5 +390,50 @@ const styles = StyleSheet.create({
   },
   inactiveTabLabel: {
     color: '#64748B',
+  },
+  floatingChatButton: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 90 : 74,
+    right: 18,
+    backgroundColor: '#0F294A',
+    borderRadius: 24,
+    paddingVertical: 7,
+    paddingHorizontal: 13,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  floatingChatInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  floatingChatIconCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#4338CA',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  floatingChatTextWrap: {
+    flexDirection: 'column',
+  },
+  floatingChatTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
+  },
+  floatingChatSub: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#A5B4FC',
+    letterSpacing: 0.1,
   },
 });
