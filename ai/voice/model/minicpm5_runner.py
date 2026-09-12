@@ -5,10 +5,16 @@ import re
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
 
+from ai.voice.model.neural_slm import (
+    MiniCPM5ONNXModel,
+    IndicEntityParser,
+    NaturalSpeechVerbalizer
+)
+
 
 class MiniCPM5Config(BaseModel):
     model_name: str = "MiniCPM-V-2.6 / MiniCPM-4B-SLM"
-    quantization: str = "INT4-AWQ / GGUF"
+    quantization: str = "INT4-AWQ / ONNX-Runtime"
     context_window: int = 4096
     ram_footprint_mb: int = 1850
     target_hardware: str = "On-Device Mobile NPU / Snapdragon 7+ / Apple Neural Engine"
@@ -19,49 +25,6 @@ class MiniCPM5Runner:
     """Local edge SLM runner executing vernacular intent detection and privacy-preserved verbalization."""
 
     CONFIG = MiniCPM5Config()
-
-    _INTENT_VOCABULARY = {
-        "PAY_METRO": [
-            r"(?i)\b(metro|dmrc|subway|train|recharge|smart\s*card|commute)\b",
-            r"(?i)(मेट्रो|स्मार्ट कार्ड|सफर|यात्रा)",
-            r"(?i)(મેટ્રો|સ્માર્ટ કાર્ડ|મુસાફરી)"
-        ],
-        "CHECK_EMI": [
-            r"(?i)\b(emi|loan|installment|due\s*date|monthly\s*payment|home\s*loan)\b",
-            r"(?i)(ईएमआई|किस्त|लोन|कर्ज|हफ्ता)",
-            r"(?i)(હપ્તો|લોન|ઇએમઆઇ|વ્યાજ)"
-        ],
-        "CHECK_BALANCE": [
-            r"(?i)\b(balance|available|funds|account|savings|paisa|kitna)\b",
-            r"(?i)(बैलेंस|खाता|रुपया|कितने पैसे|जमा)",
-            r"(?i)(બેલેન્સ|ખાતું|કેટલા રૂપિયા|જમા)"
-        ],
-        "PAY_BILL": [
-            r"(?i)\b(bill|electricity|bijli|power|gas|cylinder|water|broadband)\b",
-            r"(?i)(बिल|बिजली|गैस|पानी|रीचार्ज)",
-            r"(?i)(બિલ|લાઈટ બિલ|વીજળી|ગેસ)"
-        ],
-        "MEDICAL_CLAIM_HELP": [
-            r"(?i)\b(medical|hospital|claim|insurance|doctor|health|admit|reimbursement)\b",
-            r"(?i)(अस्पताल|दवा|इलाज|क्लेम|बीमा|मेडिकल)",
-            r"(?i)(હોસ્પિટલ|દવા|બીમારી|ક્લેમ|વીમો)"
-        ],
-        "REVIEW_COMMITMENTS": [
-            r"(?i)\b(stress|tight|budget|commitment|pause|cancel|subscription|kharcha)\b",
-            r"(?i)(तंग|बजट|खर्च|कम करो|सब्सक्रिप्शन|रोक दो)",
-            r"(?i)(બજેટ|ખર્ચ|ખેંચ|સબસ્ક્રિપ્શન|અટકાવો)"
-        ],
-        "SAVE_SURPLUS": [
-            r"(?i)\b(save|surplus|fd|fixed\s*deposit|invest|smart\s*deposit|interest)\b",
-            r"(?i)(बचत|एफडी|निवेश|जमा करो|ब्याज)",
-            r"(?i)(બચત|રોકાણ|એફડી|વધારે પૈસા)"
-        ],
-        "LOCK_CARD": [
-            r"(?i)\b(lock|freeze|fraud|stolen|block|suspicious|theft|lost)\b",
-            r"(?i)(बंद करो|ब्लॉक|फ्रॉड|धोखा|चोरी|खो गया)",
-            r"(?i)(બંધ કરો|બ્લોક|ફ્રોડ|ખોવાઈ ગયું)"
-        ]
-    }
 
     @classmethod
     def get_system_prompt(cls, language: str) -> str:
@@ -92,9 +55,9 @@ class MiniCPM5Runner:
 
     @classmethod
     def parse_intent(cls, spoken_query: Optional[str], preferred_lang: Optional[str] = None) -> Dict[str, Any]:
-        """Parses vernacular spoken query into structured VoiceIntent conforming to contracts/voice-intent.schema.json."""
+        """Parses vernacular spoken query into structured VoiceIntent conforming to contracts/voice-intent.schema.json using ONNX SLM."""
         clean_q = str(spoken_query or "").strip()
-        
+
         # Normalize preferred language code (handles 'hi-IN', 'gu-IN', etc.)
         norm_lang = "en"
         if preferred_lang and isinstance(preferred_lang, str):
@@ -112,63 +75,35 @@ class MiniCPM5Runner:
 
         lang = norm_lang
 
-        detected_intent = "GENERAL_QUERY"
-        matched_confidence = 0.70
-        entities: Dict[str, Any] = {}
+        if not clean_q:
+            return {
+                "intent": "GENERAL_QUERY",
+                "language": lang,
+                "confidence": 0.70,
+                "entities": {},
+                "runtime_device": cls.CONFIG.target_hardware,
+                "model_version": cls.CONFIG.model_name,
+                "latency_ms": 0.1
+            }
 
-        for intent, patterns in cls._INTENT_VOCABULARY.items():
-            for pat in patterns:
-                if re.search(pat, clean_q):
-                    detected_intent = intent
-                    matched_confidence = 0.96
-                    break
-            if detected_intent != "GENERAL_QUERY":
-                break
+        # Genuine on-device neural forward pass via ONNX Runtime
+        prediction = MiniCPM5ONNXModel.predict(clean_q)
+        detected_intent = prediction["intent"]
+        confidence = prediction["confidence"]
+        latency_ms = prediction["latency_ms"]
 
-        # Dynamic amount extraction from spoken utterance if mentioned
-        amt_match = re.search(r"(?:₹|rs\.?|inr)?\s*(\d+(?:,\d+)*(?:\.\d+)?)", clean_q, re.IGNORECASE)
-        extracted_amt = None
-        if amt_match:
-            try:
-                cleaned_num = amt_match.group(1).replace(",", "")
-                f_val = float(cleaned_num)
-                extracted_amt = int(f_val) if f_val.is_integer() else f_val
-            except (ValueError, TypeError):
-                extracted_amt = None
-
-        # Entity extraction
-        if detected_intent == "PAY_METRO":
-            entities = {"merchant": "Delhi Metro Smart Card", "amount": extracted_amt or 40}
-        elif detected_intent == "CHECK_EMI":
-            is_loan_app = bool(
-                re.search(r"(?i)\b(apply|need|want|give|get|take|personal|card|new|quick|instant)\b.*\b(loan|credit|karz|udhar)\b", clean_q)
-                or re.search(r"(?i)(लोन चाहिए|नया लोन|कर्ज चाहिए|उधार|लोन लेना|ऋण)", clean_q)
-                or re.search(r"(?i)(લોન જોઈએ|નવી લોન|ઉધાર|કર્જ)", clean_q)
-            )
-            if is_loan_app:
-                entities = {"inquiry_type": "loan_application", "action": "loan_application", "category": "personal_loan", "amount": extracted_amt or 50000}
-            else:
-                entities = {"category": "home_loan", "amount": extracted_amt or 16500}
-        elif detected_intent == "CHECK_BALANCE":
-            entities = {"account_type": "primary_savings"}
-        elif detected_intent == "PAY_BILL":
-            entities = {"category": "electricity", "biller": "Tata Power Electricity", "amount": extracted_amt or 1450}
-        elif detected_intent == "MEDICAL_CLAIM_HELP":
-            entities = {"hospital": "Max Super Speciality Hospital", "amount": extracted_amt or 48200}
-        elif detected_intent == "REVIEW_COMMITMENTS":
-            entities = {"status": "tight_cash_flow", "action": "pause_unused_subscriptions"}
-        elif detected_intent == "SAVE_SURPLUS":
-            entities = {"recommended_product": "Smart_FD_7_85"}
-        elif detected_intent == "LOCK_CARD":
-            entities = {"action": "biometric_freeze", "status": "card_locked"}
+        # Dynamic entity and spoken numeral extraction
+        entities = IndicEntityParser.extract_entities(detected_intent, clean_q)
 
         return {
             "intent": detected_intent,
             "language": lang,
-            "confidence": matched_confidence,
+            "confidence": confidence,
             "entities": entities,
             "runtime_device": cls.CONFIG.target_hardware,
-            "model_version": cls.CONFIG.model_name
+            "model_version": cls.CONFIG.model_name,
+            "latency_ms": latency_ms,
+            "probabilities": prediction.get("probabilities", {})
         }
 
     @classmethod
@@ -276,3 +211,19 @@ class MiniCPM5Runner:
         elif lang == "hi":
             return "मैंने आपका अनुरोध प्राप्त कर लिया है। मैं आपकी क्या सहायता कर सकता हूँ?"
         return "I have received your banking request and am ready to assist."
+
+    @classmethod
+    def verbalize_spoken(
+        cls,
+        intent: str,
+        entities: Dict[str, Any],
+        lang: str = "en",
+        stress_level: str = "normal"
+    ) -> str:
+        """Verbalizes into natural speech audio string where numbers are words and no special symbols exist."""
+        return NaturalSpeechVerbalizer.verbalize_spoken(
+            intent=intent,
+            entities=entities,
+            language=lang,
+            stress_level=stress_level
+        )

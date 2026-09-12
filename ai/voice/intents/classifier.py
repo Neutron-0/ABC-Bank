@@ -32,8 +32,11 @@ class VoiceIntentClassifier:
         stress_level: str = "normal",
         pending_clarification: Optional[str] = None
     ) -> Dict[str, Any]:
-        normalized_lang = cls.normalize_language_code(lang)
         clean_q = str(query or "").strip()
+        if lang is None:
+            normalized_lang = MiniCPM5Runner.detect_language(clean_q)
+        else:
+            normalized_lang = cls.normalize_language_code(lang)
 
         # Step 1: Check multi-turn DialogueManager for smart disambiguation & direct navigation
         dialogue_turn = DialogueManager.process_turn(

@@ -1,17 +1,36 @@
 {
-  "intent": "CHECK_EMI",
+  "intent": "LOCK_CARD",
   "language": "en",
-  "confidence": 0.96,
+  "confidence": 0.997,
   "entities": {
-    "inquiry_type": "loan_application",
-    "action": "loan_application",
-    "category": "personal_loan",
-    "amount": 50000
+    "action": "biometric_freeze",
+    "status": "card_locked"
   },
-  "response_text": "Under RBI fair lending guidelines and your active debt commitments, cash flow stabilization is recommended before taking new credit. Would you like to review your commitments?",
+  "response_text": "Your debit card has been instantly frozen for your security.",
   "suggested_actions": [
-    "REVIEW_COMMITMENTS",
-    "SPEAK_TO_COUNSELOR",
-    "DISMISS"
+    "UNFREEZE",
+    "DISPUTE_CHARGE",
+    "CALL_HELPLINE"
+  ],
+  "suggested_prompts": [
+    "Lock Card",
+    "Change ATM Limit",
+    "Credit Score"
+  ],
+  "pending_clarification": null,
+  "navigation": {
+    "type": "JOURNEY",
+    "target": "debit_card",
+    "auto_navigate": true,
+    "action_label": "Open Debit Card"
+  },
+  "action_chips": [
+    {
+      "label": "Open Debit Card",
+      "action": "OPEN_JOURNEY",
+      "payload": {
+        "journeyId": "debit_card"
+      }
+    }
   ]
 }
