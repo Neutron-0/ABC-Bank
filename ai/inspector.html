@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,7 +27,12 @@
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: var(--font);
       background: var(--bg);
@@ -36,7 +42,11 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    .container { max-width: 1440px; margin: 0 auto; }
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
     header {
       display: flex;
       justify-content: space-between;
@@ -46,40 +56,71 @@
       margin-bottom: 24px;
     }
 
-    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
     .brand-logo {
-      width: 46px; height: 46px;
+      width: 46px;
+      height: 46px;
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
       border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 18px; color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
       box-shadow: 0 4px 14px var(--primary-glow);
       letter-spacing: 0.05em;
     }
-    .brand h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
-    .brand p { font-size: 13px; color: var(--text-muted); }
 
-    .compliance-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .brand h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .compliance-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .badge {
-      font-size: 11px; font-weight: 600;
-      padding: 5px 12px; border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 9999px;
       background: rgba(16, 185, 129, 0.12);
       color: var(--success);
       border: 1px solid rgba(16, 185, 129, 0.3);
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       text-transform: uppercase;
       letter-spacing: 0.03em;
     }
+
     .badge.rbi {
       background: rgba(59, 130, 246, 0.12);
       color: var(--primary-light);
       border-color: rgba(59, 130, 246, 0.3);
     }
+
     .badge.cadence {
       background: rgba(168, 85, 247, 0.12);
       color: #c084fc;
       border-color: rgba(168, 85, 247, 0.3);
     }
+
     .badge.math {
       background: rgba(245, 158, 11, 0.12);
       color: #fcd34d;
@@ -100,7 +141,10 @@
       align-items: center;
       line-height: 1.5;
     }
-    .privacy-notice strong { color: #fff; }
+
+    .privacy-notice strong {
+      color: #fff;
+    }
 
     /* Controls Bar */
     .controls-panel {
@@ -116,9 +160,21 @@
       justify-content: space-between;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     }
-    .selector-group { display: flex; align-items: center; gap: 10px; }
-    label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
-    select, button {
+
+    .selector-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    select,
+    button {
       background: #1e293b;
       border: 1px solid #334155;
       color: var(--text);
@@ -129,20 +185,35 @@
       transition: all 0.15s ease;
       font-family: inherit;
     }
-    select:focus, button:focus { outline: 2px solid var(--primary); }
-    button:hover { background: #334155; }
+
+    select:focus,
+    button:focus {
+      outline: 2px solid var(--primary);
+    }
+
+    button:hover {
+      background: #334155;
+    }
+
     button.btn-shock {
       background: rgba(239, 68, 68, 0.15);
       border-color: rgba(239, 68, 68, 0.4);
       color: #fca5a5;
     }
-    button.btn-shock:hover { background: rgba(239, 68, 68, 0.25); }
+
+    button.btn-shock:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
     button.btn-reset {
       background: rgba(59, 130, 246, 0.15);
       border-color: rgba(59, 130, 246, 0.4);
       color: var(--primary-light);
     }
-    button.btn-reset:hover { background: rgba(59, 130, 246, 0.25); }
+
+    button.btn-reset:hover {
+      background: rgba(59, 130, 246, 0.25);
+    }
 
     /* Grid Layout */
     .grid-layout {
@@ -159,6 +230,7 @@
       margin-bottom: 24px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
+
     .card-title {
       font-size: 12px;
       font-weight: 700;
@@ -172,18 +244,53 @@
     }
 
     /* Persona Profile */
-    .persona-header { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+    .persona-header {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
     .persona-avatar {
-      width: 48px; height: 48px; border-radius: 10px;
-      background: #1e293b; display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 800; color: var(--primary-light);
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary-light);
       border: 1px solid var(--surface-border-active);
     }
-    .persona-name { font-size: 17px; font-weight: 700; }
-    .persona-tier { font-size: 12px; color: var(--primary-light); font-weight: 500; }
-    .stat-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px dashed #1e293b; }
-    .stat-label { color: var(--text-muted); }
-    .stat-val { font-weight: 600; }
+
+    .persona-name {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .persona-tier {
+      font-size: 12px;
+      color: var(--primary-light);
+      font-weight: 500;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      font-size: 13px;
+      border-bottom: 1px dashed #1e293b;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+    }
+
+    .stat-val {
+      font-weight: 600;
+    }
 
     /* Safe-to-Spend Dial */
     .dial-box {
@@ -193,9 +300,27 @@
       padding: 18px;
       margin-top: 16px;
     }
-    .dial-title { font-size: 11px; font-weight: 700; color: var(--primary-light); text-transform: uppercase; letter-spacing: 0.05em; }
-    .dial-amount { font-size: 28px; font-weight: 800; color: #fff; margin: 4px 0; }
-    .dial-sub { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+    .dial-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .dial-amount {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      margin: 4px 0;
+    }
+
+    .dial-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
 
     /* Statistical Confidence Meter */
     .meter-box {
@@ -206,8 +331,18 @@
       border-radius: 12px;
       margin-top: 16px;
     }
-    .meter-number { font-size: 36px; font-weight: 800; color: var(--success); }
-    .meter-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    .meter-number {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--success);
+    }
+
+    .meter-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
 
     /* Internal Spend Intelligence */
     .spend-intel-header {
@@ -229,13 +364,23 @@
       height: 12px;
       display: flex;
     }
+
     .spend-segment {
       height: 100%;
       transition: width 0.3s ease;
     }
-    .segment-needs { background: #3b82f6; }
-    .segment-wants { background: #f59e0b; }
-    .segment-savings { background: #10b981; }
+
+    .segment-needs {
+      background: #3b82f6;
+    }
+
+    .segment-wants {
+      background: #f59e0b;
+    }
+
+    .segment-savings {
+      background: #10b981;
+    }
 
     .spend-legend {
       display: flex;
@@ -244,8 +389,18 @@
       font-size: 11px;
       color: var(--text-muted);
     }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
 
     .category-grid {
       display: grid;
@@ -253,6 +408,7 @@
       gap: 8px;
       margin-top: 14px;
     }
+
     .category-card {
       background: #090f1d;
       border: 1px solid var(--surface-border);
@@ -262,8 +418,17 @@
       align-items: center;
       justify-content: space-between;
     }
-    .cat-name { font-size: 11px; color: var(--text-muted); }
-    .cat-amount { font-size: 12px; font-weight: 700; color: #fff; }
+
+    .cat-name {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .cat-amount {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
 
     .service-mapping-box {
       margin-top: 14px;
@@ -274,7 +439,14 @@
       font-size: 11px;
       color: var(--text-muted);
     }
-    .mapping-title { font-weight: 700; color: var(--primary-light); margin-bottom: 4px; text-transform: uppercase; font-size: 10px; }
+
+    .mapping-title {
+      font-weight: 700;
+      color: var(--primary-light);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
 
     /* Dual Cadence Architecture Lab */
     .cadence-box {
@@ -284,21 +456,40 @@
       padding: 16px;
       margin-top: 12px;
     }
+
     .cadence-comparison {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-bottom: 14px;
     }
+
     .cadence-col {
       background: #141f36;
       border: 1px solid var(--surface-border);
       border-radius: 8px;
       padding: 12px;
     }
-    .cadence-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
-    .cadence-timing { font-size: 17px; font-weight: 800; color: var(--primary-light); margin: 4px 0; }
-    .cadence-detail { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+
+    .cadence-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .cadence-timing {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--primary-light);
+      margin: 4px 0;
+    }
+
+    .cadence-detail {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
 
     .micro-triggers {
       display: flex;
@@ -306,6 +497,7 @@
       flex-wrap: wrap;
       margin-top: 12px;
     }
+
     .btn-trigger {
       font-size: 11px;
       padding: 6px 12px;
@@ -314,11 +506,13 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
     .btn-trigger:hover {
       background: #2563eb;
       color: #fff;
       border-color: #2563eb;
     }
+
     .trigger-result {
       margin-top: 12px;
       padding: 10px 14px;
@@ -342,11 +536,13 @@
       align-items: flex-start;
       gap: 12px;
     }
+
     .banner-danger {
       background: rgba(239, 68, 68, 0.12);
       border: 1px solid rgba(239, 68, 68, 0.35);
       color: #fca5a5;
     }
+
     .banner-success {
       background: rgba(16, 185, 129, 0.12);
       border: 1px solid rgba(16, 185, 129, 0.35);
@@ -365,18 +561,65 @@
       align-items: center;
       transition: all 0.15s ease;
     }
-    .rec-item:hover { border-color: var(--primary); transform: translateY(-1px); }
-    .rec-rank {
-      font-size: 18px; font-weight: 800; color: var(--primary-light);
-      margin-right: 16px; min-width: 24px;
+
+    .rec-item:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
     }
-    .rec-info { flex: 1; }
-    .rec-title { font-size: 14px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
-    .rec-category { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #1e293b; color: var(--text-muted); text-transform: uppercase; }
-    .rec-reason { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-    .rec-score-box { text-align: right; min-width: 90px; }
-    .rec-score { font-size: 20px; font-weight: 800; color: var(--primary-light); }
-    .rec-score-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+
+    .rec-rank {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-light);
+      margin-right: 16px;
+      min-width: 24px;
+    }
+
+    .rec-info {
+      flex: 1;
+    }
+
+    .rec-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rec-category {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #1e293b;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .rec-reason {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .rec-score-box {
+      text-align: right;
+      min-width: 90px;
+    }
+
+    .rec-score {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary-light);
+    }
+
+    .rec-score-lbl {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
 
     /* Customer Explanation Cards */
     .expl-card {
@@ -386,9 +629,28 @@
       padding: 14px 16px;
       margin-bottom: 10px;
     }
-    .expl-title { font-size: 13px; font-weight: 700; color: #fff; display: flex; justify-content: space-between; }
-    .expl-body { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
-    .expl-cf { font-size: 11px; color: var(--primary-light); margin-top: 6px; font-style: italic; }
+
+    .expl-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .expl-body {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .expl-cf {
+      font-size: 11px;
+      color: var(--primary-light);
+      margin-top: 6px;
+      font-style: italic;
+    }
 
     /* Cryptographic Proof Block */
     .crypto-block {
@@ -403,14 +665,24 @@
       overflow-x: auto;
       line-height: 1.6;
     }
-    .hash-val { color: var(--success); font-weight: 600; }
-    .hash-val.tampered { color: var(--danger); }
+
+    .hash-val {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .hash-val.tampered {
+      color: var(--danger);
+    }
 
     @media (max-width: 1080px) {
-      .grid-layout { grid-template-columns: 1fr; }
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -418,7 +690,8 @@
         <div class="brand-logo">ABC</div>
         <div>
           <h1>Adaptive Banking for Bharat - Hyper-Personalization Inspector</h1>
-          <p>Deterministic Mathematical Ranking • RBI Fair Practice Caps • DPDP Purpose Scope • Dual-Cadence 14-Day/0.16ms Engine</p>
+          <p>Deterministic Mathematical Ranking • RBI Fair Practice Caps • DPDP Purpose Scope • Dual-Cadence
+            14-Day/0.16ms Engine</p>
         </div>
       </div>
       <div class="compliance-badges">
@@ -434,9 +707,12 @@
     <div class="privacy-notice">
       <div>
         <strong>Customer Privacy & Dignity Invariant:</strong>
-        Granular spend telemetry (stocks, entertainment, dining, healthcare) is strictly processed as <em>internal feature intelligence</em> to deliver better, personalized services. It is <strong>never displayed as an invasive surveillance dashboard to the customer</strong>.
+        Granular spend telemetry (stocks, entertainment, dining, healthcare) is strictly processed as <em>internal
+          feature intelligence</em> to deliver better, personalized services. It is <strong>never displayed as an
+          invasive surveillance dashboard to the customer</strong>.
       </div>
-      <span class="badge" style="background:#2563eb20; color:#60a5fa; border-color:#2563eb40;">Internal Model Telemetry</span>
+      <span class="badge" style="background:#2563eb20; color:#60a5fa; border-color:#2563eb40;">Internal Model
+        Telemetry</span>
     </div>
 
     <!-- Interactive Simulation Controls -->
@@ -527,7 +803,9 @@
           </div>
 
           <div class="spend-intel-header">
-            <strong>Internal Intelligence Purpose:</strong> This velocity vector is analyzed behind the scenes to size liquid surplus, forecast cash-flows, and trigger relevant services. <em>It is withheld from the customer's UI to preserve user dignity and privacy.</em>
+            <strong>Internal Intelligence Purpose:</strong> This velocity vector is analyzed behind the scenes to size
+            liquid surplus, forecast cash-flows, and trigger relevant services. <em>It is withheld from the customer's
+              UI to preserve user dignity and privacy.</em>
           </div>
 
           <!-- 3-Segment Stacked Progress Bar -->
@@ -538,9 +816,18 @@
           </div>
 
           <div class="spend-legend">
-            <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div><span id="lbl-needs">Needs: 48% (Target 50%)</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#f59e0b;"></div><span id="lbl-wants">Wants: 26% (Target 30%)</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div><span id="lbl-savings">Savings: 26% (Target 20%)</span></div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#3b82f6;"></div><span id="lbl-needs">Needs: 48% (Target
+                50%)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#f59e0b;"></div><span id="lbl-wants">Wants: 26% (Target
+                30%)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#10b981;"></div><span id="lbl-savings">Savings: 26% (Target
+                20%)</span>
+            </div>
           </div>
 
           <!-- 8 Categorical Telemetry Cards (Model Feature Signals) -->
@@ -550,18 +837,24 @@
 
           <div class="service-mapping-box" id="service-mapping-box">
             <div class="mapping-title">Service Translation Pipeline:</div>
-            <div id="mapping-content">High investment velocity (₹22k/mo) maps to Smart Auto-Sweep FD and 80C Tax-Saver services.</div>
+            <div id="mapping-content">High investment velocity (₹22k/mo) maps to Smart Auto-Sweep FD and 80C Tax-Saver
+              services.</div>
           </div>
         </div>
 
         <!-- Multi-Factor Radar Weights -->
         <div class="card">
           <div class="card-title">Multi-Factor Scoring Weights (Deterministic)</div>
-          <div class="stat-row"><span class="stat-label">Affordability Fit (30%):</span><span class="stat-val" id="w-afford">0.94</span></div>
-          <div class="stat-row"><span class="stat-label">Lifecycle Need (30%):</span><span class="stat-val" id="w-need">0.88</span></div>
-          <div class="stat-row"><span class="stat-label">Temporal Urgency (25%):</span><span class="stat-val" id="w-urgency">0.95</span></div>
-          <div class="stat-row"><span class="stat-label">Archetype Affinity (15%):</span><span class="stat-val" id="w-affinity">1.00</span></div>
-          <div class="stat-row"><span class="stat-label">Risk & Volatility Penalty (R):</span><span class="stat-val" id="w-risk">0.05</span></div>
+          <div class="stat-row"><span class="stat-label">Affordability Fit (30%):</span><span class="stat-val"
+              id="w-afford">0.94</span></div>
+          <div class="stat-row"><span class="stat-label">Lifecycle Need (30%):</span><span class="stat-val"
+              id="w-need">0.88</span></div>
+          <div class="stat-row"><span class="stat-label">Temporal Urgency (25%):</span><span class="stat-val"
+              id="w-urgency">0.95</span></div>
+          <div class="stat-row"><span class="stat-label">Archetype Affinity (15%):</span><span class="stat-val"
+              id="w-affinity">1.00</span></div>
+          <div class="stat-row"><span class="stat-label">Risk & Volatility Penalty (R):</span><span class="stat-val"
+              id="w-risk">0.05</span></div>
         </div>
       </aside>
 
@@ -572,7 +865,8 @@
           <div style="font-weight: 800; font-size: 16px;">[SHIELD]</div>
           <div>
             <strong>RBI & DPDP Guardrails Active:</strong>
-            <span id="banner-text">Fair Lending Suitability passed. Purpose consent scopes verified for all surfaced products.</span>
+            <span id="banner-text">Fair Lending Suitability passed. Purpose consent scopes verified for all surfaced
+              products.</span>
           </div>
         </div>
 
@@ -605,23 +899,27 @@
             <span class="badge cadence">Sub-Millisecond Micro-Interception</span>
           </div>
           <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-            ABC Bank separates massive 10,000-transaction batching (every 14 days) from high-frequency real-time event triggers (bills, FASTag, CIBIL refresh).
+            ABC Bank separates massive 10,000-transaction batching (every 14 days) from high-frequency real-time event
+            triggers (bills, FASTag, CIBIL refresh).
           </p>
 
           <div class="cadence-comparison">
             <div class="cadence-col">
               <div class="cadence-title">Tier 1: 14-Day Heavy Batch</div>
               <div class="cadence-timing">52.1 ms / 10k Txns</div>
-              <div class="cadence-detail">Runs full clustering, behavioral baseline, multi-factor weighting, and profile caches once a fortnight.</div>
+              <div class="cadence-detail">Runs full clustering, behavioral baseline, multi-factor weighting, and profile
+                caches once a fortnight.</div>
             </div>
             <div class="cadence-col" style="border-color: rgba(16, 185, 129, 0.4);">
               <div class="cadence-title" style="color: var(--success);">Tier 2: Real-Time Micro-Trigger</div>
               <div class="cadence-timing" style="color: var(--success);">0.162 ms (Sub-ms)</div>
-              <div class="cadence-detail">Intercepts live bill webhooks, low balance thresholds, and CIBIL unlocks with <strong>95.4% CPU compute savings</strong>.</div>
+              <div class="cadence-detail">Intercepts live bill webhooks, low balance thresholds, and CIBIL unlocks with
+                <strong>95.4% CPU compute savings</strong>.</div>
             </div>
           </div>
 
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 8px;">Simulate Real-Time Micro-Event Ingestion:</div>
+          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 8px;">Simulate Real-Time
+            Micro-Event Ingestion:</div>
           <div class="micro-triggers">
             <button class="btn-trigger" onclick="fireMicroTrigger('electricity')">Electricity Bill Due (₹1,450)</button>
             <button class="btn-trigger" onclick="fireMicroTrigger('fastag')">FASTag Low Balance (&lt; ₹150)</button>
@@ -636,10 +934,12 @@
         <div class="card">
           <div class="card-title">
             <span>Immutable Cryptographic Audit Ledger</span>
-            <button onclick="toggleTamperSimulation()" style="font-size: 11px; padding: 4px 8px;">Simulate Tamper</button>
+            <button onclick="toggleTamperSimulation()" style="font-size: 11px; padding: 4px 8px;">Simulate
+              Tamper</button>
           </div>
           <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
-            Every decision is cryptographically locked in a linked SHA-256 chain (Genesis &rarr; Block 1 &rarr; Block 2). Non-repudiation guaranteed for regulatory inspection.
+            Every decision is cryptographically locked in a linked SHA-256 chain (Genesis &rarr; Block 1 &rarr; Block
+            2). Non-repudiation guaranteed for regulatory inspection.
           </p>
           <div class="crypto-block" id="crypto-proof">
             <!-- Dynamically updated -->
@@ -1227,4 +1527,5 @@
     render();
   </script>
 </body>
+
 </html>

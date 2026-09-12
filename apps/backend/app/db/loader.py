@@ -15,7 +15,8 @@ class DataLoader:
     """
     Primary Data Access Layer for ABC Bank.
     Reads customer records, accounts, and transaction logs directly from PostgreSQL.
-    If PostgreSQL is offline or unconfigured, gracefully falls back to seed JSON fixtures.
+    If PostgreSQL is offline or unconfigured, raises an operational error with actionable instructions.
+    Legacy JSON scenarios are loaded from disk with clean normalization.
     """
     _db_offline_until: float = 0.0
 
@@ -26,19 +27,6 @@ class DataLoader:
     @classmethod
     def _mark_db_offline(cls, duration: float = 15.0) -> None:
         cls._db_offline_until = time.time() + duration
-
-    @classmethod
-    def is_database_connected(cls) -> bool:
-        if cls._is_db_offline():
-            return False
-        try:
-            with SessionLocal() as db:
-                from sqlalchemy import text
-                db.execute(text("SELECT 1"))
-                return True
-        except Exception:
-            cls._mark_db_offline()
-            return False
 
     @classmethod
     def get_data_dir(cls) -> Path:
