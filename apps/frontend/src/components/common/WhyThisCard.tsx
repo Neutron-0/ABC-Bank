@@ -1,9 +1,9 @@
-﻿import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import React from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { colors, typography, spacing, radii } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
-import { HelpCircle, X, CheckCircle2, ShieldCheck, Cpu } from 'lucide-react-native';
+import { Check, X, ShieldCheck } from 'lucide-react-native';
 
 export const WhyThisCard: React.FC = () => {
   const { selectedWhyCard, setWhyCard, language } = useCustomerStore();
@@ -15,257 +15,244 @@ export const WhyThisCard: React.FC = () => {
     <Modal
       visible={Boolean(selectedWhyCard)}
       transparent
-      animationType="fade"
+      animationType="slide"
       onRequestClose={() => setWhyCard(null)}
     >
-      <View style={styles.overlay}>
-        <View style={styles.sheet}>
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.headerLeft}>
-              <View style={styles.iconCircle}>
-                <Cpu size={20} color={colors.primary} />
+      <TouchableWithoutFeedback onPress={() => setWhyCard(null)}>
+        <View style={styles.backdrop}>
+          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+            <View style={styles.sheet}>
+              {/* Drag Handle Indicator */}
+              <View style={styles.handleWrap}>
+                <View style={styles.dragHandle} />
               </View>
-              <View>
-                <Text style={styles.title}>Explainable AI Insight</Text>
-                <Text style={styles.subtitle}>Why this card appeared in your attention stack</Text>
+
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.title}>{t.whyModal.title}</Text>
+                  <Text style={styles.subtitle}>{t.whyModal.subtitle}</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => setWhyCard(null)}
+                  style={styles.closeCircle}
+                  delayPressIn={0}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <X size={16} color="#525866" />
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                {/* Surfaced Action Preview */}
+                <View style={styles.previewBox}>
+                  <Text style={styles.previewEyebrow}>{t.whyModal.currentContext}</Text>
+                  <Text style={styles.previewTitle}>{selectedWhyCard.title}</Text>
+                  <Text style={styles.previewDesc}>{selectedWhyCard.description}</Text>
+                </View>
+
+                {/* Primary Trigger Statement */}
+                <View style={styles.section}>
+                  <Text style={styles.sectionHeading}>{t.whyModal.weNoticed}</Text>
+                  {selectedWhyCard.whyDetails && selectedWhyCard.whyDetails.length > 0 ? (
+                    selectedWhyCard.whyDetails.map((detail, idx) => (
+                      <View key={idx} style={styles.checkRow}>
+                        <View style={styles.checkCircle}>
+                          <Check size={12} color="#059669" strokeWidth={3} />
+                        </View>
+                        <Text style={styles.checkText}>{detail}</Text>
+                      </View>
+                    ))
+                  ) : (
+                    <View style={styles.checkRow}>
+                      <View style={styles.checkCircle}>
+                        <Check size={12} color="#059669" strokeWidth={3} />
+                      </View>
+                      <Text style={styles.checkText}>{selectedWhyCard.reason}</Text>
+                    </View>
+                  )}
+                </View>
+
+                {/* Ethical Guardrails Note */}
+                <View style={styles.ethicalNote}>
+                  <ShieldCheck size={16} color="#0D9488" />
+                  <Text style={styles.ethicalText}>
+                    {language === 'hi'
+                      ? 'प्रमोशन से पहले सुरक्षा: यदि कैश फ्लो तनाव या चिकित्सा आपातकाल पाया जाता है, तो लोन और उत्पाद ऑफ़र पूरी तरह दबा दिए जाते हैं।'
+                      : language === 'gu'
+                      ? 'પ્રમોશન પહેલાં સુરક્ષા: જો રોકડ પ્રવાહની કટોકટી અથવા તબીબી આંચકો જણાય, તો લોન ઑફર્સ આપમેળે અટકાવી દેવાય છે.'
+                      : 'Protection Before Promotion: If cash flow stress or medical shocks are detected, product nudges are automatically suppressed.'}
+                  </Text>
+                </View>
+              </ScrollView>
+
+              {/* Bottom Done Button */}
+              <View style={styles.footer}>
+                <TouchableOpacity
+                  style={styles.doneBtn}
+                  onPress={() => setWhyCard(null)}
+                  delayPressIn={0}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.doneBtnText}>{t.common.done}</Text>
+                </TouchableOpacity>
               </View>
             </View>
-            <TouchableOpacity onPress={() => setWhyCard(null)} style={styles.closeBtn}>
-              <X size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            {/* Card Subject */}
-            <View style={styles.cardPreviewBox}>
-              <Text style={styles.previewLabel}>Surfaced Card</Text>
-              <Text style={styles.previewTitle}>{selectedWhyCard.title}</Text>
-              <Text style={styles.previewDesc}>{selectedWhyCard.description}</Text>
-            </View>
-
-            {/* Core Reason */}
-            <View style={styles.section}>
-              <Text style={styles.sectionHeading}>Primary Trigger Reason</Text>
-              <View style={styles.reasonCard}>
-                <Text style={styles.reasonText}>{selectedWhyCard.reason}</Text>
-              </View>
-            </View>
-
-            {/* Signal Telemetry Checklist */}
-            {selectedWhyCard.whyDetails && selectedWhyCard.whyDetails.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionHeading}>Detected Real-Time Signals</Text>
-                {selectedWhyCard.whyDetails.map((detail, idx) => (
-                  <View key={idx} style={styles.signalRow}>
-                    <CheckCircle2 size={16} color={colors.accent} style={styles.checkIcon} />
-                    <Text style={styles.signalText}>{detail}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {/* Priority Scoring Telemetry */}
-            <View style={styles.telemetryCard}>
-              <Text style={styles.telemetryTitle}>Decision Engine Metrics</Text>
-              <View style={styles.metricRow}>
-                <Text style={styles.metricLabel}>Attention Layer:</Text>
-                <Text style={styles.metricValue}>{selectedWhyCard.layer}</Text>
-              </View>
-              <View style={styles.metricRow}>
-                <Text style={styles.metricLabel}>Calculated Priority Score:</Text>
-                <Text style={styles.metricValue}>{selectedWhyCard.priority} / 100</Text>
-              </View>
-              <View style={styles.metricRow}>
-                <Text style={styles.metricLabel}>Confidence Coefficient:</Text>
-                <Text style={styles.metricValue}>{Math.round(selectedWhyCard.confidence * 100)}%</Text>
-              </View>
-            </View>
-
-            {/* Ethical Safeguard Note */}
-            <View style={styles.ethicalNote}>
-              <ShieldCheck size={16} color={colors.success} />
-              <Text style={styles.ethicalText}>
-                Guaranteed Ethical AI: We never use dark patterns, fake urgency, or predatory loan nudging.
-              </Text>
-            </View>
-          </ScrollView>
-
-          {/* Bottom Action */}
-          <TouchableOpacity
-            style={styles.doneButton}
-            onPress={() => setWhyCard(null)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.doneButtonText}>Understood</Text>
-          </TouchableOpacity>
+          </TouchableWithoutFeedback>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
+  backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.md,
+    backgroundColor: 'rgba(17, 19, 24, 0.45)',
+    justifyContent: 'flex-end',
   },
   sheet: {
-    width: '100%',
-    maxWidth: 520,
-    maxHeight: '85%',
-    backgroundColor: colors.cardBg,
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    ...shadows.lg,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    maxHeight: '82%',
+    paddingBottom: 28,
+  },
+  handleWrap: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  dragHandle: {
+    width: 38,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#E5E7EB',
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    flex: 1,
-  },
-  iconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: radii.full,
-    backgroundColor: colors.primarySubtle,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    paddingHorizontal: 22,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ECEEF2',
   },
   title: {
-    ...typography.h4,
-    color: colors.textPrimary,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111318',
+    letterSpacing: -0.3,
   },
   subtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#525866',
+    marginTop: 3,
+    lineHeight: 18,
   },
-  closeBtn: {
-    padding: spacing.xs,
+  closeCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F4F5F7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 12,
   },
   content: {
-    marginBottom: spacing.md,
+    paddingHorizontal: 22,
+    paddingTop: 16,
   },
-  cardPreviewBox: {
-    backgroundColor: colors.cardBgSecondary,
-    borderRadius: radii.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary,
+  previewBox: {
+    backgroundColor: '#F7F8F9',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    marginBottom: 20,
   },
-  previewLabel: {
-    ...typography.tiny,
-    color: colors.textMuted,
-    textTransform: 'uppercase',
-    marginBottom: 2,
+  previewEyebrow: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#8C95A6',
+    letterSpacing: 1.0,
+    marginBottom: 4,
   },
   previewTitle: {
-    ...typography.bodyBold,
-    color: colors.textPrimary,
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111318',
+    letterSpacing: -0.2,
   },
   previewDesc: {
-    ...typography.caption,
-    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#525866',
     marginTop: 2,
+    lineHeight: 18,
   },
   section: {
-    marginBottom: spacing.md,
+    marginBottom: 20,
   },
   sectionHeading: {
-    ...typography.captionMedium,
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111318',
+    marginBottom: 12,
   },
-  reasonCard: {
-    backgroundColor: '#EFF6FF',
-    borderRadius: radii.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: '#DBEAFE',
-  },
-  reasonText: {
-    ...typography.bodyMedium,
-    color: '#1E40AF',
-  },
-  signalRow: {
+  checkRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: spacing.xs,
-    paddingRight: spacing.sm,
+    gap: 12,
+    marginBottom: 12,
   },
-  checkIcon: {
+  checkCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#ECFDF5',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 2,
-    marginRight: spacing.sm,
   },
-  signalText: {
-    ...typography.body,
-    color: colors.textPrimary,
+  checkText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#111318',
+    lineHeight: 19,
     flex: 1,
-  },
-  telemetryCard: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: radii.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.md,
-  },
-  telemetryTitle: {
-    ...typography.captionMedium,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-  },
-  metricRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 2,
-  },
-  metricLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  metricValue: {
-    ...typography.captionMedium,
-    color: colors.textPrimary,
-    fontWeight: '700',
   },
   ethicalNote: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.successLight,
-    padding: spacing.sm,
-    borderRadius: radii.md,
+    alignItems: 'flex-start',
+    gap: 10,
+    backgroundColor: '#F0FDFA',
+    borderRadius: 14,
+    padding: 14,
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#CCFBF1',
+    marginBottom: 10,
   },
   ethicalText: {
-    ...typography.caption,
-    color: '#065F46',
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#0F766E',
+    lineHeight: 17,
     flex: 1,
   },
-  doneButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radii.md,
-    paddingVertical: spacing.md,
+  footer: {
+    paddingHorizontal: 22,
+    paddingTop: 14,
+  },
+  doneBtn: {
+    backgroundColor: '#111318',
+    paddingVertical: 14,
+    borderRadius: 99,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  doneButtonText: {
-    ...typography.bodyBold,
-    color: colors.textWhite,
+  doneBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });

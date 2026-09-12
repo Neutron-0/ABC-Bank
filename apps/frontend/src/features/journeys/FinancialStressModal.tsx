@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -107,7 +107,7 @@ export const FinancialStressModal: React.FC = () => {
                       onPress={() => togglePauseSub(sub.name)}
                     >
                       <Text style={[styles.pauseBtnText, isPaused && styles.pausedBtnText]}>
-                        {isPaused ? 'Paused ✓' : 'Pause for 30 Days'}
+                        {isPaused ? 'Paused' : 'Pause for 30 Days'}
                       </Text>
                     </TouchableOpacity>
                   </View>

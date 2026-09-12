@@ -1,19 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, spacing } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
+import { AnimatedBalance } from './AnimatedBalance';
 import {
   Eye,
   EyeOff,
-  ShieldCheck,
   QrCode,
   Send,
-  Train,
-  LifeBuoy,
-  TrendingUp,
-  TrendingDown,
-  Sparkles,
+  FileText,
+  CreditCard,
+  ShieldCheck,
 } from 'lucide-react-native';
 
 export const BalanceHeader: React.FC = () => {
@@ -25,335 +23,277 @@ export const BalanceHeader: React.FC = () => {
     financialHealth,
     currentState,
     setActiveTab,
-    openJourney,
-    performPayment,
   } = useCustomerStore();
   const t = getTranslation(language);
 
-  const getStatusBadge = () => {
+  const getSubtleContextText = () => {
     if (currentState === 'fraud_alert') {
-      return {
-        text: 'Dispute Lock Active',
-        color: '#F87171',
-        bg: 'rgba(239, 68, 68, 0.16)',
-        dotColor: '#EF4444',
-      };
+      return 'Biometric Security Protocol Active • Ref: SEC-8921';
+    }
+    if (currentState === 'medical_event') {
+      return 'Healthcare Outflow Tagged • Cashless TPA Claim Eligible';
     }
     if (financialHealth.status === 'stress') {
-      return {
-        text: 'Buffer Optimization Active',
-        color: '#FBBF24',
-        bg: 'rgba(245, 158, 11, 0.16)',
-        dotColor: '#F59E0B',
-      };
+      return 'Liquidity Guard Active • ₹32,000 Mandates Scheduled';
     }
     if (financialHealth.status === 'thriving') {
-      return {
-        text: 'Surplus Cashflow',
-        color: '#34D399',
-        bg: 'rgba(16, 185, 129, 0.16)',
-        dotColor: '#10B981',
-      };
+      return `Monthly Surplus Cash Flow: +₹14,200 • ${financialHealth.emergencyFundMonths} Mo. Reserve`;
     }
-    return {
-      text: 'Cashflow Resilient',
-      color: '#60A5FA',
-      bg: 'rgba(37, 99, 235, 0.16)',
-      dotColor: '#3B82F6',
-    };
+    return `Operating Reserve: ${financialHealth.emergencyFundMonths} Months • Auto-Sweep Active`;
   };
 
-  const badge = getStatusBadge();
-
   return (
-    <View style={styles.cardContainer}>
-      <View style={styles.card}>
-        {/* Ambient Top Subtle Flare */}
-        <View style={styles.cardGlowOverlay} />
-
-        {/* Top Header Row */}
-        <View style={styles.topRow}>
-          <View style={styles.labelRow}>
-            <Text style={styles.label}>{t.home.availableBalance}</Text>
-            <TouchableOpacity onPress={toggleBalanceHide} style={styles.eyeBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              {isBalanceHidden ? (
-                <EyeOff size={15} color="rgba(255, 255, 255, 0.55)" />
-              ) : (
-                <Eye size={15} color="rgba(255, 255, 255, 0.55)" />
-              )}
-            </TouchableOpacity>
+    <View style={styles.container}>
+      {/* Institutional Account Card */}
+      <View style={styles.accountCard}>
+        {/* Top Card Row */}
+        <View style={styles.cardHeaderRow}>
+          <View style={styles.accountTypeWrap}>
+            <Text style={styles.accountTypeText}>PRIMARY SAVINGS ACCOUNT</Text>
+            <Text style={styles.accountNumText}>A/C 5010 •••• 4092</Text>
           </View>
-
-          <View style={[styles.statusPill, { backgroundColor: badge.bg }]}>
-            <View style={[styles.statusDot, { backgroundColor: badge.dotColor }]} />
-            <Text style={[styles.statusText, { color: badge.color }]}>{badge.text}</Text>
-          </View>
-        </View>
-
-        {/* Large Sleek Balance Readout */}
-        <View style={styles.amountRow}>
-          <Text style={styles.currencySymbol}>₹</Text>
-          <Text style={styles.amountText}>
-            {isBalanceHidden ? '••••••' : balance.available.toLocaleString('en-IN')}
-          </Text>
-          <Text style={styles.fractionText}>{isBalanceHidden ? '' : '.00'}</Text>
-
-          {!isBalanceHidden && (
-            <View style={styles.trendBadge}>
-              <TrendingUp size={11} color="#34D399" />
-              <Text style={styles.trendBadgeText}>+₹14.2k</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Sleek Integrated Quick Action Strip */}
-        <View style={styles.quickActionRow}>
           <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => setActiveTab('payments')}
-            activeOpacity={0.75}
+            onPress={toggleBalanceHide}
+            style={styles.eyeBtn}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            activeOpacity={0.7}
           >
-            <View style={styles.actionIconCircle}>
-              <QrCode size={16} color="#FFFFFF" />
-            </View>
-            <Text style={styles.actionBtnLabel}>Scan UPI</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => setActiveTab('payments')}
-            activeOpacity={0.75}
-          >
-            <View style={styles.actionIconCircle}>
-              <Send size={16} color="#FFFFFF" />
-            </View>
-            <Text style={styles.actionBtnLabel}>Pay Contact</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() =>
-              performPayment({
-                amount: 40,
-                merchant: 'Delhi Metro Smart Card',
-                category: 'transport',
-                description: 'Routine morning commute recharge',
-              })
-            }
-            activeOpacity={0.75}
-          >
-            <View style={[styles.actionIconCircle, { backgroundColor: '#1D4ED8' }]}>
-              <Train size={16} color="#FFFFFF" />
-            </View>
-            <Text style={styles.actionBtnLabel}>Metro ₹40</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => openJourney('medical_assistance')}
-            activeOpacity={0.75}
-          >
-            <View style={styles.actionIconCircle}>
-              <LifeBuoy size={16} color="#FFFFFF" />
-            </View>
-            <Text style={styles.actionBtnLabel}>Assistance</Text>
+            {isBalanceHidden ? (
+              <EyeOff size={16} color="#64748B" />
+            ) : (
+              <Eye size={16} color="#64748B" />
+            )}
           </TouchableOpacity>
         </View>
 
-        {/* Hairline Divider */}
-        <View style={styles.divider} />
+        {/* Available Balance Large Numerical Figure */}
+        <View style={styles.balanceWrap}>
+          <Text style={styles.balanceLabel}>AVAILABLE FOR WITHDRAWAL / UPI</Text>
+          <AnimatedBalance
+            value={balance.available}
+            isPrivacyHidden={isBalanceHidden}
+            currencyPrefix="₹"
+            fractionSuffix=".00"
+          />
+        </View>
 
-        {/* Sub-Metrics Footer */}
-        <View style={styles.bottomRow}>
-          <View style={styles.subMetric}>
-            <Text style={styles.subMetricLabel}>{t.home.savingsBalance}</Text>
-            <Text style={styles.subMetricValue}>
-              {isBalanceHidden ? '••••••' : `₹${balance.savings.toLocaleString('en-IN')}`}
+        {/* Secondary Financial Ledger Metrics */}
+        <View style={styles.ledgerRow}>
+          <View style={styles.ledgerCol}>
+            <Text style={styles.ledgerLabel}>TOTAL DEPOSITS</Text>
+            <Text style={styles.ledgerValue}>
+              {isBalanceHidden ? '••••••' : `₹${(balance.savings || 185000).toLocaleString('en-IN')}`}
             </Text>
           </View>
-
-          <View style={styles.metricSeparator} />
-
-          <View style={styles.subMetric}>
-            <Text style={styles.subMetricLabel}>Emergency Buffer</Text>
-            <Text style={styles.subMetricValue}>
-              {financialHealth.emergencyFundMonths} Months Runway
+          <View style={styles.ledgerDivider} />
+          <View style={styles.ledgerCol}>
+            <Text style={styles.ledgerLabel}>AUTO-SWEEP FD</Text>
+            <Text style={styles.ledgerValue}>
+              {isBalanceHidden ? '••••••' : `₹${(balance.fixedDeposits || 250000).toLocaleString('en-IN')}`}
             </Text>
           </View>
+          <View style={styles.ledgerDivider} />
+          <View style={styles.ledgerCol}>
+            <Text style={styles.ledgerLabel}>IFSC CODE</Text>
+            <Text style={styles.ledgerValue}>ABCD0001048</Text>
+          </View>
         </View>
+
+        {/* Regulatory Protection Trust Mark */}
+        <View style={styles.trustMarkRow}>
+          <ShieldCheck size={13} color="#059669" />
+          <Text style={styles.trustMarkText}>{getSubtleContextText()}</Text>
+        </View>
+      </View>
+
+      {/* Authoritative Banking Actions */}
+      <View style={styles.actionGrid}>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={() => setActiveTab('payments')}
+          delayPressIn={0}
+          activeOpacity={0.75}
+        >
+          <View style={styles.actionIconWrap}>
+            <Send size={16} color="#0F294A" />
+          </View>
+          <Text style={styles.actionBtnText}>Transfer</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={() => setActiveTab('payments')}
+          delayPressIn={0}
+          activeOpacity={0.75}
+        >
+          <View style={styles.actionIconWrap}>
+            <QrCode size={16} color="#0F294A" />
+          </View>
+          <Text style={styles.actionBtnText}>Scan QR</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={() => setActiveTab('activity')}
+          delayPressIn={0}
+          activeOpacity={0.75}
+        >
+          <View style={styles.actionIconWrap}>
+            <FileText size={16} color="#0F294A" />
+          </View>
+          <Text style={styles.actionBtnText}>Passbook</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={() => setActiveTab('profile')}
+          delayPressIn={0}
+          activeOpacity={0.75}
+        >
+          <View style={styles.actionIconWrap}>
+            <CreditCard size={16} color="#0F294A" />
+          </View>
+          <Text style={styles.actionBtnText}>Cards</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  cardContainer: {
+  container: {
     paddingHorizontal: spacing.lg,
-    marginTop: spacing.xs,
-    marginBottom: spacing.md,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.md,
   },
-  card: {
-    backgroundColor: '#0B0F19',
-    borderRadius: 24,
-    padding: spacing.lg,
+  accountCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.09)',
-    position: 'relative',
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.25,
-    shadowRadius: 18,
-    elevation: 8,
+    borderColor: '#E2E8F0',
+    padding: spacing.md + 2,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  cardGlowOverlay: {
-    position: 'absolute',
-    top: -60,
-    right: -40,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(59, 130, 246, 0.12)',
-  },
-  topRow: {
+  cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
-  labelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  accountTypeWrap: {
+    gap: 2,
   },
-  label: {
+  accountTypeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#64748B',
+    letterSpacing: 0.8,
+  },
+  accountNumText: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.55)',
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-  },
-  eyeBtn: {
-    padding: 2,
-  },
-  statusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 99,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: '700',
+    color: '#0F172A',
     letterSpacing: 0.2,
   },
-  amountRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginTop: spacing.xs,
-    marginBottom: spacing.md,
+  eyeBtn: {
+    padding: 4,
   },
-  currencySymbol: {
-    fontSize: 22,
+  balanceWrap: {
+    marginVertical: 4,
+  },
+  balanceLabel: {
+    fontSize: 9.5,
     fontWeight: '700',
-    color: '#93C5FD',
-    marginRight: 4,
+    color: '#64748B',
+    letterSpacing: 0.8,
+    marginBottom: 4,
   },
-  amountText: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: -1,
-  },
-  fractionText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.45)',
-    marginLeft: 1,
-  },
-  trendBadge: {
+  ledgerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    backgroundColor: 'rgba(16, 185, 129, 0.18)',
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 99,
-    marginLeft: 10,
-  },
-  trendBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#34D399',
-  },
-  quickActionRow: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: 16,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xs,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 8,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    marginTop: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-    marginBottom: spacing.md,
+    borderColor: '#E2E8F0',
   },
-  actionBtn: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  ledgerCol: {
     flex: 1,
-    gap: 5,
-  },
-  actionIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.09)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionBtnLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.85)',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    marginBottom: spacing.sm,
-  },
-  bottomRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  subMetric: {
-    flex: 1,
-  },
-  subMetricLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.45)',
-  },
-  subMetricValue: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginTop: 2,
-  },
-  metricSeparator: {
+  ledgerDivider: {
     width: 1,
     height: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    marginHorizontal: spacing.md,
+    backgroundColor: '#E2E8F0',
+  },
+  ledgerLabel: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#64748B',
+    letterSpacing: 0.5,
+  },
+  ledgerValue: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginTop: 2,
+  },
+  trustMarkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
+  },
+  trustMarkText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#475569',
+    flex: 1,
+  },
+  actionGrid: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginTop: spacing.md,
+  },
+  actionBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+    gap: 5,
+  },
+  actionIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionBtnText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#0F172A',
   },
 });

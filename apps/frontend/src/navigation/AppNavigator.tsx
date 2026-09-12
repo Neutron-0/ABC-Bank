@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   SafeAreaView,
   StatusBar,
   Platform,
+  Animated,
+  Easing,
 } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../theme';
 import { useCustomerStore } from '../state/customerStore';
@@ -38,10 +40,9 @@ import {
   Home,
   Send,
   Clock,
-  Activity,
-  Bot,
-  User,
-  Sparkles,
+  TrendingUp,
+  ShieldCheck,
+  ShieldAlert,
   CheckCircle2,
 } from 'lucide-react-native';
 
@@ -50,6 +51,93 @@ export const AppNavigator: React.FC = () => {
   const t = getTranslation(language);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Motion refs for individual tab icon bouncing
+  const iconScales = useRef<{ [key: string]: Animated.Value }>({
+    home: new Animated.Value(1),
+    payments: new Animated.Value(1),
+    activity: new Animated.Value(1),
+    insights: new Animated.Value(1),
+    profile: new Animated.Value(1),
+  }).current;
+
+  // Motion refs for screen transitions
+  const screenOpacity = useRef(new Animated.Value(1)).current;
+  const screenTranslateX = useRef(new Animated.Value(0)).current;
+  const screenScale = useRef(new Animated.Value(1)).current;
+  const prevTabRef = useRef<MainTabType>(activeTab);
+
+  const tabs: { id: MainTabType; label: string; icon: any }[] = [
+    { id: 'home', label: t.tabs.home || 'Home', icon: Home },
+    { id: 'payments', label: language === 'hi' ? 'भुगतान' : language === 'gu' ? 'ચુકવણી' : 'Pay & Transfer', icon: Send },
+    { id: 'activity', label: language === 'hi' ? 'पासबुक' : language === 'gu' ? 'પાસબુક' : 'Passbook', icon: Clock },
+    { id: 'insights', label: language === 'hi' ? 'संपत्ति' : language === 'gu' ? 'સંપત્તિ' : 'Wealth', icon: TrendingUp },
+    { id: 'profile', label: language === 'hi' ? 'सेवाएं' : language === 'gu' ? 'સેવાઓ' : 'Services', icon: ShieldCheck },
+  ];
+
+  const TAB_ORDER: Record<string, number> = {
+    home: 0,
+    payments: 1,
+    activity: 2,
+    insights: 3,
+    profile: 4,
+    assistant: 5,
+  };
+
+  // Animate tab icon bounce & screen transition when activeTab changes
+  useEffect(() => {
+    // 1. Icon spring bounce for newly active tab
+    if (iconScales[activeTab]) {
+      Animated.sequence([
+        Animated.timing(iconScales[activeTab], {
+          toValue: 1.2,
+          duration: 100,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.spring(iconScales[activeTab], {
+          toValue: 1.0,
+          friction: 6,
+          tension: 110,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+
+    // 2. Directional screen cross-fade transition
+    if (prevTabRef.current !== activeTab) {
+      const prevIdx = TAB_ORDER[prevTabRef.current] ?? 0;
+      const nextIdx = TAB_ORDER[activeTab] ?? 0;
+      const direction = nextIdx >= prevIdx ? 1 : -1;
+
+      screenOpacity.setValue(0.2);
+      screenTranslateX.setValue(direction * 18);
+      screenScale.setValue(0.985);
+
+      Animated.parallel([
+        Animated.timing(screenOpacity, {
+          toValue: 1,
+          duration: 210,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(screenTranslateX, {
+          toValue: 0,
+          duration: 210,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(screenScale, {
+          toValue: 1,
+          duration: 210,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      prevTabRef.current = activeTab;
+    }
+  }, [activeTab]);
 
   const renderActiveScreen = () => {
     switch (activeTab) {
@@ -70,60 +158,78 @@ export const AppNavigator: React.FC = () => {
     }
   };
 
-  const tabs: { id: MainTabType; label: string; icon: any; isAi?: boolean }[] = [
-    { id: 'home', label: t.tabs.home, icon: Home },
-    { id: 'payments', label: t.tabs.payments, icon: Send },
-    { id: 'activity', label: t.tabs.activity, icon: Clock },
-    { id: 'assistant', label: 'Mitra AI', icon: Bot, isAi: true },
-    { id: 'profile', label: t.tabs.profile, icon: User },
-  ];
-
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FBFBFB" />
 
-      {/* Floating State Banner if not in normal */}
+      {/* Discreet Institutional Sandbox Strip if state is simulated */}
       {currentState !== 'normal' && (
         <View style={styles.stateNoticeStrip}>
-          <Sparkles size={13} color="#92400E" />
+          <ShieldAlert size={12} color="#475569" />
           <Text style={styles.stateNoticeText}>
-            Simulated Persona: <Text style={{ fontWeight: '800' }}>{currentState.toUpperCase()}</Text>
+            AUDIT SANDBOX: <Text style={{ fontWeight: '700', color: '#0F172A' }}>{currentState.toUpperCase().replace('_', ' ')}</Text>
           </Text>
         </View>
       )}
 
       {/* Toast Banner */}
       {toastMessage && (
-        <View style={styles.toastBanner}>
+        <View style={styles.toastBanner} pointerEvents="none">
           <CheckCircle2 size={16} color="#10B981" />
           <Text style={styles.toastText}>{toastMessage}</Text>
         </View>
       )}
 
-      {/* Screen Container */}
-      <View style={styles.screenContainer}>{renderActiveScreen()}</View>
+      {/* Smooth Directional Screen Transition Container */}
+      <Animated.View
+        style={[
+          styles.screenContainer,
+          {
+            opacity: screenOpacity,
+            transform: [
+              { translateX: screenTranslateX },
+              { scale: screenScale },
+            ],
+          },
+        ]}
+      >
+        {renderActiveScreen()}
+      </Animated.View>
 
-      {/* Sleek Floating Dock Tab Bar */}
+      {/* Anchored Institutional Banking Navigation Bar */}
       <View style={styles.dockContainer}>
         <View style={styles.tabBar}>
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
             const IconComp = tab.icon;
+            const scaleValue = iconScales[tab.id] || new Animated.Value(1);
+
             return (
               <TouchableOpacity
                 key={tab.id}
-                style={[styles.tabItem, active && styles.activeTabItem]}
+                style={styles.tabItem}
                 onPress={() => setActiveTab(tab.id)}
-                activeOpacity={0.75}
+                delayPressIn={0}
+                activeOpacity={0.7}
               >
-                <View style={styles.iconContainer}>
+                <View
+                  style={[
+                    styles.activePip,
+                    active ? styles.activePipVisible : styles.activePipHidden,
+                  ]}
+                />
+                <Animated.View
+                  style={[
+                    styles.iconContainer,
+                    { transform: [{ scale: scaleValue }] },
+                  ]}
+                >
                   <IconComp
                     size={20}
-                    color={active ? '#0F172A' : '#94A3B8'}
-                    strokeWidth={active ? 2.5 : 1.8}
+                    color={active ? '#0F294A' : '#64748B'}
+                    strokeWidth={active ? 2.3 : 1.7}
                   />
-                  {tab.isAi && <View style={styles.aiGlowDot} />}
-                </View>
+                </Animated.View>
                 <Text
                   style={[
                     styles.tabLabel,
@@ -160,22 +266,23 @@ export const AppNavigator: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FBFBFB',
   },
   stateNoticeStrip: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#F1F5F9',
     paddingVertical: 5,
     gap: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#FDE68A',
+    borderBottomColor: '#E2E8F0',
   },
   stateNoticeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#92400E',
+    color: '#475569',
+    letterSpacing: 0.2,
   },
   toastBanner: {
     position: 'absolute',
@@ -183,16 +290,16 @@ const styles = StyleSheet.create({
     left: spacing.lg,
     right: spacing.lg,
     backgroundColor: '#0F172A',
-    borderRadius: 14,
+    borderRadius: 12,
     padding: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     zIndex: 9999,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
     elevation: 8,
   },
   toastText: {
@@ -205,64 +312,59 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dockContainer: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 24 : 14,
-    left: 16,
-    right: 16,
-    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 8,
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 32,
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    width: '100%',
-    justifyContent: 'space-around',
+    height: Platform.OS === 'ios' ? 76 : 60,
+    paddingBottom: Platform.OS === 'ios' ? 18 : 6,
+    paddingTop: 2,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    elevation: 10,
+    justifyContent: 'space-around',
+    width: '100%',
   },
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 20,
     flex: 1,
+    paddingVertical: 2,
   },
-  activeTabItem: {
-    backgroundColor: '#F1F5F9',
+  activePip: {
+    width: 22,
+    height: 3,
+    borderRadius: 1.5,
+    marginBottom: 4,
+  },
+  activePipVisible: {
+    backgroundColor: '#0F294A',
+  },
+  activePipHidden: {
+    backgroundColor: 'transparent',
   },
   iconContainer: {
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  aiGlowDot: {
-    position: 'absolute',
-    top: -2,
-    right: -3,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#6366F1',
+    height: 22,
   },
   tabLabel: {
     fontSize: 10,
-    fontWeight: '600',
-    marginTop: 3,
+    fontWeight: '500',
+    marginTop: 2,
+    letterSpacing: 0.1,
   },
   activeTabLabel: {
-    color: '#0F172A',
-    fontWeight: '800',
+    color: '#0F294A',
+    fontWeight: '700',
   },
   inactiveTabLabel: {
-    color: '#94A3B8',
+    color: '#64748B',
   },
 });
