@@ -9,7 +9,8 @@ import {
   Modal,
   ActivityIndicator,
 } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { typography, spacing, radii, shadows } from '../../theme';
+import { useAppTheme } from '../../theme/ThemeContext';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { SmartAction } from '../../components/payments/SmartAction';
@@ -30,14 +31,16 @@ import {
   Lock,
   ArrowRight,
   Fingerprint,
+  ShieldCheck,
+  CreditCard,
 } from 'lucide-react-native';
 
 export const PaymentsScreen: React.FC = () => {
+  const { colors, isDark } = useAppTheme();
   const {
     balance,
     language,
     performPayment,
-    transactions,
     validatePin,
     triggerBiometricAuth,
     biometricsEnabled,
@@ -53,6 +56,7 @@ export const PaymentsScreen: React.FC = () => {
   const [pin, setPin] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastTxId, setLastTxId] = useState('');
+  const [timestamp, setTimestamp] = useState('');
 
   const openPayFlow = (recipient: string, defaultAmount = '', category = 'transfers') => {
     setPayRecipient(recipient);
@@ -101,6 +105,7 @@ export const PaymentsScreen: React.FC = () => {
     setIsProcessing(false);
     if (ok) {
       setLastTxId(`UPI/2026/${Math.floor(10000000 + Math.random() * 90000000)}`);
+      setTimestamp(new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }));
       setPayStep('success');
     } else {
       alert('Payment failed. Please check available balance.');
@@ -133,6 +138,7 @@ export const PaymentsScreen: React.FC = () => {
     setIsProcessing(false);
     if (ok) {
       setLastTxId(`UPI/2026/${Math.floor(10000000 + Math.random() * 90000000)}`);
+      setTimestamp(new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }));
       setPayStep('success');
     } else {
       alert('Payment failed. Please check available balance.');
@@ -147,11 +153,17 @@ export const PaymentsScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>{t.payments.title}</Text>
-        <Text style={styles.subtitle}>{t.payments.subtitle}</Text>
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      {/* Institutional Top Header */}
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+        <View>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>{t.payments.title}</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t.payments.subtitle}</Text>
+        </View>
+        <View style={[styles.npciBadge, { backgroundColor: colors.cardBgSecondary, borderColor: colors.borderLight }]}>
+          <ShieldCheck size={13} color={isDark ? colors.textPrimary : colors.primary} />
+          <Text style={[styles.npciBadgeText, { color: isDark ? colors.textPrimary : colors.primary }]}>UPI 2.0 Secure</Text>
+        </View>
       </View>
 
       <ScrollView
@@ -159,48 +171,57 @@ export const PaymentsScreen: React.FC = () => {
         contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Balance Snapshot */}
-        <View style={styles.balanceStrip}>
-          <Text style={styles.balanceLabel}>UPI Linked Account Balance:</Text>
-          <Text style={styles.balanceValue}>₹{balance.available.toLocaleString('en-IN')}</Text>
+        {/* Balance Snapshot Bar */}
+        <View style={[styles.balanceStrip, { backgroundColor: colors.cardBgSecondary, borderBottomColor: colors.border }]}>
+          <View style={styles.balanceInfoLeft}>
+            <CreditCard size={14} color={colors.textSecondary} />
+            <Text style={[styles.balanceLabel, { color: colors.textSecondary }]}>ABC Savings •••• 4092</Text>
+          </View>
+          <View style={styles.balanceInfoRight}>
+            <Text style={[styles.balanceLabelSmall, { color: colors.textMuted }]}>Available:</Text>
+            <Text style={[styles.balanceValue, { color: isDark ? colors.textPrimary : colors.primary }]}>₹{balance.available.toLocaleString('en-IN')}</Text>
+          </View>
         </View>
 
-        {/* Smart Actions Grid */}
+        {/* Primary UPI Transfer Hub */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Smart UPI Actions</Text>
-          <View style={styles.actionsGrid}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Instant Transfers</Text>
+          <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
+            Direct zero-fee IMPS & UPI transfers across all Indian banks
+          </Text>
+          <View style={[styles.actionsGrid, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <SmartAction
               label={t.payments.scanPay}
+              sublabel="Any QR"
               icon={QrCode}
-              color="#2563EB"
               onPress={() => openPayFlow('Store Merchant QR', '150', 'shopping')}
             />
             <SmartAction
               label={t.payments.payContact}
+              sublabel="Phone/UPI"
               icon={Users}
-              color="#0D9488"
               onPress={() => openPayFlow('Phone Contact UPI', '500', 'transfers')}
             />
             <SmartAction
               label={t.payments.bankTransfer}
+              sublabel="A/c + IFSC"
               icon={Building2}
-              color="#7C3AED"
               onPress={() => openPayFlow('Beneficiary Account', '5000', 'transfers')}
             />
             <SmartAction
               label={t.payments.bills}
+              sublabel="BBPS"
               icon={FileText}
-              color="#D97706"
               onPress={() => openPayFlow('Utility Bill Payment', '1450', 'bills')}
             />
           </View>
         </View>
 
-        {/* Frequent Shortcuts with Repeated Intent */}
+        {/* Routine & Frequent Shortcuts */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.payments.frequentShortcuts}</Text>
-          <Text style={styles.sectionSubtitle}>
-            Learned from your recurring habits and routine commute
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t.payments.frequentShortcuts}</Text>
+          <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
+            1-Tap routine transfers learned from your recurring commute and utility cycle
           </Text>
 
           <FrequentContact
@@ -214,7 +235,7 @@ export const PaymentsScreen: React.FC = () => {
 
           <FrequentContact
             title="Tata Power Electricity"
-            subtitle="Monthly Residential Bill"
+            subtitle="Monthly Residential Bill • Due Soon"
             amount={1450}
             icon={Zap}
             onPress={() => openPayFlow('Tata Power Electricity', '1450', 'bills')}
@@ -222,7 +243,7 @@ export const PaymentsScreen: React.FC = () => {
 
           <FrequentContact
             title="Dad (Family Support)"
-            subtitle="Frequent Monthly UPI Transfer"
+            subtitle="Monthly Family Transfer • Primary Savings"
             amount={10000}
             icon={Heart}
             onPress={() => openPayFlow('Dad (Family Support)', '10000', 'transfers')}
@@ -249,31 +270,38 @@ export const PaymentsScreen: React.FC = () => {
       {/* Interactive Payment Flow Modal */}
       <Modal visible={modalVisible} transparent animationType="slide" onRequestClose={closePayModal}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalSheet}>
+          <View style={[styles.modalSheet, { backgroundColor: colors.cardBg }]}>
             {/* Modal Header */}
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {payStep === 'input'
-                  ? 'Send UPI Payment'
-                  : payStep === 'pin'
-                  ? 'Authorize Payment'
-                  : 'Payment Receipt'}
-              </Text>
-              <TouchableOpacity onPress={closePayModal} style={styles.closeBtn}>
-                <X size={20} color={colors.textSecondary} />
+            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+              <View>
+                <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                  {payStep === 'input'
+                    ? 'Send UPI Payment'
+                    : payStep === 'pin'
+                    ? 'Authorize Payment'
+                    : 'Payment Confirmation'}
+                </Text>
+                <Text style={[styles.modalSubtitle, { color: colors.textMuted }]}>
+                  ABC Bank Immediate Payment Service
+                </Text>
+              </View>
+              <TouchableOpacity onPress={closePayModal} style={[styles.closeBtn, { backgroundColor: colors.cardBgSecondary }]}>
+                <X size={18} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
             {/* STEP 1: Enter Amount */}
             {payStep === 'input' && (
               <View style={styles.stepBox}>
-                <Text style={styles.recipientLabel}>{t.payments.payingTo}</Text>
-                <Text style={styles.recipientName}>{payRecipient}</Text>
+                <View style={styles.recipientHeader}>
+                  <Text style={[styles.recipientLabel, { color: colors.textMuted }]}>{t.payments.payingTo}</Text>
+                  <Text style={[styles.recipientName, { color: colors.textPrimary }]}>{payRecipient}</Text>
+                </View>
 
-                <View style={styles.amountInputWrap}>
-                  <Text style={styles.amountPrefix}>₹</Text>
+                <View style={[styles.amountInputWrap, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
+                  <Text style={[styles.amountPrefix, { color: colors.textPrimary }]}>₹</Text>
                   <TextInput
-                    style={styles.amountInput}
+                    style={[styles.amountInput, { color: colors.textPrimary }]}
                     placeholder="0"
                     placeholderTextColor={colors.textMuted}
                     keyboardType="numeric"
@@ -285,21 +313,28 @@ export const PaymentsScreen: React.FC = () => {
 
                 {/* Quick Chips */}
                 <View style={styles.chipsRow}>
-                  {['40', '500', '1000', '2000', '5000'].map((chip) => (
+                  {['100', '500', '1000', '2000', '5000'].map((chip) => (
                     <TouchableOpacity
                       key={chip}
-                      style={styles.chip}
+                      style={[styles.chip, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}
                       onPress={() => setPayAmount(chip)}
+                      activeOpacity={0.7}
                     >
-                      <Text style={styles.chipText}>+₹{chip}</Text>
+                      <Text style={[styles.chipText, { color: isDark ? colors.textPrimary : colors.primary }]}>+₹{Number(chip).toLocaleString('en-IN')}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
 
-                <View style={styles.accountChoice}>
-                  <Text style={styles.accountChoiceLabel}>Debiting Account</Text>
-                  <Text style={styles.accountChoiceValue}>
-                    Bharat Primary Savings (₹{balance.available.toLocaleString('en-IN')})
+                <View style={[styles.accountChoice, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
+                  <View style={styles.accountChoiceRow}>
+                    <Text style={[styles.accountChoiceLabel, { color: colors.textMuted }]}>Debiting From</Text>
+                    <Text style={[styles.accountChoiceType, { color: colors.success }]}>Active • Primary</Text>
+                  </View>
+                  <Text style={[styles.accountChoiceValue, { color: colors.textPrimary }]}>
+                    ABC Bank Savings A/c •••• 4092
+                  </Text>
+                  <Text style={[styles.accountChoiceBalance, { color: colors.textSecondary }]}>
+                    Available: ₹{balance.available.toLocaleString('en-IN')}
                   </Text>
                 </View>
 
@@ -310,13 +345,15 @@ export const PaymentsScreen: React.FC = () => {
                     <TouchableOpacity
                       style={[
                         styles.primaryActionBtn,
+                        { backgroundColor: isDark ? '#27272A' : colors.primary },
                         isInvalid && styles.disabledBtn,
                       ]}
                       onPress={handleProceedToPin}
                       disabled={isInvalid}
+                      activeOpacity={0.85}
                     >
                       <Text style={styles.primaryActionBtnText}>Proceed to Secure PIN</Text>
-                      <ArrowRight size={16} color={colors.textWhite} />
+                      <ArrowRight size={16} color="#FFFFFF" />
                     </TouchableOpacity>
                   );
                 })()}
@@ -327,16 +364,18 @@ export const PaymentsScreen: React.FC = () => {
             {payStep === 'pin' && (
               <View style={styles.stepBox}>
                 <View style={styles.pinLockHeader}>
-                  <Lock size={24} color={colors.primary} />
-                  <Text style={styles.pinHeaderTitle}>Enter 4-Digit UPI PIN</Text>
-                  <Text style={styles.pinHeaderSubtitle}>
+                  <View style={[styles.pinIconCircle, { backgroundColor: `${colors.primary}15` }]}>
+                    <Lock size={24} color={colors.primary} />
+                  </View>
+                  <Text style={[styles.pinHeaderTitle, { color: colors.textPrimary }]}>Enter 4-Digit UPI PIN</Text>
+                  <Text style={[styles.pinHeaderSubtitle, { color: colors.textSecondary }]}>
                     Authorizing ₹{Number(payAmount).toLocaleString('en-IN')} to {payRecipient}
                   </Text>
                 </View>
 
                 <View style={styles.pinBoxWrap}>
                   <TextInput
-                    style={styles.pinInput}
+                    style={[styles.pinInput, { color: colors.textPrimary, backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}
                     placeholder="••••"
                     placeholderTextColor={colors.textMuted}
                     keyboardType="numeric"
@@ -346,70 +385,90 @@ export const PaymentsScreen: React.FC = () => {
                     onChangeText={setPin}
                     autoFocus
                   />
+                  <Text style={[styles.pinHint, { color: colors.textMuted }]}>
+                    Default simulator PIN is 1234
+                  </Text>
                 </View>
 
                 <TouchableOpacity
-                  style={[styles.primaryActionBtn, pin.length < 4 && styles.disabledBtn]}
+                  style={[
+                    styles.primaryActionBtn,
+                    { backgroundColor: colors.primary },
+                    pin.length < 4 && styles.disabledBtn,
+                  ]}
                   onPress={handleConfirmPayment}
                   disabled={pin.length < 4 || isProcessing}
+                  activeOpacity={0.85}
                 >
                   {isProcessing ? (
-                    <ActivityIndicator color={colors.textWhite} />
+                    <ActivityIndicator color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.primaryActionBtnText}>Confirm with PIN</Text>
+                    <Text style={styles.primaryActionBtnText}>Confirm Payment</Text>
                   )}
                 </TouchableOpacity>
 
                 {biometricsEnabled && (
                   <>
                     <View style={styles.orDividerRow}>
-                      <View style={styles.orDividerLine} />
-                      <Text style={styles.orDividerText}>OR</Text>
-                      <View style={styles.orDividerLine} />
+                      <View style={[styles.orDividerLine, { backgroundColor: colors.border }]} />
+                      <Text style={[styles.orDividerText, { color: colors.textMuted }]}>OR USE BIOMETRICS</Text>
+                      <View style={[styles.orDividerLine, { backgroundColor: colors.border }]} />
                     </View>
 
                     <TouchableOpacity
-                      style={styles.paymentsBioBtn}
+                      style={[styles.paymentsBioBtn, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}
                       onPress={handleBiometricPayment}
                       disabled={isProcessing}
                       activeOpacity={0.8}
                     >
-                      <Fingerprint size={20} color="#0F294A" />
-                      <Text style={styles.paymentsBioBtnText}>Authorize via Fingerprint / Face ID</Text>
+                      <Fingerprint size={20} color={colors.primary} />
+                      <Text style={[styles.paymentsBioBtnText, { color: colors.primary }]}>Authorize with Biometrics</Text>
                     </TouchableOpacity>
                   </>
                 )}
               </View>
             )}
 
-            {/* STEP 3: SUCCESS ANIMATION */}
+            {/* STEP 3: SUCCESS CONFIRMATION RECEIPT */}
             {payStep === 'success' && (
               <View style={styles.successBox}>
-                <View style={styles.successIconCircle}>
-                  <CheckCircle2 size={44} color={colors.success} />
+                <View style={[styles.successIconCircle, { backgroundColor: colors.cardBgSecondary, borderWidth: 1, borderColor: colors.borderLight }]}>
+                  <CheckCircle2 size={36} color={colors.primary} />
                 </View>
-                <Text style={styles.successTitle}>{t.payments.paymentSuccess}</Text>
-                <Text style={styles.successAmount}>₹{Number(payAmount).toLocaleString('en-IN')}</Text>
-                <Text style={styles.successRecipient}>Transferred to {payRecipient}</Text>
+                <Text style={[styles.successTitle, { color: colors.textPrimary }]}>{t.payments.paymentSuccess}</Text>
+                <Text style={[styles.successAmount, { color: colors.textPrimary }]}>₹{Number(payAmount).toLocaleString('en-IN')}</Text>
+                <Text style={[styles.successRecipient, { color: colors.textSecondary }]}>Transferred to {payRecipient}</Text>
 
-                <View style={styles.receiptCard}>
+                {/* Institutional Payment Slip */}
+                <View style={[styles.receiptCard, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
                   <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>Reference ID</Text>
-                    <Text style={styles.receiptVal}>{lastTxId}</Text>
+                    <Text style={[styles.receiptLabel, { color: colors.textSecondary }]}>UPI Reference No.</Text>
+                    <Text style={[styles.receiptVal, { color: colors.textPrimary }]}>{lastTxId}</Text>
                   </View>
                   <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>Status</Text>
-                    <Text style={[styles.receiptVal, { color: colors.success }]}>Completed</Text>
+                    <Text style={[styles.receiptLabel, { color: colors.textSecondary }]}>Date & Time</Text>
+                    <Text style={[styles.receiptVal, { color: colors.textPrimary }]}>{timestamp || 'Just Now'}</Text>
                   </View>
                   <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>New Balance</Text>
-                    <Text style={styles.receiptVal}>₹{balance.available.toLocaleString('en-IN')}</Text>
+                    <Text style={[styles.receiptLabel, { color: colors.textSecondary }]}>Debited From</Text>
+                    <Text style={[styles.receiptVal, { color: colors.textPrimary }]}>ABC Bank A/c •••• 4092</Text>
+                  </View>
+                  <View style={styles.receiptRow}>
+                    <Text style={[styles.receiptLabel, { color: colors.textSecondary }]}>Transfer Status</Text>
+                    <Text style={[styles.receiptVal, { color: colors.success }]}>Success (NPCI Cleared)</Text>
+                  </View>
+                  <View style={[styles.receiptDivider, { backgroundColor: colors.border }]} />
+                  <View style={styles.receiptRow}>
+                    <Text style={[styles.receiptLabel, { color: colors.textSecondary }]}>Updated Available Balance</Text>
+                    <Text style={[styles.receiptVal, { color: colors.primary }]}>₹{balance.available.toLocaleString('en-IN')}</Text>
                   </View>
                 </View>
 
-                <Text style={styles.successSubtext}>{t.payments.paymentSubtext}</Text>
-
-                <TouchableOpacity style={styles.primaryActionBtn} onPress={closePayModal}>
+                <TouchableOpacity
+                  style={[styles.primaryActionBtn, { backgroundColor: colors.primary, width: '100%' }]}
+                  onPress={closePayModal}
+                  activeOpacity={0.85}
+                >
                   <Text style={styles.primaryActionBtnText}>Done</Text>
                 </TouchableOpacity>
               </View>
@@ -424,24 +483,36 @@ export const PaymentsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.bg,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
-    paddingBottom: spacing.sm,
-    backgroundColor: colors.cardBg,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   title: {
     ...typography.h2,
-    color: colors.textPrimary,
   },
   subtitle: {
     ...typography.caption,
-    color: colors.textSecondary,
     marginTop: 2,
+  },
+  npciBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+  },
+  npciBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   scroll: {
     flex: 1,
@@ -450,19 +521,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: colors.primarySubtle,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+  },
+  balanceInfoLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   balanceLabel: {
     ...typography.captionMedium,
-    color: colors.primaryDark,
+    fontSize: 12,
+  },
+  balanceInfoRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  balanceLabelSmall: {
+    fontSize: 11,
   },
   balanceValue: {
-    ...typography.bodyBold,
-    color: colors.primary,
+    ...typography.captionMedium,
+    fontWeight: '700',
+    fontSize: 13,
   },
   section: {
     paddingHorizontal: spacing.lg,
@@ -471,23 +554,19 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.h4,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
+    marginBottom: 2,
   },
   sectionSubtitle: {
     ...typography.caption,
-    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   actionsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
-    backgroundColor: colors.cardBg,
-    borderRadius: radii.xl,
+    borderRadius: radii.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
     ...shadows.sm,
   },
   modalOverlay: {
@@ -496,102 +575,114 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalSheet: {
-    backgroundColor: colors.cardBg,
     borderTopLeftRadius: radii.xl,
     borderTopRightRadius: radii.xl,
     padding: spacing.lg,
-    maxHeight: '90%',
+    maxHeight: '92%',
     ...shadows.lg,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
     marginBottom: spacing.md,
   },
   modalTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
+    fontSize: 17,
+  },
+  modalSubtitle: {
+    ...typography.tiny,
+    marginTop: 2,
   },
   closeBtn: {
-    padding: spacing.xs,
+    padding: 6,
+    borderRadius: radii.full,
   },
   stepBox: {
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  recipientHeader: {
+    marginBottom: spacing.md,
   },
   recipientLabel: {
-    ...typography.caption,
-    color: colors.textMuted,
+    ...typography.tiny,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   recipientName: {
     ...typography.h3,
-    color: colors.textPrimary,
     marginTop: 2,
-    marginBottom: spacing.md,
   },
   amountInputWrap: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.cardBgSecondary,
-    borderRadius: radii.lg,
+    borderRadius: radii.md,
     paddingVertical: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
   },
   amountPrefix: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: '700',
-    color: colors.textPrimary,
     marginRight: spacing.xs,
   },
   amountInput: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: '700',
-    color: colors.textPrimary,
     minWidth: 120,
     textAlign: 'center',
   },
   chipsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: spacing.xs,
+    gap: 6,
     marginBottom: spacing.lg,
     flexWrap: 'wrap',
   },
   chip: {
-    backgroundColor: colors.primarySubtle,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+    borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   chipText: {
-    ...typography.captionMedium,
-    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '600',
   },
   accountChoice: {
-    backgroundColor: '#F8FAFC',
     borderRadius: radii.md,
     padding: spacing.md,
     marginBottom: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+  },
+  accountChoiceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
   },
   accountChoiceLabel: {
     ...typography.tiny,
-    color: colors.textMuted,
     textTransform: 'uppercase',
+  },
+  accountChoiceType: {
+    fontSize: 11,
+    fontWeight: '600',
   },
   accountChoiceValue: {
     ...typography.bodyBold,
-    color: colors.textPrimary,
+    fontSize: 14,
+  },
+  accountChoiceBalance: {
+    ...typography.caption,
     marginTop: 2,
   },
   primaryActionBtn: {
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.md,
+    paddingVertical: 14,
     borderRadius: radii.md,
     flexDirection: 'row',
     alignItems: 'center',
@@ -600,95 +691,101 @@ const styles = StyleSheet.create({
   },
   primaryActionBtnText: {
     ...typography.bodyBold,
-    color: colors.textWhite,
+    color: '#FFFFFF',
+    fontSize: 14,
   },
   disabledBtn: {
     opacity: 0.5,
   },
   pinLockHeader: {
     alignItems: 'center',
-    marginVertical: spacing.md,
+    marginVertical: spacing.sm,
+  },
+  pinIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xs,
   },
   pinHeaderTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
-    marginTop: spacing.sm,
+    fontSize: 17,
   },
   pinHeaderSubtitle: {
     ...typography.caption,
-    color: colors.textSecondary,
     marginTop: 2,
     textAlign: 'center',
   },
   pinBoxWrap: {
     alignItems: 'center',
-    marginVertical: spacing.lg,
+    marginVertical: spacing.md,
   },
   pinInput: {
-    fontSize: 32,
-    letterSpacing: 16,
-    color: colors.textPrimary,
+    fontSize: 28,
+    letterSpacing: 14,
     textAlign: 'center',
-    width: 180,
-    backgroundColor: colors.cardBgSecondary,
+    width: 160,
     borderRadius: radii.md,
     paddingVertical: spacing.sm,
+    borderWidth: 1,
+  },
+  pinHint: {
+    fontSize: 11,
+    marginTop: spacing.xs,
   },
   successBox: {
     alignItems: 'center',
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
   },
   successIconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: colors.successLight,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   successTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
+    fontSize: 18,
   },
   successAmount: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: '700',
-    color: colors.textPrimary,
     marginTop: 4,
   },
   successRecipient: {
-    ...typography.body,
-    color: colors.textSecondary,
+    ...typography.caption,
     marginTop: 2,
     marginBottom: spacing.md,
   },
   receiptCard: {
     width: '100%',
-    backgroundColor: colors.cardBgSecondary,
     borderRadius: radii.md,
     padding: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
     gap: spacing.xs,
   },
   receiptRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingVertical: 2,
   },
   receiptLabel: {
     ...typography.caption,
-    color: colors.textSecondary,
+    fontSize: 12,
   },
   receiptVal: {
     ...typography.captionMedium,
-    color: colors.textPrimary,
-    fontWeight: '700',
+    fontWeight: '600',
+    fontSize: 12,
   },
-  successSubtext: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
+  receiptDivider: {
+    height: 1,
+    marginVertical: 4,
   },
   orDividerRow: {
     flexDirection: 'row',
@@ -699,12 +796,10 @@ const styles = StyleSheet.create({
   orDividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: colors.border,
   },
   orDividerText: {
     fontSize: 10,
     fontWeight: '700',
-    color: colors.textMuted,
     letterSpacing: 0.5,
   },
   paymentsBioBtn: {
@@ -712,15 +807,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#F1F5F9',
     borderRadius: radii.md,
-    paddingVertical: spacing.md,
-    borderWidth: 1.5,
-    borderColor: '#CBD5E1',
+    paddingVertical: 12,
+    borderWidth: 1,
   },
   paymentsBioBtnText: {
     fontSize: 13,
-    fontWeight: '700',
-    color: '#0F294A',
+    fontWeight: '600',
   },
 });

@@ -8,15 +8,17 @@ import {
   TextInput,
 } from 'react-native';
 import { colors, typography, spacing, radii } from '../../theme';
+import { useAppTheme } from '../../theme/ThemeContext';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { motion } from '../../motion';
 import { TransactionItem } from '../../components/transactions/TransactionItem';
 import { TransactionDetailModal } from './TransactionDetailModal';
-import { Search, Filter, Sparkles } from 'lucide-react-native';
+import { Search, Filter } from 'lucide-react-native';
 import { TransactionCategory } from '../../types';
 
 export const TransactionsScreen: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { transactions, language } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -46,20 +48,51 @@ export const TransactionsScreen: React.FC = () => {
     return matchesFilter && matchesSearch;
   });
 
+  const groupTransactionsByDate = (list: typeof transactions) => {
+    const groups: { title: string; items: typeof transactions }[] = [];
+    const map: Record<string, typeof transactions> = {};
+
+    list.forEach((tx) => {
+      const txDate = new Date(tx.timestamp);
+      const today = new Date();
+      const isToday = txDate.toDateString() === today.toDateString();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const isYesterday = txDate.toDateString() === yesterday.toDateString();
+
+      let key = '';
+      if (isToday) key = language === 'hi' ? 'आज' : language === 'gu' ? 'આજે' : 'Today';
+      else if (isYesterday) key = language === 'hi' ? 'कल' : language === 'gu' ? 'ગઈકાલે' : 'Yesterday';
+      else {
+        key = txDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+
+      if (!map[key]) {
+        map[key] = [];
+        groups.push({ title: key, items: map[key] });
+      }
+      map[key].push(tx);
+    });
+
+    return groups;
+  };
+
+  const grouped = groupTransactionsByDate(filteredTransactions);
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>{t.activity.title}</Text>
-        <Text style={styles.subtitle}>{t.activity.subtitle}</Text>
+      <View style={[styles.header, { backgroundColor: themeColors.cardBg, borderBottomColor: themeColors.border }]}>
+        <Text style={[styles.title, { color: themeColors.textPrimary }]}>{t.activity.title}</Text>
+        <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>{t.activity.subtitle}</Text>
 
         {/* Search Bar */}
-        <View style={styles.searchBar}>
-          <Search size={18} color={colors.textSecondary} />
+        <View style={[styles.searchBar, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+          <Search size={18} color={themeColors.textSecondary} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: themeColors.textPrimary }]}
             placeholder="Search merchant, category, bills..."
-            placeholderTextColor={colors.textMuted}
+            placeholderTextColor={themeColors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -76,12 +109,16 @@ export const TransactionsScreen: React.FC = () => {
             return (
               <TouchableOpacity
                 key={cat.id}
-                style={[styles.pill, active && styles.activePill]}
+                style={[
+                  styles.pill,
+                  { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                  active && [styles.activePill, { backgroundColor: isDark ? '#27272A' : themeColors.primary, borderColor: isDark ? '#3F3F46' : themeColors.primary }]
+                ]}
                 onPress={() => handleFilterChange(cat.id)}
                 delayPressIn={0}
                 activeOpacity={0.75}
               >
-                <Text style={[styles.pillText, active && styles.activePillText]}>
+                <Text style={[styles.pillText, { color: themeColors.textSecondary }, active && [styles.activePillText, { color: '#FFFFFF' }]]}>
                   {cat.label}
                 </Text>
               </TouchableOpacity>
@@ -96,26 +133,49 @@ export const TransactionsScreen: React.FC = () => {
         contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.timelineHeader}>
-          <Text style={styles.timelineTitle}>Transaction Feed ({filteredTransactions.length})</Text>
+        <View style={[styles.timelineHeader, { backgroundColor: themeColors.bg }]}>
+          <Text style={[styles.timelineTitle, { color: themeColors.textSecondary }]}>
+            PASSBOOK LEDGER ({filteredTransactions.length})
+          </Text>
         </View>
 
-        {filteredTransactions.map((tx) => (
-          <TransactionItem key={tx.id} transaction={tx} />
+        {grouped.map((grp) => (
+          <View key={grp.title} style={styles.dateGroup}>
+            <View style={[styles.dateGroupHeader, { backgroundColor: themeColors.cardBgSecondary, borderBottomColor: themeColors.borderLight }]}>
+              <Text style={[styles.dateGroupTitle, { color: themeColors.textSecondary }]}>{grp.title.toUpperCase()}</Text>
+              <Text style={[styles.dateGroupCount, { color: themeColors.textMuted }]}>{grp.items.length} {grp.items.length === 1 ? 'entry' : 'entries'}</Text>
+            </View>
+            {grp.items.map((tx) => (
+              <TransactionItem key={tx.id} transaction={tx} />
+            ))}
+          </View>
         ))}
 
         {filteredTransactions.length === 0 && (
           <View style={styles.emptyWrap}>
-            <Text style={styles.emptyText}>No matching transactions found.</Text>
+            <Text style={[styles.emptyTitle, { color: themeColors.textPrimary }]}>No transactions found</Text>
+            <Text style={[styles.emptyText, { color: themeColors.textSecondary }]}>
+              No transactions match "{searchQuery || selectedFilter}".
+            </Text>
+            <TouchableOpacity
+              style={[styles.clearBtn, { backgroundColor: themeColors.primary }]}
+              onPress={() => {
+                setSelectedFilter('all');
+                setSearchQuery('');
+              }}
+            >
+              <Text style={styles.clearBtnText}>Show All Entries</Text>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>
 
-      {/* Transaction Detail Modal with AI Understanding */}
+      {/* Transaction Detail Modal */}
       <TransactionDetailModal />
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -198,8 +258,44 @@ const styles = StyleSheet.create({
     padding: spacing.xxxl,
     alignItems: 'center',
   },
+  emptyTitle: {
+    ...typography.h4,
+    marginBottom: spacing.xs,
+  },
   emptyText: {
     ...typography.caption,
-    color: colors.textMuted,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  clearBtn: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radii.pill,
+  },
+  clearBtnText: {
+    ...typography.captionMedium,
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  dateGroup: {
+    marginBottom: spacing.xs,
+  },
+  dateGroupHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+  },
+  dateGroupTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  dateGroupCount: {
+    fontSize: 10,
+    fontWeight: '500',
   },
 });
+

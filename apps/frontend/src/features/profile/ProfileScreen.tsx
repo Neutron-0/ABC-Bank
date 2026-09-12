@@ -19,7 +19,6 @@ import {
   Cpu,
   RefreshCw,
   ArrowRight,
-  Sparkles,
   Lock,
   Check,
   Sun,
@@ -77,13 +76,13 @@ export const ProfileScreen: React.FC = () => {
 
           <View style={[styles.themeCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.themeInfoRow}>
-              <View style={[styles.themeIconWrap, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
+              <View style={[styles.themeIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
                 {themeMode === 'system' ? (
-                  <Smartphone size={20} color={isDark ? colors.accent : colors.primaryRoyal} />
+                  <Smartphone size={20} color={isDark ? colors.textPrimary : colors.primary} />
                 ) : themeMode === 'dark' ? (
-                  <Moon size={20} color={colors.accent} />
+                  <Moon size={20} color={isDark ? colors.textPrimary : colors.primary} />
                 ) : (
-                  <Sun size={20} color="#D97706" />
+                  <Sun size={20} color={isDark ? colors.textPrimary : colors.primary} />
                 )}
               </View>
               <View style={{ flex: 1 }}>
@@ -128,9 +127,7 @@ export const ProfileScreen: React.FC = () => {
                       size={14}
                       color={
                         active
-                          ? isDark
-                            ? colors.accent
-                            : colors.primaryRoyal
+                          ? (isDark ? colors.textPrimary : colors.primary)
                           : colors.textSecondary
                       }
                     />
@@ -139,7 +136,7 @@ export const ProfileScreen: React.FC = () => {
                         styles.themePillText,
                         { color: colors.textSecondary },
                         active && {
-                          color: isDark ? colors.accent : colors.primaryRoyal,
+                          color: isDark ? colors.textPrimary : colors.primary,
                           fontWeight: '700',
                         },
                       ]}
@@ -163,33 +160,33 @@ export const ProfileScreen: React.FC = () => {
             style={[
               styles.labCard,
               {
-                backgroundColor: isDark ? '#451A03' : '#FFFBEB',
-                borderColor: isDark ? '#78350F' : '#FCD34D',
+                backgroundColor: colors.cardBg,
+                borderColor: colors.border,
               },
             ]}
             onPress={() => openJourney('prototype_lab')}
             activeOpacity={0.85}
           >
             <View style={styles.labLeft}>
-              <View style={[styles.labIconWrap, { backgroundColor: isDark ? '#78350F' : '#FEF3C7' }]}>
-                <Sparkles size={22} color="#D97706" />
+              <View style={[styles.labIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
+                <Sliders size={22} color={isDark ? colors.textPrimary : colors.primary} />
               </View>
               <View style={styles.labInfo}>
-                <Text style={[styles.labTitle, { color: isDark ? '#FDE68A' : '#92400E' }]}>
+                <Text style={[styles.labTitle, { color: colors.textPrimary }]}>
                   Prototype Lab (State Switcher)
                 </Text>
-                <Text style={[styles.labSubtitle, { color: isDark ? '#FCD34D' : '#B45309' }]}>
+                <Text style={[styles.labSubtitle, { color: colors.textSecondary }]}>
                   Current Active State:{' '}
-                  <Text style={{ fontWeight: '700', color: isDark ? '#38BDF8' : colors.primaryRoyal }}>
+                  <Text style={{ fontWeight: '700', color: isDark ? colors.textPrimary : colors.primary }}>
                     {currentState.toUpperCase()}
                   </Text>
                 </Text>
-                <Text style={[styles.labHint, { color: isDark ? '#FCD34D' : '#B45309' }]}>
+                <Text style={[styles.labHint, { color: colors.textSecondary }]}>
                   Tap to switch between 5 customer states & see live UI adaptation.
                 </Text>
               </View>
             </View>
-            <ArrowRight size={18} color="#D97706" />
+            <ArrowRight size={18} color={isDark ? colors.textPrimary : colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -201,8 +198,8 @@ export const ProfileScreen: React.FC = () => {
             activeOpacity={0.85}
           >
             <View style={styles.labLeft}>
-              <View style={[styles.labIconWrap, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
-                <Cpu size={22} color={isDark ? colors.accent : colors.primaryRoyal} />
+              <View style={[styles.labIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
+                <Cpu size={22} color={isDark ? colors.textPrimary : colors.primary} />
               </View>
               <View style={styles.labInfo}>
                 <Text style={[styles.archTitle, { color: colors.textPrimary }]}>
@@ -213,7 +210,7 @@ export const ProfileScreen: React.FC = () => {
                 </Text>
               </View>
             </View>
-            <ArrowRight size={18} color={isDark ? colors.accent : colors.primaryRoyal} />
+            <ArrowRight size={18} color={isDark ? colors.textPrimary : colors.primary} />
           </TouchableOpacity>
         </View>
 
@@ -238,8 +235,8 @@ export const ProfileScreen: React.FC = () => {
                     active && [
                       styles.activeLangOption,
                       {
-                        borderColor: isDark ? colors.accent : colors.primaryRoyal,
-                        backgroundColor: isDark ? '#1E293B' : colors.pastelBlue,
+                        borderColor: isDark ? colors.borderLight : colors.primaryRoyal,
+                        backgroundColor: isDark ? colors.cardBgSecondary : colors.pastelBlue,
                       },
                     ],
                   ]}
@@ -250,7 +247,7 @@ export const ProfileScreen: React.FC = () => {
                       styles.langOptionText,
                       { color: colors.textPrimary },
                       active && {
-                        color: isDark ? colors.accent : colors.primaryRoyal,
+                        color: isDark ? colors.textPrimary : colors.primaryRoyal,
                         fontWeight: '700',
                       },
                     ]}
@@ -258,7 +255,7 @@ export const ProfileScreen: React.FC = () => {
                     {langItem.label}
                   </Text>
                   {active && (
-                    <Check size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
+                    <Check size={16} color={isDark ? colors.textPrimary : colors.primaryRoyal} />
                   )}
                 </TouchableOpacity>
               );

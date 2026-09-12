@@ -135,8 +135,8 @@ export const AdaptiveHomeScreen: React.FC = () => {
       merchant: 'Delhi Metro Smart Card',
       category: 'transport',
       icon: Train,
-      iconColor: '#0F294A',
-      iconBg: '#F0F4F8',
+      iconColor: themeColors.iconNeutral,
+      iconBg: themeColors.cardBgSecondary,
       recurrenceTag: language === 'hi' ? 'दैनिक आदत • सुबह 8:40' : language === 'gu' ? 'દૈનિક ટેવ • સવારે 8:40' : 'DAILY HABIT • 8:40 AM',
       description: t.heroes.metroDesc,
       actionLabel: t.heroes.payAgain,
@@ -151,8 +151,8 @@ export const AdaptiveHomeScreen: React.FC = () => {
       merchant: 'Tata Power Residential',
       category: 'bills',
       icon: Zap,
-      iconColor: '#D97706',
-      iconBg: '#FEF3C7',
+      iconColor: themeColors.iconNeutral,
+      iconBg: themeColors.cardBgSecondary,
       recurrenceTag: language === 'hi' ? 'मासिक मैंडेट • 15 तारीख' : language === 'gu' ? 'માસિક મેન્ડેટ • 15 તારીખ' : 'MONTHLY MANDATE • 15TH',
       description: language === 'hi'
         ? 'नियमित मासिक आवासीय बिजली बिल। सत्यापित उपभोक्ता मैंडेट के साथ स्वचालित चालान समाधान।'
@@ -171,8 +171,8 @@ export const AdaptiveHomeScreen: React.FC = () => {
       merchant: 'Monthly House Rent',
       category: 'transfers',
       icon: Home,
-      iconColor: '#2563EB',
-      iconBg: '#EFF6FF',
+      iconColor: themeColors.iconNeutral,
+      iconBg: themeColors.cardBgSecondary,
       recurrenceTag: language === 'hi' ? 'मासिक मैंडेट • 1 तारीख' : language === 'gu' ? 'માસિક મેન્ડેટ • 1 તારીખ' : 'MONTHLY MANDATE • 1ST',
       description: language === 'hi'
         ? 'मकान मालिक के पंजीकृत खाते में मासिक किराया ट्रांसफर। शून्य लेनदेन शुल्क के साथ त्वरित सुरक्षित यूपीआई।'
@@ -191,8 +191,8 @@ export const AdaptiveHomeScreen: React.FC = () => {
       merchant: 'Airtel Prepaid Recharge',
       category: 'bills',
       icon: Wifi,
-      iconColor: '#059669',
-      iconBg: '#ECFDF5',
+      iconColor: themeColors.iconNeutral,
+      iconBg: themeColors.cardBgSecondary,
       recurrenceTag: language === 'hi' ? '28-दिवसीय चक्र • नियमित' : language === 'gu' ? '28-દિવસનું ચક્ર • નિયમિત' : '28-DAY CYCLE • RECURRING',
       description: language === 'hi'
         ? 'प्राथमिक पंजीकृत नंबर के लिए 28-दिवसीय असीमित 5G डेटा और कॉलिंग प्लान नवीनीकरण।'
@@ -275,21 +275,21 @@ export const AdaptiveHomeScreen: React.FC = () => {
     if (currentState === 'medical_event') {
       return (
         <View style={styles.heroSection}>
-          <Text style={styles.sectionEyebrow}>{t.heroes.medicalTag}</Text>
-          <View style={styles.medicalBox}>
+          <Text style={[styles.sectionEyebrow, { color: themeColors.textMuted }]}>{t.heroes.medicalTag}</Text>
+          <View style={[styles.medicalBox, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
             <View style={styles.medicalHeader}>
-              <View style={styles.medicalIconWrap}>
-                <HeartHandshake size={20} color="#0D9488" />
+              <View style={[styles.medicalIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <HeartHandshake size={20} color={themeColors.primary} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.medicalHospital}>{t.heroes.medicalHospital}</Text>
-                <Text style={styles.medicalAmount}>{t.heroes.medicalAmount}</Text>
+                <Text style={[styles.medicalHospital, { color: themeColors.textPrimary }]}>{t.heroes.medicalHospital}</Text>
+                <Text style={[styles.medicalAmount, { color: themeColors.textSecondary }]}>{t.heroes.medicalAmount}</Text>
               </View>
             </View>
-            <Text style={styles.medicalText}>{t.heroes.medicalDesc}</Text>
+            <Text style={[styles.medicalText, { color: themeColors.textSecondary }]}>{t.heroes.medicalDesc}</Text>
             <View style={styles.medicalActionRow}>
               <TouchableOpacity
-                style={styles.medicalPrimaryBtn}
+                style={[styles.medicalPrimaryBtn, { backgroundColor: themeColors.primary }]}
                 onPress={() => openJourney('medical_assistance')}
                 delayPressIn={0}
                 activeOpacity={0.8}
@@ -298,12 +298,12 @@ export const AdaptiveHomeScreen: React.FC = () => {
                 <ArrowRight size={14} color="#FFFFFF" />
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.medicalSecondaryBtn}
+                style={[styles.medicalSecondaryBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
                 onPress={() => setActiveTab('assistant')}
                 delayPressIn={0}
                 activeOpacity={0.8}
               >
-                <Text style={styles.medicalSecondaryBtnText}>
+                <Text style={[styles.medicalSecondaryBtnText, { color: themeColors.textPrimary }]}>
                   {language === 'hi' ? 'मित्रा से बात करें' : language === 'gu' ? 'મિત્ર સાથે વાત કરો' : 'Talk to Mitra'}
                 </Text>
               </TouchableOpacity>
@@ -317,23 +317,23 @@ export const AdaptiveHomeScreen: React.FC = () => {
     if (currentState === 'financial_stress') {
       return (
         <View style={styles.heroSection}>
-          <Text style={styles.sectionEyebrow}>{t.heroes.stressTag}</Text>
-          <View style={styles.stressBox}>
+          <Text style={[styles.sectionEyebrow, { color: themeColors.textMuted }]}>{t.heroes.stressTag}</Text>
+          <View style={[styles.stressBox, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
             <View style={styles.stressHeader}>
-              <View style={styles.stressIconWrap}>
-                <AlertCircle size={20} color="#D97706" />
+              <View style={[styles.stressIconWrap, { backgroundColor: themeColors.brandSecondarySubtle }]}>
+                <AlertCircle size={20} color={themeColors.brandSecondary} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.stressTitle}>{t.heroes.stressTitle}</Text>
-                <Text style={styles.stressSubtitle}>
+                <Text style={[styles.stressTitle, { color: themeColors.textPrimary }]}>{t.heroes.stressTitle}</Text>
+                <Text style={[styles.stressSubtitle, { color: themeColors.brandSecondary }]}>
                   {language === 'hi' ? 'आगामी जिम्मेदारियां: ₹32,000' : language === 'gu' ? 'આગામી જવાબદારીઓ: ₹32,000' : 'Upcoming obligations: ₹32,000'}
                 </Text>
               </View>
             </View>
-            <Text style={styles.stressText}>{t.heroes.stressDesc}</Text>
+            <Text style={[styles.stressText, { color: themeColors.textSecondary }]}>{t.heroes.stressDesc}</Text>
             <View style={styles.stressActionRow}>
               <TouchableOpacity
-                style={styles.stressPrimaryBtn}
+                style={[styles.stressPrimaryBtn, { backgroundColor: themeColors.primary }]}
                 onPress={() => openJourney('financial_stress')}
                 delayPressIn={0}
                 activeOpacity={0.8}
@@ -351,21 +351,21 @@ export const AdaptiveHomeScreen: React.FC = () => {
     if (currentState === 'surplus') {
       return (
         <View style={styles.heroSection}>
-          <Text style={styles.sectionEyebrow}>{t.heroes.surplusTag}</Text>
-          <View style={styles.surplusBox}>
+          <Text style={[styles.sectionEyebrow, { color: themeColors.textMuted }]}>{t.heroes.surplusTag}</Text>
+          <View style={[styles.surplusBox, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
             <View style={styles.surplusHeader}>
-              <View style={styles.surplusIconWrap}>
-                <TrendingUp size={20} color="#059669" />
+              <View style={[styles.surplusIconWrap, { backgroundColor: themeColors.brandSecondarySubtle }]}>
+                <TrendingUp size={20} color={themeColors.brandSecondary} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.surplusTitle}>{t.heroes.surplusTitle}</Text>
-                <Text style={styles.surplusSubtitle}>{t.heroes.surplusSubtitle}</Text>
+                <Text style={[styles.surplusTitle, { color: themeColors.textPrimary }]}>{t.heroes.surplusTitle}</Text>
+                <Text style={[styles.surplusSubtitle, { color: themeColors.brandSecondary }]}>{t.heroes.surplusSubtitle}</Text>
               </View>
             </View>
-            <Text style={styles.surplusText}>{t.heroes.surplusDesc}</Text>
+            <Text style={[styles.surplusText, { color: themeColors.textSecondary }]}>{t.heroes.surplusDesc}</Text>
             <View style={styles.surplusActionRow}>
               <TouchableOpacity
-                style={styles.surplusPrimaryBtn}
+                style={[styles.surplusPrimaryBtn, { backgroundColor: themeColors.primary }]}
                 onPress={() => openJourney('savings_invest')}
                 delayPressIn={0}
                 activeOpacity={0.8}
@@ -385,12 +385,12 @@ export const AdaptiveHomeScreen: React.FC = () => {
         <Animated.View style={[styles.heroSection, { transform: [{ scale: heroScaleAnim }] }]}>
           <View style={styles.sectionHeaderRow}>
             <View style={styles.sectionTitleGroup}>
-              <Text style={styles.sectionTitleText}>
+              <Text style={[styles.sectionTitleText, { color: themeColors.textSecondary }]}>
                 {language === 'hi' ? 'बिल एवं रीचार्ज' : language === 'gu' ? 'બિલ અને રિચાર્જ' : 'BILLS & RECHARGES'}
               </Text>
             </View>
-            <View style={styles.mandateCountBadge}>
-              <Text style={styles.mandateCountText}>4 DUE</Text>
+            <View style={[styles.mandateCountBadge, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+              <Text style={[styles.mandateCountText, { color: themeColors.textSecondary }]}>4 DUE</Text>
             </View>
           </View>
 
@@ -407,7 +407,11 @@ export const AdaptiveHomeScreen: React.FC = () => {
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[styles.routineCard, isPaid && styles.routineCardPaid]}
+                  style={[
+                    styles.routineCard,
+                    { backgroundColor: themeColors.cardBg, borderColor: themeColors.border },
+                    isPaid && { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight }
+                  ]}
                   onPress={() => handlePayRepeatedIntent(item)}
                   onLongPress={() => toggleExpandIntent(item.id)}
                   delayLongPress={300}
@@ -415,40 +419,40 @@ export const AdaptiveHomeScreen: React.FC = () => {
                   activeOpacity={0.8}
                 >
                   <View style={styles.routineCardTop}>
-                    <View style={[styles.routineIconCircle, { backgroundColor: isPaid ? '#ECFDF5' : item.iconBg }]}>
+                    <View style={[styles.routineIconCircle, { backgroundColor: isPaid ? themeColors.cardBgSecondary : item.iconBg }]}>
                       {isPaid ? (
-                        <CheckCircle2 size={16} color="#059669" />
+                        <CheckCircle2 size={16} color={themeColors.textSecondary} />
                       ) : (
                         <IconComponent size={16} color={item.iconColor} />
                       )}
                     </View>
-                    <View style={styles.routineCategoryBadge}>
-                      <Text style={styles.routineCategoryText}>{item.category.toUpperCase()}</Text>
+                    <View style={[styles.routineCategoryBadge, { backgroundColor: themeColors.cardBgSecondary }]}>
+                      <Text style={[styles.routineCategoryText, { color: themeColors.textSecondary }]}>{item.category.toUpperCase()}</Text>
                     </View>
                   </View>
 
-                  <Text style={styles.routineCardTitle} numberOfLines={1}>
+                  <Text style={[styles.routineCardTitle, { color: themeColors.textPrimary }]} numberOfLines={1}>
                     {item.shortTitle}
                   </Text>
-                  <Text style={styles.routineCardSub} numberOfLines={1}>
+                  <Text style={[styles.routineCardSub, { color: themeColors.textMuted }]} numberOfLines={1}>
                     {item.recurrenceTag}
                   </Text>
 
-                  <View style={styles.routineCardBottom}>
-                    <Text style={[styles.routineCardAmount, isPaid && styles.routineCardAmountPaid]}>
+                  <View style={[styles.routineCardBottom, { borderTopColor: themeColors.borderLight }]}>
+                    <Text style={[styles.routineCardAmount, { color: themeColors.textPrimary }, isPaid && { color: themeColors.textSecondary }]}>
                       {item.amountFormatted}
                     </Text>
 
                     {isPaid ? (
-                      <View style={styles.routinePaidBadge}>
-                        <CheckCircle2 size={11} color="#059669" />
-                        <Text style={styles.routinePaidBadgeText}>
+                      <View style={[styles.routinePaidBadge, { backgroundColor: themeColors.cardBgSecondary }]}>
+                        <CheckCircle2 size={11} color={themeColors.textSecondary} />
+                        <Text style={[styles.routinePaidBadgeText, { color: themeColors.textSecondary }]}>
                           {language === 'hi' ? 'सफल' : language === 'gu' ? 'સફળ' : 'Paid'}
                         </Text>
                       </View>
                     ) : (
-                      <View style={styles.routinePayBtn}>
-                        <Text style={styles.routinePayBtnText}>
+                      <View style={[styles.routinePayBtn, { backgroundColor: themeColors.primary }]}>
+                        <Text style={[styles.routinePayBtnText, { color: '#FFFFFF' }]}>
                           {isProcessing ? '...' : (language === 'hi' ? 'भरें →' : language === 'gu' ? 'ચૂકવો →' : 'Pay →')}
                         </Text>
                       </View>
@@ -471,52 +475,56 @@ export const AdaptiveHomeScreen: React.FC = () => {
     return (
       <Animated.View style={[styles.heroSection, { transform: [{ scale: heroScaleAnim }] }]}>
         <View style={styles.heroSectionHeader}>
-          <Text style={styles.sectionEyebrow}>{t.heroes.metroTag}</Text>
+          <Text style={[styles.sectionEyebrow, { color: themeColors.textMuted }]}>{t.heroes.metroTag}</Text>
           <TouchableOpacity
-            style={styles.collapseHeaderBtn}
+            style={[styles.collapseHeaderBtn, { backgroundColor: themeColors.cardBgSecondary }]}
             onPress={() => toggleExpandIntent(null)}
             delayPressIn={0}
             activeOpacity={0.7}
           >
-            <Text style={styles.collapseHeaderBtnText}>
+            <Text style={[styles.collapseHeaderBtnText, { color: themeColors.textSecondary }]}>
               {language === 'hi' ? 'संक्षिप्त करें' : language === 'gu' ? 'સંક્ષિપ્ત કરો' : 'Collapse'}
             </Text>
-            <ChevronUp size={14} color="#525866" />
+            <ChevronUp size={14} color={themeColors.iconNeutral} />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.metroBox}>
+        <View style={[styles.metroBox, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
           <View style={styles.metroTopRow}>
-            <View style={[styles.metroIconWrap, { backgroundColor: expandedItem.iconBg }]}>
-              <ExpandedIconComponent size={20} color={expandedItem.iconColor} />
+            <View style={[styles.metroIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <ExpandedIconComponent size={20} color={themeColors.iconNeutral} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.metroTitle}>{expandedItem.fullTitle}</Text>
-              <Text style={styles.metroSubtitle}>{expandedItem.subtitle}</Text>
+              <Text style={[styles.metroTitle, { color: themeColors.textPrimary }]}>{expandedItem.fullTitle}</Text>
+              <Text style={[styles.metroSubtitle, { color: themeColors.textSecondary }]}>{expandedItem.subtitle}</Text>
             </View>
             <TouchableOpacity
-              style={styles.collapseIconBtn}
+              style={[styles.collapseIconBtn, { backgroundColor: themeColors.cardBgSecondary }]}
               onPress={() => toggleExpandIntent(null)}
               delayPressIn={0}
               activeOpacity={0.7}
             >
-              <ChevronUp size={16} color="#525866" />
+              <ChevronUp size={16} color={themeColors.iconNeutral} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.expandedTagRow}>
-            <View style={styles.expandedTagBadge}>
-              <ShieldCheck size={12} color="#0F294A" />
-              <Text style={styles.expandedTagText}>{expandedItem.recurrenceTag}</Text>
+            <View style={[styles.expandedTagBadge, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight }]}>
+              <ShieldCheck size={12} color={themeColors.iconNeutral} />
+              <Text style={[styles.expandedTagText, { color: themeColors.textPrimary }]}>{expandedItem.recurrenceTag}</Text>
             </View>
-            <Text style={styles.expandedTagCategory}>{expandedItem.category.toUpperCase()}</Text>
+            <Text style={[styles.expandedTagCategory, { color: themeColors.textMuted }]}>{expandedItem.category.toUpperCase()}</Text>
           </View>
 
-          <Text style={styles.metroDesc}>{expandedItem.description}</Text>
+          <Text style={[styles.metroDesc, { color: themeColors.textSecondary }]}>{expandedItem.description}</Text>
 
           <View style={styles.expandedActionRow}>
             <TouchableOpacity
-              style={[styles.metroActionBtn, isExpandedPaid && styles.metroActionBtnPaid]}
+              style={[
+                styles.metroActionBtn,
+                { backgroundColor: themeColors.primary },
+                isExpandedPaid && { backgroundColor: themeColors.cardBgSecondary }
+              ]}
               onPress={() => handlePayRepeatedIntent(expandedItem)}
               disabled={isExpandedProcessing || isExpandedPaid}
               delayPressIn={0}
@@ -524,8 +532,8 @@ export const AdaptiveHomeScreen: React.FC = () => {
             >
               {isExpandedPaid ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <CheckCircle2 size={15} color="#FFFFFF" />
-                  <Text style={styles.metroActionBtnText}>
+                  <CheckCircle2 size={15} color={themeColors.textSecondary} />
+                  <Text style={[styles.metroActionBtnText, { color: themeColors.textSecondary }]}>
                     {language === 'hi' ? 'भुगतान सफल' : language === 'gu' ? 'ચુકવણી સફળ' : 'Payment Cleared'}
                   </Text>
                 </View>
@@ -539,12 +547,12 @@ export const AdaptiveHomeScreen: React.FC = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.collapseSecondaryBtn}
+              style={[styles.collapseSecondaryBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight }]}
               onPress={() => toggleExpandIntent(null)}
               delayPressIn={0}
               activeOpacity={0.75}
             >
-              <Text style={styles.collapseSecondaryBtnText}>
+              <Text style={[styles.collapseSecondaryBtnText, { color: themeColors.textPrimary }]}>
                 {language === 'hi' ? '4 शॉर्टकट' : language === 'gu' ? '4 શોર્ટકટ્સ' : '4 Shortcuts'}
               </Text>
             </TouchableOpacity>
@@ -562,17 +570,17 @@ export const AdaptiveHomeScreen: React.FC = () => {
 
     return (
       <View style={styles.upcomingSection}>
-        <Text style={styles.sectionEyebrow}>{t.heroes.upcomingTag}</Text>
-        <View style={styles.upcomingRow}>
-          <View style={styles.upcomingIconCircle}>
-            <Calendar size={16} color="#525866" />
+        <Text style={[styles.sectionEyebrow, { color: themeColors.textMuted }]}>{t.heroes.upcomingTag}</Text>
+        <View style={[styles.upcomingRow, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
+          <View style={[styles.upcomingIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+            <Calendar size={16} color={themeColors.iconNeutral} />
           </View>
           <View style={styles.upcomingTextWrap}>
-            <Text style={styles.upcomingTitle}>{t.heroes.emiTitle}</Text>
-            <Text style={styles.upcomingSubtitle}>{t.heroes.emiSubtitle}</Text>
+            <Text style={[styles.upcomingTitle, { color: themeColors.textPrimary }]}>{t.heroes.emiTitle}</Text>
+            <Text style={[styles.upcomingSubtitle, { color: themeColors.textSecondary }]}>{t.heroes.emiSubtitle}</Text>
           </View>
           <TouchableOpacity
-            style={styles.upcomingPayBtn}
+            style={[styles.upcomingPayBtn, { backgroundColor: themeColors.primary }]}
             onPress={() => setActiveTab('payments')}
             delayPressIn={0}
             activeOpacity={0.8}
@@ -589,23 +597,23 @@ export const AdaptiveHomeScreen: React.FC = () => {
   // =========================================================================
   const renderRechargeAndBillPay = () => {
     const billers = [
-      { id: 'mobile', name: language === 'hi' ? 'मोबाइल' : language === 'gu' ? 'મોબાઇલ' : 'Mobile', sub: 'Jio / Airtel', icon: Smartphone, bg: '#EFF6FF', color: '#0052CC' },
-      { id: 'electricity', name: language === 'hi' ? 'बिजली' : language === 'gu' ? 'વીજળી' : 'Electricity', sub: 'BESCOM', icon: Zap, bg: '#FEF3C7', color: '#D97706' },
-      { id: 'dth', name: language === 'hi' ? 'डीटीएच' : language === 'gu' ? 'DTH' : 'DTH / Cable', sub: 'Tata Play', icon: Tv, bg: '#F3E8FF', color: '#7C3AED' },
-      { id: 'broadband', name: language === 'hi' ? 'ब्रॉडबैंड' : language === 'gu' ? 'બ્રોડબેન્ડ' : 'FASTag', sub: 'NHAI / Net', icon: Wifi, bg: '#ECFDF5', color: '#059669' },
+      { id: 'mobile', name: language === 'hi' ? 'मोबाइल' : language === 'gu' ? 'મોબાઇલ' : 'Mobile', sub: 'Jio / Airtel', icon: Smartphone },
+      { id: 'electricity', name: language === 'hi' ? 'बिजली' : language === 'gu' ? 'વીજળી' : 'Electricity', sub: 'BESCOM', icon: Zap },
+      { id: 'dth', name: language === 'hi' ? 'डीटीएच' : language === 'gu' ? 'DTH' : 'DTH / Cable', sub: 'Tata Play', icon: Tv },
+      { id: 'broadband', name: language === 'hi' ? 'ब्रॉडबैंड' : language === 'gu' ? 'બ્રોડબેન્ડ' : 'FASTag', sub: 'NHAI / Net', icon: Wifi },
     ];
 
     return (
       <View style={styles.rechargeSection}>
         <View style={styles.sectionHeaderRow}>
           <View style={styles.sectionTitleGroup}>
-            <Text style={styles.sectionTitleText}>
+            <Text style={[styles.sectionTitleText, { color: themeColors.textSecondary }]}>
               {language === 'hi' ? 'रीचार्ज एवं बिल भुगतान' : language === 'gu' ? 'રિચાર્જ અને બિલ ચુકવણી' : 'RECHARGE & PAY BILLS'}
             </Text>
           </View>
         </View>
 
-        <View style={styles.rechargeCard}>
+        <View style={[styles.rechargeCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
           <View style={styles.rechargeRow}>
             {billers.map((b) => {
               const IconComp = b.icon;
@@ -617,11 +625,11 @@ export const AdaptiveHomeScreen: React.FC = () => {
                   delayPressIn={0}
                   activeOpacity={0.75}
                 >
-                  <View style={[styles.rechargeIconCircle, { backgroundColor: b.bg }]}>
-                    <IconComp size={20} color={b.color} />
+                  <View style={[styles.rechargeIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+                    <IconComp size={20} color={themeColors.iconNeutral} />
                   </View>
-                  <Text style={styles.rechargeTitle} numberOfLines={1}>{b.name}</Text>
-                  <Text style={styles.rechargeSub} numberOfLines={1}>{b.sub}</Text>
+                  <Text style={[styles.rechargeTitle, { color: themeColors.textPrimary }]} numberOfLines={1}>{b.name}</Text>
+                  <Text style={[styles.rechargeSub, { color: themeColors.textMuted }]} numberOfLines={1}>{b.sub}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -639,7 +647,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
       <View style={styles.servicesSection}>
         <View style={styles.sectionHeaderRow}>
           <View style={styles.sectionTitleGroup}>
-            <Text style={styles.sectionTitleText}>
+            <Text style={[styles.sectionTitleText, { color: themeColors.textSecondary }]}>
               {language === 'hi' ? 'वित्तीय उत्पाद' : language === 'gu' ? 'નાણાકીય ઉત્પાદનો' : 'FINANCIAL PRODUCTS'}
             </Text>
           </View>
@@ -648,101 +656,101 @@ export const AdaptiveHomeScreen: React.FC = () => {
         <View style={styles.productsGrid}>
           {/* 1. Quick Personal Loan */}
           <TouchableOpacity
-            style={styles.productCard}
+            style={[styles.productCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
             onPress={() => openJourney('loan')}
             delayPressIn={0}
             activeOpacity={0.8}
           >
             <View style={styles.productCardTop}>
-              <View style={[styles.productIconCircle, { backgroundColor: '#FEF3C7' }]}>
-                <CreditCard size={18} color="#D97706" />
+              <View style={[styles.productIconCircle, { backgroundColor: themeColors.brandSecondarySubtle }]}>
+                <CreditCard size={18} color={themeColors.brandSecondary} />
               </View>
-              <View style={[styles.productBadge, { backgroundColor: '#FEF3C7' }]}>
-                <Text style={[styles.productBadgeText, { color: '#B45309' }]}>Pre-Approved</Text>
+              <View style={[styles.productBadge, { backgroundColor: themeColors.brandSecondarySubtle }]}>
+                <Text style={[styles.productBadgeText, { color: themeColors.brandSecondary }]}>Pre-Approved</Text>
               </View>
             </View>
-            <Text style={styles.productTitle}>Personal Loan</Text>
-            <Text style={styles.productSub}>Up to ₹1,50,000 instant credit</Text>
-            <View style={styles.productActionRow}>
-              <Text style={styles.productActionText}>
+            <Text style={[styles.productTitle, { color: themeColors.textPrimary }]}>Personal Loan</Text>
+            <Text style={[styles.productSub, { color: themeColors.textSecondary }]}>Up to ₹1,50,000 instant credit</Text>
+            <View style={[styles.productActionRow, { borderTopColor: themeColors.borderLight }]}>
+              <Text style={[styles.productActionText, { color: themeColors.primary }]}>
                 {language === 'hi' ? 'आवेदन करें' : language === 'gu' ? 'અરજી કરો' : 'Apply Now'}
               </Text>
-              <ArrowRight size={12} color="#0052CC" />
+              <ArrowRight size={12} color={themeColors.primary} />
             </View>
           </TouchableOpacity>
 
           {/* 2. Smart Auto-Sweep FD */}
           <TouchableOpacity
-            style={styles.productCard}
+            style={[styles.productCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
             onPress={() => openJourney('savings_invest')}
             delayPressIn={0}
             activeOpacity={0.8}
           >
             <View style={styles.productCardTop}>
-              <View style={[styles.productIconCircle, { backgroundColor: '#ECFDF5' }]}>
-                <TrendingUp size={18} color="#059669" />
+              <View style={[styles.productIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <TrendingUp size={18} color={themeColors.primary} />
               </View>
-              <View style={[styles.productBadge, { backgroundColor: '#ECFDF5' }]}>
-                <Text style={[styles.productBadgeText, { color: '#059669' }]}>7.2% p.a.</Text>
+              <View style={[styles.productBadge, { backgroundColor: themeColors.brandSecondarySubtle }]}>
+                <Text style={[styles.productBadgeText, { color: themeColors.brandSecondary }]}>7.2% p.a.</Text>
               </View>
             </View>
-            <Text style={styles.productTitle}>Smart Auto-Sweep</Text>
-            <Text style={styles.productSub}>Higher returns on idle cash</Text>
-            <View style={styles.productActionRow}>
-              <Text style={styles.productActionText}>
+            <Text style={[styles.productTitle, { color: themeColors.textPrimary }]}>Smart Auto-Sweep</Text>
+            <Text style={[styles.productSub, { color: themeColors.textSecondary }]}>Higher returns on idle cash</Text>
+            <View style={[styles.productActionRow, { borderTopColor: themeColors.borderLight }]}>
+              <Text style={[styles.productActionText, { color: themeColors.primary }]}>
                 {language === 'hi' ? 'शुरू करें' : language === 'gu' ? 'શરૂ કરો' : 'Start Sweep'}
               </Text>
-              <ArrowRight size={12} color="#0052CC" />
+              <ArrowRight size={12} color={themeColors.primary} />
             </View>
           </TouchableOpacity>
 
           {/* 3. Digital KYC Verification */}
           <TouchableOpacity
-            style={styles.productCard}
+            style={[styles.productCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
             onPress={() => openJourney('kyc')}
             delayPressIn={0}
             activeOpacity={0.8}
           >
             <View style={styles.productCardTop}>
-              <View style={[styles.productIconCircle, { backgroundColor: '#EFF6FF' }]}>
-                <FileCheck size={18} color="#0052CC" />
+              <View style={[styles.productIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <FileCheck size={18} color={themeColors.iconNeutral} />
               </View>
-              <View style={[styles.productBadge, { backgroundColor: '#EFF6FF' }]}>
-                <Text style={[styles.productBadgeText, { color: '#0052CC' }]}>Tier-2 Active</Text>
+              <View style={[styles.productBadge, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <Text style={[styles.productBadgeText, { color: themeColors.textSecondary }]}>Tier-2 Active</Text>
               </View>
             </View>
-            <Text style={styles.productTitle}>Digital KYC</Text>
-            <Text style={styles.productSub}>Zero limit verified banking</Text>
-            <View style={styles.productActionRow}>
-              <Text style={styles.productActionText}>
+            <Text style={[styles.productTitle, { color: themeColors.textPrimary }]}>Digital KYC</Text>
+            <Text style={[styles.productSub, { color: themeColors.textSecondary }]}>Zero limit verified banking</Text>
+            <View style={[styles.productActionRow, { borderTopColor: themeColors.borderLight }]}>
+              <Text style={[styles.productActionText, { color: themeColors.primary }]}>
                 {language === 'hi' ? 'विवरण देखें' : language === 'gu' ? 'વિગતો જુઓ' : 'View Details'}
               </Text>
-              <ArrowRight size={12} color="#0052CC" />
+              <ArrowRight size={12} color={themeColors.primary} />
             </View>
           </TouchableOpacity>
 
           {/* 4. Debit Card & Protection */}
           <TouchableOpacity
-            style={styles.productCard}
+            style={[styles.productCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
             onPress={() => openJourney('debit_card')}
             delayPressIn={0}
             activeOpacity={0.8}
           >
             <View style={styles.productCardTop}>
-              <View style={[styles.productIconCircle, { backgroundColor: '#ECFEFF' }]}>
-                <ShieldCheck size={18} color="#0891B2" />
+              <View style={[styles.productIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <ShieldCheck size={18} color={themeColors.iconNeutral} />
               </View>
-              <View style={[styles.productBadge, { backgroundColor: '#F1F5F9' }]}>
-                <Text style={[styles.productBadgeText, { color: '#475569' }]}>Controls</Text>
+              <View style={[styles.productBadge, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <Text style={[styles.productBadgeText, { color: themeColors.textSecondary }]}>Controls</Text>
               </View>
             </View>
-            <Text style={styles.productTitle}>Card Safety</Text>
-            <Text style={styles.productSub}>Manage virtual card & freeze</Text>
-            <View style={styles.productActionRow}>
-              <Text style={styles.productActionText}>
+            <Text style={[styles.productTitle, { color: themeColors.textPrimary }]}>Card Safety</Text>
+            <Text style={[styles.productSub, { color: themeColors.textSecondary }]}>Manage virtual card & freeze</Text>
+            <View style={[styles.productActionRow, { borderTopColor: themeColors.borderLight }]}>
+              <Text style={[styles.productActionText, { color: themeColors.primary }]}>
                 {language === 'hi' ? 'प्रबंधित करें' : language === 'gu' ? 'સંચાલિત કરો' : 'Manage Card'}
               </Text>
-              <ArrowRight size={12} color="#0052CC" />
+              <ArrowRight size={12} color={themeColors.primary} />
             </View>
           </TouchableOpacity>
         </View>
@@ -755,15 +763,15 @@ export const AdaptiveHomeScreen: React.FC = () => {
   // =========================================================================
   const renderRecentTransactionsPeek = () => {
     const recentTx = [
-      { id: 'tx_1', name: 'Delhi Metro Smart Card', time: 'Today, 08:45 AM', amount: '-₹40.00', icon: Train, bg: '#EFF6FF', color: '#0052CC' },
-      { id: 'tx_2', name: 'BESCOM Electricity Bill', time: 'Yesterday, 18:20', amount: '-₹1,450.00', icon: Zap, bg: '#FEF3C7', color: '#D97706' },
+      { id: 'tx_1', name: 'Delhi Metro Smart Card', time: 'Today, 08:45 AM', amount: '-₹40.00', icon: Train },
+      { id: 'tx_2', name: 'BESCOM Electricity Bill', time: 'Yesterday, 18:20', amount: '-₹1,450.00', icon: Zap },
     ];
 
     return (
       <View style={styles.recentSection}>
         <View style={styles.sectionHeaderRow}>
           <View style={styles.sectionTitleGroup}>
-            <Text style={styles.sectionTitleText}>
+            <Text style={[styles.sectionTitleText, { color: themeColors.textSecondary }]}>
               {language === 'hi' ? 'हालिया लेनदेन' : language === 'gu' ? 'તાજેતરના વ્યવહારો' : 'RECENT TRANSACTIONS'}
             </Text>
           </View>
@@ -772,28 +780,28 @@ export const AdaptiveHomeScreen: React.FC = () => {
             delayPressIn={0}
             activeOpacity={0.7}
           >
-            <Text style={styles.viewAllText}>
+            <Text style={[styles.viewAllText, { color: themeColors.primary }]}>
               {language === 'hi' ? 'पासबुक देखें →' : language === 'gu' ? 'પાસબુક જુઓ →' : 'Passbook →'}
             </Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.recentCard}>
+        <View style={[styles.recentCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
           {recentTx.map((tx, idx) => {
             const IconComp = tx.icon;
             return (
               <View key={tx.id}>
                 <View style={styles.recentTxRow}>
-                  <View style={[styles.recentIconCircle, { backgroundColor: tx.bg }]}>
-                    <IconComp size={16} color={tx.color} />
+                  <View style={[styles.recentIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+                    <IconComp size={16} color={themeColors.iconNeutral} />
                   </View>
                   <View style={styles.recentTextWrap}>
-                    <Text style={styles.recentTxName} numberOfLines={1}>{tx.name}</Text>
-                    <Text style={styles.recentTxTime}>{tx.time}</Text>
+                    <Text style={[styles.recentTxName, { color: themeColors.textPrimary }]} numberOfLines={1}>{tx.name}</Text>
+                    <Text style={[styles.recentTxTime, { color: themeColors.textMuted }]}>{tx.time}</Text>
                   </View>
-                  <Text style={styles.recentTxAmount}>{tx.amount}</Text>
+                  <Text style={[styles.recentTxAmount, { color: themeColors.textPrimary }]}>{tx.amount}</Text>
                 </View>
-                {idx < recentTx.length - 1 && <View style={styles.recentDivider} />}
+                {idx < recentTx.length - 1 && <View style={[styles.recentDivider, { backgroundColor: themeColors.borderLight }]} />}
               </View>
             );
           })}
@@ -801,6 +809,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
       </View>
     );
   };
+
 
   // Hoist top-priority urgent security/warning cards to the very top of the feed
   const topWarningCard = cards.find(
@@ -822,22 +831,22 @@ export const AdaptiveHomeScreen: React.FC = () => {
       >
         {/* Top-Priority Urgent Security / Warning Alert Banner */}
         {topWarningCard && (
-          <View style={styles.topWarningBanner}>
+          <View style={[styles.topWarningBanner, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
             <View style={styles.topWarningLeft}>
-              <View style={styles.topWarningIconCircle}>
-                <ShieldAlert size={16} color="#DC2626" />
+              <View style={[styles.topWarningIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <ShieldAlert size={16} color={themeColors.danger} />
               </View>
               <View style={styles.topWarningTextWrap}>
-                <Text style={styles.topWarningTag}>
+                <Text style={[styles.topWarningTag, { color: themeColors.danger }]}>
                   {topWarningCard.badgeText || (language === 'hi' ? 'सुरक्षा अलर्ट' : language === 'gu' ? 'સુરક્ષા ચેતવણી' : 'SECURITY ALERT')}
                 </Text>
-                <Text style={styles.topWarningTitle} numberOfLines={1}>
+                <Text style={[styles.topWarningTitle, { color: themeColors.textPrimary }]} numberOfLines={1}>
                   {topWarningCard.title}
                 </Text>
               </View>
             </View>
             <TouchableOpacity
-              style={styles.topWarningBtn}
+              style={[styles.topWarningBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
               onPress={() => {
                 const action = topWarningCard.primaryAction;
                 const journeyId = action?.journeyId || 'fraud_alert';
@@ -846,10 +855,10 @@ export const AdaptiveHomeScreen: React.FC = () => {
               delayPressIn={0}
               activeOpacity={0.8}
             >
-              <Text style={styles.topWarningBtnText}>
+              <Text style={[styles.topWarningBtnText, { color: themeColors.danger }]}>
                 {topWarningCard.primaryAction?.label || (language === 'hi' ? 'जांचें' : language === 'gu' ? 'તપાસો' : 'Review')}
               </Text>
-              <ArrowRight size={12} color="#DC2626" />
+              <ArrowRight size={12} color={themeColors.danger} />
             </TouchableOpacity>
           </View>
         )}
@@ -867,14 +876,14 @@ export const AdaptiveHomeScreen: React.FC = () => {
           {renderHighestPriorityContext()}
         </Animated.View>
 
+        {/* Recent Transactions / Passbook Peek - Financial Truth */}
+        {renderRecentTransactionsPeek()}
+
         {/* Recharge & Pay Bills Hub */}
         {renderRechargeAndBillPay()}
 
         {/* Financial Products 2x2 Showcase */}
         {renderDirectBankingHub()}
-
-        {/* Recent Transactions / Passbook Peek */}
-        {renderRecentTransactionsPeek()}
 
         {/* Upcoming Financial Obligations Strip */}
         {renderUpcomingCommitment()}
@@ -1052,15 +1061,11 @@ const styles = StyleSheet.create({
   // Normal Hero: Metro Commute & Expanded Repeated Intent Card
   metroBox: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 22,
-    padding: 20,
+    borderRadius: radii.card,
+    padding: spacing.lg,
     borderWidth: 1,
     borderColor: '#ECEEF2',
-    shadowColor: '#111318',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 10,
-    elevation: 2,
+    ...shadows.sm,
   },
   metroTopRow: {
     flexDirection: 'row',
@@ -1073,9 +1078,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     backgroundColor: '#F4F5F7',
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 99,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: radii.sm,
   },
   collapseHeaderBtnText: {
     fontSize: 10,
@@ -1083,9 +1088,9 @@ const styles = StyleSheet.create({
     color: '#525866',
   },
   collapseIconBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 28,
+    height: 28,
+    borderRadius: radii.sm,
     backgroundColor: '#F4F5F7',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1169,9 +1174,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
   collapseSecondaryBtn: {
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 14,
-    borderRadius: 99,
+    borderRadius: radii.md,
     borderWidth: 1,
     borderColor: '#ECEEF2',
     backgroundColor: '#F8F9FA',
@@ -1186,9 +1191,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     backgroundColor: '#ECFDF5',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: radii.card,
     borderWidth: 1,
     borderColor: '#A7F3D0',
   },
@@ -1201,10 +1206,11 @@ const styles = StyleSheet.create({
   // Fraud Hero
   fraudBox: {
     backgroundColor: '#FEF2F2',
-    borderRadius: 22,
-    padding: 20,
+    borderRadius: radii.card,
+    padding: spacing.lg,
     borderWidth: 1,
     borderColor: '#FECACA',
+    ...shadows.sm,
   },
   fraudHeader: {
     flexDirection: 'row',
@@ -1213,9 +1219,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   fraudIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: radii.md,
     backgroundColor: '#FEE2E2',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1247,7 +1253,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#DC2626',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 99,
+    borderRadius: radii.md,
   },
   freezeBtnText: {
     fontSize: 12,
@@ -1258,7 +1264,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingVertical: 10,
     paddingHorizontal: 14,
-    borderRadius: 99,
+    borderRadius: radii.md,
     borderWidth: 1,
     borderColor: '#FECACA',
   },
@@ -1271,10 +1277,11 @@ const styles = StyleSheet.create({
   // Medical Care Hero
   medicalBox: {
     backgroundColor: '#F0FDFA',
-    borderRadius: 22,
-    padding: 20,
+    borderRadius: radii.card,
+    padding: spacing.lg,
     borderWidth: 1,
     borderColor: '#CCFBF1',
+    ...shadows.sm,
   },
   medicalHeader: {
     flexDirection: 'row',
@@ -1283,9 +1290,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   medicalIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: radii.md,
     backgroundColor: '#CCFBF1',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1320,7 +1327,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0D9488',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 99,
+    borderRadius: radii.md,
   },
   medicalPrimaryBtnText: {
     fontSize: 12,
@@ -1331,7 +1338,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingVertical: 10,
     paddingHorizontal: 14,
-    borderRadius: 99,
+    borderRadius: radii.md,
     borderWidth: 1,
     borderColor: '#99F6E4',
   },
@@ -1344,10 +1351,11 @@ const styles = StyleSheet.create({
   // Financial Stress Hero
   stressBox: {
     backgroundColor: '#FFFBEB',
-    borderRadius: 22,
-    padding: 20,
+    borderRadius: radii.card,
+    padding: spacing.lg,
     borderWidth: 1,
     borderColor: '#FDE68A',
+    ...shadows.sm,
   },
   stressHeader: {
     flexDirection: 'row',
@@ -1356,9 +1364,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   stressIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: radii.md,
     backgroundColor: '#FEF3C7',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1391,7 +1399,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D97706',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 99,
+    borderRadius: radii.md,
   },
   stressPrimaryBtnText: {
     fontSize: 12,
@@ -1402,10 +1410,11 @@ const styles = StyleSheet.create({
   // Surplus Hero
   surplusBox: {
     backgroundColor: '#ECFDF5',
-    borderRadius: 22,
-    padding: 20,
+    borderRadius: radii.card,
+    padding: spacing.lg,
     borderWidth: 1,
     borderColor: '#A7F3D0',
+    ...shadows.sm,
   },
   surplusHeader: {
     flexDirection: 'row',
@@ -1414,9 +1423,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   surplusIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: radii.md,
     backgroundColor: '#D1FAE5',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1449,7 +1458,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#059669',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 99,
+    borderRadius: radii.md,
   },
   surplusPrimaryBtnText: {
     fontSize: 12,
@@ -1466,8 +1475,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    paddingVertical: 14,
+    borderRadius: radii.card,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: '#ECEEF2',
@@ -1554,8 +1563,8 @@ const styles = StyleSheet.create({
   routineCard: {
     width: 154,
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 14,
+    borderRadius: radii.card,
+    padding: 12,
     borderWidth: 1,
     borderColor: '#ECEEF2',
     ...shadows.sm,
@@ -1569,19 +1578,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   routineIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 32,
+    height: 32,
+    borderRadius: radii.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   routineCategoryBadge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: radii.xs,
     backgroundColor: '#F1F5F9',
   },
   routineCategoryText: {
@@ -1601,7 +1610,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '500',
     color: '#94A3B8',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   routineCardBottom: {
     flexDirection: 'row',
@@ -1624,9 +1633,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 3,
-    borderRadius: 9999,
+    borderRadius: radii.sm,
     backgroundColor: '#ECFDF5',
   },
   routinePaidBadgeText: {
@@ -1637,7 +1646,7 @@ const styles = StyleSheet.create({
   routinePayBtn: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 9999,
+    borderRadius: radii.sm,
     backgroundColor: '#002970',
   },
   routinePayBtnText: {
@@ -1654,7 +1663,7 @@ const styles = StyleSheet.create({
   rechargeCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: radii.card,
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: '#ECEEF2',
@@ -1670,9 +1679,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   rechargeIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 15,
+    width: 40,
+    height: 40,
+    borderRadius: radii.md,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,

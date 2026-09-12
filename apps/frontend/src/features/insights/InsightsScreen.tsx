@@ -9,7 +9,6 @@ import {
   TrendingUp,
   ShieldCheck,
   AlertTriangle,
-  Sparkles,
   CheckCircle2,
   Info,
   Layers,
@@ -26,26 +25,26 @@ export const InsightsScreen: React.FC = () => {
       case 'thriving':
         return {
           label: t.insights.statusThriving,
-          color: colors.success,
-          bg: isDark ? '#064E3B' : colors.successLight,
+          color: isDark ? colors.textPrimary : colors.primary,
+          bg: colors.cardBgSecondary,
         };
       case 'stress':
         return {
           label: t.insights.statusStress,
-          color: colors.accentWarm,
-          bg: isDark ? '#451A03' : colors.warningLight,
+          color: colors.brandSecondary,
+          bg: colors.brandSecondarySubtle,
         };
       case 'tighter_than_usual':
         return {
           label: t.insights.statusTight,
-          color: '#D97706',
-          bg: isDark ? '#451A03' : '#FEF3C7',
+          color: colors.brandSecondary,
+          bg: colors.brandSecondarySubtle,
         };
       default:
         return {
           label: t.insights.statusStable,
-          color: isDark ? '#38BDF8' : colors.primaryRoyal,
-          bg: isDark ? '#0C4A6E' : colors.pastelBlue,
+          color: isDark ? colors.textPrimary : colors.primary,
+          bg: colors.cardBgSecondary,
         };
     }
   };
@@ -96,7 +95,7 @@ export const InsightsScreen: React.FC = () => {
               <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
                 {t.insights.savingsRate}
               </Text>
-              <Text style={[styles.metricVal, { color: colors.success }]}>
+              <Text style={[styles.metricVal, { color: isDark ? colors.textPrimary : colors.primary }]}>
                 {financialHealth.savingsRatePercent}%
               </Text>
             </View>
@@ -109,7 +108,7 @@ export const InsightsScreen: React.FC = () => {
                 style={[
                   styles.metricVal,
                   financialHealth.debtToIncomeRatio > 0.4
-                    ? { color: colors.danger }
+                    ? { color: colors.brandSecondary }
                     : { color: colors.textPrimary },
                 ]}
               >
@@ -141,7 +140,7 @@ export const InsightsScreen: React.FC = () => {
                 { backgroundColor: colors.cardBg, borderColor: colors.border },
               ]}
             >
-              <CheckCircle2 size={16} color={colors.success} style={styles.iconOffset} />
+              <CheckCircle2 size={16} color={isDark ? colors.textPrimary : colors.primary} style={styles.iconOffset} />
               <Text style={[styles.statementText, { color: colors.textPrimary }]}>{stmt}</Text>
             </View>
           ))}
@@ -162,16 +161,16 @@ export const InsightsScreen: React.FC = () => {
                   style={[
                     styles.statementRowCaution,
                     {
-                      backgroundColor: isDark ? '#451A03' : '#FFFBEB',
-                      borderColor: isDark ? '#78350F' : '#FDE68A',
+                      backgroundColor: colors.cardBgSecondary,
+                      borderColor: colors.border,
                     },
                   ]}
                 >
-                  <AlertTriangle size={16} color={colors.accentWarm} style={styles.iconOffset} />
+                  <AlertTriangle size={16} color={colors.brandSecondary} style={styles.iconOffset} />
                   <Text
                     style={[
                       styles.statementTextCaution,
-                      { color: isDark ? '#FDE68A' : '#92400E' },
+                      { color: colors.textPrimary },
                     ]}
                   >
                     {stmt}
@@ -188,17 +187,17 @@ export const InsightsScreen: React.FC = () => {
             style={[
               styles.whatChangedCard,
               {
-                backgroundColor: isDark ? '#172554' : '#EFF6FF',
-                borderColor: isDark ? '#1E3A8A' : '#BFDBFE',
+                backgroundColor: colors.cardBg,
+                borderColor: colors.border,
               },
             ]}
           >
             <View style={styles.whatChangedHeader}>
-              <Sparkles size={18} color={isDark ? '#38BDF8' : colors.primaryRoyal} />
+              <Activity size={18} color={isDark ? colors.textPrimary : colors.primary} />
               <Text
                 style={[
                   styles.whatChangedTitle,
-                  { color: isDark ? '#38BDF8' : colors.primaryRoyal },
+                  { color: colors.textPrimary },
                 ]}
               >
                 {t.insights.whatChanged}
@@ -209,7 +208,7 @@ export const InsightsScreen: React.FC = () => {
                 <Text
                   style={[
                     styles.changeBullet,
-                    { color: isDark ? '#38BDF8' : colors.primaryRoyal },
+                    { color: isDark ? colors.textPrimary : colors.primary },
                   ]}
                 >
                   •
@@ -217,7 +216,7 @@ export const InsightsScreen: React.FC = () => {
                 <Text
                   style={[
                     styles.changeText,
-                    { color: isDark ? '#93C5FD' : '#1E3A8A' },
+                    { color: colors.textSecondary },
                   ]}
                 >
                   {change}
@@ -239,7 +238,7 @@ export const InsightsScreen: React.FC = () => {
               { backgroundColor: colors.cardBg, borderColor: colors.border },
             ]}
           >
-            <Text style={[styles.digestTag, { color: isDark ? '#38BDF8' : colors.primaryRoyal }]}>
+            <Text style={[styles.digestTag, { color: isDark ? colors.textSecondary : colors.primary }]}>
               COMMUTE & HABITS
             </Text>
             <Text style={[styles.digestTitle, { color: colors.textPrimary }]}>
@@ -256,7 +255,7 @@ export const InsightsScreen: React.FC = () => {
               { backgroundColor: colors.cardBg, borderColor: colors.border },
             ]}
           >
-            <Text style={[styles.digestTag, { color: isDark ? '#38BDF8' : colors.primaryRoyal }]}>
+            <Text style={[styles.digestTag, { color: isDark ? colors.textSecondary : colors.primary }]}>
               UTILITIES & BILLS
             </Text>
             <Text style={[styles.digestTitle, { color: colors.textPrimary }]}>
