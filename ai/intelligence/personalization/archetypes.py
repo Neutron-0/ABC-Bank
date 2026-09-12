@@ -121,32 +121,44 @@ class ArchetypeClassifier:
             return BHARAT_ARCHETYPES[ArchetypeId(archetype_override)]
 
         income = float(customer_data.get("monthly_income", 75000.0))
+        age = int(customer_data.get("age", 30))
         tx_metrics = features.get("transaction_metrics", {})
+        cat_counts = tx_metrics.get("category_counts", {})
         cat_volumes = tx_metrics.get("category_volumes", {})
+        merch_freqs = tx_metrics.get("merchant_frequencies", {})
+        total_debit = float(tx_metrics.get("total_debit_volume", 1.0))
 
-        # 1. Senior Citizen / Pensioner: Pension narration, pharmacy dominance, high term deposits
+        # 1. Senior Citizen / Pensioner: Pension narration, pharmacy dominance, high term deposits, age >= 60
         is_pension = "pension" in str(customer_data.get("employment_type", "")).lower()
-        if is_pension or signals.get("pension_credit") or "senior" in cust_id:
+        has_pension_tx = any("pension" in m.lower() for m in merch_freqs.keys())
+        pharmacy_heavy = cat_volumes.get("healthcare", 0.0) > 0.20 * total_debit if total_debit > 0 else False
+        if is_pension or signals.get("pension_credit") or "senior" in cust_id or age >= 60 or (has_pension_tx and pharmacy_heavy):
             return BHARAT_ARCHETYPES[ArchetypeId.SENIOR_PENSIONER]
 
         # 2. Rural Farmer: Agricultural inputs, PM-KISAN, fertilizer, seeds
         is_agri = "agri" in str(customer_data.get("occupation", "")).lower() or signals.get("kcc_holder")
-        if is_agri or "farmer" in cust_id:
+        has_agri_tx = cat_counts.get("agriculture", 0) > 0 or any(k in str(merch_freqs).lower() for k in ["fertilizer", "kisan", "iffco", "seeds", "tractor", "apmc"])
+        if is_agri or "farmer" in cust_id or has_agri_tx:
             return BHARAT_ARCHETYPES[ArchetypeId.RURAL_FARMER]
 
         # 3. MSME Merchant: High merchant QR credits, erratic cashflow, vendor supplier payments
         is_msme = "merchant" in str(customer_data.get("occupation", "")).lower() or customer_data.get("is_merchant")
-        if is_msme or "merchant" in cust_id:
+        high_credit_frequency = tx_metrics.get("credit_tx_count", 0) >= 5 and tx_metrics.get("total_credit_volume", 0) >= 100000
+        if is_msme or "merchant" in cust_id or high_credit_frequency:
             return BHARAT_ARCHETYPES[ArchetypeId.MSME_MERCHANT]
 
         # 4. Gig Worker: Micro credits from platforms, weekly fuel, two-wheeler loan
         is_gig = "gig" in str(customer_data.get("occupation", "")).lower() or "delivery" in str(customer_data.get("occupation", "")).lower()
-        if is_gig or "gig" in cust_id:
+        has_gig_platform = any(p in str(merch_freqs).lower() for p in ["rapido", "zomato", "swiggy", "uber", "ola", "zepto", "blinkit"])
+        has_frequent_fuel = any("fuel" in m.lower() or "petrol" in m.lower() for m in merch_freqs.keys())
+        if is_gig or "gig" in cust_id or (has_gig_platform and has_frequent_fuel):
             return BHARAT_ARCHETYPES[ArchetypeId.GIG_WORKER]
 
         # 5. Student / First-Time Earner: Low income (< 25k), young age, zero loan history, high food/entertainment
-        age = customer_data.get("age", 30)
-        if (age < 23 and income < 25000) or "student" in cust_id:
+        is_student = "student" in str(customer_data.get("occupation", "")).lower() or "student" in cust_id
+        is_young_low_income = (age < 23 and income < 25000)
+        micro_spends_ratio = tx_metrics.get("avg_debit_amount", 1000.0) < 250.0 and tx_metrics.get("emi_tx_count", 0) == 0
+        if is_student or is_young_low_income or (income < 20000 and micro_spends_ratio and age <= 25):
             return BHARAT_ARCHETYPES[ArchetypeId.STUDENT_FIRST_EARNER]
 
         # 6. Homemaker / SHG

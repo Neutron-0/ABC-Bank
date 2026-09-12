@@ -51,10 +51,70 @@ class FinancialSignalDetector:
             upcoming_obs = features.get("spending_metrics", {}).get("emi_spend", 0.0) + 5000.0
         signals["upcoming_obligations"] = float(upcoming_obs)
 
-        # 5. Liquid buffer check
+        # 5. Liquid buffer & cash runway check
         avail = float(balance.get("available", 42680))
+        savings_bal = float(balance.get("savings", 185000))
         burn = float(features.get("burn_rate", 30000))
         buffer_months = round(avail / burn, 2) if burn > 0 else 2.0
+        runway_days = int(buffer_months * 30)
         signals["liquid_buffer_months"] = buffer_months
+        signals["runway_days"] = runway_days
+        signals["emergency_fund_months"] = round(savings_bal / burn, 1) if burn > 0 else 6.0
+
+        est_income = float(features.get("spending_metrics", {}).get("estimated_monthly_income", 75000.0))
+        signals["net_cash_flow_monthly"] = round(est_income - burn, 2)
+
+        # 6. Multi-Factor Financial Resilience Scoring Model (0 to 100)
+        # Pillar 1: Liquid Runway (25 pts)
+        if buffer_months >= 3.0:
+            runway_pts = 25.0
+        elif buffer_months >= 1.5:
+            runway_pts = 20.0
+        elif buffer_months >= 0.75:
+            runway_pts = 12.0
+        elif buffer_months >= 0.3:
+            runway_pts = 6.0
+        else:
+            runway_pts = 2.0
+
+        # Pillar 2: Debt-to-Income Discipline (25 pts)
+        if effective_dti <= 0.15:
+            dti_pts = 25.0
+        elif effective_dti <= 0.25:
+            dti_pts = 20.0
+        elif effective_dti <= 0.35:
+            dti_pts = 14.0
+        elif effective_dti <= 0.45:
+            dti_pts = 7.0
+        else:
+            dti_pts = 0.0
+
+        # Pillar 3: Emergency Fund & Savings Reserve (25 pts)
+        ideal_emergency = burn * 6 if burn > 0 else 100000.0
+        savings_ratio = round(savings_bal / ideal_emergency, 2) if ideal_emergency > 0 else 1.0
+        if savings_ratio >= 1.0:
+            savings_pts = 25.0
+        elif savings_ratio >= 0.5:
+            savings_pts = 18.0
+        elif savings_ratio >= 0.2:
+            savings_pts = 10.0
+        else:
+            savings_pts = 4.0
+
+        # Pillar 4: Volatility & Trend Stability (25 pts)
+        if volatility == "low":
+            vol_pts = 22.0
+        elif volatility == "medium":
+            vol_pts = 14.0
+        else:
+            vol_pts = 5.0
+
+        if effective_trend == "positive":
+            vol_pts = min(25.0, vol_pts + 3.0)
+        elif effective_trend == "negative":
+            vol_pts = max(0.0, vol_pts - 4.0)
+
+        health_score = int(round(runway_pts + dti_pts + savings_pts + vol_pts))
+        signals["financial_health_score"] = max(5, min(100, health_score))
 
         return signals

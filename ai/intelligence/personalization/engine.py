@@ -6,6 +6,7 @@ from ai.intelligence.personalization.archetypes import ArchetypeClassifier, Bhar
 from ai.intelligence.personalization.catalog import PRODUCT_CATALOG, BankingProduct
 from ai.intelligence.personalization.compliance import ComplianceEngine, DecisionAuditRecord
 from ai.intelligence.personalization.scorer import MultiFactorScorer
+from ai.intelligence.explanations.explainer import Explainer
 
 
 class PersonalizationEngine:
@@ -133,11 +134,13 @@ class PersonalizationEngine:
                     features=features,
                     health=health
                 )
+                user_reason = Explainer.explain(product.id, signals)
                 rec_item = {
                     "id": product.id,
                     "category": product.category,
                     "title": product.title,
-                    "reason": compliance_reason,
+                    "reason": user_reason,
+                    "compliance_reason": compliance_reason,
                     "priority": final_priority,
                     "suppressed": False,
                     "confidence": confidence_score,
