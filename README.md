@@ -19,7 +19,7 @@ Three interconnected systems:
 | Layer | What it does | Tech |
 |---|---|---|
 | **Backend Intelligence** | Customer 360, signals, recommendations, experience orchestration | Python, FastAPI, Pydantic |
-| **Adaptive Frontend** | Renders dynamic UI from ExperienceConfig | React Native, Expo 52, TypeScript, Zustand |
+| **Adaptive Frontend** | Renders dynamic UI from ExperienceConfig | React Native, Expo (SDK 54), TypeScript, Zustand |
 | **Voice Layer** | Vernacular intent detection (Hindi, Gujarati, English) | Python (MiniCPM5 planned) |
 
 ---
