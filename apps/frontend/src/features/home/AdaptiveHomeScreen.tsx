@@ -82,6 +82,8 @@ export const AdaptiveHomeScreen: React.FC = () => {
     transactions,
     balance,
     setSelectedTransaction,
+    profile,
+    signals,
   } = useCustomerStore();
   const t = getTranslation(language);
   const [refreshing, setRefreshing] = useState(false);
@@ -770,38 +772,59 @@ export const AdaptiveHomeScreen: React.FC = () => {
   // 1. HINGE VITALS & ATTRIBUTES BLOCK (Exact Match to Block 2 from Image)
   // =========================================================================
   const renderAccountGroup = () => {
+    const accLastFour = (profile as any)?.accountNumber ? (profile as any).accountNumber.slice(-4) : '4092';
+    const cibilScore = profile.creditScore || 785;
+    const savingsAmount = balance.savings || 185000;
+    const isKycVerified = profile.kycStatus === 'verified';
+
     return (
       <View style={styles.vitalsCard}>
-        {/* Top 3-Column Vitals Strip with Vertical Hairlines */}
+        {/* Dynamic Editorial Vitals Strip with Interactive Access */}
         <View style={styles.vitalsTopRow}>
-          <View style={styles.vitalsTopCol}>
-            <ShieldCheck size={18} color="#141414" />
-            <Text style={styles.vitalsTopText}>KYC Verified</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.vitalsTopCol}
+            onPress={() => openJourney('kyc')}
+            activeOpacity={0.7}
+          >
+            <ShieldCheck size={16} color="#141414" />
+            <Text style={styles.vitalsTopText}>
+              {isKycVerified
+                ? (language === 'hi' ? 'केवाईसी सत्यापित' : language === 'gu' ? 'KYC ચકાસાયેલ' : 'KYC Verified')
+                : (language === 'hi' ? 'केवाईसी लंबित' : language === 'gu' ? 'KYC બાકી' : 'KYC Pending')}
+            </Text>
+          </TouchableOpacity>
           <View style={styles.vitalsVerticalLine} />
-          <View style={styles.vitalsTopCol}>
-            <Award size={18} color="#141414" />
-            <Text style={styles.vitalsTopText}>CIBIL 782</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.vitalsTopCol}
+            onPress={() => openJourney('credit_score')}
+            activeOpacity={0.7}
+          >
+            <Award size={16} color="#141414" />
+            <Text style={styles.vitalsTopText}>CIBIL {cibilScore}</Text>
+          </TouchableOpacity>
           <View style={styles.vitalsVerticalLine} />
-          <View style={styles.vitalsTopCol}>
-            <TrendingUp size={18} color="#B45309" />
+          <TouchableOpacity
+            style={styles.vitalsTopCol}
+            onPress={() => openJourney('savings_invest')}
+            activeOpacity={0.7}
+          >
+            <TrendingUp size={16} color="#B45309" />
             <Text style={[styles.vitalsTopText, { color: '#B45309' }]}>7.2% Yield</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Row 1: Primary Savings Account */}
         <View style={styles.vitalsRowDivider} />
         <TouchableOpacity
           style={styles.vitalsRow}
-          onPress={() => openJourney('kyc')}
+          onPress={() => setActiveTab('activity')}
           activeOpacity={0.7}
         >
           <View style={styles.vitalsIconWrap}>
             <CreditCard size={18} color="#141414" />
           </View>
           <View style={styles.vitalsRowBody}>
-            <Text style={styles.vitalsRowTitle}>Savings Account · •••• 4092</Text>
+            <Text style={styles.vitalsRowTitle}>Savings Account · •••• {accLastFour}</Text>
             <Text style={styles.vitalsRowDesc}>ABC Bank · Primary liquidity account</Text>
           </View>
           <Text style={styles.vitalsRowRightAmount}>₹{balance.available.toLocaleString('en-IN')}</Text>
@@ -821,7 +844,9 @@ export const AdaptiveHomeScreen: React.FC = () => {
             <Text style={styles.vitalsRowTitle}>Auto-Sweep Liquid Deposit</Text>
             <Text style={styles.vitalsRowDesc}>Earning 7.2% tax-free · Zero penalty breakable</Text>
           </View>
-          <Text style={[styles.vitalsRowRightAmount, { color: '#B45309' }]}>₹18,000</Text>
+          <Text style={[styles.vitalsRowRightAmount, { color: '#B45309' }]}>
+            ₹{savingsAmount.toLocaleString('en-IN')}
+          </Text>
         </TouchableOpacity>
 
         {/* Row 3: Debit Card Controls */}
@@ -852,7 +877,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
           </View>
           <View style={styles.vitalsRowBody}>
             <Text style={styles.vitalsRowTitle}>Daily UPI Allowance & Autopay</Text>
-            <Text style={styles.vitalsRowDesc}>₹1,00,000 daily limit (₹18,420 used today) · 2 active mandates</Text>
+            <Text style={styles.vitalsRowDesc}>₹1,00,000 daily limit · 2 active mandates</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -863,18 +888,24 @@ export const AdaptiveHomeScreen: React.FC = () => {
   // 2. HINGE PROMPT CARD: MONTHLY FINANCIAL HABIT (Exact Match to Image Block 1)
   // =========================================================================
   const renderFinancialObservation = () => {
+    const sweepPotential = signals.surplusAmount && signals.surplusAmount > 0
+      ? signals.surplusAmount
+      : Math.min(25000, Math.round(balance.available * 0.4));
+
     return (
       <View style={styles.hingePromptCard}>
         <Text style={styles.hingePromptHeader}>
           {language === 'hi' ? 'वित्तीय आदत एवं विश्लेषण' : language === 'gu' ? 'નાણાકીય આદત અને વિશ્લેષણ' : 'My monthly financial habit'}
         </Text>
         <Text style={styles.hingePromptSerifAnswer}>
-          Spending is 8% below your typical average. You have ₹24,100 ready to sweep into 7.2% tax-free yield.
+          {signals.surplusAmount && signals.surplusAmount > 0
+            ? `Discretionary spend is calm this cycle. You have ₹${sweepPotential.toLocaleString('en-IN')} available to sweep into 7.2% tax-free yield.`
+            : `Spending is 8% below your monthly average. You have ₹${sweepPotential.toLocaleString('en-IN')} ready to sweep into 7.2% yield.`}
         </Text>
 
         <View style={styles.hingePromptMetaRow}>
           <Text style={styles.hingePromptMetaText}>
-            Pacing: ₹18,420 spent of ₹42,000 budget
+            Pacing: ₹{Math.round(balance.available * 0.35).toLocaleString('en-IN')} spend baseline · Balanced outflow
           </Text>
         </View>
 

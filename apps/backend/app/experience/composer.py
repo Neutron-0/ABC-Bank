@@ -297,12 +297,8 @@ class ExperienceComposer:
                 payload=payload
             )
 
-            why_details = [
-                rec.reason or "Identified by customer intelligence model",
-                f"Priority score: {rec.priority}/100",
-            ]
-            if is_stress:
-                why_details.append("Anti-predatory safety policy active: borrowing options suppressed")
+            clean_reason = rec.reason or "Based on verified customer transaction and account patterns"
+            why_details = [clean_reason]
 
             card = ContextCardModel(
                 id=f"card_{rec.id}",

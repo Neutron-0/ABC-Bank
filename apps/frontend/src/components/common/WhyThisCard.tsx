@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, TouchableWithoutFeedback, Platform } from 'react-native';
 import { colors, typography, spacing, radii, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
@@ -52,26 +52,14 @@ export const WhyThisCard: React.FC = () => {
                   <Text style={[styles.previewDesc, { color: themeColors.textSecondary }]}>{selectedWhyCard.description}</Text>
                 </View>
 
-                {/* Primary Trigger Statement */}
-                <View style={styles.section}>
-                  <Text style={[styles.sectionHeading, { color: themeColors.textPrimary }]}>{t.whyModal.weNoticed}</Text>
-                  {selectedWhyCard.whyDetails && selectedWhyCard.whyDetails.length > 0 ? (
-                    selectedWhyCard.whyDetails.map((detail, idx) => (
-                      <View key={idx} style={styles.checkRow}>
-                        <View style={[styles.checkCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
-                          <Check size={12} color={themeColors.primary} strokeWidth={3} />
-                        </View>
-                        <Text style={[styles.checkText, { color: themeColors.textPrimary }]}>{detail}</Text>
-                      </View>
-                    ))
-                  ) : (
-                    <View style={styles.checkRow}>
-                      <View style={[styles.checkCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
-                        <Check size={12} color={themeColors.primary} strokeWidth={3} />
-                      </View>
-                      <Text style={[styles.checkText, { color: themeColors.textPrimary }]}>{selectedWhyCard.reason}</Text>
-                    </View>
-                  )}
+                {/* Editorial Context Narrative (Replaces mechanical rule checklist) */}
+                <View style={[styles.editorialNarrativeWrap, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                  <Text style={[styles.editorialEyebrow, { color: themeColors.textMuted }]}>
+                    {language === 'hi' ? 'प्रासंगिक समझ' : language === 'gu' ? 'વિશ્લેષણ' : 'CONTEXTUAL INTELLIGENCE'}
+                  </Text>
+                  <Text style={[styles.editorialNarrativeText, { color: themeColors.textPrimary }]}>
+                    {selectedWhyCard.reason || selectedWhyCard.description}
+                  </Text>
                 </View>
 
                 {/* Ethical Guardrails Note */}
@@ -191,36 +179,26 @@ const styles = StyleSheet.create({
     marginTop: 2,
     lineHeight: 18,
   },
-  section: {
+  editorialNarrativeWrap: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
     marginBottom: 20,
   },
-  sectionHeading: {
-    fontSize: 14,
+  editorialEyebrow: {
+    fontSize: 10,
     fontWeight: '700',
-    color: '#111318',
-    marginBottom: 12,
+    letterSpacing: 1.2,
+    marginBottom: 8,
   },
-  checkRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    marginBottom: 12,
-  },
-  checkCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#ECFDF5',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 2,
-  },
-  checkText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#111318',
-    lineHeight: 19,
-    flex: 1,
+  editorialNarrativeText: {
+    fontSize: 15,
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+    lineHeight: 23,
+    color: '#141414',
+    letterSpacing: -0.2,
   },
   ethicalNote: {
     flexDirection: 'row',

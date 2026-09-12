@@ -31,6 +31,7 @@ export const BalanceHeader: React.FC = () => {
     setActiveTab,
     openJourney,
     showToast,
+    profile,
   } = useCustomerStore();
 
   const t = getTranslation(language);
@@ -99,7 +100,9 @@ export const BalanceHeader: React.FC = () => {
         <View style={styles.vitalsStrip}>
           <View style={styles.vitalsCol}>
             <Text style={styles.vitalsLabel}>TOTAL DEPOSITS</Text>
-            <Text style={styles.vitalsVal}>{isBalanceHidden ? '••••••' : '₹1,42,680'}</Text>
+            <Text style={styles.vitalsVal}>
+              {isBalanceHidden ? '••••••' : `₹${(balance.available + (balance.savings || 185000)).toLocaleString('en-IN')}`}
+            </Text>
           </View>
           <View style={styles.vitalsDivider} />
           <View style={styles.vitalsCol}>
