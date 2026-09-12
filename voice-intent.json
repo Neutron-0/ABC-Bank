@@ -1,15 +1,17 @@
 {
-  "intent": "PAY_METRO",
+  "intent": "CHECK_EMI",
   "language": "en",
   "confidence": 0.96,
   "entities": {
-    "merchant": "Delhi Metro Smart Card",
-    "amount": 40
+    "inquiry_type": "loan_application",
+    "action": "loan_application",
+    "category": "personal_loan",
+    "amount": 50000
   },
-  "response_text": "Your routine morning metro fare is \u20b940. Would you like to pay with 1-tap UPI?",
+  "response_text": "Under RBI fair lending guidelines and your active debt commitments, cash flow stabilization is recommended before taking new credit. Would you like to review your commitments?",
   "suggested_actions": [
-    "1_TAP_PAY",
-    "CHANGE_AMOUNT",
-    "VIEW_PASS"
+    "REVIEW_COMMITMENTS",
+    "SPEAK_TO_COUNSELOR",
+    "DISMISS"
   ]
 }

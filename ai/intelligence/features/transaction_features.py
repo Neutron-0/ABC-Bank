@@ -33,6 +33,7 @@ class TransactionFeatureExtractor:
         category_counts: Dict[str, int] = defaultdict(int)
         category_volumes: Dict[str, float] = defaultdict(float)
         merchant_frequencies: Dict[str, int] = defaultdict(int)
+        credit_merchant_frequencies: Dict[str, int] = defaultdict(int)
 
         metro_count = 0
         utility_count = 0
@@ -44,11 +45,13 @@ class TransactionFeatureExtractor:
             merchant = str(tx.get("merchant", ""))
             tx_type = tx.get("type", "debit")
 
+            # Record merchant frequencies across all transactions
+            merchant_frequencies[merchant] += 1
+
             if tx_type == "debit":
                 debit_amounts.append(amt)
                 category_counts[cat] += 1
                 category_volumes[cat] += amt
-                merchant_frequencies[merchant] += 1
 
                 if cat == "transport" or "metro" in merchant.lower():
                     metro_count += 1
@@ -58,6 +61,7 @@ class TransactionFeatureExtractor:
                     emi_count += 1
             else:
                 credit_amounts.append(amt)
+                credit_merchant_frequencies[merchant] += 1
 
         total_debits = sum(debit_amounts)
         total_credits = sum(credit_amounts)
@@ -78,6 +82,7 @@ class TransactionFeatureExtractor:
             "category_counts": dict(category_counts),
             "category_volumes": dict(category_volumes),
             "merchant_frequencies": dict(merchant_frequencies),
+            "credit_merchants": dict(credit_merchant_frequencies),
             "metro_frequency_30d": metro_count,
             "utility_bill_count": utility_count,
             "emi_tx_count": emi_count,

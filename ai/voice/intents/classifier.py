@@ -22,7 +22,8 @@ class VoiceIntentClassifier:
         return "en"
 
     @classmethod
-    def classify(cls, query: Optional[str], lang: str = "en") -> Dict[str, Any]:
+    @classmethod
+    def classify(cls, query: Optional[str], lang: str = "en", stress_level: str = "normal") -> Dict[str, Any]:
         normalized_lang = cls.normalize_language_code(lang)
         parsed = MiniCPM5Runner.parse_intent(query, preferred_lang=normalized_lang)
         intent = parsed["intent"]
@@ -31,7 +32,7 @@ class VoiceIntentClassifier:
         entities = parsed["entities"]
 
         # Verbalize response using MiniCPM5Runner with fallback to prompt dictionary
-        response_text = MiniCPM5Runner.verbalize(intent, entities, lang=resolved_lang)
+        response_text = MiniCPM5Runner.verbalize(intent, entities, lang=resolved_lang, stress_level=stress_level)
 
         # Exhaustive domain-specific suggested actions
         suggested_actions = ["CONFIRM", "DISMISS", "DETAILS"]
@@ -40,7 +41,13 @@ class VoiceIntentClassifier:
         elif intent == "PAY_METRO":
             suggested_actions = ["1_TAP_PAY", "CHANGE_AMOUNT", "VIEW_PASS"]
         elif intent == "CHECK_EMI":
-            suggested_actions = ["PAY_NOW", "SET_REMINDER", "VIEW_SCHEDULE"]
+            if entities.get("inquiry_type") == "loan_application":
+                if stress_level in ["stress", "tight"]:
+                    suggested_actions = ["REVIEW_COMMITMENTS", "SPEAK_TO_COUNSELOR", "DISMISS"]
+                else:
+                    suggested_actions = ["EXPLORE_ELIGIBILITY", "VIEW_RATES", "DISMISS"]
+            else:
+                suggested_actions = ["PAY_NOW", "SET_REMINDER", "VIEW_SCHEDULE"]
         elif intent == "PAY_BILL":
             suggested_actions = ["1_TAP_PAY", "VIEW_BILL", "CHANGE_ACCOUNT"]
         elif intent == "MEDICAL_CLAIM_HELP":

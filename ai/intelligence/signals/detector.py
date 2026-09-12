@@ -14,7 +14,26 @@ class SignalDetector:
     @classmethod
     def detect(cls, scenario_data: Dict[str, Any], features: Dict[str, Any]) -> Dict[str, Any]:
         scenario_signals = dict(scenario_data.get("signals", {}))
-        balance = dict(scenario_data.get("balance", {"available": 42680, "savings": 185000, "currency": "INR"}))
+
+        # Resilient balance resolution supporting both 'balance' and 'accounts' schemas
+        raw_bal = scenario_data.get("balance")
+        raw_acc = scenario_data.get("accounts")
+        if isinstance(raw_bal, dict) and "available" in raw_bal:
+            balance = {
+                "available": float(raw_bal.get("available", 42680.0)),
+                "savings": float(raw_bal.get("savings", 185000.0)),
+                "currency": str(raw_bal.get("currency", "INR"))
+            }
+        elif isinstance(raw_acc, dict) and "available_balance" in raw_acc:
+            balance = {
+                "available": float(raw_acc.get("available_balance", 42680.0)),
+                "savings": float(raw_acc.get("savings_reserve", 185000.0)),
+                "currency": "INR"
+            }
+        elif isinstance(raw_bal, dict):
+            balance = dict(raw_bal)
+        else:
+            balance = {"available": 42680.0, "savings": 185000.0, "currency": "INR"}
 
         # 1. Behavioral Domain
         behavioral_signals = BehavioralSignalDetector.evaluate(scenario_signals, features)

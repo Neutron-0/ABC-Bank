@@ -140,7 +140,15 @@ class MiniCPM5Runner:
         if detected_intent == "PAY_METRO":
             entities = {"merchant": "Delhi Metro Smart Card", "amount": extracted_amt or 40}
         elif detected_intent == "CHECK_EMI":
-            entities = {"category": "home_loan", "amount": extracted_amt or 16500}
+            is_loan_app = bool(
+                re.search(r"(?i)\b(apply|need|want|give|get|take|personal|card|new|quick|instant)\b.*\b(loan|credit|karz|udhar)\b", clean_q)
+                or re.search(r"(?i)(लोन चाहिए|नया लोन|कर्ज चाहिए|उधार|लोन लेना|ऋण)", clean_q)
+                or re.search(r"(?i)(લોન જોઈએ|નવી લોન|ઉધાર|કર્જ)", clean_q)
+            )
+            if is_loan_app:
+                entities = {"inquiry_type": "loan_application", "action": "loan_application", "category": "personal_loan", "amount": extracted_amt or 50000}
+            else:
+                entities = {"category": "home_loan", "amount": extracted_amt or 16500}
         elif detected_intent == "CHECK_BALANCE":
             entities = {"account_type": "primary_savings"}
         elif detected_intent == "PAY_BILL":
@@ -177,7 +185,16 @@ class MiniCPM5Runner:
         if intent == "CHECK_EMI":
             amt = trusted_data.get("amount", 16500)
             date = trusted_data.get("due_date", "16 September")
+            is_loan_app = trusted_data.get("inquiry_type") == "loan_application" or trusted_data.get("action") == "loan_application"
+
             if is_stressed:
+                if is_loan_app:
+                    if lang == "gu":
+                        return "આરબીઆઈ ફેર લેન્ડિંગ નિયમો મુજબ, તમારા હાલના ઋણ બોજને કારણે નવી લોન લેવા કરતાં કેશફ્લો સ્થિર કરવાની સલાહ આપવામાં આવે છે. શું તમે તમારા વર્તમાન ખર્ચની સમીક્ષા કરવા માંગો છો?"
+                    elif lang == "hi":
+                        return "आरबीआई निष्पक्ष ऋण दिशानिर्देशों के अनुसार, आपके वर्तमान ऋण दायित्वों को देखते हुए नया ऋण लेने के बजाय नकदी प्रवाह को स्थिर करना बेहतर होगा। क्या आप वर्तमान खर्चों की समीक्षा करना चाहते हैं?"
+                    return "Under RBI fair lending guidelines and your active debt commitments, cash flow stabilization is recommended before taking new credit. Would you like to review your commitments?"
+
                 if lang == "gu":
                     return f"તમારું હોમ લોન EMI ₹{amt:,} છે અને તે {date} એ ચૂકવવાનું છે. ચિંતા કરશો નહીં, અમે સુરક્ષિત કેશ ફ્લો વિકલ્પો તૈયાર રાખ્યા છે."
                 elif lang == "hi":

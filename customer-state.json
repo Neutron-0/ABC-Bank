@@ -21,8 +21,12 @@
     "debt_to_income_ratio": 0.0485,
     "income_stability": 0.92,
     "spending_volatility": "medium",
-    "upcoming_obligations": 9125.0,
-    "liquid_buffer_months": 3.22,
+    "upcoming_obligations": 21500.0,
+    "liquid_buffer_months": 0.81,
+    "runway_days": 24,
+    "emergency_fund_months": 3.5,
+    "net_cash_flow_monthly": 287006.0,
+    "financial_health_score": 72,
     "medical_surge": false,
     "derived_life_stage": [
       "early_career",
@@ -66,7 +70,7 @@
       "priority": 87,
       "rank": 1,
       "category": "transport",
-      "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+      "reason": "Surfaced because you make weekday Delhi Metro Smart Card payments around 08:40 AM.",
       "suppressed": false
     },
     {
@@ -75,34 +79,34 @@
       "priority": 86,
       "rank": 2,
       "category": "transport",
-      "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
-      "suppressed": false
-    },
-    {
-      "id": "rec_smart_savings",
-      "title": "Put Surplus Cash into 7.85% Smart FD",
-      "priority": 74,
-      "rank": 3,
-      "category": "savings",
-      "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+      "reason": "Surfaced based on your current cash-flow health and recent account activity.",
       "suppressed": false
     },
     {
       "id": "srv_form15g_h",
       "title": "Form 15G / 15H TDS Zero-Tax Submission",
       "priority": 69,
-      "rank": 4,
+      "rank": 3,
       "category": "tax_compliance",
-      "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+      "reason": "Surfaced based on your current cash-flow health and recent account activity.",
+      "suppressed": false
+    },
+    {
+      "id": "rec_smart_savings",
+      "title": "Put Surplus Cash into 7.85% Smart FD",
+      "priority": 67,
+      "rank": 4,
+      "category": "savings",
+      "reason": "Surfaced because your available cash buffer is well above historical monthly burn rate.",
       "suppressed": false
     },
     {
       "id": "rec_personal_loan",
       "title": "Pre-Approved Personal Loan",
-      "priority": 61,
+      "priority": 58,
       "rank": 5,
       "category": "credit",
-      "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+      "reason": "Surfaced based on your current cash-flow health and recent account activity.",
       "suppressed": false
     }
   ],
@@ -241,7 +245,8 @@
         "id": "rec_commute_metro",
         "category": "transport",
         "title": "Morning Metro Quick Pay",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "reason": "Surfaced because you make weekday Delhi Metro Smart Card payments around 08:40 AM.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
         "priority": 87,
         "suppressed": false,
         "confidence": 0.927,
@@ -262,7 +267,8 @@
         "id": "srv_ncmc_reload",
         "category": "transport",
         "title": "NCMC Metro Balance Threshold Auto-Load",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "reason": "Surfaced based on your current cash-flow health and recent account activity.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
         "priority": 86,
         "suppressed": false,
         "confidence": 0.927,
@@ -280,31 +286,11 @@
         "rank": 2
       },
       {
-        "id": "rec_smart_savings",
-        "category": "savings",
-        "title": "Put Surplus Cash into 7.85% Smart FD",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
-        "priority": 74,
-        "suppressed": false,
-        "confidence": 0.927,
-        "scoring_metrics": {
-          "affordability_fit": 0.95,
-          "lifecycle_need": 0.6,
-          "temporal_urgency": 0.5,
-          "archetype_affinity": 1.0,
-          "risk_penalty": 0.0,
-          "weighted_index": 0.74
-        },
-        "counterfactual": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
-        "apr_percent": null,
-        "cooling_off_days": 3,
-        "rank": 3
-      },
-      {
         "id": "srv_form15g_h",
         "category": "tax_compliance",
         "title": "Form 15G / 15H TDS Zero-Tax Submission",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "reason": "Surfaced based on your current cash-flow health and recent account activity.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
         "priority": 69,
         "suppressed": false,
         "confidence": 0.927,
@@ -319,23 +305,46 @@
         "counterfactual": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
         "apr_percent": null,
         "cooling_off_days": 3,
+        "rank": 3
+      },
+      {
+        "id": "rec_smart_savings",
+        "category": "savings",
+        "title": "Put Surplus Cash into 7.85% Smart FD",
+        "reason": "Surfaced because your available cash buffer is well above historical monthly burn rate.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "priority": 67,
+        "suppressed": false,
+        "confidence": 0.927,
+        "scoring_metrics": {
+          "affordability_fit": 0.4,
+          "lifecycle_need": 0.6,
+          "temporal_urgency": 0.5,
+          "archetype_affinity": 1.0,
+          "risk_penalty": 0.0,
+          "weighted_index": 0.575
+        },
+        "counterfactual": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
+        "apr_percent": null,
+        "cooling_off_days": 3,
         "rank": 4
       },
       {
         "id": "rec_personal_loan",
         "category": "credit",
         "title": "Pre-Approved Personal Loan",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
-        "priority": 61,
+        "reason": "Surfaced based on your current cash-flow health and recent account activity.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "priority": 58,
         "suppressed": false,
         "confidence": 0.927,
         "scoring_metrics": {
-          "affordability_fit": 0.927,
+          "affordability_fit": 0.635,
           "lifecycle_need": 0.6,
           "temporal_urgency": 0.5,
           "archetype_affinity": 1.0,
           "risk_penalty": 0.0,
-          "weighted_index": 0.733
+          "weighted_index": 0.645
         },
         "counterfactual": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
         "apr_percent": 11.25,
@@ -348,7 +357,8 @@
         "id": "rec_commute_metro",
         "category": "transport",
         "title": "Morning Metro Quick Pay",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "reason": "Surfaced because you make weekday Delhi Metro Smart Card payments around 08:40 AM.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
         "priority": 87,
         "suppressed": false,
         "confidence": 0.927,
@@ -369,7 +379,8 @@
         "id": "srv_ncmc_reload",
         "category": "transport",
         "title": "NCMC Metro Balance Threshold Auto-Load",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "reason": "Surfaced based on your current cash-flow health and recent account activity.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
         "priority": 86,
         "suppressed": false,
         "confidence": 0.927,
@@ -387,31 +398,11 @@
         "rank": 2
       },
       {
-        "id": "rec_smart_savings",
-        "category": "savings",
-        "title": "Put Surplus Cash into 7.85% Smart FD",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
-        "priority": 74,
-        "suppressed": false,
-        "confidence": 0.927,
-        "scoring_metrics": {
-          "affordability_fit": 0.95,
-          "lifecycle_need": 0.6,
-          "temporal_urgency": 0.5,
-          "archetype_affinity": 1.0,
-          "risk_penalty": 0.0,
-          "weighted_index": 0.74
-        },
-        "counterfactual": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
-        "apr_percent": null,
-        "cooling_off_days": 3,
-        "rank": 3
-      },
-      {
         "id": "srv_form15g_h",
         "category": "tax_compliance",
         "title": "Form 15G / 15H TDS Zero-Tax Submission",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "reason": "Surfaced based on your current cash-flow health and recent account activity.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
         "priority": 69,
         "suppressed": false,
         "confidence": 0.927,
@@ -426,23 +417,46 @@
         "counterfactual": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
         "apr_percent": null,
         "cooling_off_days": 3,
+        "rank": 3
+      },
+      {
+        "id": "rec_smart_savings",
+        "category": "savings",
+        "title": "Put Surplus Cash into 7.85% Smart FD",
+        "reason": "Surfaced because your available cash buffer is well above historical monthly burn rate.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "priority": 67,
+        "suppressed": false,
+        "confidence": 0.927,
+        "scoring_metrics": {
+          "affordability_fit": 0.4,
+          "lifecycle_need": 0.6,
+          "temporal_urgency": 0.5,
+          "archetype_affinity": 1.0,
+          "risk_penalty": 0.0,
+          "weighted_index": 0.575
+        },
+        "counterfactual": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
+        "apr_percent": null,
+        "cooling_off_days": 3,
         "rank": 4
       },
       {
         "id": "rec_personal_loan",
         "category": "credit",
         "title": "Pre-Approved Personal Loan",
-        "reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
-        "priority": 61,
+        "reason": "Surfaced based on your current cash-flow health and recent account activity.",
+        "compliance_reason": "Approved: Meets regulatory suitability standards and DPDP purpose authorization.",
+        "priority": 58,
         "suppressed": false,
         "confidence": 0.927,
         "scoring_metrics": {
-          "affordability_fit": 0.927,
+          "affordability_fit": 0.635,
           "lifecycle_need": 0.6,
           "temporal_urgency": 0.5,
           "archetype_affinity": 1.0,
           "risk_penalty": 0.0,
-          "weighted_index": 0.733
+          "weighted_index": 0.645
         },
         "counterfactual": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
         "apr_percent": 11.25,
@@ -472,8 +486,8 @@
     ],
     "audit_trail": [
       {
-        "audit_id": "aud_84801aca141e",
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "audit_id": "aud_b1a661d6dde8",
+        "timestamp": "2026-09-12T06:41:16.894604",
         "customer_id": "cust_bharat_001",
         "product_id": "rec_commute_metro",
         "product_title": "Morning Metro Quick Pay",
@@ -496,8 +510,8 @@
         "rbi_kfs_required": false
       },
       {
-        "audit_id": "aud_c07d4a9cacfd",
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "audit_id": "aud_4b0f6f6e85ed",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "rec_smart_savings",
         "product_title": "Put Surplus Cash into 7.85% Smart FD",
@@ -520,8 +534,8 @@
         "rbi_kfs_required": false
       },
       {
-        "audit_id": "aud_99cc77263de2",
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "audit_id": "aud_4048d0d55c4b",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "rec_personal_loan",
         "product_title": "Pre-Approved Personal Loan",
@@ -545,8 +559,8 @@
         "rbi_kfs_required": true
       },
       {
-        "audit_id": "aud_142743e83c9c",
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "audit_id": "aud_deb8e8807e56",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "rec_sachet_insurance",
         "product_title": "\u20b910/Day Gig Partner Protection Cover",
@@ -570,8 +584,8 @@
         "rbi_kfs_required": false
       },
       {
-        "audit_id": "aud_0d53e4122d6a",
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "audit_id": "aud_38ef55f3bd0c",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "srv_ncmc_reload",
         "product_title": "NCMC Metro Balance Threshold Auto-Load",
@@ -594,8 +608,8 @@
         "rbi_kfs_required": false
       },
       {
-        "audit_id": "aud_d40c4ebb156f",
-        "timestamp": "2026-09-12T06:34:17.180880",
+        "audit_id": "aud_2f3e5f690426",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "srv_form15g_h",
         "product_title": "Form 15G / 15H TDS Zero-Tax Submission",
@@ -618,8 +632,8 @@
         "rbi_kfs_required": false
       },
       {
-        "audit_id": "aud_e323aa90451f",
-        "timestamp": "2026-09-12T06:34:17.180880",
+        "audit_id": "aud_e58d7c034739",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "srv_pmjjby_pmsby",
         "product_title": "PMJJBY & PMSBY Annual Renewal Shield",
@@ -646,7 +660,7 @@
     "cryptographic_ledger": [
       {
         "block_index": 0,
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "timestamp": "2026-09-12T06:41:16.894604",
         "customer_id": "cust_bharat_001",
         "product_id": "rec_commute_metro",
         "product_title": "Morning Metro Quick Pay",
@@ -658,11 +672,11 @@
         "counterfactual_explanation": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
         "customer_plain_explanation": "We surfaced 'Morning Metro Quick Pay' because your profile, cash flow, and routine show strong suitability. You are under no obligation to apply, and you retain complete control in your privacy settings.",
         "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-        "block_hash": "56a1411537239e35d39ddcb9d979e04a3e2f6f37bbe54a61c2ea3d334ada2856"
+        "block_hash": "2dc730192de27981e623f7b262c5350ab96157795dffc105b1935419b7064ffc"
       },
       {
         "block_index": 1,
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "rec_smart_savings",
         "product_title": "Put Surplus Cash into 7.85% Smart FD",
@@ -673,12 +687,12 @@
         ],
         "counterfactual_explanation": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
         "customer_plain_explanation": "We surfaced 'Put Surplus Cash into 7.85% Smart FD' because your profile, cash flow, and routine show strong suitability. You are under no obligation to apply, and you retain complete control in your privacy settings.",
-        "previous_hash": "56a1411537239e35d39ddcb9d979e04a3e2f6f37bbe54a61c2ea3d334ada2856",
-        "block_hash": "1d0aee53dfbb65d94ea906d4d5ecb420e5f0526fd5a991ee6c55c604b821fbf6"
+        "previous_hash": "2dc730192de27981e623f7b262c5350ab96157795dffc105b1935419b7064ffc",
+        "block_hash": "b385ffecfa3c83ad14d01acbd00b3e7ddba1a46338e34778d7160e08cf740b71"
       },
       {
         "block_index": 2,
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "rec_personal_loan",
         "product_title": "Pre-Approved Personal Loan",
@@ -690,12 +704,12 @@
         ],
         "counterfactual_explanation": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
         "customer_plain_explanation": "We surfaced 'Pre-Approved Personal Loan' because your profile, cash flow, and routine show strong suitability. You are under no obligation to apply, and you retain complete control in your privacy settings.",
-        "previous_hash": "1d0aee53dfbb65d94ea906d4d5ecb420e5f0526fd5a991ee6c55c604b821fbf6",
-        "block_hash": "2453e2af149e920b347d03936bf185576e189284cf7d5cd1ad379a05d83a10b3"
+        "previous_hash": "b385ffecfa3c83ad14d01acbd00b3e7ddba1a46338e34778d7160e08cf740b71",
+        "block_hash": "93064a16e7cac54810f05b73bbbbeab19e12090249c78789658573bd0a31dc87"
       },
       {
         "block_index": 3,
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "rec_sachet_insurance",
         "product_title": "\u20b910/Day Gig Partner Protection Cover",
@@ -707,12 +721,12 @@
         ],
         "counterfactual_explanation": "User must grant explicit consent for 'insurance_underwriting' in privacy settings.",
         "customer_plain_explanation": "We held back '\u20b910/Day Gig Partner Protection Cover' today to protect your financial wellness. How to unlock: User must grant explicit consent for 'insurance_underwriting' in privacy settings.",
-        "previous_hash": "2453e2af149e920b347d03936bf185576e189284cf7d5cd1ad379a05d83a10b3",
-        "block_hash": "37573c424884a3b64904cd2a3f2fbbb892a07b5db2f399c82bdf22f3af8aa8ac"
+        "previous_hash": "93064a16e7cac54810f05b73bbbbeab19e12090249c78789658573bd0a31dc87",
+        "block_hash": "a07eb4bb1a19e4f9bf66d6edcfacda10db85995d9200f757468e084704bec508"
       },
       {
         "block_index": 4,
-        "timestamp": "2026-09-12T06:34:17.179878",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "srv_ncmc_reload",
         "product_title": "NCMC Metro Balance Threshold Auto-Load",
@@ -723,12 +737,12 @@
         ],
         "counterfactual_explanation": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
         "customer_plain_explanation": "We surfaced 'NCMC Metro Balance Threshold Auto-Load' because your profile, cash flow, and routine show strong suitability. You are under no obligation to apply, and you retain complete control in your privacy settings.",
-        "previous_hash": "37573c424884a3b64904cd2a3f2fbbb892a07b5db2f399c82bdf22f3af8aa8ac",
-        "block_hash": "8ec49009c46fc557719846e173ae329bb404b3b4b03d534c836eb7af890e61bd"
+        "previous_hash": "a07eb4bb1a19e4f9bf66d6edcfacda10db85995d9200f757468e084704bec508",
+        "block_hash": "a34faef1ff0fccc5322d9cbb181e7e2bc0772b6804c2cf2d6d6ac0fad343bbed"
       },
       {
         "block_index": 5,
-        "timestamp": "2026-09-12T06:34:17.180880",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "srv_form15g_h",
         "product_title": "Form 15G / 15H TDS Zero-Tax Submission",
@@ -739,12 +753,12 @@
         ],
         "counterfactual_explanation": "Decision would be suppressed if debt pressure exceeds 0.40 DTI or consent is withdrawn.",
         "customer_plain_explanation": "We surfaced 'Form 15G / 15H TDS Zero-Tax Submission' because your profile, cash flow, and routine show strong suitability. You are under no obligation to apply, and you retain complete control in your privacy settings.",
-        "previous_hash": "8ec49009c46fc557719846e173ae329bb404b3b4b03d534c836eb7af890e61bd",
-        "block_hash": "bbabc14b758af764708abb3055251d451d3008438d88c46ae0db0f231285299a"
+        "previous_hash": "a34faef1ff0fccc5322d9cbb181e7e2bc0772b6804c2cf2d6d6ac0fad343bbed",
+        "block_hash": "77b445530f562382efa688367848cbc691a7e8ecb122c320827d2dbde32dacde"
       },
       {
         "block_index": 6,
-        "timestamp": "2026-09-12T06:34:17.180880",
+        "timestamp": "2026-09-12T06:41:16.895603",
         "customer_id": "cust_bharat_001",
         "product_id": "srv_pmjjby_pmsby",
         "product_title": "PMJJBY & PMSBY Annual Renewal Shield",
@@ -756,8 +770,8 @@
         ],
         "counterfactual_explanation": "User must grant explicit consent for 'insurance_underwriting' in privacy settings.",
         "customer_plain_explanation": "We held back 'PMJJBY & PMSBY Annual Renewal Shield' today to protect your financial wellness. How to unlock: User must grant explicit consent for 'insurance_underwriting' in privacy settings.",
-        "previous_hash": "bbabc14b758af764708abb3055251d451d3008438d88c46ae0db0f231285299a",
-        "block_hash": "bd88763867cf5f144cc33968aab0fe3734d594e672e4387c77c65c674de91ee7"
+        "previous_hash": "77b445530f562382efa688367848cbc691a7e8ecb122c320827d2dbde32dacde",
+        "block_hash": "62a0caed7e34eaaa529ebefbe9ea8c64c1fbd8d6f8371554d988458ade93ad05"
       }
     ],
     "cryptographic_verification": "Cryptographic integrity verified: 7 decision blocks are immutable and tamper-free.",

@@ -135,10 +135,18 @@ class ArchetypeClassifier:
         if is_pension or signals.get("pension_credit") or "senior" in cust_id or age >= 60 or (has_pension_tx and pharmacy_heavy):
             return BHARAT_ARCHETYPES[ArchetypeId.SENIOR_PENSIONER]
 
+        # Check for urban commuter indicators first (corporate payroll + daily metro transit)
+        has_metro_commute = bool(signals.get("commute_habit_detected") or features.get("commute_detected") or tx_metrics.get("metro_frequency_30d", 0) >= 2)
+        has_corporate_salary = any(k in str(merch_freqs).lower() for k in ["salary", "infosys", "tcs", "wipro", "tech mahindra", "accenture", "corp salary"])
+        if has_metro_commute and has_corporate_salary and not ("farmer" in cust_id or "merchant" in cust_id or "gig" in cust_id):
+            return BHARAT_ARCHETYPES[ArchetypeId.URBAN_COMMUTER]
+
         # 2. Rural Farmer: Agricultural inputs, PM-KISAN, fertilizer, seeds
-        is_agri = "agri" in str(customer_data.get("occupation", "")).lower() or signals.get("kcc_holder")
-        has_agri_tx = cat_counts.get("agriculture", 0) > 0 or any(k in str(merch_freqs).lower() for k in ["fertilizer", "kisan", "iffco", "seeds", "tractor", "apmc"])
-        if is_agri or "farmer" in cust_id or has_agri_tx:
+        is_agri = "agri" in str(customer_data.get("occupation", "")).lower() or "farmer" in str(customer_data.get("occupation", "")).lower() or signals.get("kcc_holder")
+        agri_tx_cnt = cat_counts.get("agriculture", 0)
+        has_agri_merch = any(k in str(merch_freqs).lower() for k in ["fertilizer", "kisan", "iffco", "seeds", "tractor", "apmc"])
+        has_agri_pattern = (agri_tx_cnt >= 2 or (agri_tx_cnt >= 1 and not has_corporate_salary) or has_agri_merch and not has_corporate_salary)
+        if is_agri or "farmer" in cust_id or has_agri_pattern:
             return BHARAT_ARCHETYPES[ArchetypeId.RURAL_FARMER]
 
         # 3. MSME Merchant: High merchant QR credits, erratic cashflow, vendor supplier payments

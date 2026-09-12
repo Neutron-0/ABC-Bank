@@ -111,17 +111,20 @@ class PredictiveCashFlowEngine:
                     entry["count"] += 1
 
         # 2. Build 30-Day Forward Obligation Calendar
+        import calendar
+        days_in_curr_month = calendar.monthrange(ref_dt.year, ref_dt.month)[1]
+
         upcoming_items: List[ObligationItem] = []
         tot_15d = 0.0
         tot_30d = 0.0
 
         for key, rec in recurring_tracker.items():
             due_dom = rec["day_of_month"]
-            # Calculate days until this obligation occurs
+            # Calculate days until this obligation occurs using real calendar month boundaries
             if due_dom >= ref_day:
                 days_ahead = due_dom - ref_day
             else:
-                days_ahead = (30 - ref_day) + due_dom
+                days_ahead = (days_in_curr_month - ref_day) + due_dom
 
             if days_ahead <= 30:
                 due_dt = ref_dt + timedelta(days=days_ahead)
@@ -149,7 +152,7 @@ class PredictiveCashFlowEngine:
         if salary_day >= ref_day:
             income_days_ahead = salary_day - ref_day
         else:
-            income_days_ahead = (30 - ref_day) + salary_day
+            income_days_ahead = (days_in_curr_month - ref_day) + salary_day
         next_income_dt = ref_dt + timedelta(days=income_days_ahead)
         next_income_iso = next_income_dt.strftime("%Y-%m-%d")
         next_income_amt = monthly_income if monthly_income > 0 else 50000.0
@@ -160,17 +163,37 @@ class PredictiveCashFlowEngine:
         committed_15d = tot_15d
         safe_to_spend = max(0.0, round(available_balance - committed_15d - emergency_buffer, 2))
 
-        # 5. Deficit / Cash-flow crunch trajectory simulation
+        # 5. Chronological Deficit / Cash-flow crunch trajectory simulation
+        events: List[Dict[str, Any]] = []
+        if next_income_amt > 0 and next_income_iso and income_days_ahead <= 30:
+            events.append({
+                "date": next_income_iso,
+                "type": "income",
+                "amount": next_income_amt,
+                "description": "Projected Monthly Income"
+            })
+        for item in upcoming_items:
+            events.append({
+                "date": item.predicted_due_date,
+                "type": "obligation",
+                "amount": -item.amount,
+                "description": item.merchant,
+                "item": item
+            })
+
+        # Sort events chronologically. For identical dates, credit arrives before debit (start of business day)
+        events.sort(key=lambda x: (x["date"], 0 if x["type"] == "income" else 1))
+
         running_balance = available_balance
         deficit_predicted = False
         deficit_date = None
         deficit_amount = 0.0
 
-        for item in upcoming_items:
-            running_balance -= item.amount
+        for ev in events:
+            running_balance += ev["amount"]
             if running_balance < 0 and not deficit_predicted:
                 deficit_predicted = True
-                deficit_date = item.predicted_due_date
+                deficit_date = ev["date"]
                 deficit_amount = round(abs(running_balance), 2)
 
         # 6. Actionable Interventions & Empathetic Nudges

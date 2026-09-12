@@ -25,7 +25,16 @@ class SpendingFeatureExtractor:
             tx_type = tx.get("type", "debit")
 
             if tx_type == "credit":
-                if cat == "salary" or "salary" in str(tx.get("merchant", "")).lower():
+                merch_text = (str(tx.get("merchant", "")) + " " + str(tx.get("raw_merchant", ""))).lower()
+                is_income = (
+                    cat in ["salary", "income", "gig_payout", "business_credit"]
+                    or any(w in merch_text for w in [
+                        "salary", "payroll", "corp salary", "payout", "rider", "partner", "captain",
+                        "pm-kisan", "pension", "dbt", "stipend", "honorarium", "swiggy",
+                        "zomato", "rapido", "uber", "ola", "zepto", "blinkit"
+                    ])
+                )
+                if is_income:
                     salary_credits.append(amt)
             else:
                 total_debit += amt
@@ -49,10 +58,15 @@ class SpendingFeatureExtractor:
             span_days = max(1, (max(dates) - min(dates)).days)
             if span_days > 45:
                 months_count = max(1, round(span_days / 30.0))
-        if salary_credits and len(salary_credits) > months_count:
-            months_count = len(salary_credits)
 
-        effective_income = (sum(salary_credits) / len(salary_credits)) if salary_credits else profile_income
+        if salary_credits:
+            # If credits occur at high frequency (> 2 per month, e.g. weekly gig payouts), aggregate per month
+            if len(salary_credits) > months_count * 2:
+                effective_income = sum(salary_credits) / months_count
+            else:
+                effective_income = sum(salary_credits) / len(salary_credits)
+        else:
+            effective_income = profile_income
         monthly_emi = emi_spend / months_count
         monthly_burn = total_debit / months_count
 
