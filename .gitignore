@@ -24,3 +24,8 @@ web-build/
 # OS Specific
 .DS_Store
 Thumbs.db
+
+# Reference Repositories
+reference repos/
+reference-repos/
+

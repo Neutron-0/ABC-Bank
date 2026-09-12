@@ -1,10 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, typography, spacing, radii } from '../../theme';
+import { colors, spacing } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { AnimatedBalance } from './AnimatedBalance';
-import { Eye, EyeOff, QrCode, Send, ArrowUpRight, TrendingUp } from 'lucide-react-native';
+import {
+  Eye,
+  EyeOff,
+  QrCode,
+  Send,
+  FileText,
+  CreditCard,
+  ShieldCheck,
+} from 'lucide-react-native';
 
 export const BalanceHeader: React.FC = () => {
   const {
@@ -20,79 +28,132 @@ export const BalanceHeader: React.FC = () => {
 
   const getSubtleContextText = () => {
     if (currentState === 'fraud_alert') {
-      return 'Account protection guard active';
+      return 'Biometric Security Protocol Active • Ref: SEC-8921';
     }
     if (currentState === 'medical_event') {
-      return 'Emergency reserve allocated for hospital care';
+      return 'Healthcare Outflow Tagged • Cashless TPA Claim Eligible';
     }
     if (financialHealth.status === 'stress') {
-      return 'Buffer optimization active • Upcoming EMI scheduled';
+      return 'Liquidity Guard Active • ₹32,000 Mandates Scheduled';
     }
     if (financialHealth.status === 'thriving') {
-      return `+₹14,200 surplus cash flow • ${financialHealth.emergencyFundMonths} mo runway`;
+      return `Monthly Surplus Cash Flow: +₹14,200 • ${financialHealth.emergencyFundMonths} Mo. Reserve`;
     }
-    return `Cash flow stable • ${financialHealth.emergencyFundMonths} months runway buffer`;
+    return `Operating Reserve: ${financialHealth.emergencyFundMonths} Months • Auto-Sweep Active`;
   };
 
   return (
     <View style={styles.container}>
-      {/* Eyebrow & Privacy Toggle */}
-      <View style={styles.eyebrowRow}>
-        <Text style={styles.eyebrowText}>AVAILABLE</Text>
-        <TouchableOpacity
-          onPress={toggleBalanceHide}
-          style={styles.eyeBtn}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          activeOpacity={0.7}
-        >
-          {isBalanceHidden ? (
-            <EyeOff size={15} color={colors.textMuted} />
-          ) : (
-            <Eye size={15} color={colors.textMuted} />
-          )}
-        </TouchableOpacity>
+      {/* Institutional Account Card */}
+      <View style={styles.accountCard}>
+        {/* Top Card Row */}
+        <View style={styles.cardHeaderRow}>
+          <View style={styles.accountTypeWrap}>
+            <Text style={styles.accountTypeText}>PRIMARY SAVINGS ACCOUNT</Text>
+            <Text style={styles.accountNumText}>A/C 5010 •••• 4092</Text>
+          </View>
+          <TouchableOpacity
+            onPress={toggleBalanceHide}
+            style={styles.eyeBtn}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            activeOpacity={0.7}
+          >
+            {isBalanceHidden ? (
+              <EyeOff size={16} color="#64748B" />
+            ) : (
+              <Eye size={16} color="#64748B" />
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Available Balance Large Numerical Figure */}
+        <View style={styles.balanceWrap}>
+          <Text style={styles.balanceLabel}>AVAILABLE FOR WITHDRAWAL / UPI</Text>
+          <AnimatedBalance
+            value={balance.available}
+            isPrivacyHidden={isBalanceHidden}
+            currencyPrefix="₹"
+            fractionSuffix=".00"
+          />
+        </View>
+
+        {/* Secondary Financial Ledger Metrics */}
+        <View style={styles.ledgerRow}>
+          <View style={styles.ledgerCol}>
+            <Text style={styles.ledgerLabel}>TOTAL DEPOSITS</Text>
+            <Text style={styles.ledgerValue}>
+              {isBalanceHidden ? '••••••' : `₹${(balance.savings || 185000).toLocaleString('en-IN')}`}
+            </Text>
+          </View>
+          <View style={styles.ledgerDivider} />
+          <View style={styles.ledgerCol}>
+            <Text style={styles.ledgerLabel}>AUTO-SWEEP FD</Text>
+            <Text style={styles.ledgerValue}>
+              {isBalanceHidden ? '••••••' : `₹${(balance.fixedDeposits || 250000).toLocaleString('en-IN')}`}
+            </Text>
+          </View>
+          <View style={styles.ledgerDivider} />
+          <View style={styles.ledgerCol}>
+            <Text style={styles.ledgerLabel}>IFSC CODE</Text>
+            <Text style={styles.ledgerValue}>ABCD0001048</Text>
+          </View>
+        </View>
+
+        {/* Regulatory Protection Trust Mark */}
+        <View style={styles.trustMarkRow}>
+          <ShieldCheck size={13} color="#059669" />
+          <Text style={styles.trustMarkText}>{getSubtleContextText()}</Text>
+        </View>
       </View>
 
-      {/* Numerical Animated Balance */}
-      <View style={styles.balanceWrap}>
-        <AnimatedBalance
-          value={balance.available}
-          isPrivacyHidden={isBalanceHidden}
-          currencyPrefix="₹"
-          fractionSuffix=".00"
-        />
-      </View>
-
-      {/* Contextual Subtext */}
-      <Text style={styles.contextSubtext}>{getSubtleContextText()}</Text>
-
-      {/* Clean Utility Action Strips */}
-      <View style={styles.actionStrip}>
+      {/* Authoritative Banking Actions */}
+      <View style={styles.actionGrid}>
         <TouchableOpacity
-          style={styles.actionPill}
+          style={styles.actionBtn}
           onPress={() => setActiveTab('payments')}
-          activeOpacity={0.8}
+          delayPressIn={0}
+          activeOpacity={0.75}
         >
-          <QrCode size={15} color={colors.primary} />
-          <Text style={styles.actionPillText}>Scan QR</Text>
+          <View style={styles.actionIconWrap}>
+            <Send size={16} color="#0F294A" />
+          </View>
+          <Text style={styles.actionBtnText}>Transfer</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.actionPill}
+          style={styles.actionBtn}
           onPress={() => setActiveTab('payments')}
-          activeOpacity={0.8}
+          delayPressIn={0}
+          activeOpacity={0.75}
         >
-          <Send size={15} color={colors.primary} />
-          <Text style={styles.actionPillText}>Pay Contact</Text>
+          <View style={styles.actionIconWrap}>
+            <QrCode size={16} color="#0F294A" />
+          </View>
+          <Text style={styles.actionBtnText}>Scan QR</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.actionPill}
-          onPress={() => setActiveTab('payments')}
-          activeOpacity={0.8}
+          style={styles.actionBtn}
+          onPress={() => setActiveTab('activity')}
+          delayPressIn={0}
+          activeOpacity={0.75}
         >
-          <ArrowUpRight size={15} color={colors.primary} />
-          <Text style={styles.actionPillText}>Bank Transfer</Text>
+          <View style={styles.actionIconWrap}>
+            <FileText size={16} color="#0F294A" />
+          </View>
+          <Text style={styles.actionBtnText}>Passbook</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={() => setActiveTab('profile')}
+          delayPressIn={0}
+          activeOpacity={0.75}
+        >
+          <View style={styles.actionIconWrap}>
+            <CreditCard size={16} color="#0F294A" />
+          </View>
+          <Text style={styles.actionBtnText}>Cards</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -103,58 +164,136 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xs,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.md,
   },
-  eyebrowRow: {
+  accountCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    padding: spacing.md + 2,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  cardHeaderRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
-  eyebrowText: {
-    fontSize: 11,
+  accountTypeWrap: {
+    gap: 2,
+  },
+  accountTypeText: {
+    fontSize: 10,
     fontWeight: '700',
-    color: '#8C95A6',
-    letterSpacing: 1.2,
+    color: '#64748B',
+    letterSpacing: 0.8,
+  },
+  accountNumText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0F172A',
+    letterSpacing: 0.2,
   },
   eyeBtn: {
-    padding: 2,
+    padding: 4,
   },
   balanceWrap: {
-    marginVertical: 2,
+    marginVertical: 4,
   },
-  contextSubtext: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#525866',
-    marginTop: 4,
-    letterSpacing: -0.1,
+  balanceLabel: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: '#64748B',
+    letterSpacing: 0.8,
+    marginBottom: 4,
   },
-  actionStrip: {
+  ledgerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginTop: spacing.md + 4,
+    justifyContent: 'space-between',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 8,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
-  actionPill: {
+  ledgerCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  ledgerDivider: {
+    width: 1,
+    height: 22,
+    backgroundColor: '#E2E8F0',
+  },
+  ledgerLabel: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#64748B',
+    letterSpacing: 0.5,
+  },
+  ledgerValue: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginTop: 2,
+  },
+  trustMarkRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 99,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    shadowColor: '#111318',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
-    shadowRadius: 6,
-    elevation: 1,
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
   },
-  actionPillText: {
-    fontSize: 12,
+  trustMarkText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#475569',
+    flex: 1,
+  },
+  actionGrid: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginTop: spacing.md,
+  },
+  actionBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+    gap: 5,
+  },
+  actionIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionBtnText: {
+    fontSize: 11,
     fontWeight: '600',
-    color: '#111318',
+    color: '#0F172A',
   },
 });

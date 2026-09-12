@@ -1,5 +1,5 @@
-﻿Write-Host "====================================================" -ForegroundColor Cyan
-Write-Host "🏛️  Bharat Adaptive Banking - Monorepo Demo Runner" -ForegroundColor Cyan
+Write-Host "====================================================" -ForegroundColor Cyan
+Write-Host "ABC Bank Adaptive Banking - Monorepo Demo Runner" -ForegroundColor Cyan
 Write-Host "====================================================" -ForegroundColor Cyan
 
 Write-Host "`n[1/3] Validating AI Contracts & Scenarios..." -ForegroundColor Yellow

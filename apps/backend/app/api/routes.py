@@ -1,4 +1,6 @@
 import logging
+import time
+from datetime import datetime
 from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel
@@ -344,11 +346,18 @@ def assistant_init(lang: Optional[str] = Query("en")):
 @router.post("/assistant/chat")
 def assistant_chat(req: AssistantChatMessageRequest):
     """
-    Handles interactive user messages from MitraChatScreen and returns structured replies with action chips.
+    Handles interactive user messages from MitraChatScreen and returns structured replies with action chips
+    and auto-navigation instructions for minimal follow-up routing.
     """
     query = req.query.strip()
     lang = req.language or "en"
-    classified = VoiceIntentClassifier.classify(query, lang)
+    pending = req.pending_clarification or (req.conversation_context or {}).get("pending_clarification")
+
+    classified = VoiceIntentClassifier.classify(
+        query,
+        lang=lang,
+        pending_clarification=pending
+    )
     intent = classified.get("intent", "GENERAL_QUERY")
 
     # Delegate to secure intent execution
@@ -361,24 +370,29 @@ def assistant_chat(req: AssistantChatMessageRequest):
         )
     )
 
-    action_chips = []
-    if intent == "PAY_METRO":
-        action_chips.append({"label": "Pay ₹40 Now", "action": "INSTANT_PAY", "payload": {"amount": 40, "merchant": "Delhi Metro Smart Card"}})
-    elif intent == "CHECK_EMI":
-        action_chips.append({"label": "View Schedule", "action": "OPEN_SCREEN", "payload": {"targetScreen": "Activity"}})
-    elif intent == "MEDICAL_CLAIM_HELP":
-        action_chips.append({"label": "Open Claim Desk", "action": "OPEN_JOURNEY", "payload": {"journeyId": "medical_assistance"}})
-    elif intent == "REVIEW_COMMITMENTS":
-        action_chips.append({"label": "Review Plan", "action": "OPEN_JOURNEY", "payload": {"journeyId": "stress_intervention"}})
+    action_chips = list(classified.get("action_chips", []))
+    if not action_chips:
+        if intent == "PAY_METRO":
+            action_chips.append({"label": "Pay ₹40 Now", "action": "INSTANT_PAY", "payload": {"amount": 40, "merchant": "Delhi Metro Smart Card"}})
+        elif intent == "CHECK_EMI":
+            action_chips.append({"label": "View Schedule", "action": "OPEN_SCREEN", "payload": {"targetScreen": "Activity"}})
+        elif intent == "MEDICAL_CLAIM_HELP":
+            action_chips.append({"label": "Open Claim Desk", "action": "OPEN_JOURNEY", "payload": {"journeyId": "medical_assistance"}})
+        elif intent == "REVIEW_COMMITMENTS":
+            action_chips.append({"label": "Review Plan", "action": "OPEN_JOURNEY", "payload": {"journeyId": "stress_intervention"}})
+
+    suggested_prompts = classified.get("suggested_prompts") or ["Debit Card", "Score", "Pay Metro", "Send Money"]
 
     return {
         "success": True,
         "reply": {
-            "id": f"asst_resp_{intent}",
+            "id": f"asst_resp_{intent}_{int(time.time()*1000)}",
             "sender": "assistant",
-            "text": intent_resp.response_text or classified.get("response_text", ""),
-            "timestamp": "2026-09-12T08:00:01Z",
+            "text": classified.get("response_text") or intent_resp.response_text or "How can I assist you with your banking?",
+            "timestamp": datetime.utcnow().isoformat() + "Z",
             "actionChips": action_chips,
-            "suggestedPrompts": ["Check Balance", "What are my upcoming payments?"]
+            "suggestedPrompts": suggested_prompts,
+            "pendingClarification": classified.get("pending_clarification"),
+            "navigation": classified.get("navigation")
         }
     }

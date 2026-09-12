@@ -101,6 +101,11 @@ export const gu: typeof en = {
     send: 'મોકલો',
     suggestedTopics: 'હાલની સ્થિતિ મુજબ સૂચનો',
     disclaimer: 'મિત્ર નૈતિક નિયમો અને સંદર્ભ ડેટા સાથે તમારી સહાય કરે છે.',
+    voiceListening: 'સાંભળી રહ્યો છું...',
+    voiceSpeakNow: 'સાંભળી રહ્યો છું... બોલો (ગુજરાતી, હિન્દી, અથવા અંગ્રેજી)',
+    voiceTapToSpeak: 'બોલવા માટે માઇક દબાવો',
+    voicePillsLabel: 'ઝડપી વૉઇસ અને ટેક્સ્ટ શૉર્ટકટ્સ',
+    navigatingTo: 'પેજ ખોલી રહ્યા છીએ:',
   },
   products: {
     title: 'નાણાકીય ઉત્પાદનો',

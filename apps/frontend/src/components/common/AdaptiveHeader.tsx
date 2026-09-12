@@ -4,18 +4,11 @@ import { colors, typography, spacing, radii } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { motion } from '../../motion';
-import { Bell, Globe, Sparkles, SlidersHorizontal, Bot } from 'lucide-react-native';
+import { Bell, Globe, SlidersHorizontal, ShieldCheck, User } from 'lucide-react-native';
 
 export const AdaptiveHeader: React.FC = () => {
   const { profile, language, setLanguage, openJourney, currentState, setActiveTab } = useCustomerStore();
   const t = getTranslation(language);
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return t.home.greetingMorning;
-    if (hour < 17) return t.home.greetingAfternoon;
-    return t.home.greetingEvening;
-  };
 
   const toggleLanguage = () => {
     motion.gentleLayout();
@@ -41,30 +34,25 @@ export const AdaptiveHeader: React.FC = () => {
           <View style={styles.onlineDot} />
         </View>
         <View style={styles.textWrap}>
-          <Text style={styles.greetingText}>{getGreeting()}</Text>
-          <Text style={styles.nameText}>{profile.name}</Text>
+          <View style={styles.brandRow}>
+            <Text style={styles.bankName}>ABC BANK</Text>
+            <View style={styles.tierPill}>
+              <Text style={styles.tierPillText}>PREMIER</Text>
+            </View>
+          </View>
+          <Text style={styles.accountText}>A/C 5010 •••• 4092 • {profile.name}</Text>
         </View>
       </View>
 
       <View style={styles.rightRow}>
-        {/* Prototype Persona Switcher Shortcut */}
+        {/* Sandbox Simulation Drawer Shortcut */}
         <TouchableOpacity
-          style={styles.protoButton}
+          style={styles.sandboxButton}
           onPress={() => openJourney('prototype_lab')}
           activeOpacity={0.8}
         >
-          <Sparkles size={13} color="#D97706" />
-          <Text style={styles.protoButtonText}>Lab</Text>
-        </TouchableOpacity>
-
-        {/* Ambient Mitra Assistant Trigger */}
-        <TouchableOpacity
-          style={styles.mitraButton}
-          onPress={() => setActiveTab('assistant')}
-          activeOpacity={0.8}
-        >
-          <Bot size={13} color="#4F46E5" />
-          <Text style={styles.mitraButtonText}>Mitra</Text>
+          <SlidersHorizontal size={12} color="#334155" />
+          <Text style={styles.sandboxButtonText}>Sandbox</Text>
         </TouchableOpacity>
 
         {/* Vernacular Language Selector */}
@@ -73,6 +61,7 @@ export const AdaptiveHeader: React.FC = () => {
           onPress={toggleLanguage}
           activeOpacity={0.8}
         >
+          <Globe size={12} color="#0F172A" />
           <Text style={styles.langText}>{getLangLabel()}</Text>
         </TouchableOpacity>
 
@@ -82,7 +71,7 @@ export const AdaptiveHeader: React.FC = () => {
           onPress={() => openJourney('prototype_lab')}
           activeOpacity={0.8}
         >
-          <Bell size={18} color="#0F172A" />
+          <Bell size={17} color="#0F172A" />
           {currentState !== 'normal' && <View style={styles.unreadBadge} />}
         </TouchableOpacity>
       </View>
@@ -130,61 +119,68 @@ const styles = StyleSheet.create({
   textWrap: {
     justifyContent: 'center',
   },
-  greetingText: {
-    fontSize: 12,
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  bankName: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#0F294A',
+    letterSpacing: 0.8,
+  },
+  tierPill: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 5,
+    paddingVertical: 1.5,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  tierPillText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#475569',
+    letterSpacing: 0.5,
+  },
+  accountText: {
+    fontSize: 11,
     fontWeight: '500',
     color: '#64748B',
-  },
-  nameText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#0F172A',
-    letterSpacing: -0.3,
+    marginTop: 2,
   },
   rightRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 7,
   },
-  protoButton: {
+  sandboxButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFBEB',
+    backgroundColor: '#F8FAFC',
     paddingHorizontal: 9,
-    paddingVertical: 5,
-    borderRadius: 99,
-    gap: 4,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 5,
     borderWidth: 1,
-    borderColor: '#FDE68A',
+    borderColor: '#E2E8F0',
   },
-  protoButtonText: {
+  sandboxButtonText: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#B45309',
-  },
-  mitraButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EEF2FF',
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    borderRadius: 99,
-    gap: 4,
-    borderWidth: 1,
-    borderColor: '#C7D2FE',
-  },
-  mitraButtonText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#4338CA',
+    fontWeight: '600',
+    color: '#334155',
   },
   langButton: {
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    borderRadius: 99,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 8,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E2E8F0',
+    gap: 4,
   },
   langText: {
     fontSize: 11,

@@ -1,0 +1,49 @@
+{
+  "name": "medical_emergency",
+  "title": "Major Medical Surge",
+  "customer_id": "cust_bharat_001",
+  "customer_name": "Rahul Sharma",
+  "balance": {
+    "available": 24800,
+    "savings": 142000,
+    "currency": "INR"
+  },
+  "signals": {
+    "medical_event_detected": true,
+    "medical_amount": 48200,
+    "hospital": "Max Super Speciality Hospital",
+    "anomaly_score": 14,
+    "recurring_expense_change": "high",
+    "transport_change": "medium"
+  },
+  "transactions": [
+    {
+      "id": "tx_med_01",
+      "amount": 48200.0,
+      "type": "debit",
+      "category": "healthcare",
+      "merchant": "Max Super Speciality Hospital Delhi",
+      "timestamp": "2026-09-11T14:30:00+05:30",
+      "is_recurring": false
+    },
+    {
+      "id": "tx_med_02",
+      "amount": 3200.0,
+      "type": "debit",
+      "category": "healthcare",
+      "merchant": "Apollo Pharmacy IP Extension",
+      "timestamp": "2026-09-11T17:45:00+05:30",
+      "is_recurring": false
+    },
+    {
+      "id": "tx_med_03",
+      "amount": 75000.0,
+      "type": "credit",
+      "category": "salary",
+      "merchant": "Infosys Tech Salary",
+      "timestamp": "2026-09-01T09:00:00+05:30",
+      "is_recurring": true,
+      "frequency": "monthly"
+    }
+  ]
+}

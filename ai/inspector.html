@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABC Bank - Bharat Hyper-Personalization Live Inspector</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --surface: #0f172a;
+      --surface-card: #141f36;
+      --surface-border: #1e293b;
+      --surface-border-active: #334155;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --primary-light: #60a5fa;
+      --primary-glow: rgba(59, 130, 246, 0.25);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #a855f7;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: 1440px; margin: 0 auto; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--surface-border);
+      margin-bottom: 24px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo {
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px; color: #fff;
+      box-shadow: 0 4px 14px var(--primary-glow);
+      letter-spacing: 0.05em;
+    }
+    .brand h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+    .brand p { font-size: 13px; color: var(--text-muted); }
+
+    .compliance-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      font-size: 11px; font-weight: 600;
+      padding: 5px 12px; border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      display: inline-flex; align-items: center; gap: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge.rbi {
+      background: rgba(59, 130, 246, 0.12);
+      color: var(--primary-light);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    .badge.cadence {
+      background: rgba(168, 85, 247, 0.12);
+      color: #c084fc;
+      border-color: rgba(168, 85, 247, 0.3);
+    }
+    .badge.math {
+      background: rgba(245, 158, 11, 0.12);
+      color: #fcd34d;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    /* Privacy Banner */
+    .privacy-notice {
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--primary-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      line-height: 1.5;
+    }
+    .privacy-notice strong { color: #fff; }
+
+    /* Controls Bar */
+    .controls-panel {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      padding: 16px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .selector-group { display: flex; align-items: center; gap: 10px; }
+    label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+    select, button {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    select:focus, button:focus { outline: 2px solid var(--primary); }
+    button:hover { background: #334155; }
+    button.btn-shock {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    button.btn-shock:hover { background: rgba(239, 68, 68, 0.25); }
+    button.btn-reset {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.4);
+      color: var(--primary-light);
+    }
+    button.btn-reset:hover { background: rgba(59, 130, 246, 0.25); }
+
+    /* Grid Layout */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 410px 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Persona Profile */
+    .persona-header { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+    .persona-avatar {
+      width: 48px; height: 48px; border-radius: 10px;
+      background: #1e293b; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; color: var(--primary-light);
+      border: 1px solid var(--surface-border-active);
+    }
+    .persona-name { font-size: 17px; font-weight: 700; }
+    .persona-tier { font-size: 12px; color: var(--primary-light); font-weight: 500; }
+    .stat-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px dashed #1e293b; }
+    .stat-label { color: var(--text-muted); }
+    .stat-val { font-weight: 600; }
+
+    /* Safe-to-Spend Dial */
+    .dial-box {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(16, 185, 129, 0.12));
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 16px;
+    }
+    .dial-title { font-size: 11px; font-weight: 700; color: var(--primary-light); text-transform: uppercase; letter-spacing: 0.05em; }
+    .dial-amount { font-size: 28px; font-weight: 800; color: #fff; margin: 4px 0; }
+    .dial-sub { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+    /* Statistical Confidence Meter */
+    .meter-box {
+      text-align: center;
+      padding: 16px;
+      background: #090f1d;
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      margin-top: 16px;
+    }
+    .meter-number { font-size: 36px; font-weight: 800; color: var(--success); }
+    .meter-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Internal Spend Intelligence */
+    .spend-intel-header {
+      background: rgba(148, 163, 184, 0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      border-left: 3px solid var(--primary);
+    }
+
+    .spend-bar-container {
+      margin-top: 10px;
+      background: #090f1d;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 12px;
+      display: flex;
+    }
+    .spend-segment {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    .segment-needs { background: #3b82f6; }
+    .segment-wants { background: #f59e0b; }
+    .segment-savings { background: #10b981; }
+
+    .spend-legend {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .category-card {
+      background: #090f1d;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cat-name { font-size: 11px; color: var(--text-muted); }
+    .cat-amount { font-size: 12px; font-weight: 700; color: #fff; }
+
+    .service-mapping-box {
+      margin-top: 14px;
+      background: #090f1d;
+      border: 1px dashed var(--surface-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .mapping-title { font-weight: 700; color: var(--primary-light); margin-bottom: 4px; text-transform: uppercase; font-size: 10px; }
+
+    /* Dual Cadence Architecture Lab */
+    .cadence-box {
+      background: #090f1d;
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+    .cadence-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .cadence-col {
+      background: #141f36;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .cadence-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+    .cadence-timing { font-size: 17px; font-weight: 800; color: var(--primary-light); margin: 4px 0; }
+    .cadence-detail { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+
+    .micro-triggers {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .btn-trigger {
+      font-size: 11px;
+      padding: 6px 12px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-trigger:hover {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+    .trigger-result {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      font-size: 12px;
+      color: #6ee7b7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Alert Banners */
+    .banner {
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .banner-danger {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+    }
+    .banner-success {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+
+    /* Recommendations Feed */
+    .rec-item {
+      background: #090f1d;
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s ease;
+    }
+    .rec-item:hover { border-color: var(--primary); transform: translateY(-1px); }
+    .rec-rank {
+      font-size: 18px; font-weight: 800; color: var(--primary-light);
+      margin-right: 16px; min-width: 24px;
+    }
+    .rec-info { flex: 1; }
+    .rec-title { font-size: 14px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .rec-category { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #1e293b; color: var(--text-muted); text-transform: uppercase; }
+    .rec-reason { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .rec-score-box { text-align: right; min-width: 90px; }
+    .rec-score { font-size: 20px; font-weight: 800; color: var(--primary-light); }
+    .rec-score-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+
+    /* Customer Explanation Cards */
+    .expl-card {
+      background: #090f1d;
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+    .expl-title { font-size: 13px; font-weight: 700; color: #fff; display: flex; justify-content: space-between; }
+    .expl-body { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
+    .expl-cf { font-size: 11px; color: var(--primary-light); margin-top: 6px; font-style: italic; }
+
+    /* Cryptographic Proof Block */
+    .crypto-block {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: #050811;
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 11px;
+      margin-top: 8px;
+      color: #94a3b8;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .hash-val { color: var(--success); font-weight: 600; }
+    .hash-val.tampered { color: var(--danger); }
+
+    @media (max-width: 1080px) {
+      .grid-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="brand-logo">ABC</div>
+        <div>
+          <h1>Adaptive Banking for Bharat - Hyper-Personalization Inspector</h1>
+          <p>Deterministic Mathematical Ranking • RBI Fair Practice Caps • DPDP Purpose Scope • Dual-Cadence 14-Day/0.16ms Engine</p>
+        </div>
+      </div>
+      <div class="compliance-badges">
+        <span class="badge math">Deterministic Math (No SLM)</span>
+        <span class="badge rbi">RBI DL 2022 (DTI &le; 0.40)</span>
+        <span class="badge">DPDP Act 2023 Purpose-Bound</span>
+        <span class="badge cadence">14-Day Heavy / 0.16ms Micro</span>
+        <span class="badge">SHA-256 Tamper-Proof Chain</span>
+      </div>
+    </header>
+
+    <!-- Privacy & Respect Mandate Notice -->
+    <div class="privacy-notice">
+      <div>
+        <strong>Customer Privacy & Dignity Invariant:</strong>
+        Granular spend telemetry (stocks, entertainment, dining, healthcare) is strictly processed as <em>internal feature intelligence</em> to deliver better, personalized services. It is <strong>never displayed as an invasive surveillance dashboard to the customer</strong>.
+      </div>
+      <span class="badge" style="background:#2563eb20; color:#60a5fa; border-color:#2563eb40;">Internal Model Telemetry</span>
+    </div>
+
+    <!-- Interactive Simulation Controls -->
+    <div class="controls-panel">
+      <div class="selector-group">
+        <label for="archetype-select">Bharat Archetype:</label>
+        <select id="archetype-select" onchange="switchArchetype(this.value)">
+          <option value="urban_commuter">Rahul Sharma (Corporate Salaried - Tier 1 Metro)</option>
+          <option value="msme_merchant">Vikram Merchant (Textile Trader - Tier 2 Surat)</option>
+          <option value="gig_worker">Amit Kumar (Delivery Partner - Tier 2/3 Jaipur)</option>
+          <option value="rural_farmer">Kavita Patel (Dairy / Agri Producer - Tier 4 Anand)</option>
+          <option value="student_first_earner">Priya Verma (CS Intern / Gen-Z - Tier 2 Pune)</option>
+          <option value="senior_pensioner">Rameshwar Joshi (Retired Principal - Tier 3 Indore)</option>
+          <option value="homemaker_shg">Sunita Devi (SHG Micro-Treasurer - Tier 4 Madhubani)</option>
+        </select>
+      </div>
+
+      <div class="selector-group">
+        <label>Inject Scenario Shock:</label>
+        <button class="btn-shock" onclick="injectShock('financial_stress')">Debt Overload (DTI 0.58)</button>
+        <button class="btn-shock" onclick="injectShock('medical_emergency')">Medical Emergency</button>
+        <button class="btn-reset" onclick="resetBaseline()">Reset Baseline</button>
+      </div>
+
+      <div class="selector-group">
+        <label for="consent-select">DPDP Consent Scope:</label>
+        <select id="consent-select" onchange="switchConsent(this.value)">
+          <option value="full">Full Purpose Consent (All Active)</option>
+          <option value="limited">Transit & Utilities Only (Wealth Suppressed)</option>
+          <option value="withdrawn">Consent Withdrawn (Strict General Banking)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="grid-layout">
+      <!-- Left Column: Customer Profile, Internal Spend Telemetry & Factor Weights -->
+      <aside>
+        <!-- Profile Card -->
+        <div class="card">
+          <div class="card-title">
+            <span>Customer Profile</span>
+            <span id="persona-badge" class="badge">Tier 1</span>
+          </div>
+          <div class="persona-header">
+            <div class="persona-avatar" id="persona-avatar">RS</div>
+            <div>
+              <div class="persona-name" id="persona-name">Rahul Sharma</div>
+              <div class="persona-tier" id="persona-role">Corporate Salaried Professional</div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Monthly Income:</span>
+            <span class="stat-val" id="stat-income">₹85,000</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Available Balance:</span>
+            <span class="stat-val" id="stat-balance">₹42,680</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Debt-to-Income (DTI):</span>
+            <span class="stat-val" id="stat-dti">0.22 (Healthy)</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">CIBIL Bureau Score:</span>
+            <span class="stat-val" id="stat-cibil">780</span>
+          </div>
+
+          <!-- Safe-to-Spend Dial (Empowering Customer Facing Metric) -->
+          <div class="dial-box">
+            <div class="dial-title">Safe-to-Spend Today (Customer View)</div>
+            <div class="dial-amount" id="dial-safe-amount">₹22,151</div>
+            <div class="dial-sub" id="dial-safe-sub">After budgeting ₹18,599 for 15-day EMIs & bills</div>
+          </div>
+
+          <!-- Statistical Confidence Meter -->
+          <div class="meter-box">
+            <div class="meter-number" id="meter-confidence">0.925</div>
+            <div class="meter-label">Statistical Confidence Score (CS &in; [0.50, 0.99])</div>
+          </div>
+        </div>
+
+        <!-- Internal Category Spend Telemetry (Bank-Side Intelligence) -->
+        <div class="card">
+          <div class="card-title">
+            <span>Internal Spend Telemetry (Bank Model View)</span>
+            <span id="budget-status-badge" class="badge">Balanced</span>
+          </div>
+
+          <div class="spend-intel-header">
+            <strong>Internal Intelligence Purpose:</strong> This velocity vector is analyzed behind the scenes to size liquid surplus, forecast cash-flows, and trigger relevant services. <em>It is withheld from the customer's UI to preserve user dignity and privacy.</em>
+          </div>
+
+          <!-- 3-Segment Stacked Progress Bar -->
+          <div class="spend-bar-container">
+            <div class="spend-segment segment-needs" id="bar-needs" style="width: 48%;"></div>
+            <div class="spend-segment segment-wants" id="bar-wants" style="width: 26%;"></div>
+            <div class="spend-segment segment-savings" id="bar-savings" style="width: 26%;"></div>
+          </div>
+
+          <div class="spend-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div><span id="lbl-needs">Needs: 48% (Target 50%)</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#f59e0b;"></div><span id="lbl-wants">Wants: 26% (Target 30%)</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div><span id="lbl-savings">Savings: 26% (Target 20%)</span></div>
+          </div>
+
+          <!-- 8 Categorical Telemetry Cards (Model Feature Signals) -->
+          <div class="category-grid" id="categories-container">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div class="service-mapping-box" id="service-mapping-box">
+            <div class="mapping-title">Service Translation Pipeline:</div>
+            <div id="mapping-content">High investment velocity (₹22k/mo) maps to Smart Auto-Sweep FD and 80C Tax-Saver services.</div>
+          </div>
+        </div>
+
+        <!-- Multi-Factor Radar Weights -->
+        <div class="card">
+          <div class="card-title">Multi-Factor Scoring Weights (Deterministic)</div>
+          <div class="stat-row"><span class="stat-label">Affordability Fit (30%):</span><span class="stat-val" id="w-afford">0.94</span></div>
+          <div class="stat-row"><span class="stat-label">Lifecycle Need (30%):</span><span class="stat-val" id="w-need">0.88</span></div>
+          <div class="stat-row"><span class="stat-label">Temporal Urgency (25%):</span><span class="stat-val" id="w-urgency">0.95</span></div>
+          <div class="stat-row"><span class="stat-label">Archetype Affinity (15%):</span><span class="stat-val" id="w-affinity">1.00</span></div>
+          <div class="stat-row"><span class="stat-label">Risk & Volatility Penalty (R):</span><span class="stat-val" id="w-risk">0.05</span></div>
+        </div>
+      </aside>
+
+      <!-- Right Column: Personalization Feed, Explanations, Dual Cadence & Audit Ledger -->
+      <main>
+        <!-- Regulatory Status Banner -->
+        <div id="status-banner" class="banner banner-success">
+          <div style="font-weight: 800; font-size: 16px;">[SHIELD]</div>
+          <div>
+            <strong>RBI & DPDP Guardrails Active:</strong>
+            <span id="banner-text">Fair Lending Suitability passed. Purpose consent scopes verified for all surfaced products.</span>
+          </div>
+        </div>
+
+        <!-- Top 1 to 5 Ranked Recommendations (What the Customer Actually Sees) -->
+        <div class="card">
+          <div class="card-title">
+            <span>Customer-Facing Actionable Services (Top 1-to-5)</span>
+            <span style="font-size: 11px; color: var(--text-muted);">Calibrated Multi-Factor Index</span>
+          </div>
+          <div id="recommendations-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Plain-Language Customer Explanations & Counterfactual Cards -->
+        <div class="card">
+          <div class="card-title">
+            <span>Regulatory Explanations & Counterfactual Cards</span>
+            <span class="badge rbi">RBI DL 2022 Sec 4 Non-Repudiation</span>
+          </div>
+          <div id="explanations-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Dual-Cadence Tiered Architecture Lab -->
+        <div class="card">
+          <div class="card-title">
+            <span>Dual-Cadence Architecture Lab (95.4% Cost Reduction)</span>
+            <span class="badge cadence">Sub-Millisecond Micro-Interception</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            ABC Bank separates massive 10,000-transaction batching (every 14 days) from high-frequency real-time event triggers (bills, FASTag, CIBIL refresh).
+          </p>
+
+          <div class="cadence-comparison">
+            <div class="cadence-col">
+              <div class="cadence-title">Tier 1: 14-Day Heavy Batch</div>
+              <div class="cadence-timing">52.1 ms / 10k Txns</div>
+              <div class="cadence-detail">Runs full clustering, behavioral baseline, multi-factor weighting, and profile caches once a fortnight.</div>
+            </div>
+            <div class="cadence-col" style="border-color: rgba(16, 185, 129, 0.4);">
+              <div class="cadence-title" style="color: var(--success);">Tier 2: Real-Time Micro-Trigger</div>
+              <div class="cadence-timing" style="color: var(--success);">0.162 ms (Sub-ms)</div>
+              <div class="cadence-detail">Intercepts live bill webhooks, low balance thresholds, and CIBIL unlocks with <strong>95.4% CPU compute savings</strong>.</div>
+            </div>
+          </div>
+
+          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 8px;">Simulate Real-Time Micro-Event Ingestion:</div>
+          <div class="micro-triggers">
+            <button class="btn-trigger" onclick="fireMicroTrigger('electricity')">Electricity Bill Due (₹1,450)</button>
+            <button class="btn-trigger" onclick="fireMicroTrigger('fastag')">FASTag Low Balance (&lt; ₹150)</button>
+            <button class="btn-trigger" onclick="fireMicroTrigger('recharge')">Mobile Validity &lt; 48h</button>
+            <button class="btn-trigger" onclick="fireMicroTrigger('cibil')">CIBIL 30-Day Refresh Ready</button>
+          </div>
+
+          <div id="micro-trigger-status"></div>
+        </div>
+
+        <!-- Cryptographic Decision Proof Chain -->
+        <div class="card">
+          <div class="card-title">
+            <span>Immutable Cryptographic Audit Ledger</span>
+            <button onclick="toggleTamperSimulation()" style="font-size: 11px; padding: 4px 8px;">Simulate Tamper</button>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+            Every decision is cryptographically locked in a linked SHA-256 chain (Genesis &rarr; Block 1 &rarr; Block 2). Non-repudiation guaranteed for regulatory inspection.
+          </p>
+          <div class="crypto-block" id="crypto-proof">
+            <!-- Dynamically updated -->
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const ARCHETYPES = {
+      urban_commuter: {
+        name: "Rahul Sharma",
+        role: "Corporate Salaried Professional",
+        avatar: "RS",
+        tier: "Tier 1 Metro (Bengaluru)",
+        income: "₹85,000",
+        balance: "₹42,680",
+        dti: "0.22 (Healthy)",
+        cibil: 780,
+        safeAmount: "₹22,151",
+        safeSub: "After budgeting ₹18,599 for 15-day EMIs & bills",
+        confidence: "0.925",
+        metrics: { afford: "0.94", need: "0.88", urgency: "0.95", affinity: "1.00", risk: "0.05" },
+        spend: {
+          needsPct: 48, wantsPct: 26, savingsPct: 26,
+          categories: [
+            { name: "Food & Dining", amt: "₹8,450" },
+            { name: "Stocks & MFs", amt: "₹22,000" },
+            { name: "Groceries", amt: "₹7,200" },
+            { name: "Entertainment", amt: "₹4,100" },
+            { name: "Transit / Metro", amt: "₹6,500" },
+            { name: "Healthcare", amt: "₹2,200" },
+            { name: "Utilities", amt: "₹3,150" },
+            { name: "Home Loan EMI", amt: "₹18,500" }
+          ],
+          serviceMapping: "High investment outflow (₹22,000/mo) detected. Triggers 7.85% Smart FD auto-sweep and Section 80C tax optimization without exposing raw spend to customer."
+        },
+        recs: [
+          { rank: 1, id: "rec_commute_metro", title: "Morning Metro Quick Pay", cat: "transport", reason: "Frictionless 1-tap transit payment matched to daily commute schedule.", score: 87 },
+          { rank: 2, id: "rec_smart_savings", title: "Smart Auto-Sweep to 7.85% FD", cat: "savings", reason: "Liquid balance exceeds monthly needs by ₹22,000+.", score: 74 },
+          { rank: 3, id: "srv_form15g_h", title: "Form 15G / 15H Zero-Tax Submission", cat: "tax_compliance", reason: "Prevent 10% TDS deduction ahead of upcoming fiscal deadline.", score: 69 },
+          { rank: 4, id: "rec_personal_loan", title: "Pre-Approved Prime Personal Loan", cat: "credit", reason: "High bureau score (780) and low DTI (0.22).", score: 57 }
+        ],
+        explanations: [
+          { title: "Why Metro Quick Pay was surfaced (#1):", desc: "Detected daily DMRC tap-in routine at 08:30 AM. 1-tap UPI payment reduces commute friction.", cf: "Always active during morning transit hours." },
+          { title: "Personal Loan Status (Approved):", desc: "Meets RBI Digital Lending 2022 rules. DTI is 0.22 (well below 0.40 cap) and credit score is 780.", cf: "Pre-approved credit line available with 3-day statutory cooling-off period." }
+        ]
+      },
+      msme_merchant: {
+        name: "Vikram Merchant",
+        role: "Textile Wholesaler & Trader",
+        avatar: "VM",
+        tier: "Tier 2 Commercial (Surat)",
+        income: "₹1,45,000",
+        balance: "₹92,300",
+        dti: "0.28 (Controlled)",
+        cibil: 755,
+        safeAmount: "₹48,200",
+        safeSub: "After reserving ₹44,100 for vendor drafts & GST",
+        confidence: "0.910",
+        metrics: { afford: "0.91", need: "0.85", urgency: "0.82", affinity: "0.95", risk: "0.08" },
+        spend: {
+          needsPct: 56, wantsPct: 18, savingsPct: 26,
+          categories: [
+            { name: "Inventory Goods", amt: "₹52,000" },
+            { name: "Factory Power", amt: "₹14,500" },
+            { name: "Gold / FDs", amt: "₹38,000" },
+            { name: "Household", amt: "₹12,000" },
+            { name: "Logistics Fuel", amt: "₹8,400" },
+            { name: "Client Dinners", amt: "₹6,100" },
+            { name: "Machinery Term Loan", amt: "₹16,000" },
+            { name: "Family Health", amt: "₹3,500" }
+          ],
+          serviceMapping: "High inventory debits and commercial power bills trigger 1-click GST challan settlement and invoice discounting to maintain liquid working capital."
+        },
+        recs: [
+          { rank: 1, id: "srv_gst_challan", title: "1-Click GST Challan PMT-06 Settlement", cat: "tax_compliance", reason: "Due on the 20th. Instant clearance prevents 18% p.a. interest penalty.", score: 91 },
+          { rank: 2, id: "rec_invoice_discounting", title: "Instant MSME Invoice Discounting", cat: "working_capital", reason: "Unlock working capital from 3 verified buyer invoices pending 45 days.", score: 83 },
+          { rank: 3, id: "rec_pos_soundbox", title: "Bharat Soundbox & QR Audio Box", cat: "merchant_pos", reason: "Zero rental audio confirmation for retail counter transactions.", score: 76 }
+        ],
+        explanations: [
+          { title: "Why GST Challan was surfaced (#1):", desc: "Upcoming monthly GST deadline detected via BBPS. Instant settlement avoids statutory late fees.", cf: "Will dismiss automatically once payment is verified on Core Banking." },
+          { title: "Invoice Discounting Suitability:", desc: "Surfaced based on ₹52k pending buyer receivables and verified GST filing record.", cf: "Enables immediate cash flow without taking long-term debt." }
+        ]
+      },
+      gig_worker: {
+        name: "Amit Kumar",
+        role: "Delivery Partner (Swiggy / Blinkit)",
+        avatar: "AK",
+        tier: "Tier 2/3 (Jaipur)",
+        income: "₹28,500",
+        balance: "₹4,120",
+        dti: "0.32 (Moderate)",
+        cibil: 690,
+        safeAmount: "₹850",
+        safeSub: "After reserving ₹2,400 bike EMI on 15th",
+        confidence: "0.865",
+        metrics: { afford: "0.65", need: "0.92", urgency: "0.95", affinity: "0.95", risk: "0.15" },
+        spend: {
+          needsPct: 62, wantsPct: 31, savingsPct: 7,
+          categories: [
+            { name: "Petrol / Bike Fuel", amt: "₹6,800" },
+            { name: "Shift Meals & Tea", amt: "₹4,200" },
+            { name: "Home Kirana", amt: "₹6,500" },
+            { name: "Mobile 5G Data", amt: "₹749" },
+            { name: "Two-Wheeler EMI", amt: "₹2,400" },
+            { name: "Medicine", amt: "₹950" },
+            { name: "Mobile Gaming/OTT", amt: "₹899" },
+            { name: "Chit / Micro-SIP", amt: "₹500" }
+          ],
+          serviceMapping: "High road fuel debits trigger sachet on-duty accident protection. Mobile data usage triggers 48h validity expiry shield to prevent delivery downtime."
+        },
+        recs: [
+          { rank: 1, id: "rec_sachet_insurance", title: "₹10/Day On-Duty Accident & Health Cover", cat: "insurance", reason: "Zero-deductible hospital cash for delivery riders on active shifts.", score: 94 },
+          { rank: 2, id: "srv_mobile_recharge", title: "28-Day 5G Data Pack Validity Shield", cat: "utilities", reason: "Delivery partner connectivity pack expires in 48 hours.", score: 84 },
+          { rank: 3, id: "rec_credit_builder", title: "Credit Builder Secured Micro-Card", cat: "credit_health", reason: "Builds CIBIL score from 690 toward prime 750 tier with zero annual fee.", score: 71 }
+        ],
+        explanations: [
+          { title: "Why On-Duty Accident Cover was surfaced (#1):", desc: "High fuel debits and shift patterns indicate road exposure. ₹10/day sachet cover protects daily earnings.", cf: "Can be activated or paused per shift." },
+          { title: "Credit Builder Suitability:", desc: "Bureau score 690 is near prime threshold (700+). Secured card builds tradeline history with zero rejection risk.", cf: "Counterfactual: 6 months of on-time payments lifts score to 730+." }
+        ]
+      },
+      rural_farmer: {
+        name: "Kavita Patel",
+        role: "Dairy Producer & Agri Farmer",
+        avatar: "KP",
+        tier: "Tier 4 Rural (Anand, Gujarat)",
+        income: "₹38,000",
+        balance: "₹18,200",
+        dti: "0.18 (Low Debt)",
+        cibil: 720,
+        safeAmount: "₹12,400",
+        safeSub: "After reserving ₹4,500 for cattle feed & Kharif seeds",
+        confidence: "0.880",
+        metrics: { afford: "0.82", need: "0.95", urgency: "0.85", affinity: "1.00", risk: "0.10" },
+        spend: {
+          needsPct: 68, wantsPct: 12, savingsPct: 20,
+          categories: [
+            { name: "Cattle Feed & Seeds", amt: "₹12,500" },
+            { name: "Tractor Diesel", amt: "₹4,200" },
+            { name: "Monthly Kirana", amt: "₹6,800" },
+            { name: "Irrigation Pump Power", amt: "₹1,800" },
+            { name: "Veterinary Care", amt: "₹1,400" },
+            { name: "Dairy Co-op Savings", amt: "₹5,000" },
+            { name: "Mobile Top-up", amt: "₹249" },
+            { name: "Village Festival", amt: "₹1,200" }
+          ],
+          serviceMapping: "Pre-sowing input debits trigger subsidized 4% Kisan Credit Card enhancement. Rural risk profile triggers PMJJBY sovereign insurance renewal."
+        },
+        recs: [
+          { rank: 1, id: "rec_kcc_topup", title: "Kisan Credit Card (KCC) Season Top-up", cat: "agri_credit", reason: "4% interest subvention available for pre-sowing Kharif crop inputs.", score: 92 },
+          { rank: 2, id: "srv_pmjjby_pmsby", title: "PMJJBY & PMSBY Annual Renewal Shield", cat: "social_security", reason: "₹456 annual auto-renewal guarantees ₹4 Lakh sovereign life & disability cover.", score: 86 },
+          { rank: 3, id: "srv_dbt_tracker", title: "PM-KISAN ₹2,000 DBT Credit Tracker", cat: "government_dbt", reason: "Direct benefit transfer scheduled to credit within 7 banking days.", score: 78 }
+        ],
+        explanations: [
+          { title: "Why KCC Top-up was surfaced (#1):", desc: "Pre-sowing Kharif season detected. Subsidized 4% credit line matched to verified land parcel records.", cf: "Interest subvention active under Government of India agri lending policy." },
+          { title: "PMJJBY/PMSBY Auto-Renewal:", desc: "Guarantees continuous ₹4 Lakh social security coverage for ₹456 annual debit before May 31.", cf: "Direct debit authorized under sovereign insurance mandate." }
+        ]
+      },
+      student_first_earner: {
+        name: "Priya Verma",
+        role: "CS Student & Paid Technical Intern",
+        avatar: "PV",
+        tier: "Tier 2 College Town (Pune)",
+        income: "₹22,000",
+        balance: "₹6,400",
+        dti: "0.08 (Minimal Debt)",
+        cibil: 710,
+        safeAmount: "₹3,200",
+        safeSub: "After reserving ₹2,200 for campus canteen & metro pass",
+        confidence: "0.890",
+        metrics: { afford: "0.78", need: "0.86", urgency: "0.80", affinity: "0.95", risk: "0.10" },
+        spend: {
+          needsPct: 44, wantsPct: 38, savingsPct: 18,
+          categories: [
+            { name: "Campus Cafes & Zomato", amt: "₹4,800" },
+            { name: "Spotify & Netflix", amt: "₹799" },
+            { name: "Metro Student Pass", amt: "₹1,200" },
+            { name: "Tech Certifications", amt: "₹2,500" },
+            { name: "Fast Fashion / Myntra", amt: "₹3,400" },
+            { name: "₹500 Index Fund Micro-SIP", amt: "₹2,000" },
+            { name: "Hostel Supplies", amt: "₹1,800" },
+            { name: "5G Unlimited Pack", amt: "₹399" }
+          ],
+          serviceMapping: "Frequent micro UPI transactions trigger auto spare change round-ups into 24K gold, instilling savings discipline without intrusive budget lecturing."
+        },
+        recs: [
+          { rank: 1, id: "rec_roundup_savings", title: "UPI Spare Change Auto-Round-Up into Digital Gold", cat: "micro_savings", reason: "Rounds up daily UPI payments to the nearest ₹10 and saves into 24K gold.", score: 89 },
+          { rank: 2, id: "rec_student_forex", title: "Zero-Forex Student Global Debit Card", cat: "cards", reason: "Zero markup on international cloud lab subscriptions (AWS/GitHub).", score: 81 },
+          { rank: 3, id: "srv_cibil_refresh", title: "Free 30-Day CIBIL Score Refresh", cat: "credit_health", reason: "Score updated to 710! Track score milestones for future education loan.", score: 75 }
+        ],
+        explanations: [
+          { title: "Why UPI Round-up was surfaced (#1):", desc: "Frequent small-ticket UPI transactions detected. Auto-saving spare change builds a disciplined habit without budget pain.", cf: "Rounds up to ₹10 on every transaction." },
+          { title: "Zero-Forex Debit Card:", desc: "International developer tool subscriptions identified. Saves 3.5% markup fee on foreign exchange.", cf: "No credit risk or annual fee." }
+        ]
+      },
+      senior_pensioner: {
+        name: "Rameshwar Joshi",
+        role: "Retired School Principal",
+        avatar: "RJ",
+        tier: "Tier 3 City (Indore)",
+        income: "₹46,000",
+        balance: "₹68,400",
+        dti: "0.00 (Zero Debt)",
+        cibil: 810,
+        safeAmount: "₹45,000",
+        safeSub: "After reserving ₹12,000 for medicine & utility bills",
+        confidence: "0.950",
+        metrics: { afford: "0.98", need: "0.92", urgency: "0.90", affinity: "1.00", risk: "0.02" },
+        spend: {
+          needsPct: 52, wantsPct: 8, savingsPct: 40,
+          categories: [
+            { name: "Pharmacy & Diagnostics", amt: "₹9,200" },
+            { name: "Groceries & Milk", amt: "₹8,500" },
+            { name: "Electricity & Gas", amt: "₹3,400" },
+            { name: "Senior Citizen FD 8.25%", amt: "₹18,000" },
+            { name: "Temple Trust Donation", amt: "₹2,100" },
+            { name: "Landline & Mobile", amt: "₹850" },
+            { name: "Grandchildren Gifts", amt: "₹1,500" },
+            { name: "Newspapers & Books", amt: "₹450" }
+          ],
+          serviceMapping: "Regular diagnostic debits trigger doorstep banking and annual digital life certificate assistance to prevent branch queueing."
+        },
+        recs: [
+          { rank: 1, id: "srv_life_certificate", title: "Jeevan Pramaan Video Digital Life Certificate", cat: "pension_compliance", reason: "Annual submission window open. Avoid visiting branch to keep pension continuous.", score: 96 },
+          { rank: 2, id: "rec_senior_fd", title: "Senior Citizen Special 8.25% Sovereign FD", cat: "safe_yield", reason: "Guaranteed DICGC insured returns with monthly pension interest payout.", score: 88 },
+          { rank: 3, id: "srv_doorstep_banking", title: "Free Doorstep Cash Delivery & Cheque Pickup", cat: "assisted_banking", reason: "Senior citizen priority service available at your home address.", score: 82 }
+        ],
+        explanations: [
+          { title: "Why Digital Life Certificate is #1:", desc: "Mandatory annual submission for uninterrupted pension credit. Eliminates need to travel to branch.", cf: "Submits facial biometric via Jeevan Pramaan portal." },
+          { title: "Senior FD Suitability:", desc: "Conservative investor profile with low risk appetite. Extra 0.50% interest over standard rate.", cf: "Principal 100% insured under DICGC." }
+        ]
+      },
+      homemaker_shg: {
+        name: "Sunita Devi",
+        role: "SHG Micro-Treasurer & Homemaker",
+        avatar: "SD",
+        tier: "Tier 4 Rural (Madhubani, Bihar)",
+        income: "₹24,000",
+        balance: "₹8,900",
+        dti: "0.14 (Very Low)",
+        cibil: 705,
+        safeAmount: "₹4,800",
+        safeSub: "After reserving ₹2,000 for SHG monthly group saving",
+        confidence: "0.875",
+        metrics: { afford: "0.75", need: "0.94", urgency: "0.88", affinity: "0.98", risk: "0.10" },
+        spend: {
+          needsPct: 65, wantsPct: 10, savingsPct: 25,
+          categories: [
+            { name: "Family Ration & Kirana", amt: "₹10,500" },
+            { name: "SHG Group Micro-Savings", amt: "₹2,500" },
+            { name: "Children School Fees", amt: "₹3,200" },
+            { name: "Family Health", amt: "₹1,800" },
+            { name: "LPG Gas Cylinder", amt: "₹950" },
+            { name: "Vegetable Seeds", amt: "₹650" },
+            { name: "Feature Phone Top-up", amt: "₹199" },
+            { name: "Handicraft Thread / Craft", amt: "₹850" }
+          ],
+          serviceMapping: "Micro craft input debits trigger subsidized SHG group livelihood working credit and Sukanya Samriddhi account for daughter higher education."
+        },
+        recs: [
+          { rank: 1, id: "rec_shg_livelihood", title: "SHG Livelihood Low-Interest Working Credit", cat: "group_lending", reason: "Subsidized 7% group credit for procurement of raw weaving materials.", score: 93 },
+          { rank: 2, id: "srv_sukanya_samriddhi", title: "Sukanya Samriddhi 8.2% Daughter Education Account", cat: "government_savings", reason: "Tax-free sovereign scheme securing girl child higher education.", score: 85 },
+          { rank: 3, id: "rec_recurring_deposit", title: "₹500/Month Gullak Micro-Recurring Deposit", cat: "micro_savings", reason: "Builds a safe financial cushion for family emergencies.", score: 79 }
+        ],
+        explanations: [
+          { title: "Why SHG Livelihood Credit is #1:", desc: "Matches verified SHG group membership and regular micro-repayment history. 7% interest subvention.", cf: "Requires SHG group consensus." },
+          { title: "Sukanya Samriddhi Account:", desc: "High-yield (8.2%) sovereign scheme for daughter's education and future security.", cf: "Triple tax exemption under Section 80C." }
+        ]
+      }
+    };
+
+    let currentArchetypeKey = "urban_commuter";
+    let isShocked = false;
+    let isTampered = false;
+    let consentScope = "full";
+
+    function render() {
+      const data = ARCHETYPES[currentArchetypeKey];
+      document.getElementById("persona-name").innerText = data.name;
+      document.getElementById("persona-role").innerText = data.role;
+      document.getElementById("persona-avatar").innerText = data.avatar;
+      document.getElementById("persona-badge").innerText = data.tier;
+      document.getElementById("stat-income").innerText = data.income;
+      document.getElementById("stat-cibil").innerText = data.cibil;
+
+      const banner = document.getElementById("status-banner");
+      const bannerText = document.getElementById("banner-text");
+
+      // Render Granular Spend Telemetry
+      const barNeeds = document.getElementById("bar-needs");
+      const barWants = document.getElementById("bar-wants");
+      const barSavings = document.getElementById("bar-savings");
+      const lblNeeds = document.getElementById("lbl-needs");
+      const lblWants = document.getElementById("lbl-wants");
+      const lblSavings = document.getElementById("lbl-savings");
+      const budgetBadge = document.getElementById("budget-status-badge");
+      const catContainer = document.getElementById("categories-container");
+      const explContainer = document.getElementById("explanations-container");
+      const mappingContent = document.getElementById("mapping-content");
+
+      if (isShocked) {
+        document.getElementById("stat-balance").innerText = "₹4,120";
+        document.getElementById("stat-dti").innerText = "0.58 (CRITICAL STRESS)";
+        document.getElementById("stat-dti").style.color = "var(--danger)";
+        document.getElementById("dial-safe-amount").innerText = "₹0";
+        document.getElementById("dial-safe-sub").innerText = "Shortfall alert: ₹18,500 obligation due in 4 days. Safe-to-spend locked to ₹0.";
+        document.getElementById("meter-confidence").innerText = "0.642";
+        document.getElementById("w-afford").innerText = "0.15";
+        document.getElementById("w-risk").innerText = "0.85";
+
+        barNeeds.style.width = "78%";
+        barWants.style.width = "18%";
+        barSavings.style.width = "4%";
+        lblNeeds.innerText = "Needs: 78% (Strained)";
+        lblWants.innerText = "Wants: 18%";
+        lblSavings.innerText = "Savings: 4%";
+        budgetBadge.innerText = "Distressed";
+        budgetBadge.style.color = "var(--danger)";
+
+        mappingContent.innerText = "High debt obligations (DTI 0.58) trigger automated cash-flow stabilization assistance. All commercial loans suppressed under RBI Fair Practice Cap.";
+
+        banner.className = "banner banner-danger";
+        bannerText.innerHTML = "<strong>RBI Fair Lending Shield TRIGGERED:</strong> Customer DTI is 0.58 (regulatory cap 0.40). All loans and predatory credit strictly suppressed. Cash-flow stabilization active.";
+
+        // Stressed recommendations
+        const recsContainer = document.getElementById("recommendations-container");
+        recsContainer.innerHTML = `
+          <div class="rec-item" style="border-left: 4px solid var(--warning);">
+            <div class="rec-rank">1</div>
+            <div class="rec-info">
+              <div class="rec-title">Cash-Flow & Debt Stabilization Assistance <span class="rec-category">guidance</span></div>
+              <div class="rec-reason">Approved under RBI Guidelines: 1-tap option to pause discretionary subscriptions and reschedule upcoming EMI.</div>
+            </div>
+            <div class="rec-score-box">
+              <div class="rec-score">95</div>
+              <div class="rec-score-lbl">Priority</div>
+            </div>
+          </div>
+          <div class="rec-item" style="opacity: 0.45; border-left: 4px solid var(--danger);">
+            <div class="rec-rank" style="color: var(--danger);">X</div>
+            <div class="rec-info">
+              <div class="rec-title" style="text-decoration: line-through;">Pre-Approved Personal Loan <span class="rec-category">suppressed</span></div>
+              <div class="rec-reason" style="color: #fca5a5;">Blocked by RBI Digital Lending Fair Practice Cap: DTI > 0.40. Counterfactual: Reduce debt to unlock.</div>
+            </div>
+            <div class="rec-score-box">
+              <div class="rec-score" style="color: var(--danger);">0</div>
+              <div class="rec-score-lbl">Suppressed</div>
+            </div>
+          </div>
+        `;
+
+        explContainer.innerHTML = `
+          <div class="expl-card" style="border-left: 4px solid var(--danger);">
+            <div class="expl-title" style="color:#fca5a5;"><span>[SUPPRESSED] Personal Loan:</span><span>RBI DL 2022 Mandate</span></div>
+            <div class="expl-body">Customer's Debt-to-Income (DTI) is 0.58, exceeding the statutory 0.40 threshold. The mathematical gatekeeper permanently blocks predatory credit marketing.</div>
+            <div class="expl-cf"><strong>Actionable Counterfactual:</strong> Pay down ₹14,000 in existing credit dues to lower DTI below 0.40 and automatically unlock prime pre-approved lending.</div>
+          </div>
+          <div class="expl-card" style="border-left: 4px solid var(--warning);">
+            <div class="expl-title" style="color:#fcd34d;"><span>[ACTIVE] Cash-Flow Stabilization Surfaced:</span><span>Guidance Fit</span></div>
+            <div class="expl-body">Surfaced to protect customer wellness. Suggests pausing ₹2,400 in unused digital subscriptions to prevent EMI bounce charge of ₹500 + GST.</div>
+          </div>
+        `;
+
+        updateCryptoBlock("SUPPRESS");
+      } else {
+        document.getElementById("stat-balance").innerText = data.balance;
+        document.getElementById("stat-dti").innerText = data.dti;
+        document.getElementById("stat-dti").style.color = "var(--text)";
+        document.getElementById("dial-safe-amount").innerText = data.safeAmount;
+        document.getElementById("dial-safe-sub").innerText = data.safeSub;
+        document.getElementById("meter-confidence").innerText = data.confidence;
+        document.getElementById("w-afford").innerText = data.metrics.afford;
+        document.getElementById("w-need").innerText = data.metrics.need;
+        document.getElementById("w-urgency").innerText = data.metrics.urgency;
+        document.getElementById("w-affinity").innerText = data.metrics.affinity;
+        document.getElementById("w-risk").innerText = data.metrics.risk;
+
+        barNeeds.style.width = data.spend.needsPct + "%";
+        barWants.style.width = data.spend.wantsPct + "%";
+        barSavings.style.width = data.spend.savingsPct + "%";
+        lblNeeds.innerText = `Needs: ${data.spend.needsPct}% (50%)`;
+        lblWants.innerText = `Wants: ${data.spend.wantsPct}% (30%)`;
+        lblSavings.innerText = `Savings: ${data.spend.savingsPct}% (20%)`;
+
+        budgetBadge.innerText = "Balanced";
+        budgetBadge.style.color = "var(--success)";
+        mappingContent.innerText = data.spend.serviceMapping;
+
+        catContainer.innerHTML = data.spend.categories.map(c => `
+          <div class="category-card">
+            <div class="cat-name">${c.name}</div>
+            <div class="cat-amount">${c.amt}</div>
+          </div>
+        `).join("");
+
+        // Handle consent scopes
+        let activeRecs = [...data.recs];
+        if (consentScope === "limited") {
+          activeRecs = activeRecs.filter(r => r.cat === "transport" || r.cat === "utilities" || r.cat === "tax_compliance");
+          banner.className = "banner banner-success";
+          bannerText.innerText = "DPDP Consent: Limited to Transit & Utilities. Wealth and Lending products suppressed per user scope.";
+        } else if (consentScope === "withdrawn") {
+          activeRecs = activeRecs.filter(r => r.cat === "tax_compliance");
+          banner.className = "banner banner-danger";
+          bannerText.innerText = "DPDP Act 2023 Sec 6: Consent withdrawn. Commercial cross-selling strictly suppressed. Core statutory services only.";
+        } else {
+          banner.className = "banner banner-success";
+          bannerText.innerText = "Fair Lending Suitability passed. Purpose consent scopes verified for all surfaced products.";
+        }
+
+        const recsContainer = document.getElementById("recommendations-container");
+        if (activeRecs.length === 0) {
+          recsContainer.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">Zero commercial recommendations surfaced under strict DPDP consent withdrawal.</div>`;
+        } else {
+          recsContainer.innerHTML = activeRecs.map((r, idx) => `
+            <div class="rec-item">
+              <div class="rec-rank">${idx + 1}</div>
+              <div class="rec-info">
+                <div class="rec-title">${r.title} <span class="rec-category">${r.cat}</span></div>
+                <div class="rec-reason">${r.reason}</div>
+              </div>
+              <div class="rec-score-box">
+                <div class="rec-score">${r.score}</div>
+                <div class="rec-score-lbl">Priority</div>
+              </div>
+            </div>
+          `).join("");
+        }
+
+        explContainer.innerHTML = data.explanations.map(e => `
+          <div class="expl-card">
+            <div class="expl-title"><span>${e.title}</span><span class="badge rbi">Deterministic Rule</span></div>
+            <div class="expl-body">${e.desc}</div>
+            <div class="expl-cf"><strong>Guidance:</strong> ${e.cf}</div>
+          </div>
+        `).join("");
+
+        updateCryptoBlock("RECOMMEND");
+      }
+    }
+
+    function fireMicroTrigger(type) {
+      const statusDiv = document.getElementById("micro-trigger-status");
+      const recsContainer = document.getElementById("recommendations-container");
+
+      if (type === "electricity") {
+        statusDiv.innerHTML = `
+          <div class="trigger-result">
+            <div>[TRIGGER: ELECTRICITY] Incoming UGVCL/BESCOM Bill SMS detected. Latency: <strong>0.158 ms</strong> (100% Cache Hit, 0ms batch cost).</div>
+            <span class="badge" style="background:#10b98120; color:#10b981;">Surfaced Top 1</span>
+          </div>
+        `;
+        recsContainer.insertAdjacentHTML("afterbegin", `
+          <div class="rec-item" style="border: 2px solid var(--primary); animation: pulse 1s;">
+            <div class="rec-rank" style="color: #60a5fa;">!</div>
+            <div class="rec-info">
+              <div class="rec-title">Electricity Bill Due (₹1,450) <span class="rec-category" style="background:var(--primary); color:#fff;">Real-Time Trigger</span></div>
+              <div class="rec-reason">Due in 3 days. 1-Tap BBPS Instant Settlement surfaced without full historical recalculation.</div>
+            </div>
+            <div class="rec-score-box">
+              <div class="rec-score" style="color: var(--primary-light);">98</div>
+              <div class="rec-score-lbl">Urgent Micro</div>
+            </div>
+          </div>
+        `);
+      } else if (type === "fastag") {
+        statusDiv.innerHTML = `
+          <div class="trigger-result">
+            <div>[TRIGGER: FASTAG] FASTag balance alert &lt; ₹150 detected. Latency: <strong>0.164 ms</strong> (95.4% compute saved).</div>
+            <span class="badge" style="background:#10b98120; color:#10b981;">Surfaced Top 1</span>
+          </div>
+        `;
+        recsContainer.insertAdjacentHTML("afterbegin", `
+          <div class="rec-item" style="border: 2px solid var(--warning);">
+            <div class="rec-rank" style="color: var(--warning);">!</div>
+            <div class="rec-info">
+              <div class="rec-title">FASTag Auto-Reload (Balance: ₹120) <span class="rec-category" style="background:var(--warning); color:#000;">Low Balance</span></div>
+              <div class="rec-reason">Below toll threshold. 1-Tap ₹500 reload avoids toll booth blacklisting on next trip.</div>
+            </div>
+            <div class="rec-score-box">
+              <div class="rec-score" style="color: var(--warning);">96</div>
+              <div class="rec-score-lbl">Urgent Micro</div>
+            </div>
+          </div>
+        `);
+      } else if (type === "recharge") {
+        statusDiv.innerHTML = `
+          <div class="trigger-result">
+            <div>[TRIGGER: RECHARGE] Telco validity webhook received. Latency: <strong>0.161 ms</strong>.</div>
+            <span class="badge" style="background:#10b98120; color:#10b981;">Surfaced Top 1</span>
+          </div>
+        `;
+        recsContainer.insertAdjacentHTML("afterbegin", `
+          <div class="rec-item" style="border: 2px solid #a855f7;">
+            <div class="rec-rank" style="color: #c084fc;">!</div>
+            <div class="rec-info">
+              <div class="rec-title">Prepaid Plan Expiring in 48 Hours <span class="rec-category" style="background:#a855f7; color:#fff;">Validity Shield</span></div>
+              <div class="rec-reason">Repeat favorite ₹299 28-day 5G pack ready for 1-tap renewal. Prevents service interruption.</div>
+            </div>
+            <div class="rec-score-box">
+              <div class="rec-score" style="color: #c084fc;">95</div>
+              <div class="rec-score-lbl">Urgent Micro</div>
+            </div>
+          </div>
+        `);
+      } else if (type === "cibil") {
+        statusDiv.innerHTML = `
+          <div class="trigger-result">
+            <div>[TRIGGER: CIBIL] 30-Day Bureau Refresh Window Unlocked. Latency: <strong>0.155 ms</strong>.</div>
+            <span class="badge" style="background:#10b98120; color:#10b981;">Surfaced Top 1</span>
+          </div>
+        `;
+        recsContainer.insertAdjacentHTML("afterbegin", `
+          <div class="rec-item" style="border: 2px solid var(--success);">
+            <div class="rec-rank" style="color: var(--success);">!</div>
+            <div class="rec-info">
+              <div class="rec-title">CIBIL Monthly Score Refresh Ready <span class="rec-category" style="background:var(--success); color:#fff;">Credit Health</span></div>
+              <div class="rec-reason">30 days have elapsed since last check. Fetch updated credit score with zero impact on rating.</div>
+            </div>
+            <div class="rec-score-box">
+              <div class="rec-score" style="color: var(--success);">94</div>
+              <div class="rec-score-lbl">Milestone</div>
+            </div>
+          </div>
+        `);
+      }
+    }
+
+    function updateCryptoBlock(decision) {
+      const proof = document.getElementById("crypto-proof");
+      if (isTampered) {
+        proof.innerHTML = `
+          <div>[GENESIS] 0000000000000000000000000000000000000000000000000000000000000000</div>
+          <div>&darr; Block #0 [TAMPERED RECORD DETECTED]</div>
+          <div>&nbsp;&nbsp;PrevHash: 0000000000000000000000000000000000000000000000000000000000000000</div>
+          <div>&nbsp;&nbsp;ComputedHash: <span class="hash-val tampered">f82a991a3b...c014</span></div>
+          <div>&nbsp;&nbsp;Status: <span class="hash-val tampered">[TAMPER DETECTED: CRYPTOGRAPHIC SIGNATURE MISMATCH - INVALID]</span></div>
+        `;
+      } else {
+        proof.innerHTML = `
+          <div>[GENESIS] 0000000000000000000000000000000000000000000000000000000000000000</div>
+          <div>&darr; Block #0 [${decision}: ${decision === 'SUPPRESS' ? 'rec_personal_loan' : 'rec_commute_metro'}]</div>
+          <div>&nbsp;&nbsp;PrevHash: 0000000000000000000000000000000000000000000000000000000000000000</div>
+          <div>&nbsp;&nbsp;BlockHash: <span class="hash-val">7b3f94e10ab672c842fbc947e2b109e23847dafe102834b19284fae10984daef</span> [IMMUTABLE AUDIT VERIFIED]</div>
+          <div>&nbsp;&nbsp;Reason: ${decision === 'SUPPRESS' ? 'Fair lending DTI cap 0.40 exceeded (DTI: 0.58)' : 'Affordability 0.94, Need 0.88, Temporal 0.95'}</div>
+        `;
+      }
+    }
+
+    function switchArchetype(key) {
+      currentArchetypeKey = key;
+      isShocked = false;
+      isTampered = false;
+      document.getElementById("micro-trigger-status").innerHTML = "";
+      render();
+    }
+
+    function injectShock(type) {
+      isShocked = true;
+      isTampered = false;
+      document.getElementById("micro-trigger-status").innerHTML = "";
+      render();
+    }
+
+    function resetBaseline() {
+      isShocked = false;
+      isTampered = false;
+      document.getElementById("micro-trigger-status").innerHTML = "";
+      render();
+    }
+
+    function switchConsent(val) {
+      consentScope = val;
+      render();
+    }
+
+    function toggleTamperSimulation() {
+      isTampered = !isTampered;
+      render();
+    }
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

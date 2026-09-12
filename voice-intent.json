@@ -1,15 +1,37 @@
 {
   "intent": "PAY_METRO",
   "language": "en",
-  "confidence": 0.94,
+  "confidence": 0.9968,
   "entities": {
     "merchant": "Delhi Metro Smart Card",
-    "amount": 40
+    "amount": 40.0
   },
-  "response_text": "Your routine morning Metro commute is \u20b940 at 8:40 AM. Would you like to proceed with instant UPI recharge?",
+  "response_text": "Your routine morning metro fare is \u20b940.0. Would you like to pay with 1-tap UPI?",
   "suggested_actions": [
-    "CONFIRM",
-    "DISMISS",
-    "DETAILS"
+    "1_TAP_PAY",
+    "CHANGE_AMOUNT",
+    "VIEW_PASS"
+  ],
+  "suggested_prompts": [
+    "Pay Metro \u20b940",
+    "View Commute Card",
+    "Passbook"
+  ],
+  "pending_clarification": null,
+  "navigation": {
+    "type": "TAB",
+    "target": "payments",
+    "auto_navigate": false,
+    "action_label": "Pay \u20b940 Metro"
+  },
+  "action_chips": [
+    {
+      "label": "Pay \u20b940 Metro",
+      "action": "INSTANT_PAY",
+      "payload": {
+        "amount": 40,
+        "merchant": "Delhi Metro Smart Card"
+      }
+    }
   ]
 }

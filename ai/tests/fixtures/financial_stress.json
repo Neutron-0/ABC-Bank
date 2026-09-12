@@ -1,0 +1,59 @@
+{
+  "name": "financial_stress",
+  "title": "Critical Cash Flow Strain",
+  "customer_id": "cust_bharat_001",
+  "customer_name": "Rahul Sharma",
+  "balance": {
+    "available": 7850,
+    "savings": 32000,
+    "currency": "INR"
+  },
+  "signals": {
+    "savings_trend": "negative",
+    "emi_pressure": "high",
+    "spending_volatility": "high",
+    "upcoming_obligations": 34200,
+    "active_subscriptions": 7,
+    "debt_to_income_ratio": 0.58,
+    "stress_alert": true,
+    "anomaly_score": 8
+  },
+  "transactions": [
+    {
+      "id": "tx_str_01",
+      "amount": 16500.0,
+      "type": "debit",
+      "category": "emi",
+      "merchant": "HDFC Home Loan EMI",
+      "timestamp": "2026-08-16T10:00:00+05:30",
+      "is_recurring": true
+    },
+    {
+      "id": "tx_str_02",
+      "amount": 14800.0,
+      "type": "debit",
+      "category": "emi",
+      "merchant": "Bajaj Finserv Auto Loan",
+      "timestamp": "2026-08-20T10:00:00+05:30",
+      "is_recurring": true
+    },
+    {
+      "id": "tx_str_03",
+      "amount": 29000.0,
+      "type": "debit",
+      "category": "repairs",
+      "merchant": "Emergency Home Plumbing & Electricals",
+      "timestamp": "2026-09-05T19:20:00+05:30",
+      "is_recurring": false
+    },
+    {
+      "id": "tx_str_04",
+      "amount": 1199.0,
+      "type": "debit",
+      "category": "entertainment",
+      "merchant": "Netflix India Recurring",
+      "timestamp": "2026-09-02T03:00:00+05:30",
+      "is_recurring": true
+    }
+  ]
+}

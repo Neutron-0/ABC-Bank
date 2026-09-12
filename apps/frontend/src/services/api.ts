@@ -47,7 +47,7 @@ export class BankingApi {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s timeout for snappy UI
+      const timeoutId = setTimeout(() => controller.abort(), 1200); // 1.2s timeout for instant non-blocking UI response
 
       const res = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
@@ -95,10 +95,18 @@ export class BankingApi {
     return this.request(`/assistant/init?lang=${lang}`);
   }
 
-  public static async sendAssistantMessage(query: string, language: LanguageCode = 'en'): Promise<any | null> {
+  public static async sendAssistantMessage(
+    query: string,
+    language: LanguageCode = 'en',
+    pendingClarification?: string | null
+  ): Promise<any | null> {
     return this.request('/assistant/chat', {
       method: 'POST',
-      body: JSON.stringify({ query, language }),
+      body: JSON.stringify({
+        query,
+        language,
+        pending_clarification: pendingClarification || null,
+      }),
     });
   }
 }

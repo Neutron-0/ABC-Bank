@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -19,7 +19,14 @@ export const FinancialStressModal: React.FC = () => {
 
   const [pausedSubs, setPausedSubs] = useState<string[]>([]);
 
-  if (activeJourney !== 'stress_intervention') return null;
+  const isVisible =
+    activeJourney === 'stress_intervention' ||
+    activeJourney === 'financial_stress' ||
+    activeJourney === 'stress' ||
+    activeJourney === 'moratorium' ||
+    activeJourney === 'budget_shield';
+
+  if (!isVisible) return null;
 
   const togglePauseSub = (subName: string) => {
     if (pausedSubs.includes(subName)) {
@@ -107,7 +114,7 @@ export const FinancialStressModal: React.FC = () => {
                       onPress={() => togglePauseSub(sub.name)}
                     >
                       <Text style={[styles.pauseBtnText, isPaused && styles.pausedBtnText]}>
-                        {isPaused ? 'Paused ✓' : 'Pause for 30 Days'}
+                        {isPaused ? 'Paused' : 'Pause for 30 Days'}
                       </Text>
                     </TouchableOpacity>
                   </View>

@@ -13,7 +13,6 @@ import {
   Briefcase,
   Home,
   TrendingUp,
-  Sparkles,
 } from 'lucide-react-native';
 
 export const KycModal: React.FC = () => {
@@ -174,9 +173,9 @@ export const KycModal: React.FC = () => {
             {step === 3 && (
               <View style={styles.content}>
                 <View style={styles.aiTag}>
-                  <Sparkles size={13} color="#4F46E5" />
+                  <ShieldCheck size={14} color="#0F294A" />
                   <Text style={styles.aiTagText}>
-                    {language === 'hi' ? 'एआई जीवन-चरण पैटर्न सत्यापन' : language === 'gu' ? 'AI જીવન-તબક્કા પેટર્ન ચકાસણી' : 'AI LIFE-STAGE PATTERN VERIFICATION'}
+                    {language === 'hi' ? 'क्रेडिट योग्यता एवं जीवन-चरण सत्यापन' : language === 'gu' ? 'ક્રેડિટ યોગ્યતા અને જીવન-તબક્કા ચકાસણી' : 'CREDITWORTHINESS & LIFE-STAGE VERIFICATION'}
                   </Text>
                 </View>
 
@@ -185,10 +184,10 @@ export const KycModal: React.FC = () => {
                 </Text>
                 <Text style={styles.stepDesc}>
                   {language === 'hi'
-                    ? 'हम बिना किसी मैनुअल कागजी कार्रवाई के आपके वास्तविक बैंकिंग पैटर्न को सत्यापित करते हैं:'
+                    ? 'हम बिना किसी कागजी कार्रवाई के आपके वास्तविक बैंकिंग पैटर्न को सत्यापित करते हैं:'
                     : language === 'gu'
                     ? 'અમે કોઈપણ કાગળ વગર તમારી વાસ્તવિક બેંકિંગ પેટર્નની ચકાસણી કરીએ છીએ:'
-                    : 'How our AI verifies your financial stability without manual salary slips:'}
+                    : 'Institutional ledger analysis verifying financial stability without manual documentation:'}
                 </Text>
 
                 {/* Signals breakdown cards */}
@@ -436,17 +435,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#EEF2FF',
+    backgroundColor: '#F0F4F8',
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 99,
+    borderRadius: 6,
     alignSelf: 'flex-start',
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#D9E2EC',
   },
   aiTagText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#4F46E5',
+    color: '#0F294A',
     letterSpacing: 0.5,
   },
   signalCard: {

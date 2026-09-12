@@ -1,0 +1,72 @@
+{
+  "name": "commuter_normal",
+  "title": "Daily Metro Commuter",
+  "customer_id": "cust_bharat_001",
+  "customer_name": "Rahul Sharma",
+  "balance": {
+    "available": 42680,
+    "savings": 185000,
+    "currency": "INR"
+  },
+  "signals": {
+    "metro_usage": "high",
+    "upi_usage": "high",
+    "savings_trend": "positive",
+    "investment_interest": "medium",
+    "commute_time": "08:40",
+    "anomaly_score": 4,
+    "income_stability": 0.94,
+    "debt_pressure": 0.22
+  },
+  "transactions": [
+    {
+      "id": "tx_com_01",
+      "amount": 40.0,
+      "type": "debit",
+      "category": "transport",
+      "merchant": "Delhi Metro Smart Card",
+      "timestamp": "2026-09-12T08:38:00+05:30",
+      "is_recurring": true,
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_com_02",
+      "amount": 40.0,
+      "type": "debit",
+      "category": "transport",
+      "merchant": "DMRC Metro Recharge",
+      "timestamp": "2026-09-11T08:42:00+05:30",
+      "is_recurring": true,
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_com_03",
+      "amount": 75000.0,
+      "type": "credit",
+      "category": "salary",
+      "merchant": "Infosys Tech Salary",
+      "timestamp": "2026-09-01T09:00:00+05:30",
+      "is_recurring": true,
+      "frequency": "monthly"
+    },
+    {
+      "id": "tx_com_04",
+      "amount": 16500.0,
+      "type": "debit",
+      "category": "emi",
+      "merchant": "HDFC Home Loan EMI",
+      "timestamp": "2026-08-16T10:00:00+05:30",
+      "is_recurring": true,
+      "frequency": "monthly"
+    },
+    {
+      "id": "tx_com_05",
+      "amount": 450.0,
+      "type": "debit",
+      "category": "food",
+      "merchant": "Swiggy Bangalore",
+      "timestamp": "2026-09-10T13:15:00+05:30",
+      "is_recurring": false
+    }
+  ]
+}

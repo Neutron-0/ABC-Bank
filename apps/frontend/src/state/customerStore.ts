@@ -142,7 +142,7 @@ export const OFFLINE_STATE_BUNDLES: Record<CustomerStateType, {
         layer: 'DO',
         priority: 94,
         confidence: 0.97,
-        title: '🚇 Your morning Metro',
+        title: 'Transit Mandate: Delhi Metro (DMRC)',
         description: 'You usually make this payment around 8:40 AM for your weekday commute.',
         reason: 'Based on your frequent weekday travel pattern (22 times this month).',
         whyDetails: [
@@ -675,6 +675,11 @@ interface CustomerStateStore {
 }
 
 export const CARD_TRANSLATIONS: Record<string, Record<LanguageCode, { title: string; description: string; actionLabel?: string }>> = {
+  card_morning_metro: {
+    en: { title: 'Transit Mandate: Delhi Metro (DMRC)', description: 'Scheduled weekday commute around 8:40 AM. 1-Tap fast checkout with UPI auto-confirm.', actionLabel: 'Pay ₹40 Again' },
+    hi: { title: 'पारगमन अधिदेश: दिल्ली मेट्रो (DMRC)', description: 'सुबह 8:40 बजे का नियमित कार्यदिवस आवागमन। यूपीआई ऑटो-पुष्टि के साथ 1-टैप चेकआउट।', actionLabel: 'पुनः ₹40 भुगतान करें' },
+    gu: { title: 'ટ્રાન્ઝિટ આદેશ: દિલ્હી મેટ્રો (DMRC)', description: 'સવારે 8:40 વાગ્યે નિયમિત મુસાફરી. UPI ઓટો-પુષ્ટિ સાથે 1-ટેપ ચુકવણી.', actionLabel: 'ફરીથી ₹40 ચૂકવો' },
+  },
   card_metro_commute: {
     en: { title: 'Routine Commute Alert', description: 'Your usual Delhi Metro morning commute at 8:40 AM. 1-Tap recharge active.', actionLabel: 'Instant ₹40 UPI' },
     hi: { title: 'दैनिक यात्रा अलर्ट', description: 'आपकी सामान्य दिल्ली मेट्रो सुबह 8:40 की यात्रा। 1-टैप रिचार्ज उपलब्ध है।', actionLabel: 'त्वरित ₹40 यूपीआई' },
@@ -722,8 +727,49 @@ export const CARD_TRANSLATIONS: Record<string, Record<LanguageCode, { title: str
   },
 };
 
-const localizeCardList = (cards: ContextCard[], lang: LanguageCode): ContextCard[] => {
-  return cards.map((card) => {
+export const normalizeContextCard = (rawCard: any): ContextCard => {
+  const pAction = rawCard?.primaryAction || rawCard?.primary_action || {
+    label: 'View Details',
+    actionType: 'NAVIGATE',
+  };
+  const sAction = rawCard?.secondaryAction || rawCard?.secondary_action;
+
+  return {
+    id: rawCard?.id || `card_${Date.now()}`,
+    type: rawCard?.type || 'generic',
+    layer: rawCard?.layer || 'DO',
+    priority: rawCard?.priority || 50,
+    confidence: rawCard?.confidence ?? 0.95,
+    title: rawCard?.title || '',
+    description: rawCard?.description || '',
+    reason: rawCard?.reason || '',
+    badgeText: rawCard?.badgeText || rawCard?.badge,
+    accentColor: rawCard?.accentColor || rawCard?.accent,
+    dismissible: rawCard?.dismissible ?? true,
+    category: rawCard?.category || 'banking',
+    metadata: rawCard?.metadata,
+    iconName: rawCard?.iconName || rawCard?.icon_name,
+    primaryAction: {
+      label: pAction?.label || 'View Details',
+      actionType: pAction?.actionType || pAction?.action_type || 'NAVIGATE',
+      journeyId: pAction?.journeyId || pAction?.journey_id,
+      targetScreen: pAction?.targetScreen || pAction?.target_screen,
+      payload: pAction?.payload,
+    },
+    secondaryAction: sAction ? {
+      label: sAction?.label || 'Dismiss',
+      actionType: sAction?.actionType || sAction?.action_type || 'NAVIGATE',
+      journeyId: sAction?.journeyId || sAction?.journey_id,
+      targetScreen: sAction?.targetScreen || sAction?.target_screen,
+      payload: sAction?.payload,
+    } : undefined,
+    whyDetails: rawCard?.whyDetails || rawCard?.why_details || [],
+  };
+};
+
+const localizeCardList = (cards: any[], lang: LanguageCode): ContextCard[] => {
+  return (cards || []).map((rawCard) => {
+    const card = normalizeContextCard(rawCard);
     const tr = CARD_TRANSLATIONS[card.id]?.[lang];
     if (!tr) return card;
     return {
@@ -732,7 +778,7 @@ const localizeCardList = (cards: ContextCard[], lang: LanguageCode): ContextCard
       description: tr.description,
       primaryAction: {
         ...card.primaryAction,
-        label: tr.actionLabel || card.primaryAction.label,
+        label: tr.actionLabel || card.primaryAction?.label || 'View Details',
       },
     };
   });
@@ -772,9 +818,7 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     },
 
     switchCustomerState: async (state: CustomerStateType) => {
-      set({ isLoading: true });
-
-      // Apply offline bundle instantly so Expo Go transitions are immediate
+      // Apply offline bundle instantly with 0ms latency
       const bundle = OFFLINE_STATE_BUNDLES[state] || OFFLINE_STATE_BUNDLES.normal;
       const currentLang = get().language;
       const localized = localizeCardList(bundle.cards, currentLang);
@@ -786,28 +830,23 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
         risk: { ...bundle.risk },
         cards: localized,
         transactions: [...bundle.transactions],
+        isLoading: false,
       });
 
-      // Also notify backend if reachable
-      try {
-        await BankingApi.switchScenario(state);
-      } catch (err) {
-        // Fallback already active
-      } finally {
-        set({ isLoading: false });
-      }
+      // Background non-blocking notification to backend
+      BankingApi.switchScenario(state).catch(() => {});
     },
 
     fetchStateAndContext: async () => {
-      try {
-        const exp = await BankingApi.getExperience(get().profile.id, get().language);
-        if (exp && exp.context_cards && exp.context_cards.length > 0) {
-          // Sync cards from backend experience contract if available
-          set({ cards: exp.context_cards });
-        }
-      } catch (err) {
-        // Guaranteed fallback cards already loaded
-      }
+      // Background non-blocking sync
+      BankingApi.getExperience(get().profile.id, get().language)
+        .then((exp) => {
+          if (exp && exp.context_cards && exp.context_cards.length > 0) {
+            const normalized = localizeCardList(exp.context_cards, get().language);
+            set({ cards: normalized });
+          }
+        })
+        .catch(() => {});
     },
 
     dismissCard: async (cardId: string) => {
