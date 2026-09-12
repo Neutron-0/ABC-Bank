@@ -287,66 +287,66 @@ export class MiniCPM5EdgeEngine {
 
       case 'CHECK_BALANCE':
         if (lang === 'hi') {
-          return 'आपके प्राथमिक बचत खाते (•••• 4092) में उपलब्ध शेष राशि ₹18,420.50 है। सभी लेनदेन अद्यतित हैं।';
+          return 'मैं आपके अनुरोध को ऑफलाइन समझ सकता हूँ, लेकिन आपका सटीक खाता बैलेंस देखने के लिए बैंक सर्वर से सुरक्षित कनेक्शन आवश्यक है।';
         }
         if (lang === 'gu') {
-          return 'તમારા પ્રાથમિક બચત ખાતા (•••• 4092) માં ઉપલબ્ધ બેલેન્સ ₹18,420.50 છે. તમામ વ્યવહારો અપડેટ છે.';
+          return 'હું તમારી વિનંતીને ઑફલાઇન સમજી શકું છું, પરંતુ તમારા ખાતાનું બેલેન્સ જોવા માટે બેંક સર્વર સાથે સુરક્ષિત જોડાણ આવશ્યક છે.';
         }
-        return 'Your primary savings account (•••• 4092) has an available balance of ₹18,420.50. All transactions are cleared.';
+        return 'I can understand your request offline, but I need a secure connection to the bank to retrieve your account information.';
 
       case 'CHECK_EMI':
         if (lang === 'hi') {
-          return 'आपकी अगली होम लोन ईएमआई ₹32,000 की 10 तारीख को देय है। क्या आप भुगतान शेड्यूल देखना चाहते हैं?';
+          return 'ईएमआई विवरण की जांच के लिए बैंक सर्वर से सुरक्षित कनेक्टिविटी आवश्यक है। कृपया नेटवर्क उपलब्ध होने पर पुनः प्रयास करें।';
         }
         if (lang === 'gu') {
-          return 'તમારી આગામી હોમ લોન EMI ₹32,000 ની 10 તારીખે બાકી છે. શું તમે ચુકવણી શિડ્યુલ જોવા માંગો છો?';
+          return 'EMI વિગતો મેળવવા માટે બેંક સર્વર જોડાણ આવશ્યક છે. કૃપા કરીને નેટવર્ક કનેક્ટ થયા પછી ફરી પ્રયાસ કરો.';
         }
-        return 'Your upcoming Home Loan EMI of ₹32,000 is scheduled for the 10th. Would you like to review payment dates?';
+        return 'Checking your EMI schedule requires a secure connection to the bank. Please reconnect to view your active mandate details.';
 
       case 'LOCK_CARD':
         if (lang === 'hi') {
-          return 'सुरक्षा अलर्ट: आपका प्लेटिनम डेबिट कार्ड (•••• 4092) तुरंत ब्लॉक या अनब्लॉक किया जा सकता है।';
+          return 'सुरक्षा निर्देश: कार्ड ब्लॉक अनुरोध दर्ज किया गया। केंद्रीय स्विच पर तुरंत कार्ड फ्रीज करने के लिए बैंक नेटवर्क कनेक्टिविटी आवश्यक है।';
         }
         if (lang === 'gu') {
-          return 'સુરક્ષા ચેતવણી: તમારું પ્લેટિનમ ડેબિટ કાર્ડ (•••• 4092) તરત જ બ્લૉક અથવા અનબ્લૉક કરી શકાય છે.';
+          return 'સુરક્ષા સૂચના: કાર્ડ બ્લોક વિનંતી નોંધાઈ. સેન્ટ્રલ સિસ્ટમમાં કાર્ડ ફ્રીઝ પૂર્ણ કરવા નેટવર્ક કનેક્શન જરૂરી છે.';
         }
-        return 'Card Security: Your Platinum Debit Card (•••• 4092) can be frozen or unfrozen instantly to prevent unauthorized usage.';
+        return 'Card Security: Freeze command recognized offline. Bank connectivity is required to freeze your card on the core network.';
 
       case 'MEDICAL_CLAIM_HELP':
         if (lang === 'hi') {
-          return 'मैक्स सुपर स्पेशियलिटी अस्पताल के ₹48,200 बिल के लिए कैशलेस क्लेम डेस्क और सेक्शन 80D रसीद उपलब्ध है।';
+          return 'मेडिकल क्लेम सहायता अनुरोध दर्ज किया गया। अस्पताल और पॉलिसी विवरण लोड करने के लिए नेटवर्क कनेक्टिविटी आवश्यक है।';
         }
         if (lang === 'gu') {
-          return 'મેક્સ હોસ્પિટલના ₹48,200 બિલ માટે કેશલેસ ક્લેમ ડેસ્ક અને સેક્શન 80D રસીદ ઉપલબ્ધ છે.';
+          return 'મેડિકલ ક્લેમ સહાય વિનંતી નોંધાઈ. પોલિસી વિગતો ચકાસવા નેટવર્ક જોડાણ જરૂરી છે.';
         }
-        return 'Insurance Claim Desk is ready for your recent Max Super Speciality hospital payment of ₹48,200.';
+        return 'Medical claim assistance recognized. Live banking connectivity is required to inspect eligible claims.';
 
       case 'SAVE_SURPLUS':
         if (lang === 'hi') {
-          return 'आपके खाते में ₹24,000 का अधिशेष उपलब्ध है। आप 7.2% ऑटो-स्वीप लिक्विड एफडी में बचत कर सकते हैं।';
+          return 'वर्तमान खाता जानकारी और अधिशेष बचत विकल्पों की जांच के लिए बैंक सर्वर से कनेक्टिविटी आवश्यक है।';
         }
         if (lang === 'gu') {
-          return 'તમારા ખાતામાં ₹24,000 નો સરપ્લસ ઉપલબ્ધ છે. તમે 7.2% ઑટો-સ્વીપ લિક્વિડ FD માં રોકાણ કરી શકો છો.';
+          return 'હાલના ખાતાની માહિતી અને સરપ્લસ બચત વિકલ્પો ચકાસવા માટે બેંક સર્વર સાથે કનેક્ટિવિટી આવશ્યક છે.';
         }
-        return 'Surplus detected: You have ₹24,000 idle funds earning standard interest. Consider auto-sweep at 7.2%.';
+        return 'Reviewing surplus funds and savings opportunities requires a live connection to your current account records.';
 
       case 'NAVIGATE_KYC':
         if (lang === 'hi') {
-          return 'आपका डिजिटल केवाईसी टियर-2 सक्रिय है। नया पैन या आधार अपडेट करने के लिए सत्यापन केंद्र खोलें।';
+          return 'डिजिटल केवाईसी स्थिति देखने और दस्तावेज सत्यापित करने के लिए बैंक सर्वर से कनेक्शन आवश्यक है।';
         }
         if (lang === 'gu') {
-          return 'તમારું ડિજિટલ KYC ટાયર-2 સક્રિય છે. નવું પાન અથવા આધાર અપડેટ કરવા માટે વેરિફિકેશન કેન્દ્ર ખોલો.';
+          return 'ડિજિટલ KYC સ્થિતિ તપાસવા અને દસ્તાવેજો અપડેટ કરવા બેંક કનેક્શન આવશ્યક છે.';
         }
-        return 'Your Digital KYC is currently Tier-2 verified. Open the verification center to inspect or update documents.';
+        return 'Viewing your KYC status and updating verification documents requires a live banking connection.';
 
       case 'CHECK_CREDIT_SCORE':
         if (lang === 'hi') {
-          return 'आपका वर्तमान सिबिल क्रेडिट स्कोर 768 (उत्कृष्ट) है। समय पर ईएमआई भुगतान से यह स्थिर बना हुआ है।';
+          return 'आपका नवीनतम क्रेडिट स्कोर लोड करने के लिए बैंक नेटवर्क कनेक्टिविटी आवश्यक है।';
         }
         if (lang === 'gu') {
-          return 'તમારો વર્તમાન CIBIL ક્રેડિટ સ્કોર 768 (ઉત્કૃષ્ટ) છે. સમયસર EMI ચુકવણીથી તે સ્થિર રહ્યો છે.';
+          return 'તમારો લેટેસ્ટ ક્રેડિટ સ્કોર ચકાસવા માટે બેંક નેટવર્ક કનેક્શન આવશ્યક છે.';
         }
-        return 'Your current CIBIL Credit Score is 768 (Excellent). All institutional lines remain healthy.';
+        return 'Retrieving your updated credit score requires a secure connection to institutional bureau records.';
 
       default:
         if (lang === 'hi') {
