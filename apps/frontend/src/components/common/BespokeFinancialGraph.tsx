@@ -180,10 +180,10 @@ export const BespokeFinancialGraph: React.FC = () => {
       </View>
 
       {/* Interactive Active Point Inspection Box */}
-      <View style={[styles.inspectBox, { backgroundColor: isDark ? colors.cardBgSecondary : '#F0F4FA', borderColor: colors.border }]}>
+      <View style={[styles.inspectBox, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
         <View style={styles.inspectLeft}>
           <View style={styles.inspectDotWrap}>
-            <View style={[styles.inspectDot, { backgroundColor: isDark ? colors.accent : '#002970' }]} />
+            <View style={[styles.inspectDot, { backgroundColor: colors.brandSecondary }]} />
             <Text style={[styles.inspectDate, { color: colors.textSecondary }]}>{activePoint.date}</Text>
           </View>
           <Text style={[styles.inspectNote, { color: colors.textPrimary }]}>
@@ -196,7 +196,7 @@ export const BespokeFinancialGraph: React.FC = () => {
             ₹{activePoint.amount.toLocaleString('en-IN')}
           </Text>
           <View style={styles.inspectTag}>
-            <Text style={[styles.inspectTagText, { color: activePoint.amount > currentDataset.avgBurn ? colors.warning : colors.success }]}>
+            <Text style={[styles.inspectTagText, { color: activePoint.amount > currentDataset.avgBurn ? colors.brandSecondary : colors.textSecondary }]}>
               {activePoint.amount > currentDataset.avgBurn ? 'Above Avg' : 'Optimal'}
             </Text>
           </View>
@@ -210,12 +210,12 @@ export const BespokeFinancialGraph: React.FC = () => {
             <LinearGradient id="gradientFill" x1="0" y1="0" x2="0" y2="1">
               <Stop
                 offset="0%"
-                stopColor={isDark ? '#38BDF8' : '#002970'}
-                stopOpacity={isDark ? 0.35 : 0.22}
+                stopColor={colors.primary}
+                stopOpacity={isDark ? 0.35 : 0.18}
               />
               <Stop
                 offset="100%"
-                stopColor={isDark ? '#38BDF8' : '#002970'}
+                stopColor={colors.primary}
                 stopOpacity={0.0}
               />
             </LinearGradient>
@@ -227,7 +227,7 @@ export const BespokeFinancialGraph: React.FC = () => {
             y1={avgY}
             x2={GRAPH_WIDTH - PADDING_HORIZONTAL}
             y2={avgY}
-            stroke={isDark ? '#334155' : '#CBD5E1'}
+            stroke={colors.border}
             strokeWidth={1}
             strokeDasharray="4, 4"
           />
@@ -237,7 +237,7 @@ export const BespokeFinancialGraph: React.FC = () => {
             y={avgY - 6}
             fontSize="10"
             fontWeight="600"
-            fill={isDark ? '#64748B' : '#94A3B8'}
+            fill={colors.textMuted}
             textAnchor="end"
           >
             Avg: ₹{Math.round(currentDataset.avgBurn).toLocaleString('en-IN')}
@@ -250,7 +250,7 @@ export const BespokeFinancialGraph: React.FC = () => {
           <Path
             d={curvePath}
             fill="none"
-            stroke={isDark ? '#38BDF8' : '#002970'}
+            stroke={colors.primary}
             strokeWidth={3}
             strokeLinecap="round"
           />
@@ -267,10 +267,10 @@ export const BespokeFinancialGraph: React.FC = () => {
                     y1={coord.y}
                     x2={coord.x}
                     y2={GRAPH_HEIGHT - PADDING_BOTTOM + 6}
-                    stroke={isDark ? '#38BDF8' : '#002970'}
+                    stroke={colors.primary}
                     strokeWidth={1.5}
                     strokeDasharray="2, 2"
-                    opacity={0.6}
+                    opacity={0.5}
                   />
                 )}
 
@@ -280,8 +280,8 @@ export const BespokeFinancialGraph: React.FC = () => {
                     cx={coord.x}
                     cy={coord.y}
                     r={9}
-                    fill={isDark ? '#38BDF8' : '#002970'}
-                    opacity={0.2}
+                    fill={colors.brandSecondary}
+                    opacity={0.25}
                   />
                 )}
 
@@ -290,8 +290,8 @@ export const BespokeFinancialGraph: React.FC = () => {
                   cx={coord.x}
                   cy={coord.y}
                   r={isSelected ? 5 : 3.5}
-                  fill={isSelected ? (isDark ? '#38BDF8' : '#002970') : colors.cardBg}
-                  stroke={isDark ? '#38BDF8' : '#002970'}
+                  fill={isSelected ? colors.brandSecondary : colors.cardBg}
+                  stroke={isSelected ? colors.brandSecondary : colors.primary}
                   strokeWidth={2}
                 />
 
@@ -301,7 +301,7 @@ export const BespokeFinancialGraph: React.FC = () => {
                   y={GRAPH_HEIGHT - 8}
                   fontSize="10"
                   fontWeight={isSelected ? '700' : '500'}
-                  fill={isSelected ? (isDark ? '#F8FAFC' : '#002970') : (isDark ? '#64748B' : '#94A3B8')}
+                  fill={isSelected ? colors.primary : colors.textMuted}
                   textAnchor="middle"
                 >
                   {coord.label}
@@ -327,12 +327,12 @@ export const BespokeFinancialGraph: React.FC = () => {
       {/* Net Cash Flow Breakdown Ribbon */}
       <View style={[styles.flowRibbon, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
         <View style={styles.flowItem}>
-          <View style={styles.flowIconWrapGreen}>
-            <ArrowDownLeft size={13} color="#059669" />
+          <View style={[styles.flowIconWrapGreen, { backgroundColor: colors.cardBg }]}>
+            <ArrowDownLeft size={13} color={colors.primary} />
           </View>
           <View>
             <Text style={[styles.flowLabel, { color: colors.textSecondary }]}>Total Inflow</Text>
-            <Text style={[styles.flowValue, { color: '#059669' }]}>
+            <Text style={[styles.flowValue, { color: colors.primary }]}>
               +₹{currentDataset.inflow.toLocaleString('en-IN')}
             </Text>
           </View>
@@ -341,8 +341,8 @@ export const BespokeFinancialGraph: React.FC = () => {
         <View style={[styles.flowDivider, { backgroundColor: colors.border }]} />
 
         <View style={styles.flowItem}>
-          <View style={styles.flowIconWrapRed}>
-            <ArrowUpRight size={13} color="#DC2626" />
+          <View style={[styles.flowIconWrapRed, { backgroundColor: colors.cardBg }]}>
+            <ArrowUpRight size={13} color={colors.textSecondary} />
           </View>
           <View>
             <Text style={[styles.flowLabel, { color: colors.textSecondary }]}>Total Outflow</Text>
@@ -355,8 +355,8 @@ export const BespokeFinancialGraph: React.FC = () => {
         <View style={[styles.flowDivider, { backgroundColor: colors.border }]} />
 
         <View style={styles.flowItem}>
-          <View style={styles.savingsPill}>
-            <Text style={styles.savingsRateText}>{savingsRate}% Saved</Text>
+          <View style={[styles.savingsPill, { backgroundColor: colors.brandSecondarySubtle }]}>
+            <Text style={[styles.savingsRateText, { color: colors.brandSecondary }]}>{savingsRate}% Saved</Text>
           </View>
         </View>
       </View>
@@ -364,27 +364,27 @@ export const BespokeFinancialGraph: React.FC = () => {
       {/* Proportional Category Allocation Bar */}
       <View style={styles.categoryBarWrap}>
         <View style={styles.categorySegments}>
-          <View style={[styles.catSegment, { flex: 35, backgroundColor: '#002970' }]} />
-          <View style={[styles.catSegment, { flex: 25, backgroundColor: '#059669' }]} />
-          <View style={[styles.catSegment, { flex: 22, backgroundColor: '#D97706' }]} />
-          <View style={[styles.catSegment, { flex: 18, backgroundColor: '#8B5CF6' }]} />
+          <View style={[styles.catSegment, { flex: 35, backgroundColor: colors.primary }]} />
+          <View style={[styles.catSegment, { flex: 25, backgroundColor: colors.primaryLight }]} />
+          <View style={[styles.catSegment, { flex: 22, backgroundColor: colors.textSecondary }]} />
+          <View style={[styles.catSegment, { flex: 18, backgroundColor: colors.textMuted }]} />
         </View>
 
         <View style={styles.categoryLegend}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#002970' }]} />
+            <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
             <Text style={[styles.legendText, { color: colors.textSecondary }]}>Bills 35%</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#059669' }]} />
+            <View style={[styles.legendDot, { backgroundColor: colors.primaryLight }]} />
             <Text style={[styles.legendText, { color: colors.textSecondary }]}>Food 25%</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#D97706' }]} />
+            <View style={[styles.legendDot, { backgroundColor: colors.textSecondary }]} />
             <Text style={[styles.legendText, { color: colors.textSecondary }]}>Commute 22%</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#8B5CF6' }]} />
+            <View style={[styles.legendDot, { backgroundColor: colors.textMuted }]} />
             <Text style={[styles.legendText, { color: colors.textSecondary }]}>Others 18%</Text>
           </View>
         </View>

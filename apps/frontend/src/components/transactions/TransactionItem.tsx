@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Transaction } from '../../types';
-import { colors, typography, spacing, radii } from '../../theme';
+import { colors, typography, spacing, radii, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import {
   Train,
@@ -18,7 +18,6 @@ import {
   Utensils,
   ArrowUpRight,
   ArrowDownLeft,
-  Sparkles,
 } from 'lucide-react-native';
 
 interface Props {
@@ -26,6 +25,7 @@ interface Props {
 }
 
 export const TransactionItem: React.FC<Props> = ({ transaction }) => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { setSelectedTransaction } = useCustomerStore();
 
   const getIcon = () => {
@@ -34,29 +34,29 @@ export const TransactionItem: React.FC<Props> = ({ transaction }) => {
     const isFlagged = transaction.status === 'flagged';
 
     if (isFlagged) {
-      return <ShieldAlert size={size} color={colors.danger} />;
+      return <ShieldAlert size={size} color={themeColors.danger} />;
     }
 
     switch (transaction.category) {
       case 'transport':
-        return <Train size={size} color="#2563EB" />;
+        return <Train size={size} color={themeColors.iconNeutral} />;
       case 'food':
-        return <Coffee size={size} color="#D97706" />;
+        return <Coffee size={size} color={themeColors.iconNeutral} />;
       case 'bills':
-        return <Zap size={size} color="#EAB308" />;
+        return <Zap size={size} color={themeColors.iconNeutral} />;
       case 'salary':
-        return <Briefcase size={size} color={colors.success} />;
+        return <Briefcase size={size} color={themeColors.primary} />;
       case 'emi':
-        return <Home size={size} color="#7C3AED" />;
+        return <Home size={size} color={themeColors.iconNeutral} />;
       case 'healthcare':
-        return <HeartPulse size={size} color="#0284C7" />;
+        return <HeartPulse size={size} color={themeColors.iconNeutral} />;
       case 'shopping':
-        return <ShoppingCart size={size} color="#EC4899" />;
+        return <ShoppingCart size={size} color={themeColors.iconNeutral} />;
       default:
         return isCredit ? (
-          <ArrowDownLeft size={size} color={colors.success} />
+          <ArrowDownLeft size={size} color={themeColors.primary} />
         ) : (
-          <ArrowUpRight size={size} color={colors.textSecondary} />
+          <ArrowUpRight size={size} color={themeColors.iconNeutral} />
         );
     }
   };
@@ -66,7 +66,11 @@ export const TransactionItem: React.FC<Props> = ({ transaction }) => {
 
   return (
     <TouchableOpacity
-      style={[styles.container, isFlagged && styles.flaggedContainer]}
+      style={[
+        styles.container,
+        { backgroundColor: themeColors.cardBg, borderBottomColor: themeColors.borderLight },
+        isFlagged && { backgroundColor: themeColors.cardBgSecondary, borderLeftWidth: 3, borderLeftColor: themeColors.danger }
+      ]}
       onPress={() => setSelectedTransaction(transaction)}
       activeOpacity={0.7}
     >
@@ -74,29 +78,29 @@ export const TransactionItem: React.FC<Props> = ({ transaction }) => {
         <View
           style={[
             styles.iconWrap,
-            isFlagged && styles.flaggedIconWrap,
-            isCredit && styles.creditIconWrap,
+            { backgroundColor: themeColors.cardBgSecondary },
+            isFlagged && { backgroundColor: themeColors.cardBgSecondary },
           ]}
         >
           {getIcon()}
         </View>
         <View style={styles.details}>
           <View style={styles.merchantRow}>
-            <Text style={styles.merchant} numberOfLines={1}>
+            <Text style={[styles.merchant, { color: themeColors.textPrimary }]} numberOfLines={1}>
               {transaction.merchant}
             </Text>
             {transaction.isRecurring && (
-              <View style={styles.recurringBadge}>
-                <Text style={styles.recurringText}>Repeat</Text>
+              <View style={[styles.recurringBadge, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <Text style={[styles.recurringText, { color: themeColors.textSecondary }]}>Repeat</Text>
               </View>
             )}
             {isFlagged && (
-              <View style={styles.flaggedBadge}>
-                <Text style={styles.flaggedText}>Anomaly</Text>
+              <View style={[styles.flaggedBadge, { backgroundColor: themeColors.cardBgSecondary, borderWidth: 1, borderColor: themeColors.danger }]}>
+                <Text style={[styles.flaggedText, { color: themeColors.danger }]}>Anomaly</Text>
               </View>
             )}
           </View>
-          <Text style={styles.description} numberOfLines={1}>
+          <Text style={[styles.description, { color: themeColors.textSecondary }]} numberOfLines={1}>
             {transaction.description}
           </Text>
         </View>
@@ -106,13 +110,13 @@ export const TransactionItem: React.FC<Props> = ({ transaction }) => {
         <Text
           style={[
             styles.amount,
-            isCredit && styles.creditAmount,
-            isFlagged && styles.flaggedAmount,
+            { color: themeColors.textPrimary },
+            isFlagged && { color: themeColors.danger },
           ]}
         >
-          {isCredit ? '+' : '-'}₹{transaction.amount.toLocaleString('en-IN')}
+          {isCredit ? '+' : '−'}₹{transaction.amount.toLocaleString('en-IN')}
         </Text>
-        <Text style={styles.time}>
+        <Text style={[styles.time, { color: themeColors.textMuted }]}>
           {new Date(transaction.timestamp).toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit',
@@ -122,6 +126,7 @@ export const TransactionItem: React.FC<Props> = ({ transaction }) => {
     </TouchableOpacity>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

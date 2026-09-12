@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, typography, spacing, radii } from '../../theme';
+import { colors, typography, spacing, radii, useAppTheme } from '../../theme';
 import { LucideIcon } from 'lucide-react-native';
 
 interface FrequentContactProps {
@@ -20,40 +20,43 @@ export const FrequentContact: React.FC<FrequentContactProps> = ({
   badge,
   onPress,
 }) => {
+  const { colors: themeColors, isDark } = useAppTheme();
+
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
       onPress={onPress}
       delayPressIn={0}
       activeOpacity={0.75}
     >
       <View style={styles.leftRow}>
-        <View style={styles.iconBox}>
-          <Icon size={20} color={colors.primary} />
+        <View style={[styles.iconBox, { backgroundColor: themeColors.cardBgSecondary }]}>
+          <Icon size={20} color={themeColors.iconNeutral} />
         </View>
         <View style={styles.info}>
           <View style={styles.titleRow}>
-            <Text style={styles.title}>{title}</Text>
+            <Text style={[styles.title, { color: themeColors.textPrimary }]}>{title}</Text>
             {badge && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{badge}</Text>
+              <View style={[styles.badge, { backgroundColor: themeColors.brandSecondarySubtle }]}>
+                <Text style={[styles.badgeText, { color: themeColors.brandSecondary }]}>{badge}</Text>
               </View>
             )}
           </View>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+          <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>{subtitle}</Text>
         </View>
       </View>
 
       <View style={styles.rightSide}>
         {amount ? (
-          <Text style={styles.amount}>₹{amount}</Text>
+          <Text style={[styles.amount, { color: themeColors.textPrimary }]}>₹{amount}</Text>
         ) : (
-          <Text style={styles.payCta}>Repeat</Text>
+          <Text style={[styles.payCta, { color: themeColors.primary }]}>Repeat</Text>
         )}
       </View>
     </TouchableOpacity>
   );
 };
+
 
 const styles = StyleSheet.create({
   card: {

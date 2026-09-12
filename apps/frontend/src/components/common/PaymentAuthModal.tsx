@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import {
@@ -25,6 +25,7 @@ import {
 } from 'lucide-react-native';
 
 export const PaymentAuthModal: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const {
     authModal,
     closePaymentAuth,
@@ -221,12 +222,12 @@ export const PaymentAuthModal: React.FC = () => {
           // =========================================================================
           // STAGE 1: INSTITUTIONAL PAYMENT AUTHORIZATION SHEET
           // =========================================================================
-          <View style={styles.sheet}>
+          <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
             {/* Header */}
             <View style={styles.topRow}>
-              <View style={styles.securityTag}>
-                <ShieldCheck size={14} color="#059669" />
-                <Text style={styles.securityTagText}>
+              <View style={[styles.securityTag, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
+                <ShieldCheck size={14} color={themeColors.success} />
+                <Text style={[styles.securityTagText, { color: themeColors.success }]}>
                   {language === 'hi'
                     ? 'सुरक्षित बैंक भुगतान प्राधिकरण'
                     : language === 'gu'
@@ -235,47 +236,47 @@ export const PaymentAuthModal: React.FC = () => {
                 </Text>
               </View>
               <TouchableOpacity
-                style={styles.closeButton}
+                style={[styles.closeButton, { backgroundColor: themeColors.cardBgSecondary }]}
                 onPress={closePaymentAuth}
                 hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                 disabled={isProcessingTx}
               >
-                <X size={18} color="#64748B" />
+                <X size={18} color={themeColors.iconNeutral} />
               </TouchableOpacity>
             </View>
 
             {/* Transaction Overview Card */}
-            <View style={styles.paymentSummaryCard}>
+            <View style={[styles.paymentSummaryCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.merchantHeaderRow}>
-                <View style={styles.merchantAvatarCircle}>
-                  <Building2 size={18} color="#0F294A" />
+                <View style={[styles.merchantAvatarCircle, { backgroundColor: isDark ? '#27272A' : '#E2E8F0' }]}>
+                  <Building2 size={18} color={themeColors.iconNeutral} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.payingToLabel}>
+                  <Text style={[styles.payingToLabel, { color: themeColors.textSecondary }]}>
                     {language === 'hi' ? 'भुगतान प्राप्तकर्ता' : language === 'gu' ? 'ચુકવણી પ્રાપ્તકર્તા' : 'PAYING TO'}
                   </Text>
-                  <Text style={styles.merchantTitle} numberOfLines={1}>
+                  <Text style={[styles.merchantTitle, { color: themeColors.textPrimary }]} numberOfLines={1}>
                     {paymentData.merchant}
                   </Text>
                 </View>
-                <View style={styles.categoryBadge}>
-                  <Text style={styles.categoryBadgeText}>{(paymentData.category || 'UPI').toUpperCase()}</Text>
+                <View style={[styles.categoryBadge, { backgroundColor: isDark ? '#27272A' : '#EFF6FF', borderColor: isDark ? themeColors.border : '#BFDBFE' }]}>
+                  <Text style={[styles.categoryBadgeText, { color: themeColors.textPrimary }]}>{(paymentData.category || 'UPI').toUpperCase()}</Text>
                 </View>
               </View>
 
               <View style={styles.amountWrap}>
-                <Text style={styles.rupeeSymbol}>₹</Text>
-                <Text style={styles.amountDisplay}>
+                <Text style={[styles.rupeeSymbol, { color: themeColors.textPrimary }]}>₹</Text>
+                <Text style={[styles.amountDisplay, { color: themeColors.textPrimary }]}>
                   {paymentData.amount.toLocaleString('en-IN')}.00
                 </Text>
               </View>
 
-              <View style={styles.debitInfoRow}>
-                <Text style={styles.accountSourceText}>
+              <View style={[styles.debitInfoRow, { borderTopColor: themeColors.border }]}>
+                <Text style={[styles.accountSourceText, { color: themeColors.textSecondary }]}>
                   Debiting A/C 5010 •••• 4092
                 </Text>
-                <View style={styles.balanceBadge}>
-                  <Text style={styles.balanceBadgeText}>
+                <View style={[styles.balanceBadge, { backgroundColor: isDark ? '#0C2417' : '#F1F5F9' }]}>
+                  <Text style={[styles.balanceBadgeText, { color: themeColors.success }]}>
                     Available ₹{balance.available.toLocaleString('en-IN')}
                   </Text>
                 </View>
@@ -287,8 +288,9 @@ export const PaymentAuthModal: React.FC = () => {
               <TouchableOpacity
                 style={[
                   styles.biometricButton,
-                  bioSuccess && styles.biometricButtonSuccess,
-                  isAuthenticatingBio && styles.biometricButtonScanning,
+                  { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                  bioSuccess && (isDark ? { borderColor: '#10B981', backgroundColor: '#0C2417' } : styles.biometricButtonSuccess),
+                  isAuthenticatingBio && (isDark ? { borderColor: '#52525B', backgroundColor: '#27272A' } : styles.biometricButtonScanning),
                 ]}
                 onPress={handleBiometricAuth}
                 activeOpacity={0.8}
@@ -296,18 +298,19 @@ export const PaymentAuthModal: React.FC = () => {
               >
                 <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
                   {bioSuccess ? (
-                    <CheckCircle2 size={22} color="#059669" />
+                    <CheckCircle2 size={22} color={themeColors.success} />
                   ) : isAuthenticatingBio ? (
-                    <ActivityIndicator size="small" color="#2563EB" />
+                    <ActivityIndicator size="small" color={themeColors.textPrimary} />
                   ) : (
-                    <Fingerprint size={22} color="#0F294A" />
+                    <Fingerprint size={22} color={themeColors.iconNeutral} />
                   )}
                 </Animated.View>
                 <View style={styles.biometricTextWrap}>
                   <Text
                     style={[
                       styles.biometricButtonTitle,
-                      bioSuccess && { color: '#059669' },
+                      { color: themeColors.textPrimary },
+                      bioSuccess && { color: themeColors.success },
                     ]}
                   >
                     {bioSuccess
@@ -328,7 +331,7 @@ export const PaymentAuthModal: React.FC = () => {
                       ? 'બાયોમેટ્રિકથી 1-ટેપ ચુકવણી કરો'
                       : 'Authorize via Fingerprint / Face ID'}
                   </Text>
-                  <Text style={styles.biometricButtonSubtitle}>
+                  <Text style={[styles.biometricButtonSubtitle, { color: themeColors.textSecondary }]}>
                     {language === 'hi'
                       ? 'सुरक्षित हार्डवेयर टोकन'
                       : language === 'gu'
@@ -341,15 +344,15 @@ export const PaymentAuthModal: React.FC = () => {
 
             {/* Divider */}
             <View style={styles.separatorRow}>
-              <View style={styles.sepLine} />
-              <Text style={styles.sepText}>
+              <View style={[styles.sepLine, { backgroundColor: themeColors.border }]} />
+              <Text style={[styles.sepText, { color: themeColors.textMuted }]}>
                 {language === 'hi'
                   ? 'या 4-अंकीय यूपीआई पिन दर्ज करें'
                   : language === 'gu'
                   ? 'અથવા 4-અંકનો UPI PIN દાખલ કરો'
                   : 'OR ENTER 4-DIGIT SECURITY PIN'}
               </Text>
-              <View style={styles.sepLine} />
+              <View style={[styles.sepLine, { backgroundColor: themeColors.border }]} />
             </View>
 
             {/* PIN Dots Area */}
@@ -362,7 +365,8 @@ export const PaymentAuthModal: React.FC = () => {
                       key={idx}
                       style={[
                         styles.pinDot,
-                        filled && styles.pinDotFilled,
+                        { borderColor: themeColors.border },
+                        filled && [styles.pinDotFilled, { backgroundColor: themeColors.textPrimary, borderColor: themeColors.textPrimary }],
                         errorMsg && styles.pinDotError,
                       ]}
                     />
@@ -379,8 +383,8 @@ export const PaymentAuthModal: React.FC = () => {
 
               {isProcessingTx && (
                 <View style={styles.processingRow}>
-                  <ActivityIndicator size="small" color="#0F294A" />
-                  <Text style={styles.processingText}>
+                  <ActivityIndicator size="small" color={themeColors.textPrimary} />
+                  <Text style={[styles.processingText, { color: themeColors.textPrimary }]}>
                     {language === 'hi'
                       ? 'लेनदेन सुरक्षित रूप से संसाधित हो रहा है...'
                       : language === 'gu'
@@ -408,24 +412,24 @@ export const PaymentAuthModal: React.FC = () => {
                       return (
                         <TouchableOpacity
                           key={colIdx}
-                          style={styles.keypadKey}
+                          style={[styles.keypadKey, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
                           onPress={handleDelete}
                           activeOpacity={0.6}
                           disabled={isProcessingTx}
                         >
-                          <Delete size={20} color="#334155" />
+                          <Delete size={20} color={themeColors.iconNeutral} />
                         </TouchableOpacity>
                       );
                     }
                     return (
                       <TouchableOpacity
                         key={colIdx}
-                        style={styles.keypadKey}
+                        style={[styles.keypadKey, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
                         onPress={() => handleKeyPress(key)}
                         activeOpacity={0.6}
                         disabled={isProcessingTx}
                       >
-                        <Text style={styles.keypadKeyText}>{key}</Text>
+                        <Text style={[styles.keypadKeyText, { color: themeColors.textPrimary }]}>{key}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -441,6 +445,7 @@ export const PaymentAuthModal: React.FC = () => {
             style={[
               styles.receiptSheet,
               {
+                backgroundColor: themeColors.cardBg,
                 opacity: receiptAnim,
                 transform: [
                   {
@@ -454,11 +459,11 @@ export const PaymentAuthModal: React.FC = () => {
             ]}
           >
             {/* Top Success Badge */}
-            <View style={styles.receiptTopCircle}>
-              <CheckCircle2 size={36} color="#059669" />
+            <View style={[styles.receiptTopCircle, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5', borderColor: isDark ? '#10B981' : '#A7F3D0' }]}>
+              <CheckCircle2 size={36} color={themeColors.success} />
             </View>
 
-            <Text style={styles.receiptSuccessTitle}>
+            <Text style={[styles.receiptSuccessTitle, { color: themeColors.textPrimary }]}>
               {language === 'hi'
                 ? 'भुगतान सफलतापूर्वक पूरा हुआ'
                 : language === 'gu'
@@ -466,51 +471,51 @@ export const PaymentAuthModal: React.FC = () => {
                 : 'Payment Successful'}
             </Text>
 
-            <Text style={styles.receiptMerchantSubtitle}>
+            <Text style={[styles.receiptMerchantSubtitle, { color: themeColors.textSecondary }]}>
               {language === 'hi' ? 'भुगतान प्राप्तकर्ता:' : language === 'gu' ? 'ચુકવણી પ્રાપ્તકર્તા:' : 'Paid to'}{' '}
-              <Text style={{ fontWeight: '700', color: '#0F172A' }}>{paymentData.merchant}</Text>
+              <Text style={{ fontWeight: '700', color: themeColors.textPrimary }}>{paymentData.merchant}</Text>
             </Text>
 
             <View style={styles.receiptAmountBox}>
-              <Text style={styles.receiptAmountText}>
+              <Text style={[styles.receiptAmountText, { color: themeColors.success }]}>
                 ₹{paymentData.amount.toLocaleString('en-IN')}.00
               </Text>
-              <View style={styles.receiptStatusPill}>
-                <ShieldCheck size={12} color="#059669" />
-                <Text style={styles.receiptStatusPillText}>
+              <View style={[styles.receiptStatusPill, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
+                <ShieldCheck size={12} color={themeColors.success} />
+                <Text style={[styles.receiptStatusPillText, { color: themeColors.success }]}>
                   {authMethodUsed === 'Biometrics' ? 'Verified by Biometrics' : 'Authorized by UPI PIN'}
                 </Text>
               </View>
             </View>
 
             {/* Official Receipt Ledger Card */}
-            <View style={styles.receiptLedgerCard}>
+            <View style={[styles.receiptLedgerCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.ledgerRow}>
-                <Text style={styles.ledgerLabel}>UPI Ref Number</Text>
-                <Text style={styles.ledgerValue}>{txRefId}</Text>
+                <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>UPI Ref Number</Text>
+                <Text style={[styles.ledgerValue, { color: themeColors.textPrimary }]}>{txRefId}</Text>
               </View>
-              <View style={styles.ledgerDivider} />
+              <View style={[styles.ledgerDivider, { backgroundColor: themeColors.border }]} />
               <View style={styles.ledgerRow}>
-                <Text style={styles.ledgerLabel}>Debited From</Text>
-                <Text style={styles.ledgerValue}>ABC Bank A/C •••• 4092</Text>
+                <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>Debited From</Text>
+                <Text style={[styles.ledgerValue, { color: themeColors.textPrimary }]}>ABC Bank A/C •••• 4092</Text>
               </View>
-              <View style={styles.ledgerDivider} />
+              <View style={[styles.ledgerDivider, { backgroundColor: themeColors.border }]} />
               <View style={styles.ledgerRow}>
-                <Text style={styles.ledgerLabel}>Updated Balance</Text>
-                <Text style={[styles.ledgerValue, { color: '#059669' }]}>
+                <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>Updated Balance</Text>
+                <Text style={[styles.ledgerValue, { color: themeColors.textPrimary }]}>
                   ₹{balance.available.toLocaleString('en-IN')}
                 </Text>
               </View>
-              <View style={styles.ledgerDivider} />
+              <View style={[styles.ledgerDivider, { backgroundColor: themeColors.border }]} />
               <View style={styles.ledgerRow}>
-                <Text style={styles.ledgerLabel}>Payment Mode</Text>
-                <Text style={styles.ledgerValue}>Instant Institutional UPI</Text>
+                <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>Payment Mode</Text>
+                <Text style={[styles.ledgerValue, { color: themeColors.textPrimary }]}>Instant Institutional UPI</Text>
               </View>
             </View>
 
             {/* Done Button */}
             <TouchableOpacity
-              style={styles.receiptDoneButton}
+              style={[styles.receiptDoneButton, { backgroundColor: themeColors.primary }]}
               onPress={handleFinish}
               activeOpacity={0.85}
             >
@@ -519,7 +524,7 @@ export const PaymentAuthModal: React.FC = () => {
               </Text>
             </TouchableOpacity>
 
-            <Text style={styles.receiptDismissHint}>
+            <Text style={[styles.receiptDismissHint, { color: themeColors.textMuted }]}>
               {language === 'hi'
                 ? 'स्वचालित रूप से बंद हो रहा है...'
                 : language === 'gu'
@@ -536,7 +541,7 @@ export const PaymentAuthModal: React.FC = () => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'flex-end',
   },
   sheet: {

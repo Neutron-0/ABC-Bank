@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import { ContextCard as ContextCardType } from '../../types';
-import { colors, typography, spacing, radii } from '../../theme';
+import { typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { motion } from '../../motion';
@@ -20,7 +20,7 @@ import {
   Zap,
   CreditCard,
   Award,
-  Sparkles,
+  Clock,
   CheckCircle2,
 } from 'lucide-react-native';
 
@@ -29,6 +29,7 @@ interface Props {
 }
 
 export const ContextCard: React.FC<Props> = ({ card }) => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const {
     dismissCard,
     openJourney,
@@ -38,6 +39,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
     language,
   } = useCustomerStore();
   const t = getTranslation(language);
+
 
   // Tactile press scale animation
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -272,17 +274,17 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
       case 'credit-card':
         return <CreditCard size={size} color={color} />;
       default:
-        return <Sparkles size={size} color={color} />;
+        return <Clock size={size} color={color} />;
     }
   };
 
   // =========================================================================
-  // PATTERN 1: EVENT ROW (Section 22: e.g. "Salary received Yesterday")
+  // PATTERN 1: EVENT ROW (e.g. "Salary received Yesterday")
   // =========================================================================
   if (card.type === 'event') {
     return (
       <Animated.View style={[styles.eventRowWrap, cardAnimatedStyle]}>
-        <View style={styles.eventRow}>
+        <View style={[styles.eventRow, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
           <TouchableOpacity
             style={styles.eventMainArea}
             onPress={handlePrimaryAction}
@@ -291,12 +293,12 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             delayPressIn={0}
             activeOpacity={0.7}
           >
-            <View style={styles.eventIconCircle}>
-              <CheckCircle2 size={16} color="#059669" />
+            <View style={[styles.eventIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <CheckCircle2 size={16} color={themeColors.primary} />
             </View>
             <View style={styles.eventTextWrap}>
-              <Text style={styles.eventTitle}>{card.title}</Text>
-              <Text style={styles.eventSubtitle}>{card.description}</Text>
+              <Text style={[styles.eventTitle, { color: themeColors.textPrimary }]}>{card.title}</Text>
+              <Text style={[styles.eventSubtitle, { color: themeColors.textSecondary }]}>{card.description}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -305,18 +307,18 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   }
 
   // =========================================================================
-  // PATTERN 2: INLINE EDITORIAL INSIGHT (Section 21: e.g. "YOUR SAVINGS")
+  // PATTERN 2: INLINE EDITORIAL INSIGHT (e.g. "YOUR SAVINGS")
   // =========================================================================
-  if (card.type === 'insight') {
+  if (card.type === 'opportunity') {
     return (
       <Animated.View style={[styles.insightBlockWrap, cardAnimatedStyle]}>
-        <View style={styles.insightBlock}>
+        <View style={[styles.insightBlock, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
           <View style={styles.insightHeaderRow}>
-            <Text style={styles.insightEyebrow}>FINANCIAL INSIGHT</Text>
+            <Text style={[styles.insightEyebrow, { color: themeColors.primary }]}>FINANCIAL INSIGHT</Text>
           </View>
 
-          <Text style={styles.insightTitle}>{card.title}</Text>
-          <Text style={styles.insightDescription}>{card.description}</Text>
+          <Text style={[styles.insightTitle, { color: themeColors.textPrimary }]}>{card.title}</Text>
+          <Text style={[styles.insightDescription, { color: themeColors.textSecondary }]}>{card.description}</Text>
 
           <TouchableOpacity
             style={styles.insightLink}
@@ -324,8 +326,8 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             delayPressIn={0}
             activeOpacity={0.7}
           >
-            <Text style={styles.insightLinkText}>{primaryAction.label}</Text>
-            <ArrowRight size={14} color="#111318" />
+            <Text style={[styles.insightLinkText, { color: themeColors.primary }]}>{primaryAction.label}</Text>
+            <ArrowRight size={14} color={themeColors.primary} />
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -333,27 +335,27 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   }
 
   // =========================================================================
-  // PATTERN 3: EMPATHETIC ASSISTANCE BANNER (Section 16: e.g. Medical Care)
+  // PATTERN 4: EMPATHETIC ASSISTANCE BANNER (e.g. Medical Care)
   // =========================================================================
   if (card.type === 'assistance') {
     return (
       <Animated.View style={[styles.assistanceWrap, cardAnimatedStyle]}>
-        <View style={styles.assistanceBanner}>
+        <View style={[styles.assistanceBanner, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
           <View style={styles.assistanceTopRow}>
-            <View style={styles.assistanceIconBox}>
-              <HeartHandshake size={18} color="#0D9488" />
+            <View style={[styles.assistanceIconBox, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <HeartHandshake size={18} color={themeColors.iconNeutral} />
             </View>
             <View style={styles.assistanceTextWrap}>
-              <Text style={styles.assistanceTag}>HEALTHCARE SUPPORT</Text>
-              <Text style={styles.assistanceTitle}>{card.title}</Text>
+              <Text style={[styles.assistanceTag, { color: isDark ? themeColors.textSecondary : themeColors.primary }]}>HEALTHCARE SUPPORT</Text>
+              <Text style={[styles.assistanceTitle, { color: themeColors.textPrimary }]}>{card.title}</Text>
             </View>
           </View>
 
-          <Text style={styles.assistanceDescription}>{card.description}</Text>
+          <Text style={[styles.assistanceDescription, { color: themeColors.textSecondary }]}>{card.description}</Text>
 
           <View style={styles.assistanceButtonRow}>
             <TouchableOpacity
-              style={styles.assistancePrimaryBtn}
+              style={[styles.assistancePrimaryBtn, { backgroundColor: isDark ? '#27272A' : themeColors.primary }]}
               onPress={handlePrimaryAction}
               delayPressIn={0}
               activeOpacity={0.8}
@@ -363,12 +365,12 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.assistanceSecondaryBtn}
+              style={[styles.assistanceSecondaryBtn, { borderColor: themeColors.border, backgroundColor: themeColors.cardBg }]}
               onPress={() => setActiveTab('assistant')}
               delayPressIn={0}
               activeOpacity={0.8}
             >
-              <Text style={styles.assistanceSecondaryBtnText}>
+              <Text style={[styles.assistanceSecondaryBtnText, { color: isDark ? themeColors.textPrimary : themeColors.primary }]}>
                 {language === 'hi' ? 'सहायता केंद्र' : language === 'gu' ? 'સહાય કેન્દ્ર' : 'Assistance Desk'}
               </Text>
             </TouchableOpacity>
@@ -379,23 +381,23 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   }
 
   // =========================================================================
-  // PATTERN 4: SECURITY ALERT STRIP (Section 18: e.g. Fraud Warning)
+  // PATTERN 5: SECURITY ALERT STRIP (e.g. Fraud Warning)
   // =========================================================================
   if (card.type === 'warning') {
     return (
       <Animated.View style={[styles.securityWrap, cardAnimatedStyle]}>
-        <View style={styles.securityStrip}>
+        <View style={[styles.securityStrip, { backgroundColor: isDark ? '#450A0A' : '#FEF2F2', borderColor: isDark ? '#7F1D1D' : '#FECACA' }]}>
           <View style={styles.securityTopRow}>
-            <View style={styles.securityIconBox}>
+            <View style={[styles.securityIconBox, { backgroundColor: isDark ? '#7F1D1D' : '#FEE2E2' }]}>
               <ShieldAlert size={18} color="#DC2626" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.securityTag}>SECURITY REVIEW</Text>
-              <Text style={styles.securityTitle}>{card.title}</Text>
+              <Text style={[styles.securityTitle, { color: isDark ? '#FCA5A5' : '#991B1B' }]}>{card.title}</Text>
             </View>
           </View>
 
-          <Text style={styles.securityDescription}>{card.description}</Text>
+          <Text style={[styles.securityDescription, { color: isDark ? '#F87171' : '#7F1D1D' }]}>{card.description}</Text>
 
           <View style={styles.securityActionRow}>
             <TouchableOpacity
@@ -414,26 +416,26 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   }
 
   // =========================================================================
-  // PATTERN 5: PRIMARY ACTION HERO (Section 20: Large, Minimal, Expressive)
+  // PATTERN 6: PRIMARY ACTION HERO (Minimal, Expressive Banking Action)
   // =========================================================================
   if (card.type === 'action') {
     return (
       <Animated.View style={[styles.actionSurfaceWrap, cardAnimatedStyle]}>
-        <View style={styles.actionSurface}>
+        <View style={[styles.actionSurface, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
           <View style={styles.actionTopRow}>
-            <View style={styles.actionIconBox}>
-              {renderIcon('#111318', 22)}
+            <View style={[styles.actionIconBox, { backgroundColor: themeColors.cardBgSecondary }]}>
+              {renderIcon(themeColors.primary, 20)}
             </View>
             <View style={styles.actionHeaderRight}>
               {card.dismissible && (
                 <TouchableOpacity
                   onPress={handleDismiss}
-                  style={styles.dismissCircle}
+                  style={[styles.dismissCircle, { backgroundColor: themeColors.cardBgSecondary }]}
                   delayPressIn={0}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   activeOpacity={0.7}
                 >
-                  <X size={14} color="#8C95A6" />
+                  <X size={14} color={themeColors.textMuted} />
                 </TouchableOpacity>
               )}
             </View>
@@ -446,13 +448,13 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             delayPressIn={0}
             activeOpacity={0.85}
           >
-            <Text style={styles.actionSurfaceTitle}>{card.title}</Text>
-            <Text style={styles.actionSurfaceDesc}>{card.description}</Text>
+            <Text style={[styles.actionSurfaceTitle, { color: themeColors.textPrimary }]}>{card.title}</Text>
+            <Text style={[styles.actionSurfaceDesc, { color: themeColors.textSecondary }]}>{card.description}</Text>
           </TouchableOpacity>
 
           <View style={styles.actionCtaRow}>
             <TouchableOpacity
-              style={styles.actionCtaPill}
+              style={[styles.actionCtaPill, { backgroundColor: themeColors.primary }]}
               onPress={handlePrimaryAction}
               delayPressIn={0}
               activeOpacity={0.8}
@@ -467,26 +469,26 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   }
 
   // =========================================================================
-  // PATTERN 6: JUSTIFIED PROTECTION / PRODUCT / DEFAULT (Section 24)
+  // PATTERN 6: JUSTIFIED PROTECTION / PRODUCT / DEFAULT
   // =========================================================================
   return (
     <Animated.View style={[styles.defaultCardWrap, cardAnimatedStyle]}>
-      <View style={styles.defaultCard}>
+      <View style={[styles.defaultCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
         <View style={styles.defaultTopRow}>
-          <View style={styles.defaultIconBox}>
-            {renderIcon('#111318', 18)}
+          <View style={[styles.defaultIconBox, { backgroundColor: themeColors.cardBgSecondary }]}>
+            {renderIcon(themeColors.primary, 18)}
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.defaultEyebrow}>ACCOUNT MANDATE & ADVISORY</Text>
-            <Text style={styles.defaultTitle}>{card.title}</Text>
+            <Text style={[styles.defaultEyebrow, { color: themeColors.primary }]}>ACCOUNT MANDATE & ADVISORY</Text>
+            <Text style={[styles.defaultTitle, { color: themeColors.textPrimary }]}>{card.title}</Text>
           </View>
         </View>
 
-        <Text style={styles.defaultDesc}>{card.description}</Text>
+        <Text style={[styles.defaultDesc, { color: themeColors.textSecondary }]}>{card.description}</Text>
 
         <View style={styles.defaultFooterRow}>
           <TouchableOpacity
-            style={styles.defaultActionBtn}
+            style={[styles.defaultActionBtn, { backgroundColor: themeColors.primary }]}
             onPress={handlePrimaryAction}
             delayPressIn={0}
             activeOpacity={0.8}
@@ -497,12 +499,12 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
 
           {secondaryAction && (
             <TouchableOpacity
-              style={styles.defaultSecondaryBtn}
+              style={[styles.defaultSecondaryBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
               onPress={handleSecondaryAction}
               delayPressIn={0}
               activeOpacity={0.8}
             >
-              <Text style={styles.defaultSecondaryBtnText}>{secondaryAction.label}</Text>
+              <Text style={[styles.defaultSecondaryBtnText, { color: themeColors.textSecondary }]}>{secondaryAction.label}</Text>
             </TouchableOpacity>
           )}
         </View>

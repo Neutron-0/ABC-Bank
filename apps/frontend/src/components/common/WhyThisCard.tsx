@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, TouchableWithoutFeedback } from 'react-native';
-import { colors, typography, spacing, radii } from '../../theme';
+import { colors, typography, spacing, radii, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { Check, X, ShieldCheck } from 'lucide-react-native';
 
 export const WhyThisCard: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { selectedWhyCard, setWhyCard, language } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -21,62 +22,62 @@ export const WhyThisCard: React.FC = () => {
       <TouchableWithoutFeedback onPress={() => setWhyCard(null)}>
         <View style={styles.backdrop}>
           <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-            <View style={styles.sheet}>
+            <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
               {/* Drag Handle Indicator */}
               <View style={styles.handleWrap}>
-                <View style={styles.dragHandle} />
+                <View style={[styles.dragHandle, { backgroundColor: themeColors.border }]} />
               </View>
 
               {/* Header */}
-              <View style={styles.header}>
+              <View style={[styles.header, { borderBottomColor: themeColors.border }]}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.title}>{t.whyModal.title}</Text>
-                  <Text style={styles.subtitle}>{t.whyModal.subtitle}</Text>
+                  <Text style={[styles.title, { color: themeColors.textPrimary }]}>{t.whyModal.title}</Text>
+                  <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>{t.whyModal.subtitle}</Text>
                 </View>
                 <TouchableOpacity
                   onPress={() => setWhyCard(null)}
-                  style={styles.closeCircle}
+                  style={[styles.closeCircle, { backgroundColor: themeColors.cardBgSecondary }]}
                   delayPressIn={0}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <X size={16} color="#525866" />
+                  <X size={16} color={themeColors.textSecondary} />
                 </TouchableOpacity>
               </View>
 
               <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Surfaced Action Preview */}
-                <View style={styles.previewBox}>
-                  <Text style={styles.previewEyebrow}>{t.whyModal.currentContext}</Text>
-                  <Text style={styles.previewTitle}>{selectedWhyCard.title}</Text>
-                  <Text style={styles.previewDesc}>{selectedWhyCard.description}</Text>
+                <View style={[styles.previewBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                  <Text style={[styles.previewEyebrow, { color: themeColors.textMuted }]}>{t.whyModal.currentContext}</Text>
+                  <Text style={[styles.previewTitle, { color: themeColors.textPrimary }]}>{selectedWhyCard.title}</Text>
+                  <Text style={[styles.previewDesc, { color: themeColors.textSecondary }]}>{selectedWhyCard.description}</Text>
                 </View>
 
                 {/* Primary Trigger Statement */}
                 <View style={styles.section}>
-                  <Text style={styles.sectionHeading}>{t.whyModal.weNoticed}</Text>
+                  <Text style={[styles.sectionHeading, { color: themeColors.textPrimary }]}>{t.whyModal.weNoticed}</Text>
                   {selectedWhyCard.whyDetails && selectedWhyCard.whyDetails.length > 0 ? (
                     selectedWhyCard.whyDetails.map((detail, idx) => (
                       <View key={idx} style={styles.checkRow}>
-                        <View style={styles.checkCircle}>
-                          <Check size={12} color="#059669" strokeWidth={3} />
+                        <View style={[styles.checkCircle, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
+                          <Check size={12} color={isDark ? '#34D399' : '#059669'} strokeWidth={3} />
                         </View>
-                        <Text style={styles.checkText}>{detail}</Text>
+                        <Text style={[styles.checkText, { color: themeColors.textPrimary }]}>{detail}</Text>
                       </View>
                     ))
                   ) : (
                     <View style={styles.checkRow}>
-                      <View style={styles.checkCircle}>
-                        <Check size={12} color="#059669" strokeWidth={3} />
+                      <View style={[styles.checkCircle, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
+                        <Check size={12} color={isDark ? '#34D399' : '#059669'} strokeWidth={3} />
                       </View>
-                      <Text style={styles.checkText}>{selectedWhyCard.reason}</Text>
+                      <Text style={[styles.checkText, { color: themeColors.textPrimary }]}>{selectedWhyCard.reason}</Text>
                     </View>
                   )}
                 </View>
 
                 {/* Ethical Guardrails Note */}
-                <View style={styles.ethicalNote}>
-                  <ShieldCheck size={16} color="#0D9488" />
-                  <Text style={styles.ethicalText}>
+                <View style={[styles.ethicalNote, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                  <ShieldCheck size={16} color={isDark ? themeColors.textPrimary : '#0D9488'} />
+                  <Text style={[styles.ethicalText, { color: themeColors.textSecondary }]}>
                     {language === 'hi'
                       ? 'प्रमोशन से पहले सुरक्षा: यदि कैश फ्लो तनाव या चिकित्सा आपातकाल पाया जाता है, तो लोन और उत्पाद ऑफ़र पूरी तरह दबा दिए जाते हैं।'
                       : language === 'gu'
@@ -89,7 +90,7 @@ export const WhyThisCard: React.FC = () => {
               {/* Bottom Done Button */}
               <View style={styles.footer}>
                 <TouchableOpacity
-                  style={styles.doneBtn}
+                  style={[styles.doneBtn, { backgroundColor: isDark ? '#27272A' : '#111318' }]}
                   onPress={() => setWhyCard(null)}
                   delayPressIn={0}
                   activeOpacity={0.8}

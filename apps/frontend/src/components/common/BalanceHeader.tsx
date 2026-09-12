@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, spacing, radii, shadows } from '../../theme';
+import { colors, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { AnimatedBalance } from './AnimatedBalance';
@@ -20,6 +20,7 @@ import {
 } from 'lucide-react-native';
 
 export const BalanceHeader: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const {
     balance,
     isBalanceHidden,
@@ -31,6 +32,7 @@ export const BalanceHeader: React.FC = () => {
     openJourney,
     showToast,
   } = useCustomerStore();
+
   const t = getTranslation(language);
   const bh = t.balanceHeader;
 
@@ -46,35 +48,35 @@ export const BalanceHeader: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Signature Jio Payments Bank Luxury Account Card */}
-      <View style={styles.heroCard}>
+      {/* Signature Institutional Banking Luxury Account Card */}
+      <View style={[styles.heroCard, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
         {/* Top Account Identifier Row */}
         <View style={styles.cardTopRow}>
           <View style={styles.bankTagGroup}>
-            <View style={styles.shieldIconWrap}>
-              <ShieldCheck size={14} color="#002970" />
+            <View style={[styles.shieldIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <ShieldCheck size={14} color={isDark ? themeColors.textPrimary : themeColors.primary} />
             </View>
             <View>
-              <Text style={styles.bankTagTitle}>ABC PAYMENTS BANK</Text>
-              <Text style={styles.accountNumberText}>Savings A/C •••• 4092</Text>
+              <Text style={[styles.bankTagTitle, { color: isDark ? themeColors.textPrimary : themeColors.primary }]}>ABC PAYMENTS BANK</Text>
+              <Text style={[styles.accountNumberText, { color: themeColors.textSecondary }]}>Savings A/C •••• 4092</Text>
             </View>
           </View>
 
           {/* UPI ID Pill with Copy */}
           <TouchableOpacity
-            style={styles.upiPill}
+            style={[styles.upiPill, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}
             onPress={handleCopyUpiId}
             activeOpacity={0.7}
           >
-            <Text style={styles.upiPillText}>rahul@abcbank</Text>
-            <Copy size={11} color="#0052CC" />
+            <Text style={[styles.upiPillText, { color: themeColors.textSecondary }]}>rahul@abcbank</Text>
+            <Copy size={11} color={themeColors.iconNeutral} />
           </TouchableOpacity>
         </View>
 
         {/* Available Balance Figure */}
         <View style={styles.balanceContainer}>
           <View style={styles.balanceLabelRow}>
-            <Text style={styles.balanceLabel}>
+            <Text style={[styles.balanceLabel, { color: themeColors.textSecondary }]}>
               {language === 'hi' ? 'उपलब्ध शेष राशि' : language === 'gu' ? 'ઉપલબ્ધ બેલેન્સ' : 'AVAILABLE BALANCE'}
             </Text>
             <TouchableOpacity
@@ -84,9 +86,9 @@ export const BalanceHeader: React.FC = () => {
               activeOpacity={0.7}
             >
               {isBalanceHidden ? (
-                <EyeOff size={15} color="#64748B" />
+                <EyeOff size={15} color={themeColors.textSecondary} />
               ) : (
-                <Eye size={15} color="#64748B" />
+                <Eye size={15} color={themeColors.textSecondary} />
               )}
             </TouchableOpacity>
           </View>
@@ -102,49 +104,55 @@ export const BalanceHeader: React.FC = () => {
             </View>
 
             <TouchableOpacity
-              style={styles.addMoneyPill}
+              style={[
+                styles.addMoneyPill,
+                {
+                  backgroundColor: isDark ? themeColors.cardBgSecondary : themeColors.primarySubtle,
+                  borderColor: themeColors.borderLight,
+                },
+              ]}
               onPress={() => setActiveTab('payments')}
               activeOpacity={0.8}
             >
-              <Plus size={13} color="#002970" />
-              <Text style={styles.addMoneyPillText}>
+              <Plus size={13} color={isDark ? themeColors.textPrimary : themeColors.primary} />
+              <Text style={[styles.addMoneyPillText, { color: isDark ? themeColors.textPrimary : themeColors.primary }]}>
                 {language === 'hi' ? 'पैसे जोड़ें' : language === 'gu' ? 'પૈસા ઉમેરો' : 'Add Money'}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Secondary Ledger Metrics Row (Jio Payments Bank Depth) */}
-        <View style={styles.ledgerRow}>
+        {/* Secondary Ledger Metrics Row */}
+        <View style={[styles.ledgerRow, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight }]}>
           <View style={styles.ledgerCol}>
-            <Text style={styles.ledgerLabel}>
+            <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>
               {language === 'hi' ? 'कुल बैलेंस' : language === 'gu' ? 'કુલ બેલેન્સ' : 'Total Deposits'}
             </Text>
-            <Text style={styles.ledgerValue}>
+            <Text style={[styles.ledgerValue, { color: themeColors.textPrimary }]}>
               {isBalanceHidden ? '••••••' : '₹72,500'}
             </Text>
           </View>
-          <View style={styles.ledgerDivider} />
+          <View style={[styles.ledgerDivider, { backgroundColor: themeColors.divider }]} />
           <View style={styles.ledgerCol}>
-            <Text style={styles.ledgerLabel}>
+            <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>
               {language === 'hi' ? 'ऑटो-स्वीप एफडी' : language === 'gu' ? 'ઑટો-સ્વીપ FD' : 'Auto-Sweep FD'}
             </Text>
-            <Text style={[styles.ledgerValue, { color: '#059669' }]}>
+            <Text style={[styles.ledgerValue, { color: themeColors.brandSecondary }]}>
               {isBalanceHidden ? '••••••' : '₹18,000 (7.2%)'}
             </Text>
           </View>
-          <View style={styles.ledgerDivider} />
+          <View style={[styles.ledgerDivider, { backgroundColor: themeColors.divider }]} />
           <View style={styles.ledgerCol}>
-            <Text style={styles.ledgerLabel}>
+            <Text style={[styles.ledgerLabel, { color: themeColors.textSecondary }]}>
               {language === 'hi' ? 'आईएफएससी' : language === 'gu' ? 'IFSC' : 'IFSC Code'}
             </Text>
-            <Text style={styles.ledgerValue}>ABCD0001048</Text>
+            <Text style={[styles.ledgerValue, { color: themeColors.textPrimary }]}>ABCD0001048</Text>
           </View>
         </View>
       </View>
 
-      {/* JioFinance-Style 4-Column Primary Transfer Hub */}
-      <View style={styles.quickActionsBar}>
+      {/* 4-Column Primary Transfer Hub (Monochromatic Banking Actions) */}
+      <View style={[styles.quickActionsBar, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
         {/* 1. Scan QR */}
         <TouchableOpacity
           style={styles.quickActionItem}
@@ -152,10 +160,10 @@ export const BalanceHeader: React.FC = () => {
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: '#EFF6FF' }]}>
-            <QrCode size={20} color="#0052CC" />
+          <View style={[styles.quickActionCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight, borderWidth: 1 }]}>
+            <QrCode size={19} color={isDark ? themeColors.textPrimary : themeColors.primary} />
           </View>
-          <Text style={styles.quickActionLabel}>
+          <Text style={[styles.quickActionLabel, { color: themeColors.textPrimary }]}>
             {language === 'hi' ? 'स्कैन क्यूआर' : language === 'gu' ? 'સ્કેન QR' : 'Scan QR'}
           </Text>
         </TouchableOpacity>
@@ -167,10 +175,10 @@ export const BalanceHeader: React.FC = () => {
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: '#ECFDF5' }]}>
-            <Smartphone size={20} color="#059669" />
+          <View style={[styles.quickActionCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight, borderWidth: 1 }]}>
+            <Smartphone size={19} color={themeColors.iconNeutral} />
           </View>
-          <Text style={styles.quickActionLabel}>
+          <Text style={[styles.quickActionLabel, { color: themeColors.textPrimary }]}>
             {language === 'hi' ? 'मोबाइल पे' : language === 'gu' ? 'મોબાઇલ પે' : 'To Mobile'}
           </Text>
         </TouchableOpacity>
@@ -182,10 +190,10 @@ export const BalanceHeader: React.FC = () => {
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: '#FEF3C7' }]}>
-            <Building2 size={20} color="#D97706" />
+          <View style={[styles.quickActionCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight, borderWidth: 1 }]}>
+            <Building2 size={19} color={themeColors.iconNeutral} />
           </View>
-          <Text style={styles.quickActionLabel}>
+          <Text style={[styles.quickActionLabel, { color: themeColors.textPrimary }]}>
             {language === 'hi' ? 'बैंक खाता' : language === 'gu' ? 'બેંક ખાતું' : 'To Bank'}
           </Text>
         </TouchableOpacity>
@@ -197,16 +205,17 @@ export const BalanceHeader: React.FC = () => {
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: '#F3E8FF' }]}>
-            <ArrowLeftRight size={19} color="#7C3AED" />
+          <View style={[styles.quickActionCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight, borderWidth: 1 }]}>
+            <ArrowLeftRight size={19} color={themeColors.iconNeutral} />
           </View>
-          <Text style={styles.quickActionLabel}>
+          <Text style={[styles.quickActionLabel, { color: themeColors.textPrimary }]}>
             {language === 'hi' ? 'यूपीआई आईडी' : language === 'gu' ? 'UPI ID' : 'To UPI ID'}
           </Text>
         </TouchableOpacity>
       </View>
     </View>
   );
+
 };
 
 const styles = StyleSheet.create({
@@ -216,13 +225,13 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   heroCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.cardBg,
     borderRadius: radii.card,
     padding: spacing.lg,
     marginBottom: spacing.md,
     ...shadows.soft,
     borderWidth: 1,
-    borderColor: '#ECEEF2',
+    borderColor: colors.border,
   },
   cardTopRow: {
     flexDirection: 'row',
@@ -239,27 +248,27 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: colors.cardBgSecondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   bankTagTitle: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#002970',
+    color: colors.primary,
     letterSpacing: 0.5,
   },
   accountNumberText: {
     fontSize: 10,
     fontWeight: '500',
-    color: '#64748B',
+    color: colors.textSecondary,
     marginTop: 1,
   },
   upiPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: '#F0F5FF',
+    backgroundColor: colors.cardBgSecondary,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radii.pill,
@@ -267,7 +276,7 @@ const styles = StyleSheet.create({
   upiPillText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#0052CC',
+    color: colors.textSecondary,
   },
   balanceContainer: {
     marginBottom: 0,
@@ -281,7 +290,7 @@ const styles = StyleSheet.create({
   balanceLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#64748B',
+    color: colors.textSecondary,
     letterSpacing: 0.8,
   },
   eyeBtn: {
@@ -299,17 +308,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: colors.primarySubtle,
     paddingVertical: 7,
     paddingHorizontal: 14,
     borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: '#DBEAFE',
+    borderColor: colors.borderLight,
   },
   addMoneyPillText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#002970',
+    color: colors.primary,
   },
 
   // Secondary Ledger Metrics
@@ -317,13 +326,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.cardBgSecondary,
     borderRadius: radii.md,
     paddingVertical: 10,
     paddingHorizontal: 12,
     marginTop: 14,
     borderWidth: 1,
-    borderColor: '#F1F5F9',
+    borderColor: colors.borderLight,
   },
   ledgerCol: {
     flex: 1,
@@ -332,12 +341,12 @@ const styles = StyleSheet.create({
   ledgerDivider: {
     width: 1,
     height: 22,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: colors.divider,
   },
   ledgerLabel: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#64748B',
+    color: colors.textSecondary,
     letterSpacing: 0.3,
     textTransform: 'uppercase',
     marginBottom: 2,
@@ -345,7 +354,7 @@ const styles = StyleSheet.create({
   ledgerValue: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#0F172A',
+    color: colors.textPrimary,
     letterSpacing: -0.1,
   },
 
@@ -354,13 +363,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.cardBg,
     borderRadius: radii.card,
     paddingVertical: 14,
     paddingHorizontal: 12,
     ...shadows.soft,
     borderWidth: 1,
-    borderColor: '#ECEEF2',
+    borderColor: colors.border,
   },
   quickActionItem: {
     alignItems: 'center',
@@ -377,7 +386,7 @@ const styles = StyleSheet.create({
   quickActionLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#0F172A',
+    color: colors.textPrimary,
     textAlign: 'center',
   },
 });

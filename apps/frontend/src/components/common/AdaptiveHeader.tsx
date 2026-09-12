@@ -1,14 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { motion } from '../../motion';
 import { Bell, Globe, QrCode, ShieldCheck, Search } from 'lucide-react-native';
 
 export const AdaptiveHeader: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { profile, language, setLanguage, openJourney, currentState, setActiveTab } = useCustomerStore();
   const t = getTranslation(language);
+
 
   const toggleLanguage = () => {
     motion.gentleLayout();
@@ -43,7 +45,7 @@ export const AdaptiveHeader: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
       <View style={styles.leftRow}>
         <TouchableOpacity
           style={styles.avatarWrap}
@@ -52,7 +54,7 @@ export const AdaptiveHeader: React.FC = () => {
         >
           <Image
             source={{ uri: profile.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120' }}
-            style={styles.avatar}
+            style={[styles.avatar, { borderColor: themeColors.cardBg }]}
           />
           <View style={styles.verifiedDot}>
             <ShieldCheck size={8} color="#FFFFFF" />
@@ -60,7 +62,7 @@ export const AdaptiveHeader: React.FC = () => {
         </TouchableOpacity>
 
         <View style={styles.textWrap}>
-          <Text style={styles.greetingText} numberOfLines={1}>
+          <Text style={[styles.greetingText, { color: themeColors.textPrimary }]} numberOfLines={1}>
             {getGreeting()}
           </Text>
           <View style={styles.subRow}>
@@ -75,48 +77,49 @@ export const AdaptiveHeader: React.FC = () => {
       <View style={styles.rightRow}>
         {/* Universal Search Shortcut */}
         <TouchableOpacity
-          style={styles.iconButton}
+          style={[styles.iconButton, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
           onPress={() => setActiveTab('assistant')}
           activeOpacity={0.75}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Search size={18} color="#0F172A" />
+          <Search size={18} color={themeColors.iconNeutral} />
         </TouchableOpacity>
 
         {/* Quick QR Scanner Shortcut */}
         <TouchableOpacity
-          style={styles.iconButton}
+          style={[styles.iconButton, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
           onPress={() => setActiveTab('payments')}
           activeOpacity={0.75}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <QrCode size={18} color="#002970" />
+          <QrCode size={18} color={themeColors.iconNeutral} />
         </TouchableOpacity>
 
         {/* Vernacular Language Selector */}
         <TouchableOpacity
-          style={styles.langButton}
+          style={[styles.langButton, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
           onPress={toggleLanguage}
           activeOpacity={0.8}
         >
-          <Globe size={13} color="#0F172A" />
-          <Text style={styles.langText}>{getLangLabel()}</Text>
+          <Globe size={13} color={themeColors.iconNeutral} />
+          <Text style={[styles.langText, { color: themeColors.textPrimary }]}>{getLangLabel()}</Text>
         </TouchableOpacity>
 
         {/* Notifications */}
         <TouchableOpacity
-          style={styles.iconButton}
+          style={[styles.iconButton, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}
           onPress={() => openJourney('prototype_lab')}
           activeOpacity={0.8}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Bell size={18} color="#0F172A" />
-          {currentState !== 'normal' && <View style={styles.unreadBadge} />}
+          <Bell size={18} color={themeColors.iconNeutral} />
+          {currentState !== 'normal' && <View style={[styles.unreadBadge, { backgroundColor: themeColors.brandSecondary }]} />}
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -126,7 +129,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.sm + 2,
-    backgroundColor: colors.bg,
   },
   leftRow: {
     flexDirection: 'row',

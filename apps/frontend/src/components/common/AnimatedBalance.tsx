@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Text, StyleSheet, Animated, TextStyle } from 'react-native';
+import { useAppTheme } from '../../theme/ThemeContext';
 
 interface Props {
   value: number;
@@ -16,6 +17,7 @@ export const AnimatedBalance: React.FC<Props> = ({
   currencyPrefix = '₹',
   fractionSuffix = '.00',
 }) => {
+  const { colors: themeColors } = useAppTheme();
   const [displayValue, setDisplayValue] = useState(value);
   const animValue = useRef(new Animated.Value(value)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -65,14 +67,14 @@ export const AnimatedBalance: React.FC<Props> = ({
   }, [value, isPrivacyHidden]);
 
   if (isPrivacyHidden) {
-    return <Text style={[styles.text, style]}>••••••</Text>;
+    return <Text style={[styles.text, { color: themeColors.textPrimary }, style]}>••••••</Text>;
   }
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }], flexDirection: 'row', alignItems: 'baseline' }}>
-      {currencyPrefix ? <Text style={[styles.currency, style]}>{currencyPrefix}</Text> : null}
-      <Text style={[styles.text, style]}>{displayValue.toLocaleString('en-IN')}</Text>
-      {fractionSuffix ? <Text style={[styles.fraction, style]}>{fractionSuffix}</Text> : null}
+      {currencyPrefix ? <Text style={[styles.currency, { color: themeColors.textSecondary }, style]}>{currencyPrefix}</Text> : null}
+      <Text style={[styles.text, { color: themeColors.textPrimary }, style]}>{displayValue.toLocaleString('en-IN')}</Text>
+      {fractionSuffix ? <Text style={[styles.fraction, { color: themeColors.textMuted }, style]}>{fractionSuffix}</Text> : null}
     </Animated.View>
   );
 };
