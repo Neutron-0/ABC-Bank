@@ -15,6 +15,8 @@ import {
   Plus,
   ArrowRight,
   ShieldCheck,
+  Smartphone,
+  ArrowLeftRight,
 } from 'lucide-react-native';
 
 export const BalanceHeader: React.FC = () => {
@@ -44,7 +46,7 @@ export const BalanceHeader: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* JioFinance-Style Floating Account Balance Hero Card */}
+      {/* Signature Jio Payments Bank Luxury Account Card */}
       <View style={styles.heroCard}>
         {/* Top Account Identifier Row */}
         <View style={styles.cardTopRow}>
@@ -82,9 +84,9 @@ export const BalanceHeader: React.FC = () => {
               activeOpacity={0.7}
             >
               {isBalanceHidden ? (
-                <EyeOff size={16} color="#64748B" />
+                <EyeOff size={15} color="#64748B" />
               ) : (
-                <Eye size={16} color="#64748B" />
+                <Eye size={15} color="#64748B" />
               )}
             </TouchableOpacity>
           </View>
@@ -106,14 +108,42 @@ export const BalanceHeader: React.FC = () => {
             >
               <Plus size={13} color="#002970" />
               <Text style={styles.addMoneyPillText}>
-                {language === 'hi' ? 'पैसे जोड़ें' : language === 'gu' ? 'પૈસા ઉમેરો' : 'Add'}
+                {language === 'hi' ? 'पैसे जोड़ें' : language === 'gu' ? 'પૈસા ઉમેરો' : 'Add Money'}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Secondary Ledger Metrics Row (Jio Payments Bank Depth) */}
+        <View style={styles.ledgerRow}>
+          <View style={styles.ledgerCol}>
+            <Text style={styles.ledgerLabel}>
+              {language === 'hi' ? 'कुल बैलेंस' : language === 'gu' ? 'કુલ બેલેન્સ' : 'Total Deposits'}
+            </Text>
+            <Text style={styles.ledgerValue}>
+              {isBalanceHidden ? '••••••' : '₹72,500'}
+            </Text>
+          </View>
+          <View style={styles.ledgerDivider} />
+          <View style={styles.ledgerCol}>
+            <Text style={styles.ledgerLabel}>
+              {language === 'hi' ? 'ऑटो-स्वीप एफडी' : language === 'gu' ? 'ઑટો-સ્વીપ FD' : 'Auto-Sweep FD'}
+            </Text>
+            <Text style={[styles.ledgerValue, { color: '#059669' }]}>
+              {isBalanceHidden ? '••••••' : '₹18,000 (7.2%)'}
+            </Text>
+          </View>
+          <View style={styles.ledgerDivider} />
+          <View style={styles.ledgerCol}>
+            <Text style={styles.ledgerLabel}>
+              {language === 'hi' ? 'आईएफएससी' : language === 'gu' ? 'IFSC' : 'IFSC Code'}
+            </Text>
+            <Text style={styles.ledgerValue}>ABCD0001048</Text>
+          </View>
+        </View>
       </View>
 
-      {/* JioFinance-Style 4-Column Quick Actions Bar */}
+      {/* JioFinance-Style 4-Column Primary Transfer Hub */}
       <View style={styles.quickActionsBar}>
         {/* 1. Scan QR */}
         <TouchableOpacity
@@ -126,22 +156,22 @@ export const BalanceHeader: React.FC = () => {
             <QrCode size={20} color="#0052CC" />
           </View>
           <Text style={styles.quickActionLabel}>
-            {language === 'hi' ? 'क्यूआर स्कैन' : language === 'gu' ? 'QR સ્કેન' : 'Scan QR'}
+            {language === 'hi' ? 'स्कैन क्यूआर' : language === 'gu' ? 'સ્કેન QR' : 'Scan QR'}
           </Text>
         </TouchableOpacity>
 
-        {/* 2. Pay to UPI / Mobile */}
+        {/* 2. To Mobile / Contact */}
         <TouchableOpacity
           style={styles.quickActionItem}
           onPress={() => setActiveTab('payments')}
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: '#F5F3FF' }]}>
-            <Send size={19} color="#7C3AED" />
+          <View style={[styles.quickActionCircle, { backgroundColor: '#ECFDF5' }]}>
+            <Smartphone size={20} color="#059669" />
           </View>
           <Text style={styles.quickActionLabel}>
-            {language === 'hi' ? 'यूपीआई पे' : language === 'gu' ? 'UPI પે' : 'To Mobile'}
+            {language === 'hi' ? 'मोबाइल पे' : language === 'gu' ? 'મોબાઇલ પે' : 'To Mobile'}
           </Text>
         </TouchableOpacity>
 
@@ -152,26 +182,26 @@ export const BalanceHeader: React.FC = () => {
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: '#ECFDF5' }]}>
-            <Building2 size={20} color="#059669" />
+          <View style={[styles.quickActionCircle, { backgroundColor: '#FEF3C7' }]}>
+            <Building2 size={20} color="#D97706" />
           </View>
           <Text style={styles.quickActionLabel}>
             {language === 'hi' ? 'बैंक खाता' : language === 'gu' ? 'બેંક ખાતું' : 'To Bank'}
           </Text>
         </TouchableOpacity>
 
-        {/* 4. Passbook / Check Balance */}
+        {/* 4. To Self / UPI ID */}
         <TouchableOpacity
           style={styles.quickActionItem}
-          onPress={() => setActiveTab('activity')}
+          onPress={() => setActiveTab('payments')}
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={[styles.quickActionCircle, { backgroundColor: '#FEF3C7' }]}>
-            <Receipt size={20} color="#D97706" />
+          <View style={[styles.quickActionCircle, { backgroundColor: '#F3E8FF' }]}>
+            <ArrowLeftRight size={19} color="#7C3AED" />
           </View>
           <Text style={styles.quickActionLabel}>
-            {language === 'hi' ? 'पासबुक' : language === 'gu' ? 'પાસબુક' : 'Passbook'}
+            {language === 'hi' ? 'यूपीआई आईडी' : language === 'gu' ? 'UPI ID' : 'To UPI ID'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -280,6 +310,43 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: '#002970',
+  },
+
+  // Secondary Ledger Metrics
+  ledgerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F8FAFC',
+    borderRadius: radii.md,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+  },
+  ledgerCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  ledgerDivider: {
+    width: 1,
+    height: 22,
+    backgroundColor: '#E2E8F0',
+  },
+  ledgerLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#64748B',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+    marginBottom: 2,
+  },
+  ledgerValue: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#0F172A',
+    letterSpacing: -0.1,
   },
 
   // 4-Column Quick Actions Bar

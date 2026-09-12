@@ -37,6 +37,8 @@ import {
   ShieldCheck,
   FileCheck,
   CreditCard,
+  Smartphone,
+  Tv,
 } from 'lucide-react-native';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -582,7 +584,54 @@ export const AdaptiveHomeScreen: React.FC = () => {
   };
 
   // =========================================================================
-  // FINANCIAL PRODUCTS & SERVICES GRID (JioFinance Clean 4-Column Layout)
+  // RECHARGE & BILL PAYMENTS HUB (JioFinance Iconic Utility Categories)
+  // =========================================================================
+  const renderRechargeAndBillPay = () => {
+    const billers = [
+      { id: 'mobile', name: language === 'hi' ? 'मोबाइल' : language === 'gu' ? 'મોબાઇલ' : 'Mobile', sub: 'Jio / Airtel', icon: Smartphone, bg: '#EFF6FF', color: '#0052CC' },
+      { id: 'electricity', name: language === 'hi' ? 'बिजली' : language === 'gu' ? 'વીજળી' : 'Electricity', sub: 'BESCOM', icon: Zap, bg: '#FEF3C7', color: '#D97706' },
+      { id: 'dth', name: language === 'hi' ? 'डीटीएच' : language === 'gu' ? 'DTH' : 'DTH / Cable', sub: 'Tata Play', icon: Tv, bg: '#F3E8FF', color: '#7C3AED' },
+      { id: 'broadband', name: language === 'hi' ? 'ब्रॉडबैंड' : language === 'gu' ? 'બ્રોડબેન્ડ' : 'FASTag', sub: 'NHAI / Net', icon: Wifi, bg: '#ECFDF5', color: '#059669' },
+    ];
+
+    return (
+      <View style={styles.rechargeSection}>
+        <View style={styles.sectionHeaderRow}>
+          <View style={styles.sectionTitleGroup}>
+            <Text style={styles.sectionTitleText}>
+              {language === 'hi' ? 'रीचार्ज एवं बिल भुगतान' : language === 'gu' ? 'રિચાર્જ અને બિલ ચુકવણી' : 'RECHARGE & PAY BILLS'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.rechargeCard}>
+          <View style={styles.rechargeRow}>
+            {billers.map((b) => {
+              const IconComp = b.icon;
+              return (
+                <TouchableOpacity
+                  key={b.id}
+                  style={styles.rechargeCol}
+                  onPress={() => setActiveTab('payments')}
+                  delayPressIn={0}
+                  activeOpacity={0.75}
+                >
+                  <View style={[styles.rechargeIconCircle, { backgroundColor: b.bg }]}>
+                    <IconComp size={20} color={b.color} />
+                  </View>
+                  <Text style={styles.rechargeTitle} numberOfLines={1}>{b.name}</Text>
+                  <Text style={styles.rechargeSub} numberOfLines={1}>{b.sub}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  // =========================================================================
+  // FINANCIAL PRODUCTS & SERVICES HUB (JioFinance 2x2 Rich Product Showcase)
   // =========================================================================
   const renderDirectBankingHub = () => {
     return (
@@ -590,77 +639,163 @@ export const AdaptiveHomeScreen: React.FC = () => {
         <View style={styles.sectionHeaderRow}>
           <View style={styles.sectionTitleGroup}>
             <Text style={styles.sectionTitleText}>
-              {language === 'hi' ? 'सेवाएं' : language === 'gu' ? 'સેવાઓ' : 'SERVICES'}
+              {language === 'hi' ? 'वित्तीय उत्पाद' : language === 'gu' ? 'નાણાકીય ઉત્પાદનો' : 'FINANCIAL PRODUCTS'}
             </Text>
           </View>
         </View>
 
-        <View style={styles.servicesGridCard}>
-          <View style={styles.servicesRow}>
-            {/* 1. Digital KYC */}
-            <TouchableOpacity
-              style={styles.serviceCol}
-              onPress={() => openJourney('kyc')}
-              delayPressIn={0}
-              activeOpacity={0.75}
-            >
-              <View style={[styles.serviceCircle, { backgroundColor: '#EFF6FF' }]}>
-                <FileCheck size={20} color="#0052CC" />
+        <View style={styles.productsGrid}>
+          {/* 1. Quick Personal Loan */}
+          <TouchableOpacity
+            style={styles.productCard}
+            onPress={() => openJourney('loan')}
+            delayPressIn={0}
+            activeOpacity={0.8}
+          >
+            <View style={styles.productCardTop}>
+              <View style={[styles.productIconCircle, { backgroundColor: '#FEF3C7' }]}>
+                <CreditCard size={18} color="#D97706" />
               </View>
-              <Text style={styles.serviceColTitle}>Digital KYC</Text>
-              <View style={[styles.servicePill, { backgroundColor: '#ECFDF5' }]}>
-                <Text style={[styles.servicePillText, { color: '#059669' }]}>Tier-2</Text>
+              <View style={[styles.productBadge, { backgroundColor: '#FEF3C7' }]}>
+                <Text style={[styles.productBadgeText, { color: '#B45309' }]}>Pre-Approved</Text>
               </View>
-            </TouchableOpacity>
+            </View>
+            <Text style={styles.productTitle}>Personal Loan</Text>
+            <Text style={styles.productSub}>Up to ₹1,50,000 instant credit</Text>
+            <View style={styles.productActionRow}>
+              <Text style={styles.productActionText}>
+                {language === 'hi' ? 'आवेदन करें' : language === 'gu' ? 'અરજી કરો' : 'Apply Now'}
+              </Text>
+              <ArrowRight size={12} color="#0052CC" />
+            </View>
+          </TouchableOpacity>
 
-            {/* 2. Quick Loan */}
-            <TouchableOpacity
-              style={styles.serviceCol}
-              onPress={() => openJourney('loan')}
-              delayPressIn={0}
-              activeOpacity={0.75}
-            >
-              <View style={[styles.serviceCircle, { backgroundColor: '#FEF3C7' }]}>
-                <CreditCard size={20} color="#D97706" />
+          {/* 2. Smart Auto-Sweep FD */}
+          <TouchableOpacity
+            style={styles.productCard}
+            onPress={() => openJourney('savings_invest')}
+            delayPressIn={0}
+            activeOpacity={0.8}
+          >
+            <View style={styles.productCardTop}>
+              <View style={[styles.productIconCircle, { backgroundColor: '#ECFDF5' }]}>
+                <TrendingUp size={18} color="#059669" />
               </View>
-              <Text style={styles.serviceColTitle}>Quick Loan</Text>
-              <View style={[styles.servicePill, { backgroundColor: '#FEF3C7' }]}>
-                <Text style={[styles.servicePillText, { color: '#B45309' }]}>₹1.5L Pre</Text>
+              <View style={[styles.productBadge, { backgroundColor: '#ECFDF5' }]}>
+                <Text style={[styles.productBadgeText, { color: '#059669' }]}>7.2% p.a.</Text>
               </View>
-            </TouchableOpacity>
+            </View>
+            <Text style={styles.productTitle}>Smart Auto-Sweep</Text>
+            <Text style={styles.productSub}>Higher returns on idle cash</Text>
+            <View style={styles.productActionRow}>
+              <Text style={styles.productActionText}>
+                {language === 'hi' ? 'शुरू करें' : language === 'gu' ? 'શરૂ કરો' : 'Start Sweep'}
+              </Text>
+              <ArrowRight size={12} color="#0052CC" />
+            </View>
+          </TouchableOpacity>
 
-            {/* 3. Investments */}
-            <TouchableOpacity
-              style={styles.serviceCol}
-              onPress={() => openJourney('savings_invest')}
-              delayPressIn={0}
-              activeOpacity={0.75}
-            >
-              <View style={[styles.serviceCircle, { backgroundColor: '#ECFDF5' }]}>
-                <TrendingUp size={20} color="#059669" />
+          {/* 3. Digital KYC Verification */}
+          <TouchableOpacity
+            style={styles.productCard}
+            onPress={() => openJourney('kyc')}
+            delayPressIn={0}
+            activeOpacity={0.8}
+          >
+            <View style={styles.productCardTop}>
+              <View style={[styles.productIconCircle, { backgroundColor: '#EFF6FF' }]}>
+                <FileCheck size={18} color="#0052CC" />
               </View>
-              <Text style={styles.serviceColTitle}>Smart FD</Text>
-              <View style={[styles.servicePill, { backgroundColor: '#EFF6FF' }]}>
-                <Text style={[styles.servicePillText, { color: '#0052CC' }]}>7.2% Sweep</Text>
+              <View style={[styles.productBadge, { backgroundColor: '#EFF6FF' }]}>
+                <Text style={[styles.productBadgeText, { color: '#0052CC' }]}>Tier-2 Active</Text>
               </View>
-            </TouchableOpacity>
+            </View>
+            <Text style={styles.productTitle}>Digital KYC</Text>
+            <Text style={styles.productSub}>Zero limit verified banking</Text>
+            <View style={styles.productActionRow}>
+              <Text style={styles.productActionText}>
+                {language === 'hi' ? 'विवरण देखें' : language === 'gu' ? 'વિગતો જુઓ' : 'View Details'}
+              </Text>
+              <ArrowRight size={12} color="#0052CC" />
+            </View>
+          </TouchableOpacity>
 
-            {/* 4. Card Security */}
-            <TouchableOpacity
-              style={styles.serviceCol}
-              onPress={() => openJourney('debit_card')}
-              delayPressIn={0}
-              activeOpacity={0.75}
-            >
-              <View style={[styles.serviceCircle, { backgroundColor: '#ECFEFF' }]}>
-                <ShieldCheck size={20} color="#0891B2" />
+          {/* 4. Debit Card & Protection */}
+          <TouchableOpacity
+            style={styles.productCard}
+            onPress={() => openJourney('debit_card')}
+            delayPressIn={0}
+            activeOpacity={0.8}
+          >
+            <View style={styles.productCardTop}>
+              <View style={[styles.productIconCircle, { backgroundColor: '#ECFEFF' }]}>
+                <ShieldCheck size={18} color="#0891B2" />
               </View>
-              <Text style={styles.serviceColTitle}>Card Safety</Text>
-              <View style={[styles.servicePill, { backgroundColor: '#F1F5F9' }]}>
-                <Text style={[styles.servicePillText, { color: '#475569' }]}>Lock</Text>
+              <View style={[styles.productBadge, { backgroundColor: '#F1F5F9' }]}>
+                <Text style={[styles.productBadgeText, { color: '#475569' }]}>Controls</Text>
               </View>
-            </TouchableOpacity>
+            </View>
+            <Text style={styles.productTitle}>Card Safety</Text>
+            <Text style={styles.productSub}>Manage virtual card & freeze</Text>
+            <View style={styles.productActionRow}>
+              <Text style={styles.productActionText}>
+                {language === 'hi' ? 'प्रबंधित करें' : language === 'gu' ? 'સંચાલિત કરો' : 'Manage Card'}
+              </Text>
+              <ArrowRight size={12} color="#0052CC" />
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  // =========================================================================
+  // RECENT TRANSACTIONS / PASSBOOK SNIPPET (Authentic Live Passbook Feed)
+  // =========================================================================
+  const renderRecentTransactionsPeek = () => {
+    const recentTx = [
+      { id: 'tx_1', name: 'Delhi Metro Smart Card', time: 'Today, 08:45 AM', amount: '-₹40.00', icon: Train, bg: '#EFF6FF', color: '#0052CC' },
+      { id: 'tx_2', name: 'BESCOM Electricity Bill', time: 'Yesterday, 18:20', amount: '-₹1,450.00', icon: Zap, bg: '#FEF3C7', color: '#D97706' },
+    ];
+
+    return (
+      <View style={styles.recentSection}>
+        <View style={styles.sectionHeaderRow}>
+          <View style={styles.sectionTitleGroup}>
+            <Text style={styles.sectionTitleText}>
+              {language === 'hi' ? 'हालिया लेनदेन' : language === 'gu' ? 'તાજેતરના વ્યવહારો' : 'RECENT TRANSACTIONS'}
+            </Text>
           </View>
+          <TouchableOpacity
+            onPress={() => setActiveTab('activity')}
+            delayPressIn={0}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.viewAllText}>
+              {language === 'hi' ? 'पासबुक देखें →' : language === 'gu' ? 'પાસબુક જુઓ →' : 'Passbook →'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.recentCard}>
+          {recentTx.map((tx, idx) => {
+            const IconComp = tx.icon;
+            return (
+              <View key={tx.id}>
+                <View style={styles.recentTxRow}>
+                  <View style={[styles.recentIconCircle, { backgroundColor: tx.bg }]}>
+                    <IconComp size={16} color={tx.color} />
+                  </View>
+                  <View style={styles.recentTextWrap}>
+                    <Text style={styles.recentTxName} numberOfLines={1}>{tx.name}</Text>
+                    <Text style={styles.recentTxTime}>{tx.time}</Text>
+                  </View>
+                  <Text style={styles.recentTxAmount}>{tx.amount}</Text>
+                </View>
+                {idx < recentTx.length - 1 && <View style={styles.recentDivider} />}
+              </View>
+            );
+          })}
         </View>
       </View>
     );
@@ -721,7 +856,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
         {/* Calm Editorial Balance Header with Animated Counter */}
         <BalanceHeader />
 
-        {/* Highest-Priority Contextual Experience (Hero Surface with Smooth Entrance) */}
+        {/* Highest-Priority Contextual Experience: Smart Routine Payments Carousel */}
         <Animated.View
           style={{
             opacity: heroFadeAnim,
@@ -731,11 +866,17 @@ export const AdaptiveHomeScreen: React.FC = () => {
           {renderHighestPriorityContext()}
         </Animated.View>
 
+        {/* Recharge & Pay Bills Hub */}
+        {renderRechargeAndBillPay()}
+
+        {/* Financial Products 2x2 Showcase */}
+        {renderDirectBankingHub()}
+
+        {/* Recent Transactions / Passbook Peek */}
+        {renderRecentTransactionsPeek()}
+
         {/* Upcoming Financial Obligations Strip */}
         {renderUpcomingCommitment()}
-
-        {/* Direct Banking Products Hub */}
-        {renderDirectBankingHub()}
 
         {/* Adaptive Attention Hierarchy Stack (Filtered: No warnings duplicated at bottom) */}
         <ContextCardStack cards={remainingCards} />
@@ -1504,53 +1645,179 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 
-  // Financial Products & Services Grid (JioFinance Clean 4-Column Layout)
-  servicesSection: {
+  // Recharge & Pay Bills Hub (JioFinance Iconic Grid)
+  rechargeSection: {
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.md + 4,
   },
-  servicesGridCard: {
+  rechargeCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    paddingVertical: 18,
-    paddingHorizontal: 8,
+    borderRadius: radii.card,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: '#ECEEF2',
     ...shadows.sm,
   },
-  servicesRow: {
+  rechargeRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-around',
   },
-  serviceCol: {
+  rechargeCol: {
     alignItems: 'center',
     flex: 1,
   },
-  serviceCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: 16,
+  rechargeIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
-  serviceColTitle: {
+  rechargeTitle: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#1E293B',
+    fontWeight: '700',
+    color: '#0F172A',
     textAlign: 'center',
-    marginBottom: 4,
   },
-  servicePill: {
+  rechargeSub: {
+    fontSize: 9,
+    fontWeight: '500',
+    color: '#94A3B8',
+    marginTop: 1,
+    textAlign: 'center',
+  },
+
+  // Financial Products 2x2 Rich Showcase
+  servicesSection: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md + 4,
+  },
+  productsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'space-between',
+  },
+  productCard: {
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: radii.card,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    ...shadows.sm,
+  },
+  productCardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  productIconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  productBadge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 9999,
+    borderRadius: 4,
   },
-  servicePillText: {
+  productBadgeText: {
     fontSize: 9,
-    fontWeight: '700',
+    fontWeight: '800',
     letterSpacing: 0.2,
+  },
+  productTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.2,
+    marginBottom: 2,
+  },
+  productSub: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#64748B',
+    lineHeight: 14,
+    marginBottom: 10,
+  },
+  productActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: '#F8FAFC',
+  },
+  productActionText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#0052CC',
+  },
+
+  // Recent Transactions Passbook Snippet
+  recentSection: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md + 4,
+  },
+  viewAllText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#0052CC',
+  },
+  recentCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: radii.card,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    ...shadows.sm,
+  },
+  recentTxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    gap: 12,
+  },
+  recentIconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recentTextWrap: {
+    flex: 1,
+  },
+  recentTxName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.1,
+  },
+  recentTxTime: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#94A3B8',
+    marginTop: 2,
+  },
+  recentTxAmount: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#0F172A',
+    letterSpacing: -0.2,
+  },
+  recentDivider: {
+    height: 1,
+    backgroundColor: '#F1F5F9',
+    marginVertical: 6,
   },
 
   // Quiet Institutional Banking Footer

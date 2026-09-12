@@ -4,7 +4,7 @@ import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { motion } from '../../motion';
-import { Bell, Globe, QrCode, ShieldCheck, CheckCircle2 } from 'lucide-react-native';
+import { Bell, Globe, QrCode, ShieldCheck, Search } from 'lucide-react-native';
 
 export const AdaptiveHeader: React.FC = () => {
   const { profile, language, setLanguage, openJourney, currentState, setActiveTab } = useCustomerStore();
@@ -28,13 +28,13 @@ export const AdaptiveHeader: React.FC = () => {
     const name = profile.name ? profile.name.split(' ')[0] : 'Rahul';
 
     if (language === 'hi') {
-      if (hour < 12) return `शुभ प्रभात, ${name}`;
-      if (hour < 17) return `नमस्ते, ${name}`;
+      if (hour < 12) return `नमस्ते, ${name}`;
+      if (hour < 17) return `शुभ दोपहर, ${name}`;
       return `शुभ संध्या, ${name}`;
     }
     if (language === 'gu') {
-      if (hour < 12) return `શુભ સવાર, ${name}`;
-      if (hour < 17) return `નમસ્તે, ${name}`;
+      if (hour < 12) return `નમસ્તે, ${name}`;
+      if (hour < 17) return `શુભ બપોર, ${name}`;
       return `શુભ સાંજ, ${name}`;
     }
     if (hour < 12) return `Good morning, ${name}`;
@@ -64,22 +64,33 @@ export const AdaptiveHeader: React.FC = () => {
             {getGreeting()}
           </Text>
           <View style={styles.subRow}>
-            <View style={styles.verifiedPill}>
-              <Text style={styles.tierText}>Verified Account</Text>
-            </View>
+            <View style={styles.verifiedDotMini} />
+            <Text style={styles.subHeaderText}>
+              {language === 'hi' ? 'सत्यापित बचत खाता' : language === 'gu' ? 'ચકાસાયેલ બચત ખાતું' : 'Verified Savings A/C'}
+            </Text>
           </View>
         </View>
       </View>
 
       <View style={styles.rightRow}>
-        {/* Quick QR Scanner Shortcut (JioFinance Pattern) */}
+        {/* Universal Search Shortcut */}
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => setActiveTab('assistant')}
+          activeOpacity={0.75}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Search size={18} color="#0F172A" />
+        </TouchableOpacity>
+
+        {/* Quick QR Scanner Shortcut */}
         <TouchableOpacity
           style={styles.iconButton}
           onPress={() => setActiveTab('payments')}
           activeOpacity={0.75}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <QrCode size={18} color="#0F172A" />
+          <QrCode size={18} color="#002970" />
         </TouchableOpacity>
 
         {/* Vernacular Language Selector */}
@@ -92,7 +103,7 @@ export const AdaptiveHeader: React.FC = () => {
           <Text style={styles.langText}>{getLangLabel()}</Text>
         </TouchableOpacity>
 
-        {/* Notifications / Regulatory Desk */}
+        {/* Notifications */}
         <TouchableOpacity
           style={styles.iconButton}
           onPress={() => openJourney('prototype_lab')}
@@ -160,17 +171,18 @@ const styles = StyleSheet.create({
   subRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 5,
     marginTop: 2,
   },
-  verifiedPill: {
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 6,
-    paddingVertical: 1.5,
-    borderRadius: radii.pill,
+  verifiedDotMini: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#059669',
   },
-  tierText: {
-    fontSize: 9,
-    fontWeight: '700',
+  subHeaderText: {
+    fontSize: 10,
+    fontWeight: '600',
     color: '#059669',
     letterSpacing: 0.2,
   },
