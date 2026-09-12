@@ -727,8 +727,49 @@ export const CARD_TRANSLATIONS: Record<string, Record<LanguageCode, { title: str
   },
 };
 
-const localizeCardList = (cards: ContextCard[], lang: LanguageCode): ContextCard[] => {
-  return cards.map((card) => {
+export const normalizeContextCard = (rawCard: any): ContextCard => {
+  const pAction = rawCard?.primaryAction || rawCard?.primary_action || {
+    label: 'View Details',
+    actionType: 'NAVIGATE',
+  };
+  const sAction = rawCard?.secondaryAction || rawCard?.secondary_action;
+
+  return {
+    id: rawCard?.id || `card_${Date.now()}`,
+    type: rawCard?.type || 'generic',
+    layer: rawCard?.layer || 'DO',
+    priority: rawCard?.priority || 50,
+    confidence: rawCard?.confidence ?? 0.95,
+    title: rawCard?.title || '',
+    description: rawCard?.description || '',
+    reason: rawCard?.reason || '',
+    badgeText: rawCard?.badgeText || rawCard?.badge,
+    accentColor: rawCard?.accentColor || rawCard?.accent,
+    dismissible: rawCard?.dismissible ?? true,
+    category: rawCard?.category || 'banking',
+    metadata: rawCard?.metadata,
+    iconName: rawCard?.iconName || rawCard?.icon_name,
+    primaryAction: {
+      label: pAction?.label || 'View Details',
+      actionType: pAction?.actionType || pAction?.action_type || 'NAVIGATE',
+      journeyId: pAction?.journeyId || pAction?.journey_id,
+      targetScreen: pAction?.targetScreen || pAction?.target_screen,
+      payload: pAction?.payload,
+    },
+    secondaryAction: sAction ? {
+      label: sAction?.label || 'Dismiss',
+      actionType: sAction?.actionType || sAction?.action_type || 'NAVIGATE',
+      journeyId: sAction?.journeyId || sAction?.journey_id,
+      targetScreen: sAction?.targetScreen || sAction?.target_screen,
+      payload: sAction?.payload,
+    } : undefined,
+    whyDetails: rawCard?.whyDetails || rawCard?.why_details || [],
+  };
+};
+
+const localizeCardList = (cards: any[], lang: LanguageCode): ContextCard[] => {
+  return (cards || []).map((rawCard) => {
+    const card = normalizeContextCard(rawCard);
     const tr = CARD_TRANSLATIONS[card.id]?.[lang];
     if (!tr) return card;
     return {
@@ -737,7 +778,7 @@ const localizeCardList = (cards: ContextCard[], lang: LanguageCode): ContextCard
       description: tr.description,
       primaryAction: {
         ...card.primaryAction,
-        label: tr.actionLabel || card.primaryAction.label,
+        label: tr.actionLabel || card.primaryAction?.label || 'View Details',
       },
     };
   });
@@ -807,8 +848,9 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       try {
         const exp = await BankingApi.getExperience(get().profile.id, get().language);
         if (exp && exp.context_cards && exp.context_cards.length > 0) {
-          // Sync cards from backend experience contract if available
-          set({ cards: exp.context_cards });
+          // Sync and normalize cards from backend experience contract
+          const normalized = localizeCardList(exp.context_cards, get().language);
+          set({ cards: normalized });
         }
       } catch (err) {
         // Guaranteed fallback cards already loaded

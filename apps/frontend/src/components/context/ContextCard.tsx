@@ -111,8 +111,19 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
     ],
   };
 
+  const primaryAction = card.primaryAction || (card as any).primary_action || {
+    label: 'View Details',
+    actionType: 'NAVIGATE',
+  };
+  const secondaryAction = card.secondaryAction || (card as any).secondary_action;
+
   const handlePrimaryAction = async () => {
-    const { actionType, journeyId, targetScreen, payload } = card.primaryAction;
+    const action = primaryAction;
+    if (!action) return;
+    const actionType = action.actionType || (action as any).action_type;
+    const journeyId = action.journeyId || (action as any).journey_id;
+    const targetScreen = action.targetScreen || (action as any).target_screen;
+    const payload = action.payload;
 
     if (actionType === 'INSTANT_PAY' && payload) {
       await performPayment({
@@ -144,8 +155,12 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   };
 
   const handleSecondaryAction = () => {
-    if (!card.secondaryAction) return;
-    const { actionType, journeyId, targetScreen, payload } = card.secondaryAction;
+    if (!secondaryAction) return;
+    const action = secondaryAction;
+    const actionType = action.actionType || (action as any).action_type;
+    const journeyId = action.journeyId || (action as any).journey_id;
+    const targetScreen = action.targetScreen || (action as any).target_screen;
+    const payload = action.payload;
 
     if (actionType === 'DISMISS_CARD') {
       handleDismiss();
@@ -260,7 +275,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             delayPressIn={0}
             activeOpacity={0.7}
           >
-            <Text style={styles.insightLinkText}>{card.primaryAction.label}</Text>
+            <Text style={styles.insightLinkText}>{primaryAction.label}</Text>
             <ArrowRight size={14} color="#111318" />
           </TouchableOpacity>
         </View>
@@ -303,7 +318,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               delayPressIn={0}
               activeOpacity={0.8}
             >
-              <Text style={styles.assistancePrimaryBtnText}>{card.primaryAction.label}</Text>
+              <Text style={styles.assistancePrimaryBtnText}>{primaryAction.label}</Text>
               <ArrowRight size={14} color="#FFFFFF" />
             </TouchableOpacity>
 
@@ -349,7 +364,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               delayPressIn={0}
               activeOpacity={0.8}
             >
-              <Text style={styles.securityPrimaryBtnText}>{card.primaryAction.label}</Text>
+              <Text style={styles.securityPrimaryBtnText}>{primaryAction.label}</Text>
               <ArrowRight size={14} color="#FFFFFF" />
             </TouchableOpacity>
 
@@ -421,7 +436,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               delayPressIn={0}
               activeOpacity={0.8}
             >
-              <Text style={styles.actionCtaPillText}>{card.primaryAction.label}</Text>
+              <Text style={styles.actionCtaPillText}>{primaryAction.label}</Text>
               <ArrowRight size={14} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
@@ -464,18 +479,18 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             delayPressIn={0}
             activeOpacity={0.8}
           >
-            <Text style={styles.defaultActionBtnText}>{card.primaryAction.label}</Text>
+            <Text style={styles.defaultActionBtnText}>{primaryAction.label}</Text>
             <ArrowRight size={14} color="#FFFFFF" />
           </TouchableOpacity>
 
-          {card.secondaryAction && (
+          {secondaryAction && (
             <TouchableOpacity
               style={styles.defaultSecondaryBtn}
               onPress={handleSecondaryAction}
               delayPressIn={0}
               activeOpacity={0.8}
             >
-              <Text style={styles.defaultSecondaryBtnText}>{card.secondaryAction.label}</Text>
+              <Text style={styles.defaultSecondaryBtnText}>{secondaryAction.label}</Text>
             </TouchableOpacity>
           )}
         </View>
