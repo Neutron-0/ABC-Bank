@@ -31,15 +31,7 @@ export const ContextCardStack: React.FC<Props> = ({ cards }) => {
   }
 
   if (cards.length === 0) {
-    return (
-      <View style={styles.emptyBox}>
-        <View style={styles.emptyIconCircle}>
-          <Check size={18} color="#059669" />
-        </View>
-        <Text style={styles.emptyTitle}>You're all caught up</Text>
-        <Text style={styles.emptyDesc}>Nothing needs your immediate attention right now.</Text>
-      </View>
-    );
+    return null;
   }
 
   return (

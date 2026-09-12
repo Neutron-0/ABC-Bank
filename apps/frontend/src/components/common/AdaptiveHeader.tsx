@@ -64,9 +64,9 @@ export const AdaptiveHeader: React.FC = () => {
             {getGreeting()}
           </Text>
           <View style={styles.subRow}>
-            <Text style={styles.bankName}>ABC PAYMENTS BANK</Text>
-            <View style={styles.badgeDivider} />
-            <Text style={styles.tierText}>TIER-2 VERIFIED</Text>
+            <View style={styles.verifiedPill}>
+              <Text style={styles.tierText}>Verified Account</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -160,26 +160,19 @@ const styles = StyleSheet.create({
   subRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
     marginTop: 2,
   },
-  bankName: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#002970',
-    letterSpacing: 0.5,
-  },
-  badgeDivider: {
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
-    backgroundColor: '#94A3B8',
+  verifiedPill: {
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: radii.pill,
   },
   tierText: {
     fontSize: 9,
     fontWeight: '700',
     color: '#059669',
-    letterSpacing: 0.4,
+    letterSpacing: 0.2,
   },
   rightRow: {
     flexDirection: 'row',

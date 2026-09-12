@@ -263,43 +263,9 @@ export const AdaptiveHomeScreen: React.FC = () => {
   // DYNAMIC CONTEXTUAL HERO WIDGET (Sections 10, 13-18)
   // =========================================================================
   const renderHighestPriorityContext = () => {
-    // 1. FRAUD ALERT MODE (Section 18) - Ultra-focused security
+    // 1. FRAUD ALERT MODE - Hoisted to the top alert banner
     if (currentState === 'fraud_alert') {
-      return (
-        <View style={styles.heroSection}>
-          <Text style={styles.sectionEyebrow}>{t.heroes.securityTag}</Text>
-          <View style={styles.fraudBox}>
-            <View style={styles.fraudHeader}>
-              <View style={styles.fraudIconWrap}>
-                <ShieldAlert size={20} color="#DC2626" />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.fraudMerchant}>{t.heroes.fraudMerchant}</Text>
-                <Text style={styles.fraudAmount}>{t.heroes.fraudAmount}</Text>
-              </View>
-            </View>
-            <Text style={styles.fraudText}>{t.heroes.fraudDesc}</Text>
-            <View style={styles.fraudActionRow}>
-              <TouchableOpacity
-                style={styles.freezeBtn}
-                onPress={() => openJourney('fraud_alert')}
-                delayPressIn={0}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.freezeBtnText}>{t.heroes.freezeBtn}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.verifyBtn}
-                onPress={() => openJourney('fraud_alert')}
-                delayPressIn={0}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.verifyBtnText}>{t.heroes.verifyBtn}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      );
+      return null;
     }
 
     // 2. MEDICAL CARE MODE (Section 16) - Empathetic Care & Assistance First
@@ -417,14 +383,11 @@ export const AdaptiveHomeScreen: React.FC = () => {
           <View style={styles.sectionHeaderRow}>
             <View style={styles.sectionTitleGroup}>
               <Text style={styles.sectionTitleText}>
-                {language === 'hi' ? 'स्मार्ट आवर्ती भुगतान' : language === 'gu' ? 'સ્માર્ટ નિયમિત ચુકવણીઓ' : 'SMART ROUTINE PAYMENTS'}
-              </Text>
-              <Text style={styles.sectionSubText}>
-                {language === 'hi' ? 'दैनिक व नियमित बिल मैंडेट' : language === 'gu' ? 'દૈનિક અને નિયમિત બિલ મેન્ડેટ' : 'Routine bills & recurring mandates'}
+                {language === 'hi' ? 'बिल एवं रीचार्ज' : language === 'gu' ? 'બિલ અને રિચાર્જ' : 'BILLS & RECHARGES'}
               </Text>
             </View>
             <View style={styles.mandateCountBadge}>
-              <Text style={styles.mandateCountText}>4 SCHEDULED</Text>
+              <Text style={styles.mandateCountText}>4 DUE</Text>
             </View>
           </View>
 
@@ -627,10 +590,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
         <View style={styles.sectionHeaderRow}>
           <View style={styles.sectionTitleGroup}>
             <Text style={styles.sectionTitleText}>
-              {language === 'hi' ? 'वित्तीय उत्पाद एवं सेवाएं' : language === 'gu' ? 'નાણાકીય સેવાઓ અને ઉત્પાદનો' : 'FINANCIAL PRODUCTS & SERVICES'}
-            </Text>
-            <Text style={styles.sectionSubText}>
-              {language === 'hi' ? 'आरबीआई-अनुपालक डिजिटल बैंकिंग' : language === 'gu' ? 'આરબીઆઈ-સુસંગત ડિજિટલ બેંકિંગ' : 'Audited RBI-compliant institutional banking'}
+              {language === 'hi' ? 'सेवाएं' : language === 'gu' ? 'સેવાઓ' : 'SERVICES'}
             </Text>
           </View>
         </View>
@@ -706,6 +666,12 @@ export const AdaptiveHomeScreen: React.FC = () => {
     );
   };
 
+  // Hoist top-priority urgent security/warning cards to the very top of the feed
+  const topWarningCard = cards.find(
+    (c) => c.type === 'warning' || c.priority >= 80 || c.id.includes('fraud')
+  );
+  const remainingCards = cards.filter((c) => c.id !== topWarningCard?.id);
+
   return (
     <View style={styles.container}>
       <AdaptiveHeader />
@@ -718,6 +684,40 @@ export const AdaptiveHomeScreen: React.FC = () => {
         }
         showsVerticalScrollIndicator={false}
       >
+        {/* Top-Priority Urgent Security / Warning Alert Banner */}
+        {topWarningCard && (
+          <View style={styles.topWarningBanner}>
+            <View style={styles.topWarningLeft}>
+              <View style={styles.topWarningIconCircle}>
+                <ShieldAlert size={16} color="#DC2626" />
+              </View>
+              <View style={styles.topWarningTextWrap}>
+                <Text style={styles.topWarningTag}>
+                  {topWarningCard.badgeText || (language === 'hi' ? 'सुरक्षा अलर्ट' : language === 'gu' ? 'સુરક્ષા ચેતવણી' : 'SECURITY ALERT')}
+                </Text>
+                <Text style={styles.topWarningTitle} numberOfLines={1}>
+                  {topWarningCard.title}
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.topWarningBtn}
+              onPress={() => {
+                const action = topWarningCard.primaryAction;
+                const journeyId = action?.journeyId || 'fraud_alert';
+                openJourney(journeyId, action?.payload);
+              }}
+              delayPressIn={0}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.topWarningBtnText}>
+                {topWarningCard.primaryAction?.label || (language === 'hi' ? 'जांचें' : language === 'gu' ? 'તપાસો' : 'Review')}
+              </Text>
+              <ArrowRight size={12} color="#DC2626" />
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Calm Editorial Balance Header with Animated Counter */}
         <BalanceHeader />
 
@@ -737,13 +737,13 @@ export const AdaptiveHomeScreen: React.FC = () => {
         {/* Direct Banking Products Hub */}
         {renderDirectBankingHub()}
 
-        {/* Adaptive Attention Hierarchy Stack (Different visual patterns per type) */}
-        <ContextCardStack cards={cards} />
+        {/* Adaptive Attention Hierarchy Stack (Filtered: No warnings duplicated at bottom) */}
+        <ContextCardStack cards={remainingCards} />
 
         {/* Quiet Institutional Banking Footer */}
         <View style={styles.footerNote}>
           <Text style={styles.footerText}>
-            ABC Bank Ltd. • Regulated by the Reserve Bank of India • DICGC Insured up to ₹5,00,000
+            ABC Bank • Regulated by RBI • DICGC Insured
           </Text>
         </View>
       </ScrollView>
@@ -760,7 +760,70 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 90,
+    paddingBottom: 36,
+  },
+
+  // Top-Priority Warning Banner (hoisted to top of feed)
+  topWarningBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FEF2F2',
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: radii.card,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    ...shadows.sm,
+  },
+  topWarningLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+    marginRight: 8,
+  },
+  topWarningIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FEE2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  topWarningTextWrap: {
+    flex: 1,
+  },
+  topWarningTag: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#DC2626',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  topWarningTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginTop: 1,
+  },
+  topWarningBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  topWarningBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#DC2626',
   },
   sectionEyebrow: {
     fontSize: 11,

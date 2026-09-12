@@ -89,53 +89,27 @@ export const BalanceHeader: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.balanceAmountWrap}>
-            <AnimatedBalance
-              value={balance.available}
-              isPrivacyHidden={isBalanceHidden}
-              currencyPrefix="₹"
-              fractionSuffix=".00"
-            />
-          </View>
-        </View>
-
-        {/* Integrated Quick Action Strip inside Hero Card */}
-        <View style={styles.cardActionRow}>
-          <TouchableOpacity
-            style={styles.addMoneyBtn}
-            onPress={() => setActiveTab('payments')}
-            activeOpacity={0.8}
-          >
-            <Plus size={14} color="#002970" />
-            <Text style={styles.addMoneyText}>
-              {language === 'hi' ? 'पैसे जोड़ें' : language === 'gu' ? 'પૈસા ઉમેરો' : 'Add Money'}
-            </Text>
-          </TouchableOpacity>
-
-          <View style={styles.actionDivider} />
-
-          <TouchableOpacity
-            style={styles.viewPassbookBtn}
-            onPress={() => setActiveTab('activity')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.viewPassbookText}>
-              {language === 'hi' ? 'पासबुक देखें' : language === 'gu' ? 'પાસબુક જુઓ' : 'View Passbook'}
-            </Text>
-            <ArrowRight size={13} color="#0052CC" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Micro Trust & Regulatory Footnote */}
-        <View style={styles.cardFooterRow}>
-          <Text style={styles.cardFooterText}>
-            DICGC Insured up to ₹5 Lakhs • RBI Regulated
-          </Text>
-          {currentState === 'surplus' && (
-            <View style={styles.surplusBadge}>
-              <Text style={styles.surplusBadgeText}>7.2% Sweep Active</Text>
+          <View style={styles.balanceRowWithAdd}>
+            <View style={styles.balanceAmountWrap}>
+              <AnimatedBalance
+                value={balance.available}
+                isPrivacyHidden={isBalanceHidden}
+                currencyPrefix="₹"
+                fractionSuffix=".00"
+              />
             </View>
-          )}
+
+            <TouchableOpacity
+              style={styles.addMoneyPill}
+              onPress={() => setActiveTab('payments')}
+              activeOpacity={0.8}
+            >
+              <Plus size={13} color="#002970" />
+              <Text style={styles.addMoneyPillText}>
+                {language === 'hi' ? 'पैसे जोड़ें' : language === 'gu' ? 'પૈસા ઉમેરો' : 'Add'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -266,7 +240,7 @@ const styles = StyleSheet.create({
     color: '#0052CC',
   },
   balanceContainer: {
-    marginBottom: spacing.md,
+    marginBottom: 0,
   },
   balanceLabelRow: {
     flexDirection: 'row',
@@ -283,73 +257,29 @@ const styles = StyleSheet.create({
   eyeBtn: {
     padding: 2,
   },
+  balanceRowWithAdd: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   balanceAmountWrap: {
     marginVertical: 2,
   },
-  cardActionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#F8FAFC',
-    borderRadius: radii.md,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
-  },
-  addMoneyBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  addMoneyText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#002970',
-  },
-  actionDivider: {
-    width: 1,
-    height: 16,
-    backgroundColor: '#E2E8F0',
-  },
-  viewPassbookBtn: {
+  addMoneyPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    backgroundColor: '#EFF6FF',
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
   },
-  viewPassbookText: {
+  addMoneyPillText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#0052CC',
-  },
-  cardFooterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 10,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
-  },
-  cardFooterText: {
-    fontSize: 9,
-    fontWeight: '500',
-    color: '#94A3B8',
-  },
-  surplusBadge: {
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: radii.sm,
-  },
-  surplusBadgeText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#059669',
+    color: '#002970',
   },
 
   // 4-Column Quick Actions Bar

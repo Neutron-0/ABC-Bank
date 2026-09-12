@@ -299,15 +299,6 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               <Text style={styles.eventSubtitle}>{card.description}</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setWhyCard(card)}
-            style={styles.whyChip}
-            delayPressIn={0}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.whyChipText}>Why?</Text>
-          </TouchableOpacity>
         </View>
       </Animated.View>
     );
@@ -322,15 +313,6 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
         <View style={styles.insightBlock}>
           <View style={styles.insightHeaderRow}>
             <Text style={styles.insightEyebrow}>FINANCIAL INSIGHT</Text>
-            <TouchableOpacity
-              onPress={() => setWhyCard(card)}
-              style={styles.whyChip}
-              delayPressIn={0}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.whyChipText}>Why?</Text>
-            </TouchableOpacity>
           </View>
 
           <Text style={styles.insightTitle}>{card.title}</Text>
@@ -362,18 +344,9 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               <HeartHandshake size={18} color="#0D9488" />
             </View>
             <View style={styles.assistanceTextWrap}>
-              <Text style={styles.assistanceTag}>HEALTHCARE EXPENDITURE SUPPORT</Text>
+              <Text style={styles.assistanceTag}>HEALTHCARE SUPPORT</Text>
               <Text style={styles.assistanceTitle}>{card.title}</Text>
             </View>
-            <TouchableOpacity
-              onPress={() => setWhyCard(card)}
-              style={styles.whyChip}
-              delayPressIn={0}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.whyChipText}>Why?</Text>
-            </TouchableOpacity>
           </View>
 
           <Text style={styles.assistanceDescription}>{card.description}</Text>
@@ -434,16 +407,6 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               <Text style={styles.securityPrimaryBtnText}>{primaryAction.label}</Text>
               <ArrowRight size={14} color="#FFFFFF" />
             </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setWhyCard(card)}
-              style={styles.whyChip}
-              delayPressIn={0}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.whyChipText}>Why?</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Animated.View>
@@ -462,15 +425,6 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               {renderIcon('#111318', 22)}
             </View>
             <View style={styles.actionHeaderRight}>
-              <TouchableOpacity
-                onPress={() => setWhyCard(card)}
-                style={styles.whyChip}
-                delayPressIn={0}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.whyChipText}>Why?</Text>
-              </TouchableOpacity>
               {card.dismissible && (
                 <TouchableOpacity
                   onPress={handleDismiss}
@@ -526,15 +480,6 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
             <Text style={styles.defaultEyebrow}>ACCOUNT MANDATE & ADVISORY</Text>
             <Text style={styles.defaultTitle}>{card.title}</Text>
           </View>
-          <TouchableOpacity
-            onPress={() => setWhyCard(card)}
-            style={styles.whyChip}
-            delayPressIn={0}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.whyChipText}>Why?</Text>
-          </TouchableOpacity>
         </View>
 
         <Text style={styles.defaultDesc}>{card.description}</Text>
