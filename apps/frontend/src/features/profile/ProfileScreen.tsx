@@ -203,6 +203,14 @@ export const ProfileScreen: React.FC = () => {
           <Text style={styles.sectionHeader}>Demo Journeys (Challenge #2)</Text>
           <TouchableOpacity
             style={styles.journeyBtn}
+            onPress={() => openJourney('onboarding')}
+          >
+            <Text style={styles.journeyBtnText}>App Onboarding & Language Selection</Text>
+            <ArrowRight size={16} color={colors.primary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.journeyBtn}
             onPress={() => openJourney('kyc')}
           >
             <Text style={styles.journeyBtnText}>Digital KYC Journey</Text>

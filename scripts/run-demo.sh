@@ -1,8 +1,8 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 
 echo "===================================================="
-echo "🏛️  Bharat Adaptive Banking - Monorepo Demo Runner"
+echo "ABC Bank Adaptive Banking - Monorepo Demo Runner"
 echo "===================================================="
 
 echo "[1/3] Validating AI Contracts & Scenarios..."

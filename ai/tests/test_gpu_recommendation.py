@@ -11,6 +11,15 @@ if str(ROOT_DIR) not in sys.path:
 
 import pytest
 import numpy as np
+
+try:
+    import xgboost as xgb
+except ImportError:
+    xgb = None
+
+if xgb is None:
+    pytest.skip("xgboost is not installed, skipping GPU tests", allow_module_level=True)
+
 from ai.intelligence.ml.gpu_trainer import GPURecommendationTrainer, GPUTelemetry
 from ai.intelligence.ml.propensity import SupervisedPropensityModel
 
@@ -27,7 +36,8 @@ def test_gpu_telemetry_query():
 
 def test_gpu_trainer_batch_generation_and_shapes():
     """Verify GPU trainer generates stratified batches partitioned into train and holdout sets."""
-    trainer = GPURecommendationTrainer(device="cuda")
+    device = "cuda" if GPUTelemetry.get_metrics().get("available") else "cpu"
+    trainer = GPURecommendationTrainer(device=device)
     X_train, y_train, X_val, y_val = trainer.generate_streaming_batch(batch_size=5000, epoch_seed=42)
 
     assert X_train.shape[1] == 32
@@ -39,6 +49,8 @@ def test_gpu_trainer_batch_generation_and_shapes():
 
 def test_gpu_cuda_single_product_fit():
     """Verify single-product deep tree fit on CUDA cores."""
+    if not GPUTelemetry.get_metrics().get("available"):
+        pytest.skip("CUDA GPU not available on host")
     trainer = GPURecommendationTrainer(device="cuda")
     X_train, y_train, X_val, y_val = trainer.generate_streaming_batch(batch_size=3000, epoch_seed=99)
 

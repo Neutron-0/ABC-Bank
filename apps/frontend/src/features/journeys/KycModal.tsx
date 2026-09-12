@@ -22,7 +22,7 @@ export const KycModal: React.FC = () => {
   const [panInput, setPanInput] = useState('ABCDE1234F');
   const [aadhaarInput, setAadhaarInput] = useState('9876 5432 1098');
 
-  if (activeJourney !== 'kyc') return null;
+  if (activeJourney !== 'kyc' && !activeJourney?.startsWith('kyc') && activeJourney !== 'digital_kyc') return null;
 
   const handleFinish = () => {
     showToast(

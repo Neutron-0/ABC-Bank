@@ -37,7 +37,7 @@ export const ResponsibleLoanModal: React.FC = () => {
   const [isDisbursed, setIsDisbursed] = useState<boolean>(false);
   const [disbursedTxId, setDisbursedTxId] = useState<string>('');
 
-  if (activeJourney !== 'loan') return null;
+  if (activeJourney !== 'loan' && !activeJourney?.includes('loan')) return null;
 
   const isStress = currentState === 'financial_stress' || financialHealth.status === 'stress';
 

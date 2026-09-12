@@ -50,7 +50,7 @@ import {
 } from 'lucide-react-native';
 
 export const AppNavigator: React.FC = () => {
-  const { activeTab, setActiveTab, language, toastMessage, currentState } = useCustomerStore();
+  const { activeTab, setActiveTab, language, toastMessage, currentState, activeJourney, closeJourney } = useCustomerStore();
   const t = getTranslation(language);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -280,8 +280,11 @@ export const AppNavigator: React.FC = () => {
       <CreditScoreModal />
       <DebitCardModal />
       <OnboardingModal
-        visible={showOnboarding}
-        onFinish={() => setShowOnboarding(false)}
+        visible={showOnboarding || activeJourney === 'onboarding'}
+        onFinish={() => {
+          setShowOnboarding(false);
+          closeJourney();
+        }}
       />
     </SafeAreaView>
   );

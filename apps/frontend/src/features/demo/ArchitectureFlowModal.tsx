@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -13,7 +13,7 @@ export const ArchitectureFlowModal: React.FC = () => {
     {
       step: '1. Multi-Source Financial Ingestion',
       desc: 'UPI Transactions, Core Banking Mandates, Account Aggregator (AA), Recurring Billing Cycles, Geolocation telemetry.',
-      tech: 'Fastify / Express Synthetic Event Bus',
+      tech: 'FastAPI / MultiSourceDataHarmonizer',
     },
     {
       step: '2. Feature Extraction & Temporal Modeling',

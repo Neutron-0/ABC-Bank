@@ -15,9 +15,10 @@ import argparse
 from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 import numpy as np
-import joblib
-import xgboost as xgb
-from sklearn.metrics import roc_auc_score, log_loss
+try:
+    import xgboost as xgb
+except ImportError:
+    xgb = None
 
 ROOT_DIR = Path(__file__).resolve().parents[3]
 if str(ROOT_DIR) not in sys.path:
