@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Dimensions
 import Svg, { Path, Circle, Text as SvgText, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useAppTheme, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
+import { BankingApi } from '../../services/api';
 import {
   ShieldCheck,
   X,
@@ -38,27 +39,39 @@ function describeArc(x: number, y: number, radius: number, startAngle: number, e
 
 export const CreditScoreModal: React.FC = () => {
   const { colors } = useAppTheme();
-  const { activeJourney, closeJourney, language, showToast } = useCustomerStore();
+  const { activeJourney, closeJourney, language, showToast, profile } = useCustomerStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [score, setScore] = useState(785);
+  const [score, setScore] = useState(profile.creditScore || 765);
 
   const isVisible = activeJourney === 'credit_score' || activeJourney === 'credit';
 
   if (!isVisible) return null;
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setIsRefreshing(true);
-    setTimeout(() => {
+    try {
+      const customer = await BankingApi.getCustomer(profile.id);
       setIsRefreshing(false);
-      setScore(788);
-      showToast(
-        language === 'hi'
-          ? 'क्रेडिट स्कोर सफलतापूर्वक रिफ्रेश हुआ: 788'
-          : language === 'gu'
-          ? 'ક્રેડિટ સ્કોર સફળતાપૂર્વક રિફ્રેશ થયો: 788'
-          : 'Credit Score Refreshed: 788 (Excellent)'
-      );
-    }, 900);
+      if (customer && customer.credit_score) {
+        setScore(customer.credit_score);
+        showToast(
+          language === 'hi'
+            ? `सिबिल क्रेडिट स्कोर सत्यापित: ${customer.credit_score}`
+            : language === 'gu'
+            ? `CIBIL ક્રેડિટ સ્કોર ચકાસાયેલ: ${customer.credit_score}`
+            : `Authoritative CIBIL Score Refreshed: ${customer.credit_score}`
+        );
+        return;
+      }
+    } catch (e) {
+      console.warn('[CreditScore] Failed to refresh score from bureau core:', e);
+    }
+    setIsRefreshing(false);
+    showToast(
+      language === 'hi'
+        ? `सिबिल क्रेडिट स्कोर: ${score}`
+        : `Bureau Score Synchronized: ${score}`
+    );
   };
 
   const getRatingLabel = () => {

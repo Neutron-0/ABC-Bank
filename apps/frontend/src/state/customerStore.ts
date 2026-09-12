@@ -1142,8 +1142,12 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
         }
       } catch (err: any) {
         console.error('[Payment] Backend transfer failed:', err);
+        set({
+          isLoading: false,
+          toastMessage: err?.message || 'Payment failed: Unable to connect to bank payment switch.',
+        });
+        return false;
       }
-
       set({
         isLoading: false,
         toastMessage: 'Payment failed: Unable to connect to bank payment switch.',

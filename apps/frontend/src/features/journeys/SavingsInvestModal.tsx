@@ -6,7 +6,7 @@ import { TrendingUp, X, CheckCircle2, ArrowRight, ShieldCheck } from 'lucide-rea
 
 export const SavingsInvestModal: React.FC = () => {
   const { colors: themeColors } = useAppTheme();
-  const { activeJourney, closeJourney, balance, signals, showToast } = useCustomerStore();
+  const { activeJourney, closeJourney, balance, signals, showToast, performPayment } = useCustomerStore();
   const [selectedPlan, setSelectedPlan] = useState<'smart_fd' | 'index_sip'>('smart_fd');
 
   const isVisible =
@@ -21,9 +21,28 @@ export const SavingsInvestModal: React.FC = () => {
 
   const surplus = signals.surplusAmount > 0 ? signals.surplusAmount : 38400;
 
-  const handleDeposit = () => {
-    showToast('₹25,000 moved to High-Yield Smart Savings!');
-    closeJourney();
+  const handleDeposit = async () => {
+    const depositAmt = 25000;
+    if (balance.available < depositAmt) {
+      showToast('Insufficient available balance to allocate to Smart Savings.');
+      return;
+    }
+    const success = await performPayment({
+      amount: depositAmt,
+      merchant: 'ABC Smart Savings Vault',
+      category: 'savings',
+      description: 'Allocation to High-Yield Smart Savings (7.2% APY)',
+    });
+    if (success) {
+      useCustomerStore.setState((state) => ({
+        balance: {
+          ...state.balance,
+          savings: Math.round(((state.balance.savings || 185000) + depositAmt) * 100) / 100,
+        },
+      }));
+      showToast('₹25,000 moved to High-Yield Smart Savings!');
+      closeJourney();
+    }
   };
 
   return (

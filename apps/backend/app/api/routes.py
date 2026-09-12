@@ -654,11 +654,7 @@ def verify_pin(req: PinVerifyRequest):
     cid = req.customer_id or "cust_bharat_001"
     try:
         res = StateService.verify_customer_pin(cid, req.pin)
-        if res.get("locked"):
-            raise HTTPException(status_code=status.HTTP_423_LOCKED, detail=res.get("message"))
         return res
-    except HTTPException:
-        raise
     except KeyError as ke:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
     except Exception as e:

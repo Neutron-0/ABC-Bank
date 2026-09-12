@@ -63,11 +63,26 @@ export class BankingApi {
       clearTimeout(timeoutId);
 
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+        let errMessage = `HTTP ${res.status}`;
+        try {
+          const errData = await res.json();
+          if (errData?.detail) {
+            errMessage = typeof errData.detail === 'string' ? errData.detail : JSON.stringify(errData.detail);
+          }
+          if (errData && typeof errData === 'object' && ('valid' in errData || 'locked' in errData)) {
+            return errData as T;
+          }
+        } catch (_) {}
+        const error: any = new Error(errMessage);
+        error.status = res.status;
+        throw error;
       }
       return await res.json();
-    } catch (err) {
-      console.log(`[BankingApi] Edge on-device fallback mode active for ${endpoint}`);
+    } catch (err: any) {
+      console.log(`[BankingApi] Notice for ${endpoint}:`, err?.message || err);
+      if (options?.method === 'POST' && err?.status && err.status >= 400) {
+        throw err;
+      }
       return null;
     }
   }

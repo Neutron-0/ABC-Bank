@@ -14,7 +14,7 @@ import {
 
 export const FraudAlertModal: React.FC = () => {
   const { colors: themeColors } = useAppTheme();
-  const { activeJourney, closeJourney, showToast } = useCustomerStore();
+  const { activeJourney, closeJourney, showToast, updateCardControls } = useCustomerStore();
   const [resolution, setResolution] = useState<'prompt' | 'locked' | 'verified'>('prompt');
 
   const isVisible =
@@ -26,7 +26,8 @@ export const FraudAlertModal: React.FC = () => {
 
   if (!isVisible) return null;
 
-  const handleFreeze = () => {
+  const handleFreeze = async () => {
+    await updateCardControls({ is_locked: true });
     setResolution('locked');
     showToast('Debit Card Temporarily Frozen for Security!');
   };
