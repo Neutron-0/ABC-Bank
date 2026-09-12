@@ -16,7 +16,7 @@ import {
 } from 'lucide-react-native';
 
 export const InsightsScreen: React.FC = () => {
-  const { colors, isDark } = useAppTheme();
+  const { colors } = useAppTheme();
   const { financialHealth, signals, language, openJourney } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -25,7 +25,7 @@ export const InsightsScreen: React.FC = () => {
       case 'thriving':
         return {
           label: t.insights.statusThriving,
-          color: isDark ? colors.textPrimary : colors.primary,
+          color: colors.primary,
           bg: colors.cardBgSecondary,
         };
       case 'stress':
@@ -43,7 +43,7 @@ export const InsightsScreen: React.FC = () => {
       default:
         return {
           label: t.insights.statusStable,
-          color: isDark ? colors.textPrimary : colors.primary,
+          color: colors.primary,
           bg: colors.cardBgSecondary,
         };
     }
@@ -95,7 +95,7 @@ export const InsightsScreen: React.FC = () => {
               <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
                 {t.insights.savingsRate}
               </Text>
-              <Text style={[styles.metricVal, { color: isDark ? colors.textPrimary : colors.primary }]}>
+              <Text style={[styles.metricVal, { color: colors.primary }]}>
                 {financialHealth.savingsRatePercent}%
               </Text>
             </View>
@@ -140,7 +140,7 @@ export const InsightsScreen: React.FC = () => {
                 { backgroundColor: colors.cardBg, borderColor: colors.border },
               ]}
             >
-              <CheckCircle2 size={16} color={isDark ? colors.textPrimary : colors.primary} style={styles.iconOffset} />
+              <CheckCircle2 size={16} color={colors.primary} style={styles.iconOffset} />
               <Text style={[styles.statementText, { color: colors.textPrimary }]}>{stmt}</Text>
             </View>
           ))}
@@ -193,7 +193,7 @@ export const InsightsScreen: React.FC = () => {
             ]}
           >
             <View style={styles.whatChangedHeader}>
-              <Activity size={18} color={isDark ? colors.textPrimary : colors.primary} />
+              <Activity size={18} color={colors.primary} />
               <Text
                 style={[
                   styles.whatChangedTitle,
@@ -208,7 +208,7 @@ export const InsightsScreen: React.FC = () => {
                 <Text
                   style={[
                     styles.changeBullet,
-                    { color: isDark ? colors.textPrimary : colors.primary },
+                    { color: colors.primary },
                   ]}
                 >
                   •
@@ -238,7 +238,7 @@ export const InsightsScreen: React.FC = () => {
               { backgroundColor: colors.cardBg, borderColor: colors.border },
             ]}
           >
-            <Text style={[styles.digestTag, { color: isDark ? colors.textSecondary : colors.primary }]}>
+            <Text style={[styles.digestTag, { color: colors.primary }]}>
               COMMUTE & HABITS
             </Text>
             <Text style={[styles.digestTitle, { color: colors.textPrimary }]}>
@@ -255,7 +255,7 @@ export const InsightsScreen: React.FC = () => {
               { backgroundColor: colors.cardBg, borderColor: colors.border },
             ]}
           >
-            <Text style={[styles.digestTag, { color: isDark ? colors.textSecondary : colors.primary }]}>
+            <Text style={[styles.digestTag, { color: colors.primary }]}>
               UTILITIES & BILLS
             </Text>
             <Text style={[styles.digestTitle, { color: colors.textPrimary }]}>

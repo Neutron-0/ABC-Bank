@@ -19,7 +19,7 @@ import {
 } from 'lucide-react-native';
 
 export const ResponsibleLoanModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const {
     activeJourney,
     closeJourney,
@@ -134,13 +134,13 @@ export const ResponsibleLoanModal: React.FC = () => {
             {/* 1. DISBURSAL CELEBRATION RECEIPT */}
             {isDisbursed ? (
               <View style={styles.disbursedBox}>
-                <View style={[styles.disbursedIconCircle, { backgroundColor: isDark ? '#0C2417' : '#F4F5F7' }]}>
-                  <CheckCircle2 size={44} color={themeColors.success} />
+                <View style={[styles.disbursedIconCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+                  <CheckCircle2 size={44} color={themeColors.primary} />
                 </View>
                 <Text style={[styles.disbursedTitle, { color: themeColors.textPrimary }]}>
                   {language === 'hi' ? 'ऋण राशि तुरंत जमा हो गई!' : language === 'gu' ? 'લોન રકમ તાત્કાલિક જમા થઈ!' : 'Loan Disbursed Instantly!'}
                 </Text>
-                <Text style={[styles.disbursedAmount, { color: themeColors.success }]}>+₹{loanAmount.toLocaleString('en-IN')}</Text>
+                <Text style={[styles.disbursedAmount, { color: themeColors.primary }]}>+₹{loanAmount.toLocaleString('en-IN')}</Text>
                 <Text style={[styles.disbursedSub, { color: themeColors.textSecondary }]}>
                   {language === 'hi'
                     ? 'यह राशि सीधे आपके प्राथमिक खाते में जोड़ दी गई है।'
@@ -210,7 +210,7 @@ export const ResponsibleLoanModal: React.FC = () => {
                 </View>
 
                 <TouchableOpacity
-                  style={[styles.stressHelpBtn, { backgroundColor: isDark ? '#27272A' : '#DC2626' }]}
+                  style={[styles.stressHelpBtn, { backgroundColor: themeColors.primary }]}
                   onPress={() => {
                     closeJourney();
                     useCustomerStore.getState().openJourney('financial_stress');

@@ -29,7 +29,7 @@ interface Props {
 }
 
 export const ContextCard: React.FC<Props> = ({ card }) => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const {
     dismissCard,
     openJourney,
@@ -346,7 +346,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               <HeartHandshake size={18} color={themeColors.iconNeutral} />
             </View>
             <View style={styles.assistanceTextWrap}>
-              <Text style={[styles.assistanceTag, { color: isDark ? themeColors.textSecondary : themeColors.primary }]}>HEALTHCARE SUPPORT</Text>
+              <Text style={[styles.assistanceTag, { color: themeColors.primary }]}>HEALTHCARE SUPPORT</Text>
               <Text style={[styles.assistanceTitle, { color: themeColors.textPrimary }]}>{card.title}</Text>
             </View>
           </View>
@@ -355,7 +355,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
 
           <View style={styles.assistanceButtonRow}>
             <TouchableOpacity
-              style={[styles.assistancePrimaryBtn, { backgroundColor: isDark ? '#27272A' : themeColors.primary }]}
+              style={[styles.assistancePrimaryBtn, { backgroundColor: themeColors.primary }]}
               onPress={handlePrimaryAction}
               delayPressIn={0}
               activeOpacity={0.8}
@@ -370,7 +370,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
               delayPressIn={0}
               activeOpacity={0.8}
             >
-              <Text style={[styles.assistanceSecondaryBtnText, { color: isDark ? themeColors.textPrimary : themeColors.primary }]}>
+              <Text style={[styles.assistanceSecondaryBtnText, { color: themeColors.primary }]}>
                 {language === 'hi' ? 'सहायता केंद्र' : language === 'gu' ? 'સહાય કેન્દ્ર' : 'Assistance Desk'}
               </Text>
             </TouchableOpacity>
@@ -386,18 +386,18 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   if (card.type === 'warning') {
     return (
       <Animated.View style={[styles.securityWrap, cardAnimatedStyle]}>
-        <View style={[styles.securityStrip, { backgroundColor: isDark ? '#450A0A' : '#FEF2F2', borderColor: isDark ? '#7F1D1D' : '#FECACA' }]}>
+        <View style={[styles.securityStrip, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
           <View style={styles.securityTopRow}>
-            <View style={[styles.securityIconBox, { backgroundColor: isDark ? '#7F1D1D' : '#FEE2E2' }]}>
+            <View style={[styles.securityIconBox, { backgroundColor: '#FEE2E2' }]}>
               <ShieldAlert size={18} color="#DC2626" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.securityTag}>SECURITY REVIEW</Text>
-              <Text style={[styles.securityTitle, { color: isDark ? '#FCA5A5' : '#991B1B' }]}>{card.title}</Text>
+              <Text style={[styles.securityTitle, { color: '#991B1B' }]}>{card.title}</Text>
             </View>
           </View>
 
-          <Text style={[styles.securityDescription, { color: isDark ? '#F87171' : '#7F1D1D' }]}>{card.description}</Text>
+          <Text style={[styles.securityDescription, { color: '#7F1D1D' }]}>{card.description}</Text>
 
           <View style={styles.securityActionRow}>
             <TouchableOpacity

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react-native';
 
 export const FinancialStressModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { activeJourney, closeJourney, financialHealth, balance, setActiveTab, showToast } =
     useCustomerStore();
 
@@ -59,9 +59,9 @@ export const FinancialStressModal: React.FC = () => {
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Empathetic Advisory Header */}
-            <View style={[styles.advisoryBanner, { backgroundColor: isDark ? '#261C05' : '#FFFBEB', borderColor: isDark ? '#B45309' : '#FDE68A' }]}>
-              <Text style={[styles.advisoryTitle, { color: isDark ? '#FBBF24' : '#92400E' }]}>Your monthly cash flow looks tighter than usual</Text>
-              <Text style={[styles.advisoryText, { color: isDark ? '#F59E0B' : '#78350F' }]}>
+            <View style={[styles.advisoryBanner, { backgroundColor: themeColors.brandSecondarySubtle, borderColor: themeColors.border }]}>
+              <Text style={[styles.advisoryTitle, { color: themeColors.brandSecondary }]}>Your monthly cash flow looks tighter than usual</Text>
+              <Text style={[styles.advisoryText, { color: themeColors.textSecondary }]}>
                 We observed unusual emergency repair debits combined with upcoming EMI obligations.
                 Let’s review upcoming dates and pause discretionary subscriptions together.
               </Text>

@@ -25,7 +25,7 @@ interface Props {
 }
 
 export const TransactionItem: React.FC<Props> = ({ transaction }) => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { setSelectedTransaction } = useCustomerStore();
 
   const getIcon = () => {

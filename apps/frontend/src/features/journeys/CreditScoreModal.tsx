@@ -37,7 +37,7 @@ function describeArc(x: number, y: number, radius: number, startAngle: number, e
 }
 
 export const CreditScoreModal: React.FC = () => {
-  const { colors, isDark } = useAppTheme();
+  const { colors } = useAppTheme();
   const { activeJourney, closeJourney, language, showToast } = useCustomerStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [score, setScore] = useState(785);

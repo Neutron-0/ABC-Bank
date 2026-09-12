@@ -13,7 +13,7 @@ import {
 } from 'lucide-react-native';
 
 export const FraudAlertModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { activeJourney, closeJourney, showToast } = useCustomerStore();
   const [resolution, setResolution] = useState<'prompt' | 'locked' | 'verified'>('prompt');
 
@@ -42,7 +42,7 @@ export const FraudAlertModal: React.FC = () => {
         <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={[styles.iconWrap, { backgroundColor: isDark ? '#2A0E0E' : '#FEE2E2' }]}>
+              <View style={[styles.iconWrap, { backgroundColor: '#FEE2E2' }]}>
                 <ShieldAlert size={20} color={themeColors.danger} />
               </View>
               <View>
@@ -58,7 +58,7 @@ export const FraudAlertModal: React.FC = () => {
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {resolution === 'prompt' && (
               <View>
-                <View style={[styles.warningBox, { backgroundColor: isDark ? '#2A0E0E' : '#FEF2F2', borderColor: isDark ? '#EF4444' : '#FCA5A5', borderWidth: 1 }]}>
+                <View style={[styles.warningBox, { backgroundColor: '#FEF2F2', borderColor: '#FCA5A5', borderWidth: 1 }]}>
                   <Text style={[styles.amount, { color: themeColors.danger }]}>₹31,800</Text>
                   <Text style={[styles.merchant, { color: themeColors.textPrimary }]}>GlobalTech Gaming Digital Ltd</Text>
                   <Text style={[styles.timeTag, { color: themeColors.textSecondary }]}>Today at 02:14 AM • Virtual POS</Text>
@@ -99,7 +99,7 @@ export const FraudAlertModal: React.FC = () => {
 
             {resolution === 'locked' && (
               <View style={styles.resultBox}>
-                <View style={[styles.resultIcon, { backgroundColor: isDark ? '#2A0E0E' : '#FEE2E2' }]}>
+                <View style={[styles.resultIcon, { backgroundColor: '#FEE2E2' }]}>
                   <Lock size={36} color={themeColors.danger} />
                 </View>
                 <Text style={[styles.resultTitle, { color: themeColors.textPrimary }]}>Card Frozen & Account Secured</Text>
@@ -122,8 +122,8 @@ export const FraudAlertModal: React.FC = () => {
 
             {resolution === 'verified' && (
               <View style={styles.resultBox}>
-                <View style={[styles.resultIcon, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
-                  <CheckCircle2 size={36} color={themeColors.success} />
+                <View style={[styles.resultIcon, { backgroundColor: themeColors.cardBgSecondary }]}>
+                  <CheckCircle2 size={36} color={themeColors.primary} />
                 </View>
                 <Text style={[styles.resultTitle, { color: themeColors.textPrimary }]}>Transaction Verified</Text>
                 <Text style={[styles.resultDesc, { color: themeColors.textSecondary }]}>

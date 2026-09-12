@@ -36,7 +36,7 @@ import {
 } from 'lucide-react-native';
 
 export const PaymentsScreen: React.FC = () => {
-  const { colors, isDark } = useAppTheme();
+  const { colors } = useAppTheme();
   const {
     balance,
     language,
@@ -161,8 +161,8 @@ export const PaymentsScreen: React.FC = () => {
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t.payments.subtitle}</Text>
         </View>
         <View style={[styles.npciBadge, { backgroundColor: colors.cardBgSecondary, borderColor: colors.borderLight }]}>
-          <ShieldCheck size={13} color={isDark ? colors.textPrimary : colors.primary} />
-          <Text style={[styles.npciBadgeText, { color: isDark ? colors.textPrimary : colors.primary }]}>UPI 2.0 Secure</Text>
+          <ShieldCheck size={13} color={colors.primary} />
+          <Text style={[styles.npciBadgeText, { color: colors.primary }]}>UPI 2.0 Secure</Text>
         </View>
       </View>
 
@@ -179,7 +179,7 @@ export const PaymentsScreen: React.FC = () => {
           </View>
           <View style={styles.balanceInfoRight}>
             <Text style={[styles.balanceLabelSmall, { color: colors.textMuted }]}>Available:</Text>
-            <Text style={[styles.balanceValue, { color: isDark ? colors.textPrimary : colors.primary }]}>₹{balance.available.toLocaleString('en-IN')}</Text>
+            <Text style={[styles.balanceValue, { color: colors.primary }]}>₹{balance.available.toLocaleString('en-IN')}</Text>
           </View>
         </View>
 
@@ -320,7 +320,7 @@ export const PaymentsScreen: React.FC = () => {
                       onPress={() => setPayAmount(chip)}
                       activeOpacity={0.7}
                     >
-                      <Text style={[styles.chipText, { color: isDark ? colors.textPrimary : colors.primary }]}>+₹{Number(chip).toLocaleString('en-IN')}</Text>
+                      <Text style={[styles.chipText, { color: colors.primary }]}>+₹{Number(chip).toLocaleString('en-IN')}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -345,7 +345,7 @@ export const PaymentsScreen: React.FC = () => {
                     <TouchableOpacity
                       style={[
                         styles.primaryActionBtn,
-                        { backgroundColor: isDark ? '#27272A' : colors.primary },
+                        { backgroundColor: colors.primary },
                         isInvalid && styles.disabledBtn,
                       ]}
                       onPress={handleProceedToPin}

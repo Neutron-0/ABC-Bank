@@ -18,7 +18,7 @@ import { Search, Filter } from 'lucide-react-native';
 import { TransactionCategory } from '../../types';
 
 export const TransactionsScreen: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { transactions, language } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -112,7 +112,7 @@ export const TransactionsScreen: React.FC = () => {
                 style={[
                   styles.pill,
                   { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
-                  active && [styles.activePill, { backgroundColor: isDark ? '#27272A' : themeColors.primary, borderColor: isDark ? '#3F3F46' : themeColors.primary }]
+                  active && [styles.activePill, { backgroundColor: themeColors.primary, borderColor: themeColors.primary }]
                 ]}
                 onPress={() => handleFilterChange(cat.id)}
                 delayPressIn={0}

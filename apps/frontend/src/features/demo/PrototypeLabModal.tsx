@@ -24,7 +24,7 @@ import {
 } from 'lucide-react-native';
 
 export const PrototypeLabModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const {
     activeJourney,
     closeJourney,
@@ -114,7 +114,7 @@ export const PrototypeLabModal: React.FC = () => {
                       active && [
                         styles.activeStateCard,
                         {
-                          backgroundColor: isDark ? '#172554' : '#FFFFFF',
+                          backgroundColor: themeColors.cardBg,
                           borderColor: themeColors.primary,
                         },
                       ],

@@ -826,10 +826,8 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     isBalanceHidden: false,
     toastMessage: null,
     isLoading: false,
-    themeMode: 'system',
-    setThemeMode: (mode: 'system' | 'light' | 'dark') => {
-      set({ themeMode: mode });
-    },
+    themeMode: 'light',
+    setThemeMode: () => {},
 
     userPin: '1234',
     biometricsEnabled: true,

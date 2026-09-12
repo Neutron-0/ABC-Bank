@@ -6,7 +6,7 @@ import { getTranslation } from '../../i18n';
 import { Check, X, ShieldCheck } from 'lucide-react-native';
 
 export const WhyThisCard: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { selectedWhyCard, setWhyCard, language } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -58,16 +58,16 @@ export const WhyThisCard: React.FC = () => {
                   {selectedWhyCard.whyDetails && selectedWhyCard.whyDetails.length > 0 ? (
                     selectedWhyCard.whyDetails.map((detail, idx) => (
                       <View key={idx} style={styles.checkRow}>
-                        <View style={[styles.checkCircle, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
-                          <Check size={12} color={isDark ? '#34D399' : '#059669'} strokeWidth={3} />
+                        <View style={[styles.checkCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+                          <Check size={12} color={themeColors.primary} strokeWidth={3} />
                         </View>
                         <Text style={[styles.checkText, { color: themeColors.textPrimary }]}>{detail}</Text>
                       </View>
                     ))
                   ) : (
                     <View style={styles.checkRow}>
-                      <View style={[styles.checkCircle, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
-                        <Check size={12} color={isDark ? '#34D399' : '#059669'} strokeWidth={3} />
+                      <View style={[styles.checkCircle, { backgroundColor: themeColors.cardBgSecondary }]}>
+                        <Check size={12} color={themeColors.primary} strokeWidth={3} />
                       </View>
                       <Text style={[styles.checkText, { color: themeColors.textPrimary }]}>{selectedWhyCard.reason}</Text>
                     </View>
@@ -76,7 +76,7 @@ export const WhyThisCard: React.FC = () => {
 
                 {/* Ethical Guardrails Note */}
                 <View style={[styles.ethicalNote, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
-                  <ShieldCheck size={16} color={isDark ? themeColors.textPrimary : '#0D9488'} />
+                  <ShieldCheck size={16} color={themeColors.primary} />
                   <Text style={[styles.ethicalText, { color: themeColors.textSecondary }]}>
                     {language === 'hi'
                       ? 'प्रमोशन से पहले सुरक्षा: यदि कैश फ्लो तनाव या चिकित्सा आपातकाल पाया जाता है, तो लोन और उत्पाद ऑफ़र पूरी तरह दबा दिए जाते हैं।'
@@ -90,7 +90,7 @@ export const WhyThisCard: React.FC = () => {
               {/* Bottom Done Button */}
               <View style={styles.footer}>
                 <TouchableOpacity
-                  style={[styles.doneBtn, { backgroundColor: isDark ? '#27272A' : '#111318' }]}
+                  style={[styles.doneBtn, { backgroundColor: themeColors.primary }]}
                   onPress={() => setWhyCard(null)}
                   delayPressIn={0}
                   activeOpacity={0.8}

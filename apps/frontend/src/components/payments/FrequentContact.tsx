@@ -20,7 +20,7 @@ export const FrequentContact: React.FC<FrequentContactProps> = ({
   badge,
   onPress,
 }) => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
 
   return (
     <TouchableOpacity

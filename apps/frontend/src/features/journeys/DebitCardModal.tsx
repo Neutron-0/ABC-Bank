@@ -20,7 +20,7 @@ import {
 } from 'lucide-react-native';
 
 export const DebitCardModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { activeJourney, closeJourney, language, showToast } = useCustomerStore();
 
   // Card Controls State
@@ -125,7 +125,7 @@ export const DebitCardModal: React.FC = () => {
             {/* Instant Emergency Freeze Switch */}
             <View style={[styles.freezeCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }, isLocked && styles.freezeCardActive]}>
               <View style={styles.freezeLeft}>
-                <View style={[styles.freezeIconWrap, { backgroundColor: isDark ? '#27272A' : '#EDEFF2' }]}>
+                <View style={[styles.freezeIconWrap, { backgroundColor: themeColors.cardBg }]}>
                   {isLocked ? <Lock size={18} color={themeColors.danger} /> : <Unlock size={18} color={themeColors.iconNeutral} />}
                 </View>
                 <View style={{ flex: 1 }}>
@@ -144,7 +144,7 @@ export const DebitCardModal: React.FC = () => {
               <Switch
                 value={isLocked}
                 onValueChange={handleToggleLock}
-                trackColor={{ false: isDark ? '#27272A' : '#E2E8F0', true: themeColors.danger }}
+                trackColor={{ false: themeColors.border, true: themeColors.danger }}
                 thumbColor="#FFFFFF"
               />
             </View>
@@ -158,7 +158,7 @@ export const DebitCardModal: React.FC = () => {
               {/* Contactless NFC */}
               <View style={[styles.toggleRow, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                 <View style={styles.toggleLeft}>
-                  <View style={[styles.toggleIconWrap, { backgroundColor: isDark ? '#27272A' : '#EDEFF2' }]}>
+                  <View style={[styles.toggleIconWrap, { backgroundColor: themeColors.cardBg }]}>
                     <Wifi size={16} color={themeColors.iconNeutral} />
                   </View>
                   <View>
@@ -174,7 +174,7 @@ export const DebitCardModal: React.FC = () => {
                   value={contactlessEnabled && !isLocked}
                   disabled={isLocked}
                   onValueChange={setContactlessEnabled}
-                  trackColor={{ false: isDark ? '#27272A' : '#E2E8F0', true: isDark ? '#10B981' : themeColors.primary }}
+                  trackColor={{ false: themeColors.border, true: themeColors.primary }}
                   thumbColor="#FFFFFF"
                 />
               </View>
@@ -182,7 +182,7 @@ export const DebitCardModal: React.FC = () => {
               {/* Online E-commerce */}
               <View style={[styles.toggleRow, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                 <View style={styles.toggleLeft}>
-                  <View style={[styles.toggleIconWrap, { backgroundColor: isDark ? '#27272A' : '#EDEFF2' }]}>
+                  <View style={[styles.toggleIconWrap, { backgroundColor: themeColors.cardBg }]}>
                     <ShoppingCart size={16} color={themeColors.iconNeutral} />
                   </View>
                   <View>
@@ -198,7 +198,7 @@ export const DebitCardModal: React.FC = () => {
                   value={onlineEnabled && !isLocked}
                   disabled={isLocked}
                   onValueChange={setOnlineEnabled}
-                  trackColor={{ false: isDark ? '#27272A' : '#E2E8F0', true: isDark ? '#10B981' : themeColors.primary }}
+                  trackColor={{ false: themeColors.border, true: themeColors.primary }}
                   thumbColor="#FFFFFF"
                 />
               </View>
@@ -206,7 +206,7 @@ export const DebitCardModal: React.FC = () => {
               {/* International Usage */}
               <View style={[styles.toggleRow, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                 <View style={styles.toggleLeft}>
-                  <View style={[styles.toggleIconWrap, { backgroundColor: isDark ? '#27272A' : '#EDEFF2' }]}>
+                  <View style={[styles.toggleIconWrap, { backgroundColor: themeColors.cardBg }]}>
                     <Globe size={16} color={themeColors.iconNeutral} />
                   </View>
                   <View>
@@ -222,7 +222,7 @@ export const DebitCardModal: React.FC = () => {
                   value={intlEnabled && !isLocked}
                   disabled={isLocked}
                   onValueChange={setIntlEnabled}
-                  trackColor={{ false: isDark ? '#27272A' : '#E2E8F0', true: isDark ? '#10B981' : themeColors.primary }}
+                  trackColor={{ false: themeColors.border, true: themeColors.primary }}
                   thumbColor="#FFFFFF"
                 />
               </View>
@@ -278,7 +278,7 @@ export const DebitCardModal: React.FC = () => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.actionCardBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: isDark ? '#EF4444' : '#FCA5A5' }]}
+                style={[styles.actionCardBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: '#FCA5A5' }]}
                 onPress={() => {
                   setIsLocked(true);
                   showToast(language === 'hi' ? 'कार्ड ब्लॉक रिपोर्ट दर्ज की गई' : language === 'gu' ? 'કાર્ડ બ્લોક રિપોર્ટ નોંધાઈ' : 'Card Blocked & Re-issue Ticket Generated');
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   visualCard: {
-    backgroundColor: '#0F294A',
+    backgroundColor: '#141414',
     borderRadius: 16,
     padding: spacing.lg,
     marginBottom: spacing.md,

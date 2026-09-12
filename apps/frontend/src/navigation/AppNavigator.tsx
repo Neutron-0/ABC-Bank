@@ -51,7 +51,7 @@ import {
 } from 'lucide-react-native';
 
 export const AppNavigator: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { activeTab, setActiveTab, language, toastMessage, currentState, activeJourney, closeJourney } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -130,19 +130,33 @@ export const AppNavigator: React.FC = () => {
         }),
         Animated.timing(screenTranslateX, {
           toValue: 0,
-          duration: 120,
-          easing: Easing.out(Easing.cubic),
+          duration: 220,
           useNativeDriver: true,
         }),
         Animated.timing(screenScale, {
           toValue: 1,
-          duration: 120,
-          easing: Easing.out(Easing.cubic),
+          duration: 220,
           useNativeDriver: true,
         }),
       ]).start();
 
       prevTabRef.current = activeTab;
+    }
+
+    // Micro pulse on active tab icon
+    if (iconScales[activeTab]) {
+      Animated.sequence([
+        Animated.timing(iconScales[activeTab], {
+          toValue: 1.15,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(iconScales[activeTab], {
+          toValue: 1.0,
+          duration: 140,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
   }, [activeTab]);
 
@@ -156,10 +170,10 @@ export const AppNavigator: React.FC = () => {
         return <TransactionsScreen />;
       case 'insights':
         return <InsightsScreen />;
-      case 'assistant':
-        return <MitraChatScreen />;
       case 'profile':
         return <ProfileScreen />;
+      case 'assistant':
+        return <MitraChatScreen />;
       default:
         return <AdaptiveHomeScreen />;
     }
@@ -167,7 +181,7 @@ export const AppNavigator: React.FC = () => {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: themeColors.bg }]}>
-      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={themeColors.bg} />
+      <StatusBar barStyle="dark-content" backgroundColor={themeColors.bg} />
 
       <View style={[styles.responsiveShell, { backgroundColor: themeColors.bg, borderColor: themeColors.border }]}>
         {/* Discreet Institutional Sandbox Strip if state is simulated */}
@@ -182,7 +196,7 @@ export const AppNavigator: React.FC = () => {
 
         {/* Toast Banner */}
         {toastMessage && (
-          <View style={[styles.toastBanner, { backgroundColor: isDark ? '#1C1C1E' : themeColors.primaryDark }]} pointerEvents="none">
+          <View style={[styles.toastBanner, { backgroundColor: themeColors.primary }]} pointerEvents="none">
             <CheckCircle2 size={16} color={themeColors.success} />
             <Text style={styles.toastText}>{toastMessage}</Text>
           </View>
@@ -204,20 +218,20 @@ export const AppNavigator: React.FC = () => {
           {renderActiveScreen()}
         </Animated.View>
 
-        {/* Floating Mittar AI Chatbot Button (Quick Jump) */}
+        {/* Floating Mitra AI Pill Button */}
         {activeTab !== 'assistant' && (
           <TouchableOpacity
             style={[styles.floatingChatButton, { backgroundColor: themeColors.primary }]}
             onPress={() => setActiveTab('assistant')}
-            activeOpacity={0.85}
+            activeOpacity={0.88}
           >
             <View style={styles.floatingChatInner}>
-              <View style={[styles.floatingChatIconCircle, { backgroundColor: isDark ? '#1D4ED8' : '#001A4D' }]}>
-                <Bot size={15} color="#FFFFFF" />
+              <View style={[styles.floatingChatIconCircle, { backgroundColor: '#2C2B29' }]}>
+                <Bot size={14} color="#FFFFFF" />
               </View>
               <View style={styles.floatingChatTextWrap}>
-                <Text style={styles.floatingChatTitle}>Mittar AI</Text>
-                <Text style={[styles.floatingChatSub, { color: '#E0E7FF' }]}>Edge SLM</Text>
+                <Text style={styles.floatingChatTitle}>Ask Mitra</Text>
+                <Text style={[styles.floatingChatSub, { color: '#D6D2CC' }]}>Edge AI</Text>
               </View>
             </View>
           </TouchableOpacity>

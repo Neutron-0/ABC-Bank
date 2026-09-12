@@ -21,13 +21,10 @@ import {
   ArrowRight,
   Lock,
   Check,
-  Sun,
-  Moon,
-  Smartphone,
 } from 'lucide-react-native';
 
 export const ProfileScreen: React.FC = () => {
-  const { colors, isDark, themeMode, setThemeMode } = useAppTheme();
+  const { colors } = useAppTheme();
   const {
     profile,
     language,
@@ -59,93 +56,11 @@ export const ProfileScreen: React.FC = () => {
             <Text style={[styles.userName, { color: colors.textPrimary }]}>{profile.name}</Text>
             <Text style={[styles.userSub, { color: colors.textSecondary }]}>{profile.phone}</Text>
             <Text style={[styles.userSub, { color: colors.textSecondary }]}>{profile.email}</Text>
-            <View style={[styles.kycBadge, { backgroundColor: isDark ? '#064E3B' : colors.successLight }]}>
-              <Check size={12} color={colors.success} />
-              <Text style={[styles.kycBadgeText, { color: isDark ? '#34D399' : '#065F46' }]}>
+            <View style={[styles.kycBadge, { backgroundColor: colors.cardBgSecondary }]}>
+              <Check size={12} color={colors.primary} />
+              <Text style={[styles.kycBadgeText, { color: colors.textPrimary }]}>
                 KYC Verified • Tier 2 Account
               </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* APPEARANCE & THEME SWITCHER */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
-            {language === 'hi' ? 'थीम व डिस्प्ले' : language === 'gu' ? 'થીમ અને ડિસ્પ્લે' : 'Appearance & Theme'}
-          </Text>
-
-          <View style={[styles.themeCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
-            <View style={styles.themeInfoRow}>
-              <View style={[styles.themeIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
-                {themeMode === 'system' ? (
-                  <Smartphone size={20} color={isDark ? colors.textPrimary : colors.primary} />
-                ) : themeMode === 'dark' ? (
-                  <Moon size={20} color={isDark ? colors.textPrimary : colors.primary} />
-                ) : (
-                  <Sun size={20} color={isDark ? colors.textPrimary : colors.primary} />
-                )}
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.themeTitle, { color: colors.textPrimary }]}>
-                  {themeMode === 'system'
-                    ? (isDark ? 'System (Dark Mode Active)' : 'System (Light Mode Active)')
-                    : themeMode === 'dark'
-                    ? 'Dark Mode Active'
-                    : 'Light Mode Active'}
-                </Text>
-                <Text style={[styles.themeDesc, { color: colors.textSecondary }]}>
-                  {themeMode === 'system'
-                    ? 'Automatically follows your phone system settings'
-                    : 'Custom override applied'}
-                </Text>
-              </View>
-            </View>
-
-            {/* 3-Pill Toggle Bar */}
-            <View style={[styles.themePillsRow, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
-              {[
-                { id: 'system' as const, label: 'System', icon: Smartphone },
-                { id: 'light' as const, label: 'Light', icon: Sun },
-                { id: 'dark' as const, label: 'Dark', icon: Moon },
-              ].map((item) => {
-                const active = themeMode === item.id;
-                const IconComp = item.icon;
-                return (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={[
-                      styles.themePill,
-                      active && [
-                        styles.themePillActive,
-                        { backgroundColor: isDark ? colors.surfaceElevated : '#FFFFFF' },
-                      ],
-                    ]}
-                    onPress={() => setThemeMode(item.id)}
-                    activeOpacity={0.75}
-                  >
-                    <IconComp
-                      size={14}
-                      color={
-                        active
-                          ? (isDark ? colors.textPrimary : colors.primary)
-                          : colors.textSecondary
-                      }
-                    />
-                    <Text
-                      style={[
-                        styles.themePillText,
-                        { color: colors.textSecondary },
-                        active && {
-                          color: isDark ? colors.textPrimary : colors.primary,
-                          fontWeight: '700',
-                        },
-                      ]}
-                    >
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
             </View>
           </View>
         </View>
@@ -169,7 +84,7 @@ export const ProfileScreen: React.FC = () => {
           >
             <View style={styles.labLeft}>
               <View style={[styles.labIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
-                <Sliders size={22} color={isDark ? colors.textPrimary : colors.primary} />
+                <Sliders size={22} color={colors.primary} />
               </View>
               <View style={styles.labInfo}>
                 <Text style={[styles.labTitle, { color: colors.textPrimary }]}>
@@ -177,7 +92,7 @@ export const ProfileScreen: React.FC = () => {
                 </Text>
                 <Text style={[styles.labSubtitle, { color: colors.textSecondary }]}>
                   Current Active State:{' '}
-                  <Text style={{ fontWeight: '700', color: isDark ? colors.textPrimary : colors.primary }}>
+                  <Text style={{ fontWeight: '700', color: colors.primary }}>
                     {currentState.toUpperCase()}
                   </Text>
                 </Text>
@@ -186,7 +101,7 @@ export const ProfileScreen: React.FC = () => {
                 </Text>
               </View>
             </View>
-            <ArrowRight size={18} color={isDark ? colors.textPrimary : colors.primary} />
+            <ArrowRight size={18} color={colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -199,7 +114,7 @@ export const ProfileScreen: React.FC = () => {
           >
             <View style={styles.labLeft}>
               <View style={[styles.labIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
-                <Cpu size={22} color={isDark ? colors.textPrimary : colors.primary} />
+                <Cpu size={22} color={colors.primary} />
               </View>
               <View style={styles.labInfo}>
                 <Text style={[styles.archTitle, { color: colors.textPrimary }]}>
@@ -210,7 +125,7 @@ export const ProfileScreen: React.FC = () => {
                 </Text>
               </View>
             </View>
-            <ArrowRight size={18} color={isDark ? colors.textPrimary : colors.primary} />
+            <ArrowRight size={18} color={colors.primary} />
           </TouchableOpacity>
         </View>
 
@@ -235,8 +150,8 @@ export const ProfileScreen: React.FC = () => {
                     active && [
                       styles.activeLangOption,
                       {
-                        borderColor: isDark ? colors.borderLight : colors.primaryRoyal,
-                        backgroundColor: isDark ? colors.cardBgSecondary : colors.pastelBlue,
+                        borderColor: colors.primary,
+                        backgroundColor: colors.cardBgSecondary,
                       },
                     ],
                   ]}
@@ -247,7 +162,7 @@ export const ProfileScreen: React.FC = () => {
                       styles.langOptionText,
                       { color: colors.textPrimary },
                       active && {
-                        color: isDark ? colors.textPrimary : colors.primaryRoyal,
+                        color: colors.primary,
                         fontWeight: '700',
                       },
                     ]}
@@ -255,7 +170,7 @@ export const ProfileScreen: React.FC = () => {
                     {langItem.label}
                   </Text>
                   {active && (
-                    <Check size={16} color={isDark ? colors.textPrimary : colors.primaryRoyal} />
+                    <Check size={16} color={colors.primary} />
                   )}
                 </TouchableOpacity>
               );
@@ -281,8 +196,8 @@ export const ProfileScreen: React.FC = () => {
             <Switch
               value={consent.useTransactionData}
               onValueChange={(val) => updateConsent({ useTransactionData: val })}
-              trackColor={{ false: colors.border, true: isDark ? '#1E3A8A' : colors.primaryLight }}
-              thumbColor={isDark ? colors.accent : colors.cardBg}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.cardBg}
             />
           </View>
 
@@ -298,8 +213,8 @@ export const ProfileScreen: React.FC = () => {
             <Switch
               value={consent.personalizedProducts}
               onValueChange={(val) => updateConsent({ personalizedProducts: val })}
-              trackColor={{ false: colors.border, true: isDark ? '#1E3A8A' : colors.primaryLight }}
-              thumbColor={isDark ? colors.accent : colors.cardBg}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.cardBg}
             />
           </View>
 
@@ -315,8 +230,8 @@ export const ProfileScreen: React.FC = () => {
             <Switch
               value={consent.financialInsights}
               onValueChange={(val) => updateConsent({ financialInsights: val })}
-              trackColor={{ false: colors.border, true: isDark ? '#1E3A8A' : colors.primaryLight }}
-              thumbColor={isDark ? colors.accent : colors.cardBg}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.cardBg}
             />
           </View>
 
@@ -332,8 +247,8 @@ export const ProfileScreen: React.FC = () => {
             <Switch
               value={consent.assistantContextAccess}
               onValueChange={(val) => updateConsent({ assistantContextAccess: val })}
-              trackColor={{ false: colors.border, true: isDark ? '#1E3A8A' : colors.primaryLight }}
-              thumbColor={isDark ? colors.accent : colors.cardBg}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.cardBg}
             />
           </View>
         </View>
@@ -350,7 +265,7 @@ export const ProfileScreen: React.FC = () => {
             <Text style={[styles.journeyBtnText, { color: colors.textPrimary }]}>
               App Onboarding & Language Selection
             </Text>
-            <ArrowRight size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
+            <ArrowRight size={16} color={colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -360,7 +275,7 @@ export const ProfileScreen: React.FC = () => {
             <Text style={[styles.journeyBtnText, { color: colors.textPrimary }]}>
               Digital KYC Journey
             </Text>
-            <ArrowRight size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
+            <ArrowRight size={16} color={colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -370,7 +285,7 @@ export const ProfileScreen: React.FC = () => {
             <Text style={[styles.journeyBtnText, { color: colors.textPrimary }]}>
               Responsible Affordability Loan
             </Text>
-            <ArrowRight size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
+            <ArrowRight size={16} color={colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -380,7 +295,7 @@ export const ProfileScreen: React.FC = () => {
             <Text style={[styles.journeyBtnText, { color: colors.textPrimary }]}>
               Surplus Savings & Investments
             </Text>
-            <ArrowRight size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
+            <ArrowRight size={16} color={colors.primary} />
           </TouchableOpacity>
         </View>
       </ScrollView>

@@ -63,7 +63,7 @@ interface RepeatedIntentItem {
 }
 
 export const AdaptiveHomeScreen: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const {
     cards,
     fetchStateAndContext,
@@ -825,7 +825,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={isDark ? themeColors.accent : '#111318'} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={themeColors.primary} />
         }
         showsVerticalScrollIndicator={false}
       >
@@ -1052,7 +1052,7 @@ const styles = StyleSheet.create({
   compactTileAmount: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
   },
   compactTileAmountPaid: {
     color: '#059669',
@@ -1116,7 +1116,7 @@ const styles = StyleSheet.create({
   expandedTagText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
     letterSpacing: 0.3,
   },
   expandedTagCategory: {
@@ -1551,7 +1551,7 @@ const styles = StyleSheet.create({
   mandateCountText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#0052CC',
+    color: '#141414',
     letterSpacing: 0.4,
   },
 
@@ -1768,7 +1768,7 @@ const styles = StyleSheet.create({
   productActionText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#0052CC',
+    color: '#141414',
   },
 
   // Recent Transactions Passbook Snippet
@@ -1779,7 +1779,7 @@ const styles = StyleSheet.create({
   viewAllText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#0052CC',
+    color: '#141414',
   },
   recentCard: {
     backgroundColor: '#FFFFFF',

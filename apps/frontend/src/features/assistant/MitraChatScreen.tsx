@@ -36,7 +36,7 @@ import {
 } from 'lucide-react-native';
 
 export const MitraChatScreen: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const {
     currentState,
     language,
@@ -423,7 +423,7 @@ export const MitraChatScreen: React.FC = () => {
             <ArrowLeft size={20} color={themeColors.textPrimary} />
           </TouchableOpacity>
           <View style={[styles.avatarBox, { backgroundColor: themeColors.cardBgSecondary }]}>
-            <Bot size={20} color={isDark ? '#FFFFFF' : themeColors.primary} />
+            <Bot size={20} color={themeColors.primary} />
           </View>
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -431,7 +431,7 @@ export const MitraChatScreen: React.FC = () => {
                 {language === 'hi' ? 'मित्तर (Mittar) AI' : language === 'gu' ? 'મિત્તર (Mittar) AI' : 'Mittar (Mitra) AI'}
               </Text>
               <View style={[styles.miniCpmPill, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
-                <Cpu size={10} color={isDark ? '#FFFFFF' : themeColors.primary} />
+                <Cpu size={10} color={themeColors.primary} />
                 <Text style={[styles.miniCpmPillText, { color: themeColors.textSecondary }]}>Edge SLM Active</Text>
               </View>
             </View>
@@ -443,8 +443,8 @@ export const MitraChatScreen: React.FC = () => {
         </View>
 
         <View style={[styles.ethicsBadge, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
-          <ShieldCheck size={12} color={isDark ? '#FFFFFF' : themeColors.primary} />
-          <Text style={[styles.ethicsText, { color: isDark ? '#FFFFFF' : themeColors.primary }]}>RBI Encrypted</Text>
+          <ShieldCheck size={12} color={themeColors.primary} />
+          <Text style={[styles.ethicsText, { color: themeColors.primary }]}>RBI Encrypted</Text>
         </View>
       </View>
 
@@ -458,7 +458,7 @@ export const MitraChatScreen: React.FC = () => {
         {/* Context Banner */}
         <View style={styles.contextPillWrap}>
           <View style={[styles.contextPill, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}>
-            <ShieldCheck size={12} color={isDark ? '#FFFFFF' : themeColors.primary} />
+            <ShieldCheck size={12} color={themeColors.primary} />
             <Text style={[styles.contextPillText, { color: themeColors.textSecondary }]}>
               Verified Context: {currentState.toUpperCase().replace('_', ' ')}
             </Text>
@@ -474,7 +474,7 @@ export const MitraChatScreen: React.FC = () => {
             >
               {!isUser && (
                 <View style={[styles.mitraBubbleAvatar, { backgroundColor: themeColors.cardBgSecondary }]}>
-                  <Bot size={14} color={isDark ? '#FFFFFF' : themeColors.primary} />
+                  <Bot size={14} color={themeColors.primary} />
                 </View>
               )}
 
@@ -482,7 +482,7 @@ export const MitraChatScreen: React.FC = () => {
                 style={[
                   styles.messageBubble,
                   isUser
-                    ? [styles.userBubble, { backgroundColor: isDark ? '#27272A' : themeColors.primary }]
+                    ? [styles.userBubble, { backgroundColor: themeColors.primary }]
                     : [styles.assistantBubble, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }],
                 ]}
               >
@@ -645,7 +645,7 @@ export const MitraChatScreen: React.FC = () => {
           {isListening ? (
             <MicOff size={18} color="#FFFFFF" />
           ) : (
-            <Mic size={18} color={isDark ? '#FFFFFF' : themeColors.primary} />
+            <Mic size={18} color={themeColors.primary} />
           )}
         </TouchableOpacity>
 
@@ -653,7 +653,7 @@ export const MitraChatScreen: React.FC = () => {
         <TouchableOpacity
           style={[
             styles.sendButton,
-            { backgroundColor: isDark ? '#27272A' : '#002970' },
+            { backgroundColor: themeColors.primary },
             !inputText.trim() && styles.sendDisabled,
           ]}
           onPress={() => handleSendMessage()}
@@ -676,8 +676,8 @@ export const MitraChatScreen: React.FC = () => {
             {/* Top Bar */}
             <View style={styles.voiceStudioTopRow}>
               <View style={[styles.voiceStudioTag, { backgroundColor: themeColors.cardBgSecondary }]}>
-                <Radio size={13} color={isDark ? themeColors.textPrimary : themeColors.primary} />
-                <Text style={[styles.voiceStudioTagText, { color: isDark ? themeColors.textPrimary : themeColors.primary }]}>
+                <Radio size={13} color={themeColors.primary} />
+                <Text style={[styles.voiceStudioTagText, { color: themeColors.primary }]}>
                   MINICPM-5 VERNACULAR VOICE SLM
                 </Text>
               </View>
@@ -693,12 +693,12 @@ export const MitraChatScreen: React.FC = () => {
             {/* Visualizer & Mic Pulse */}
             <View style={[styles.soundwaveBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.soundwaveBarsRow}>
-                <View style={[styles.soundwaveBar, { height: 26, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 42, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 58, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 38, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 48, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 24, backgroundColor: isDark ? '#FFFFFF' : themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 26, backgroundColor: themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 42, backgroundColor: themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 58, backgroundColor: themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 38, backgroundColor: themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 48, backgroundColor: themeColors.primary }]} />
+                <View style={[styles.soundwaveBar, { height: 24, backgroundColor: themeColors.primary }]} />
               </View>
               <Text style={[styles.voiceStudioHeading, { color: themeColors.textPrimary }]}>
                 {language === 'hi'
@@ -787,7 +787,7 @@ export const MitraChatScreen: React.FC = () => {
                 }}
               />
               <TouchableOpacity
-                style={[styles.voiceDictationSend, { backgroundColor: isDark ? '#27272A' : '#0F294A' }, !inputText.trim() && { opacity: 0.5 }]}
+                style={[styles.voiceDictationSend, { backgroundColor: themeColors.primary }, !inputText.trim() && { opacity: 0.5 }]}
                 onPress={() => {
                   if (inputText.trim()) {
                     setShowVoiceStudio(false);
@@ -1245,7 +1245,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     fontWeight: '600',
-    color: '#0F294A',
+    color: '#141414',
   },
   voiceDictationRow: {
     flexDirection: 'row',
@@ -1261,14 +1261,14 @@ const styles = StyleSheet.create({
   voiceDictationInput: {
     flex: 1,
     fontSize: 13,
-    color: '#0F172A',
+    color: '#141414',
     paddingVertical: 6,
   },
   voiceDictationSend: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#0F294A',
+    backgroundColor: '#141414',
     alignItems: 'center',
     justifyContent: 'center',
   },

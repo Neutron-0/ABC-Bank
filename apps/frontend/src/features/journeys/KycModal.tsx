@@ -16,7 +16,7 @@ import {
 } from 'lucide-react-native';
 
 export const KycModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { activeJourney, closeJourney, showToast, language } = useCustomerStore();
   const t = getTranslation(language);
   const [step, setStep] = useState<number>(1);
@@ -428,19 +428,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#F0F4F8',
+    backgroundColor: '#F3EFEA',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
     alignSelf: 'flex-start',
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#D9E2EC',
+    borderColor: '#EAE6DF',
   },
   aiTagText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
     letterSpacing: 0.5,
   },
   signalCard: {

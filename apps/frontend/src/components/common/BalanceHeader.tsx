@@ -20,7 +20,7 @@ import {
 } from 'lucide-react-native';
 
 export const BalanceHeader: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const {
     balance,
     isBalanceHidden,
@@ -54,10 +54,10 @@ export const BalanceHeader: React.FC = () => {
         <View style={styles.cardTopRow}>
           <View style={styles.bankTagGroup}>
             <View style={[styles.shieldIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
-              <ShieldCheck size={14} color={isDark ? themeColors.textPrimary : themeColors.primary} />
+              <ShieldCheck size={14} color={themeColors.primary} />
             </View>
             <View>
-              <Text style={[styles.bankTagTitle, { color: isDark ? themeColors.textPrimary : themeColors.primary }]}>ABC PAYMENTS BANK</Text>
+              <Text style={[styles.bankTagTitle, { color: themeColors.primary }]}>ABC PAYMENTS BANK</Text>
               <Text style={[styles.accountNumberText, { color: themeColors.textSecondary }]}>Savings A/C •••• 4092</Text>
             </View>
           </View>
@@ -107,15 +107,15 @@ export const BalanceHeader: React.FC = () => {
               style={[
                 styles.addMoneyPill,
                 {
-                  backgroundColor: isDark ? themeColors.cardBgSecondary : themeColors.primarySubtle,
-                  borderColor: themeColors.borderLight,
+                  backgroundColor: themeColors.cardBgSecondary,
+                  borderColor: themeColors.border,
                 },
               ]}
               onPress={() => setActiveTab('payments')}
               activeOpacity={0.8}
             >
-              <Plus size={13} color={isDark ? themeColors.textPrimary : themeColors.primary} />
-              <Text style={[styles.addMoneyPillText, { color: isDark ? themeColors.textPrimary : themeColors.primary }]}>
+              <Plus size={13} color={themeColors.primary} />
+              <Text style={[styles.addMoneyPillText, { color: themeColors.primary }]}>
                 {language === 'hi' ? 'पैसे जोड़ें' : language === 'gu' ? 'પૈસા ઉમેરો' : 'Add Money'}
               </Text>
             </TouchableOpacity>
@@ -161,7 +161,7 @@ export const BalanceHeader: React.FC = () => {
           activeOpacity={0.75}
         >
           <View style={[styles.quickActionCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.borderLight, borderWidth: 1 }]}>
-            <QrCode size={19} color={isDark ? themeColors.textPrimary : themeColors.primary} />
+            <QrCode size={19} color={themeColors.primary} />
           </View>
           <Text style={[styles.quickActionLabel, { color: themeColors.textPrimary }]}>
             {language === 'hi' ? 'स्कैन क्यूआर' : language === 'gu' ? 'સ્કેન QR' : 'Scan QR'}

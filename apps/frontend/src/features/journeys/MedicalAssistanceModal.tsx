@@ -14,7 +14,7 @@ import {
 } from 'lucide-react-native';
 
 export const MedicalAssistanceModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { activeJourney, closeJourney, journeyPayload, showToast, setActiveTab } =
     useCustomerStore();
 
@@ -51,9 +51,9 @@ export const MedicalAssistanceModal: React.FC = () => {
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Empathy Banner */}
-            <View style={[styles.empathyBanner, { backgroundColor: isDark ? '#1C1C1E' : '#F0F9FF', borderColor: isDark ? themeColors.border : '#BAE6FD' }]}>
-              <Text style={[styles.empathyTitle, { color: isDark ? '#FFFFFF' : '#0369A1' }]}>We are here to support your recovery</Text>
-              <Text style={[styles.empathyText, { color: isDark ? '#A1A1AA' : '#0C4A6E' }]}>
+            <View style={[styles.empathyBanner, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+              <Text style={[styles.empathyTitle, { color: themeColors.textPrimary }]}>We are here to support your recovery</Text>
+              <Text style={[styles.empathyText, { color: themeColors.textSecondary }]}>
                 We noticed your recent payment of ₹{amount.toLocaleString('en-IN')} to {hospital}.
                 Our digital desk is ready to help you gather bills, file reimbursement claims, and reorganize upcoming monthly cash flow.
               </Text>
@@ -70,7 +70,7 @@ export const MedicalAssistanceModal: React.FC = () => {
               }}
               activeOpacity={0.8}
             >
-              <View style={[styles.actionIconBox, { backgroundColor: isDark ? '#27272A' : '#E0F2FE' }]}>
+              <View style={[styles.actionIconBox, { backgroundColor: themeColors.cardBg }]}>
                 <FileText size={22} color={themeColors.iconNeutral} />
               </View>
               <View style={styles.actionInfo}>
@@ -90,7 +90,7 @@ export const MedicalAssistanceModal: React.FC = () => {
               }}
               activeOpacity={0.8}
             >
-              <View style={[styles.actionIconBox, { backgroundColor: isDark ? '#27272A' : '#E0F2FE' }]}>
+              <View style={[styles.actionIconBox, { backgroundColor: themeColors.cardBg }]}>
                 <Bot size={22} color={themeColors.iconNeutral} />
               </View>
               <View style={styles.actionInfo}>

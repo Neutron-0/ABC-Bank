@@ -93,7 +93,7 @@ function generateSmoothCurve(points: { x: number; y: number }[]): string {
 }
 
 export const BespokeFinancialGraph: React.FC = () => {
-  const { colors, isDark } = useAppTheme();
+  const { colors } = useAppTheme();
   const [timeframe, setTimeframe] = useState<Timeframe>('1W');
   const [selectedIndex, setSelectedIndex] = useState<number>(4); // Default select Fri (Sep 12)
 
@@ -156,7 +156,7 @@ export const BespokeFinancialGraph: React.FC = () => {
                 key={tf}
                 style={[
                   styles.timeframeBtn,
-                  active && [styles.timeframeBtnActive, { backgroundColor: isDark ? colors.surfaceElevated : '#FFFFFF' }],
+                  active && [styles.timeframeBtnActive, { backgroundColor: colors.surfaceElevated }],
                 ]}
                 onPress={() => {
                   setTimeframe(tf);
@@ -168,7 +168,7 @@ export const BespokeFinancialGraph: React.FC = () => {
                   style={[
                     styles.timeframeText,
                     { color: colors.textSecondary },
-                    active && { color: colors.primaryRoyal, fontWeight: '700' },
+                    active && { color: colors.primary, fontWeight: '700' },
                   ]}
                 >
                   {tf}
@@ -211,7 +211,7 @@ export const BespokeFinancialGraph: React.FC = () => {
               <Stop
                 offset="0%"
                 stopColor={colors.primary}
-                stopOpacity={isDark ? 0.35 : 0.18}
+                stopOpacity={0.15}
               />
               <Stop
                 offset="100%"

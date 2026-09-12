@@ -7,7 +7,7 @@ import { motion } from '../../motion';
 import { Bell, Globe, QrCode, ShieldCheck, Search } from 'lucide-react-native';
 
 export const AdaptiveHeader: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { profile, language, setLanguage, openJourney, currentState, setActiveTab } = useCustomerStore();
   const t = getTranslation(language);
 

@@ -5,7 +5,7 @@ import { useCustomerStore } from '../../state/customerStore';
 import { TrendingUp, X, CheckCircle2, ArrowRight, ShieldCheck } from 'lucide-react-native';
 
 export const SavingsInvestModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { activeJourney, closeJourney, balance, signals, showToast } = useCustomerStore();
   const [selectedPlan, setSelectedPlan] = useState<'smart_fd' | 'index_sip'>('smart_fd');
 
@@ -47,10 +47,10 @@ export const SavingsInvestModal: React.FC = () => {
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Surplus Explanation */}
-            <View style={[styles.surplusBox, { backgroundColor: isDark ? '#0C2417' : '#F0FDF4', borderColor: isDark ? '#10B981' : '#BBF7D0' }]}>
-              <Text style={[styles.surplusLabel, { color: isDark ? '#34D399' : '#166534' }]}>Detected Surplus Balance</Text>
-              <Text style={[styles.surplusAmount, { color: isDark ? '#10B981' : '#15803D' }]}>₹{surplus.toLocaleString('en-IN')}</Text>
-              <Text style={[styles.surplusDesc, { color: isDark ? '#A7F3D0' : '#166534' }]}>
+            <View style={[styles.surplusBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+              <Text style={[styles.surplusLabel, { color: themeColors.brandSecondary }]}>Detected Surplus Balance</Text>
+              <Text style={[styles.surplusAmount, { color: themeColors.textPrimary }]}>₹{surplus.toLocaleString('en-IN')}</Text>
+              <Text style={[styles.surplusDesc, { color: themeColors.textSecondary }]}>
                 Available balance is ₹{balance.available.toLocaleString('en-IN')} with all monthly commitments covered.
               </Text>
             </View>
@@ -61,15 +61,15 @@ export const SavingsInvestModal: React.FC = () => {
               style={[
                 styles.planCard,
                 { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
-                selectedPlan === 'smart_fd' && [styles.activePlanCard, { borderColor: themeColors.primary, backgroundColor: isDark ? '#172554' : '#FFFFFF' }],
+                selectedPlan === 'smart_fd' && [styles.activePlanCard, { borderColor: themeColors.primary, backgroundColor: themeColors.cardBg }],
               ]}
               onPress={() => setSelectedPlan('smart_fd')}
               activeOpacity={0.8}
             >
               <View style={styles.planHeader}>
                 <Text style={[styles.planTitle, { color: themeColors.textPrimary }]}>Smart High-Yield Deposit</Text>
-                <View style={[styles.returnBadge, { backgroundColor: isDark ? '#261C05' : '#FEF3C7', borderWidth: 1, borderColor: isDark ? '#B45309' : '#FDE68A' }]}>
-                  <Text style={[styles.returnText, { color: isDark ? '#FBBF24' : '#92400E' }]}>7.85% p.a.</Text>
+                <View style={[styles.returnBadge, { backgroundColor: themeColors.cardBgSecondary, borderWidth: 1, borderColor: themeColors.border }]}>
+                  <Text style={[styles.returnText, { color: themeColors.brandSecondary }]}>7.85% p.a.</Text>
                 </View>
               </View>
               <Text style={[styles.planDesc, { color: themeColors.textSecondary }]}>
@@ -81,14 +81,14 @@ export const SavingsInvestModal: React.FC = () => {
               style={[
                 styles.planCard,
                 { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
-                selectedPlan === 'index_sip' && [styles.activePlanCard, { borderColor: themeColors.primary, backgroundColor: isDark ? '#172554' : '#FFFFFF' }],
+                selectedPlan === 'index_sip' && [styles.activePlanCard, { borderColor: themeColors.primary, backgroundColor: themeColors.cardBg }],
               ]}
               onPress={() => setSelectedPlan('index_sip')}
               activeOpacity={0.8}
             >
               <View style={styles.planHeader}>
                 <Text style={[styles.planTitle, { color: themeColors.textPrimary }]}>Disciplined Index SIP</Text>
-                <View style={[styles.returnBadge, { backgroundColor: isDark ? '#27272A' : '#FEF3C7', borderWidth: 1, borderColor: isDark ? themeColors.border : '#FDE68A' }]}>
+                <View style={[styles.returnBadge, { backgroundColor: themeColors.cardBgSecondary, borderWidth: 1, borderColor: themeColors.border }]}>
                   <Text style={[styles.returnText, { color: themeColors.textPrimary }]}>₹2,500/mo</Text>
                 </View>
               </View>

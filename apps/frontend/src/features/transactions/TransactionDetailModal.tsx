@@ -5,7 +5,7 @@ import { useCustomerStore } from '../../state/customerStore';
 import { X, FileText, ShieldCheck, ArrowRight, Share2, HelpCircle } from 'lucide-react-native';
 
 export const TransactionDetailModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { selectedTransaction, setSelectedTransaction, openJourney, showToast, language } = useCustomerStore();
 
   if (!selectedTransaction) return null;
@@ -204,11 +204,11 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   aiBox: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: colors.cardBgSecondary,
     borderRadius: radii.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#DBEAFE',
+    borderColor: colors.borderLight,
     marginBottom: spacing.md,
   },
   aiHeader: {
@@ -219,12 +219,12 @@ const styles = StyleSheet.create({
   },
   aiTitle: {
     ...typography.captionMedium,
-    color: colors.primary,
+    color: colors.textPrimary,
     fontWeight: '700',
   },
   aiText: {
     ...typography.body,
-    color: '#1E40AF',
+    color: colors.textSecondary,
   },
   metaTable: {
     backgroundColor: colors.cardBgSecondary,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     color: colors.textWhite,
   },
   medicalActionBtn: {
-    backgroundColor: '#0284C7',
+    backgroundColor: '#141414',
     borderRadius: radii.md,
     paddingVertical: spacing.md,
     flexDirection: 'row',

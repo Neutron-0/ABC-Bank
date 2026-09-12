@@ -5,7 +5,7 @@ import { useCustomerStore } from '../../state/customerStore';
 import { Cpu, X, Database, ArrowDown, ShieldCheck, Layers, Bot } from 'lucide-react-native';
 
 export const ArchitectureFlowModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { activeJourney, closeJourney } = useCustomerStore();
 
   if (activeJourney !== 'architecture_flow') return null;

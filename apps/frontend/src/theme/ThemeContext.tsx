@@ -1,45 +1,31 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import { useColorScheme } from 'react-native';
-import { lightColors, darkColors, ThemeColors } from './colors';
-import { useCustomerStore } from '../state/customerStore';
+import { lightColors, ThemeColors } from './colors';
 
-export type ThemeMode = 'system' | 'light' | 'dark';
+export type ThemeMode = 'light';
 
 export interface ThemeContextValue {
-  themeMode: ThemeMode;
-  isDark: boolean;
+  themeMode: 'light';
+  isDark: false;
   colors: ThemeColors;
-  setThemeMode: (mode: ThemeMode) => void;
+  setThemeMode: (mode: any) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  themeMode: 'system',
+  themeMode: 'light',
   isDark: false,
   colors: lightColors,
   setThemeMode: () => {},
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const systemScheme = useColorScheme();
-  const { themeMode, setThemeMode } = useCustomerStore();
-
-  const isDark = useMemo(() => {
-    if (themeMode === 'system') {
-      return systemScheme === 'dark';
-    }
-    return themeMode === 'dark';
-  }, [themeMode, systemScheme]);
-
-  const activeColors = isDark ? darkColors : lightColors;
-
-  const value = useMemo(
+  const value = useMemo<ThemeContextValue>(
     () => ({
-      themeMode,
-      isDark,
-      colors: activeColors,
-      setThemeMode,
+      themeMode: 'light',
+      isDark: false,
+      colors: lightColors,
+      setThemeMode: () => {},
     }),
-    [themeMode, isDark, activeColors, setThemeMode]
+    []
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
@@ -49,7 +35,7 @@ export const useAppTheme = (): ThemeContextValue => {
   const context = useContext(ThemeContext);
   if (!context) {
     return {
-      themeMode: 'system',
+      themeMode: 'light',
       isDark: false,
       colors: lightColors,
       setThemeMode: () => {},

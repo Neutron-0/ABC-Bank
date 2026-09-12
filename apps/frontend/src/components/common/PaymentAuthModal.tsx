@@ -25,7 +25,7 @@ import {
 } from 'lucide-react-native';
 
 export const PaymentAuthModal: React.FC = () => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const {
     authModal,
     closePaymentAuth,
@@ -225,9 +225,9 @@ export const PaymentAuthModal: React.FC = () => {
           <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
             {/* Header */}
             <View style={styles.topRow}>
-              <View style={[styles.securityTag, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
-                <ShieldCheck size={14} color={themeColors.success} />
-                <Text style={[styles.securityTagText, { color: themeColors.success }]}>
+              <View style={[styles.securityTag, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}>
+                <ShieldCheck size={14} color={themeColors.primary} />
+                <Text style={[styles.securityTagText, { color: themeColors.textPrimary }]}>
                   {language === 'hi'
                     ? 'सुरक्षित बैंक भुगतान प्राधिकरण'
                     : language === 'gu'
@@ -248,7 +248,7 @@ export const PaymentAuthModal: React.FC = () => {
             {/* Transaction Overview Card */}
             <View style={[styles.paymentSummaryCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.merchantHeaderRow}>
-                <View style={[styles.merchantAvatarCircle, { backgroundColor: isDark ? '#27272A' : '#E2E8F0' }]}>
+                <View style={[styles.merchantAvatarCircle, { backgroundColor: themeColors.cardBg }]}>
                   <Building2 size={18} color={themeColors.iconNeutral} />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -259,7 +259,7 @@ export const PaymentAuthModal: React.FC = () => {
                     {paymentData.merchant}
                   </Text>
                 </View>
-                <View style={[styles.categoryBadge, { backgroundColor: isDark ? '#27272A' : '#EFF6FF', borderColor: isDark ? themeColors.border : '#BFDBFE' }]}>
+                <View style={[styles.categoryBadge, { backgroundColor: themeColors.cardBg, borderColor: themeColors.border }]}>
                   <Text style={[styles.categoryBadgeText, { color: themeColors.textPrimary }]}>{(paymentData.category || 'UPI').toUpperCase()}</Text>
                 </View>
               </View>
@@ -275,8 +275,8 @@ export const PaymentAuthModal: React.FC = () => {
                 <Text style={[styles.accountSourceText, { color: themeColors.textSecondary }]}>
                   Debiting A/C 5010 •••• 4092
                 </Text>
-                <View style={[styles.balanceBadge, { backgroundColor: isDark ? '#0C2417' : '#F1F5F9' }]}>
-                  <Text style={[styles.balanceBadgeText, { color: themeColors.success }]}>
+                <View style={[styles.balanceBadge, { backgroundColor: themeColors.cardBg }]}>
+                  <Text style={[styles.balanceBadgeText, { color: themeColors.textPrimary }]}>
                     Available ₹{balance.available.toLocaleString('en-IN')}
                   </Text>
                 </View>
@@ -289,8 +289,8 @@ export const PaymentAuthModal: React.FC = () => {
                 style={[
                   styles.biometricButton,
                   { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
-                  bioSuccess && (isDark ? { borderColor: '#10B981', backgroundColor: '#0C2417' } : styles.biometricButtonSuccess),
-                  isAuthenticatingBio && (isDark ? { borderColor: '#52525B', backgroundColor: '#27272A' } : styles.biometricButtonScanning),
+                  bioSuccess && styles.biometricButtonSuccess,
+                  isAuthenticatingBio && styles.biometricButtonScanning,
                 ]}
                 onPress={handleBiometricAuth}
                 activeOpacity={0.8}
@@ -459,8 +459,8 @@ export const PaymentAuthModal: React.FC = () => {
             ]}
           >
             {/* Top Success Badge */}
-            <View style={[styles.receiptTopCircle, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5', borderColor: isDark ? '#10B981' : '#A7F3D0' }]}>
-              <CheckCircle2 size={36} color={themeColors.success} />
+            <View style={[styles.receiptTopCircle, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+              <CheckCircle2 size={36} color={themeColors.primary} />
             </View>
 
             <Text style={[styles.receiptSuccessTitle, { color: themeColors.textPrimary }]}>
@@ -477,12 +477,12 @@ export const PaymentAuthModal: React.FC = () => {
             </Text>
 
             <View style={styles.receiptAmountBox}>
-              <Text style={[styles.receiptAmountText, { color: themeColors.success }]}>
+              <Text style={[styles.receiptAmountText, { color: themeColors.textPrimary }]}>
                 ₹{paymentData.amount.toLocaleString('en-IN')}.00
               </Text>
-              <View style={[styles.receiptStatusPill, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
-                <ShieldCheck size={12} color={themeColors.success} />
-                <Text style={[styles.receiptStatusPillText, { color: themeColors.success }]}>
+              <View style={[styles.receiptStatusPill, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <ShieldCheck size={12} color={themeColors.primary} />
+                <Text style={[styles.receiptStatusPillText, { color: themeColors.textPrimary }]}>
                   {authMethodUsed === 'Biometrics' ? 'Verified by Biometrics' : 'Authorized by UPI PIN'}
                 </Text>
               </View>
@@ -638,13 +638,13 @@ const styles = StyleSheet.create({
   rupeeSymbol: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
     marginRight: 2,
   },
   amountDisplay: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#0F294A',
+    color: '#141414',
     letterSpacing: -0.5,
   },
   debitInfoRow: {
@@ -698,7 +698,7 @@ const styles = StyleSheet.create({
   biometricButtonTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
   },
   biometricButtonSubtitle: {
     fontSize: 10,
@@ -715,7 +715,7 @@ const styles = StyleSheet.create({
   sepLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#EAE6DF',
   },
   sepText: {
     fontSize: 9,
@@ -741,8 +741,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   pinDotFilled: {
-    backgroundColor: '#0F294A',
-    borderColor: '#0F294A',
+    backgroundColor: '#141414',
+    borderColor: '#141414',
   },
   pinDotError: {
     borderColor: '#DC2626',
@@ -768,7 +768,7 @@ const styles = StyleSheet.create({
   processingText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#0F294A',
+    color: '#141414',
   },
   keypad: {
     marginTop: 4,
@@ -782,11 +782,11 @@ const styles = StyleSheet.create({
     width: 68,
     height: 44,
     borderRadius: 10,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   keypadEmptyKey: {
     width: 68,
@@ -795,7 +795,7 @@ const styles = StyleSheet.create({
   keypadKeyText: {
     fontSize: 19,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
   },
 
   // Receipt Styles
@@ -823,7 +823,7 @@ const styles = StyleSheet.create({
   receiptSuccessTitle: {
     fontSize: 19,
     fontWeight: '800',
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: 3,
   },
   receiptMerchantSubtitle: {
@@ -859,11 +859,11 @@ const styles = StyleSheet.create({
   },
   receiptLedgerCard: {
     width: '100%',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: radii.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
     marginBottom: spacing.md,
   },
   ledgerRow: {
@@ -879,16 +879,16 @@ const styles = StyleSheet.create({
   ledgerValue: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   ledgerDivider: {
     height: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#EAE6DF',
     marginVertical: 8,
   },
   receiptDoneButton: {
     width: '100%',
-    backgroundColor: '#0F294A',
+    backgroundColor: '#141414',
     paddingVertical: 14,
     borderRadius: radii.md,
     alignItems: 'center',

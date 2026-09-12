@@ -35,7 +35,7 @@ interface Props {
 }
 
 export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
-  const { colors: themeColors, isDark } = useAppTheme();
+  const { colors: themeColors } = useAppTheme();
   const { language, setLanguage, setSecurityCredentials, showToast } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -61,7 +61,6 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
     }
     setErrorMsg(null);
     setStep(3);
-    setOtp('');
   };
 
   const handleVerifyOtp = () => {
@@ -71,82 +70,84 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
     }
     setErrorMsg(null);
     setStep(4);
-    setPin('');
-    setConfirmPin('');
-    setIsConfirmingPin(false);
   };
 
-  const handlePinKeyPress = (digit: string) => {
+  const handleKeypadPress = (digit: string) => {
     setErrorMsg(null);
     if (!isConfirmingPin) {
       if (pin.length < 4) {
-        const next = pin + digit;
-        setPin(next);
-        if (next.length === 4) {
-          setTimeout(() => {
-            setIsConfirmingPin(true);
-          }, 250);
+        const nextPin = pin + digit;
+        setPin(nextPin);
+        if (nextPin.length === 4) {
+          setIsConfirmingPin(true);
         }
       }
     } else {
       if (confirmPin.length < 4) {
-        const next = confirmPin + digit;
-        setConfirmPin(next);
-        if (next.length === 4) {
-          if (next === pin) {
-            setTimeout(() => {
-              setStep(5);
-            }, 300);
+        const nextConfirm = confirmPin + digit;
+        setConfirmPin(nextConfirm);
+        if (nextConfirm.length === 4) {
+          if (nextConfirm === pin) {
+            setStep(5);
           } else {
-            setErrorMsg('PIN mismatch. Please set PIN again.');
-            setTimeout(() => {
-              setPin('');
-              setConfirmPin('');
-              setIsConfirmingPin(false);
-            }, 600);
+            setErrorMsg('PINs did not match. Please try again.');
+            setPin('');
+            setConfirmPin('');
+            setIsConfirmingPin(false);
           }
         }
       }
     }
   };
 
-  const handlePinDelete = () => {
+  const handleKeypadDelete = () => {
     setErrorMsg(null);
-    if (!isConfirmingPin) {
-      if (pin.length > 0) setPin(pin.slice(0, -1));
+    if (isConfirmingPin) {
+      if (confirmPin.length > 0) {
+        setConfirmPin(confirmPin.slice(0, -1));
+      } else {
+        setIsConfirmingPin(false);
+      }
     } else {
-      if (confirmPin.length > 0) setConfirmPin(confirmPin.slice(0, -1));
+      if (pin.length > 0) {
+        setPin(pin.slice(0, -1));
+      }
     }
   };
 
   const handleTestBiometrics = () => {
     setIsBioTesting(true);
     Animated.sequence([
-      Animated.timing(bioPulse, { toValue: 1.25, duration: 250, useNativeDriver: true }),
-      Animated.timing(bioPulse, { toValue: 1.0, duration: 250, useNativeDriver: true }),
+      Animated.timing(bioPulse, { toValue: 1.25, duration: 300, useNativeDriver: true }),
+      Animated.timing(bioPulse, { toValue: 1.0, duration: 300, useNativeDriver: true }),
     ]).start();
 
     setTimeout(() => {
       setIsBioTesting(false);
       setBioTested(true);
-      showToast('Biometric sensor verified!');
     }, 700);
   };
 
   const handleCompleteRegistration = () => {
-    setSecurityCredentials(pin || '1234', biometricsOn, `+91 ${phone}`);
+    setSecurityCredentials(pin || '1234', biometricsOn && bioTested);
     setStep(6);
   };
 
   const handleFinishAndEnter = () => {
+    showToast(
+      language === 'hi'
+        ? 'खाता सफलतापूर्वक सत्यापित और सक्रिय हुआ!'
+        : language === 'gu'
+        ? 'ખાતું સફળતાપૂર્વક ચકાસાયેલ અને સક્રિય થયું!'
+        : 'Welcome! Your account is active and secured.'
+    );
     onFinish();
-    setStep(1);
   };
 
   return (
-    <Modal visible={visible} transparent={false} animationType="slide" onRequestClose={onFinish}>
-      <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
-        {/* Progress Tracker */}
+    <Modal visible={visible} animationType="slide" transparent={false}>
+      <View style={[styles.container, { backgroundColor: themeColors.cardBg }]}>
+        {/* Progress Bar & Header */}
         <View style={styles.headerBar}>
           <Text style={[styles.headerStepText, { color: themeColors.textPrimary }]}>
             STEP {step} OF 6 • {step === 1 ? 'LANGUAGE' : step === 2 ? 'MOBILE' : step === 3 ? 'VERIFY OTP' : step === 4 ? 'SECURITY PIN' : step === 5 ? 'BIOMETRICS' : 'LINKED'}
@@ -156,7 +157,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
           </TouchableOpacity>
         </View>
         <View style={[styles.progressBarTrack, { backgroundColor: themeColors.border }]}>
-          <View style={[styles.progressBarFill, { width: `${(step / 6) * 100}%`, backgroundColor: isDark ? '#FFFFFF' : '#0F294A' }]} />
+          <View style={[styles.progressBarFill, { width: `${(step / 6) * 100}%`, backgroundColor: themeColors.primary }]} />
         </View>
 
         {/* STEP 1: WELCOME & LANGUAGE SELECTION */}
@@ -173,7 +174,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
               {[
                 { code: 'en' as LanguageCode, label: 'English', sub: 'Institutional standard' },
                 { code: 'hi' as LanguageCode, label: 'हिंदी (Hindi)', sub: 'सुगम और सुरक्षित बैंकिंग' },
-                { code: 'gu' as LanguageCode, label: 'ગુજરાતી (Gujarati)', sub: 'સરળ અને ડિજિટલ બેંકિંગ' },
+                { code: 'gu' as LanguageCode, label: 'ગુજરાતી (Gujarati)', sub: 'સરળ અને ડિજિટલ બેંકिंग' },
               ].map((item) => {
                 const active = language === item.code;
                 return (
@@ -182,7 +183,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                     style={[
                       styles.langRow,
                       { backgroundColor: themeColors.cardBg, borderColor: themeColors.border },
-                      active && [styles.activeLangRow, { borderColor: isDark ? '#FFFFFF' : '#0F294A', backgroundColor: isDark ? '#27272A' : '#F1F5F9' }],
+                      active && [styles.activeLangRow, { borderColor: themeColors.primary, backgroundColor: themeColors.cardBgSecondary }],
                     ]}
                     onPress={() => setLanguage(item.code)}
                   >
@@ -198,7 +199,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
               })}
             </View>
 
-            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={() => setStep(2)}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]} onPress={() => setStep(2)}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'आगे बढ़ें' : language === 'gu' ? 'આગળ વધો' : 'Continue'}
               </Text>
@@ -239,20 +240,20 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
             </View>
 
             {errorMsg && (
-              <View style={[styles.errorBanner, { backgroundColor: isDark ? '#2A0E0E' : '#FEF2F2', borderColor: isDark ? '#EF4444' : '#FECACA' }]}>
+              <View style={[styles.errorBanner, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
                 <AlertCircle size={14} color="#DC2626" />
                 <Text style={styles.errorBannerText}>{errorMsg}</Text>
               </View>
             )}
 
-            <View style={[styles.trustBadge, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
-              <ShieldCheck size={16} color={themeColors.success} />
-              <Text style={[styles.trustBadgeText, { color: themeColors.success }]}>
+            <View style={[styles.trustBadge, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <ShieldCheck size={16} color={themeColors.primary} />
+              <Text style={[styles.trustBadgeText, { color: themeColors.textPrimary }]}>
                 RBI Regulated • 256-Bit Bank-Grade Tokenization
               </Text>
             </View>
 
-            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={handleSendOtp}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]} onPress={handleSendOtp}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'ओटीपी प्राप्त करें' : language === 'gu' ? 'OTP મેળવો' : 'Send 6-Digit OTP'}
               </Text>
@@ -298,7 +299,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                   style={[
                     styles.otpBox,
                     { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
-                    otp.length > idx && [styles.otpBoxFilled, { borderColor: isDark ? '#FFFFFF' : '#0F294A', backgroundColor: themeColors.cardBg }],
+                    otp.length > idx && [styles.otpBoxFilled, { borderColor: themeColors.primary, backgroundColor: themeColors.cardBg }],
                   ]}
                 >
                   <Text style={[styles.otpBoxDigit, { color: themeColors.textPrimary }]}>{otp[idx] || ''}</Text>
@@ -317,7 +318,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
             />
 
             {errorMsg && (
-              <View style={[styles.errorBanner, { backgroundColor: isDark ? '#2A0E0E' : '#FEF2F2', borderColor: isDark ? '#EF4444' : '#FECACA' }]}>
+              <View style={[styles.errorBanner, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
                 <AlertCircle size={14} color="#DC2626" />
                 <Text style={styles.errorBannerText}>{errorMsg}</Text>
               </View>
@@ -332,7 +333,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={handleVerifyOtp}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]} onPress={handleVerifyOtp}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'ओटीपी सत्यापित करें' : language === 'gu' ? 'OTP ચકાસો' : 'Verify & Set PIN'}
               </Text>
@@ -385,7 +386,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
             </View>
 
             {errorMsg && (
-              <View style={[styles.errorBanner, { backgroundColor: isDark ? '#2A0E0E' : '#FEF2F2', borderColor: isDark ? '#EF4444' : '#FECACA' }]}>
+              <View style={[styles.errorBanner, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
                 <AlertCircle size={14} color="#DC2626" />
                 <Text style={styles.errorBannerText}>{errorMsg}</Text>
               </View>
@@ -407,7 +408,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                         <TouchableOpacity
                           key={cIdx}
                           style={[styles.keypadButton, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
-                          onPress={handlePinDelete}
+                          onPress={handleKeypadDelete}
                         >
                           <Delete size={20} color={themeColors.iconNeutral} />
                         </TouchableOpacity>
@@ -417,7 +418,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                       <TouchableOpacity
                         key={cIdx}
                         style={[styles.keypadButton, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
-                        onPress={() => handlePinKeyPress(val)}
+                        onPress={() => handleKeypadPress(val)}
                       >
                         <Text style={[styles.keypadButtonText, { color: themeColors.textPrimary }]}>{val}</Text>
                       </TouchableOpacity>
@@ -432,8 +433,8 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
         {/* STEP 5: BIOMETRIC REGISTRATION & TESTING */}
         {step === 5 && (
           <ScrollView contentContainerStyle={styles.centerContent} showsVerticalScrollIndicator={false}>
-            <View style={[styles.heroLogoWrap, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
-              <Fingerprint size={36} color={themeColors.success} />
+            <View style={[styles.heroLogoWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <Fingerprint size={36} color={themeColors.primary} />
             </View>
             <Text style={[styles.heroTitle, { color: themeColors.textPrimary }]}>
               {language === 'hi' ? 'बायोमेट्रिक प्रमाणीकरण सक्षम करें' : language === 'gu' ? 'બાયોમેટ્રિક પ્રમાણીકરણ સક્ષમ કરો' : 'Enable Biometric Security'}
@@ -451,15 +452,15 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
               style={[
                 styles.bioTestCard,
                 { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
-                bioTested && (isDark ? { borderColor: '#10B981', backgroundColor: '#0C2417' } : styles.bioTestCardSuccess),
-                isBioTesting && (isDark ? { borderColor: '#52525B', backgroundColor: '#27272A' } : styles.bioTestCardScanning),
+                bioTested && styles.bioTestCardSuccess,
+                isBioTesting && styles.bioTestCardScanning,
               ]}
               onPress={handleTestBiometrics}
               activeOpacity={0.8}
             >
               <Animated.View style={{ transform: [{ scale: bioPulse }] }}>
                 {bioTested ? (
-                  <CheckCircle2 size={40} color={themeColors.success} />
+                  <CheckCircle2 size={40} color={themeColors.primary} />
                 ) : isBioTesting ? (
                   <ActivityIndicator size="large" color={themeColors.textPrimary} />
                 ) : (
@@ -488,7 +489,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={handleCompleteRegistration}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]} onPress={handleCompleteRegistration}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'सहमति और पूर्ण करें' : language === 'gu' ? 'સંમતિ અને પૂર્ણ કરો' : 'Confirm & Complete'}
               </Text>
@@ -500,8 +501,8 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
         {/* STEP 6: ACCOUNT LINKED SUCCESS */}
         {step === 6 && (
           <ScrollView contentContainerStyle={styles.centerContent} showsVerticalScrollIndicator={false}>
-            <View style={[styles.heroLogoWrap, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
-              <CheckCircle2 size={42} color={themeColors.success} />
+            <View style={[styles.heroLogoWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <CheckCircle2 size={42} color={themeColors.primary} />
             </View>
             <Text style={[styles.heroTitle, { color: themeColors.textPrimary }]}>
               {language === 'hi' ? 'खाता सफलतापूर्वक लिंक हुआ!' : language === 'gu' ? 'ખાતું સફળતાપૂર્વક લિંક થયું!' : 'Account Linked & Verified!'}
@@ -516,9 +517,9 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                   <Text style={[styles.accTypeLabel, { color: themeColors.textSecondary }]}>PRIMARY SAVINGS ACCOUNT</Text>
                   <Text style={[styles.accNumber, { color: themeColors.textPrimary }]}>A/C 5010 •••• 4092</Text>
                 </View>
-                <View style={[styles.kycVerifiedBadge, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
-                  <ShieldCheck size={13} color={themeColors.success} />
-                  <Text style={[styles.kycBadgeText, { color: themeColors.success }]}>KYC TIER 2</Text>
+                <View style={[styles.kycVerifiedBadge, { backgroundColor: themeColors.cardBgSecondary }]}>
+                  <ShieldCheck size={13} color={themeColors.primary} />
+                  <Text style={[styles.kycBadgeText, { color: themeColors.primary }]}>KYC TIER 2</Text>
                 </View>
               </View>
               <View style={[styles.cardDivider, { backgroundColor: themeColors.border }]} />
@@ -532,7 +533,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
               </View>
             </View>
 
-            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={handleFinishAndEnter}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]} onPress={handleFinishAndEnter}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'एबीसी बैंक में प्रवेश करें' : language === 'gu' ? 'એબીસી બેંકમાં પ્રવેશ કરો' : 'Enter ABC Bank'}
               </Text>
@@ -561,7 +562,7 @@ const styles = StyleSheet.create({
   headerStepText: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#0F294A',
+    color: '#141414',
     letterSpacing: 1,
   },
   skipBtn: {
@@ -574,7 +575,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#0F294A',
+    backgroundColor: '#141414',
   },
   centerContent: {
     padding: spacing.xl,
@@ -593,7 +594,7 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     ...typography.h2,
-    color: '#0F294A',
+    color: '#141414',
     textAlign: 'center',
     marginBottom: 6,
   },
@@ -634,7 +635,7 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   activeLangRow: {
-    borderColor: '#0F294A',
+    borderColor: '#141414',
     backgroundColor: '#F1F5F9',
   },
   langName: {
@@ -643,7 +644,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   activeLangName: {
-    color: '#0F294A',
+    color: '#141414',
   },
   langSub: {
     fontSize: 11,
@@ -666,7 +667,7 @@ const styles = StyleSheet.create({
   inputPrefix: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
   },
   inputDivider: {
     width: 1,
@@ -678,7 +679,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
     letterSpacing: 1,
   },
   trustBadge: {
@@ -738,13 +739,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   otpBoxFilled: {
-    borderColor: '#0F294A',
+    borderColor: '#141414',
     backgroundColor: '#FFFFFF',
   },
   otpBoxDigit: {
     fontSize: 22,
     fontWeight: '800',
-    color: '#0F294A',
+    color: '#141414',
   },
   hiddenInput: {
     position: 'absolute',
@@ -779,8 +780,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   pinCircleFilled: {
-    backgroundColor: '#0F294A',
-    borderColor: '#0F294A',
+    backgroundColor: '#141414',
+    borderColor: '#141414',
   },
   pinKeypad: {
     width: '100%',
@@ -810,7 +811,7 @@ const styles = StyleSheet.create({
   keypadButtonText: {
     fontSize: 21,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
   },
   bioTestCard: {
     width: '100%',
@@ -865,7 +866,7 @@ const styles = StyleSheet.create({
   accNumber: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#0F294A',
+    color: '#141414',
     marginTop: 2,
   },
   kycVerifiedBadge: {
@@ -900,11 +901,11 @@ const styles = StyleSheet.create({
   secValue: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#0F294A',
+    color: '#141414',
   },
   primaryBtn: {
     width: '100%',
-    backgroundColor: '#0F294A',
+    backgroundColor: '#141414',
     borderRadius: radii.md,
     paddingVertical: 14,
     flexDirection: 'row',
