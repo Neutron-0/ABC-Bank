@@ -856,6 +856,25 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     },
 
     performPayment: async (data) => {
+      if (
+        !data ||
+        typeof data.amount !== 'number' ||
+        isNaN(data.amount) ||
+        !isFinite(data.amount) ||
+        data.amount <= 0
+      ) {
+        set({ toastMessage: 'Invalid payment amount.' });
+        return false;
+      }
+
+      const currentState = get();
+      if (currentState.balance.available < data.amount) {
+        set({
+          toastMessage: `Insufficient available balance (₹${currentState.balance.available.toLocaleString('en-IN')}).`,
+        });
+        return false;
+      }
+
       set({ isLoading: true });
       const newTx: Transaction = {
         id: `tx_live_${Date.now()}`,
@@ -873,11 +892,11 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       };
 
       set((state) => {
-        const updatedBal = Math.max(0, state.balance.available - data.amount);
+        const updatedBal = Math.round(Math.max(0, state.balance.available - data.amount) * 100) / 100;
         return {
           balance: { ...state.balance, available: updatedBal },
           transactions: [newTx, ...state.transactions],
-          toastMessage: `Paid ₹${data.amount} to ${data.merchant}!`,
+          toastMessage: `Paid ₹${data.amount.toLocaleString('en-IN')} to ${data.merchant}!`,
         };
       });
 

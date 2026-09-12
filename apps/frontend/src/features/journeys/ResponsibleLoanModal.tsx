@@ -57,7 +57,8 @@ export const ResponsibleLoanModal: React.FC = () => {
     useCustomerStore.setState({
       balance: {
         ...balance,
-        available: balance.available + loanAmount,
+        available: Math.round((balance.available + loanAmount) * 100) / 100,
+        savings: Math.round(((balance.savings || 185000) + loanAmount) * 100) / 100,
       },
       transactions: [
         {

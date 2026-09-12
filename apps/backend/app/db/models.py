@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
 from sqlalchemy import (
     String, Integer, Float, Boolean, DateTime, ForeignKey, Index, Text, JSON
@@ -26,7 +26,7 @@ class Customer(Base):
     kyc_tier: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     credit_score: Mapped[int] = mapped_column(Integer, nullable=False, default=750)
     archetype: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Relationships
     accounts: Mapped[List["Account"]] = relationship("Account", back_populates="customer", cascade="all, delete-orphan")
@@ -48,7 +48,7 @@ class Account(Base):
     available_balance: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     currency: Mapped[str] = mapped_column(String(8), nullable=False, default="INR")
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="active")
-    opened_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    opened_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Relationships
     customer: Mapped["Customer"] = relationship("Customer", back_populates="accounts")
@@ -121,7 +121,7 @@ class CustomerProduct(Base):
     customer_id: Mapped[str] = mapped_column(String(64), ForeignKey("customers.id", ondelete="CASCADE"), nullable=False, index=True)
     product_id: Mapped[str] = mapped_column(String(64), ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="active")
-    acquired_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    acquired_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     customer: Mapped["Customer"] = relationship("Customer", back_populates="products")
     product: Mapped["Product"] = relationship("Product", back_populates="customer_products")
@@ -149,6 +149,6 @@ class ConsentPreference(Base):
     marketing_consent: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     data_sharing_consent: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     communication_channel: Mapped[str] = mapped_column(String(32), nullable=False, default="app_inbox")
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     customer: Mapped["Customer"] = relationship("Customer", back_populates="consent")

@@ -52,7 +52,7 @@ export const AdaptiveHeader: React.FC = () => {
           activeOpacity={0.8}
         >
           <Bot size={13} color="#FFFFFF" />
-          <Text style={styles.chatButtonText}>Mitra AI</Text>
+          <Text style={styles.chatButtonText}>{t.tabs.assistant}</Text>
         </TouchableOpacity>
 
         {/* Sandbox Simulation Drawer Shortcut */}
@@ -62,7 +62,7 @@ export const AdaptiveHeader: React.FC = () => {
           activeOpacity={0.8}
         >
           <SlidersHorizontal size={12} color="#334155" />
-          <Text style={styles.sandboxButtonText}>Sandbox</Text>
+          <Text style={styles.sandboxButtonText}>{t.balanceHeader.sandbox}</Text>
         </TouchableOpacity>
 
         {/* Vernacular Language Selector */}

@@ -28,20 +28,23 @@ export const BalanceHeader: React.FC = () => {
   const t = getTranslation(language);
 
   const getSubtleContextText = () => {
+    const bh = t.balanceHeader;
     if (currentState === 'fraud_alert') {
-      return 'Biometric Security Protocol Active • Ref: SEC-8921';
+      return bh.fraudProtocol;
     }
     if (currentState === 'medical_event') {
-      return 'Healthcare Outflow Tagged • Cashless TPA Claim Eligible';
+      return bh.medicalTagged;
     }
     if (financialHealth.status === 'stress') {
-      return 'Liquidity Guard Active • ₹32,000 Mandates Scheduled';
+      return bh.liquidityGuard;
     }
     if (financialHealth.status === 'thriving') {
-      return `Monthly Surplus Cash Flow: +₹14,200 • ${financialHealth.emergencyFundMonths} Mo. Reserve`;
+      return `${bh.surplusCashFlow} • ${financialHealth.emergencyFundMonths} ${bh.moReserve}`;
     }
-    return `Operating Reserve: ${financialHealth.emergencyFundMonths} Months • Auto-Sweep Active`;
+    return `${bh.operatingReserve}: ${financialHealth.emergencyFundMonths} ${bh.months} • ${bh.autoSweepActive}`;
   };
+
+  const bh = t.balanceHeader;
 
   return (
     <View style={styles.container}>
@@ -50,8 +53,8 @@ export const BalanceHeader: React.FC = () => {
         {/* Top Card Row */}
         <View style={styles.cardHeaderRow}>
           <View style={styles.accountTypeWrap}>
-            <Text style={styles.accountTypeText}>PRIMARY SAVINGS ACCOUNT</Text>
-            <Text style={styles.accountNumText}>A/C 5010 •••• 4092</Text>
+            <Text style={styles.accountTypeText}>{bh.primarySavings}</Text>
+            <Text style={styles.accountNumText}>{bh.accountNumber}</Text>
           </View>
           <TouchableOpacity
             onPress={toggleBalanceHide}
@@ -69,7 +72,7 @@ export const BalanceHeader: React.FC = () => {
 
         {/* Available Balance Large Numerical Figure */}
         <View style={styles.balanceWrap}>
-          <Text style={styles.balanceLabel}>AVAILABLE FOR WITHDRAWAL / UPI</Text>
+          <Text style={styles.balanceLabel}>{bh.availableForWithdrawal}</Text>
           <AnimatedBalance
             value={balance.available}
             isPrivacyHidden={isBalanceHidden}
@@ -81,21 +84,21 @@ export const BalanceHeader: React.FC = () => {
         {/* Secondary Financial Ledger Metrics */}
         <View style={styles.ledgerRow}>
           <View style={styles.ledgerCol}>
-            <Text style={styles.ledgerLabel}>TOTAL DEPOSITS</Text>
+            <Text style={styles.ledgerLabel}>{bh.totalDeposits}</Text>
             <Text style={styles.ledgerValue}>
               {isBalanceHidden ? '••••••' : `₹${(balance.savings || 185000).toLocaleString('en-IN')}`}
             </Text>
           </View>
           <View style={styles.ledgerDivider} />
           <View style={styles.ledgerCol}>
-            <Text style={styles.ledgerLabel}>AUTO-SWEEP FD</Text>
+            <Text style={styles.ledgerLabel}>{bh.autoSweepFd}</Text>
             <Text style={styles.ledgerValue}>
               {isBalanceHidden ? '••••••' : `₹${(balance.fixedDeposits || 250000).toLocaleString('en-IN')}`}
             </Text>
           </View>
           <View style={styles.ledgerDivider} />
           <View style={styles.ledgerCol}>
-            <Text style={styles.ledgerLabel}>IFSC CODE</Text>
+            <Text style={styles.ledgerLabel}>{bh.ifscCode}</Text>
             <Text style={styles.ledgerValue}>ABCD0001048</Text>
           </View>
         </View>
@@ -118,7 +121,7 @@ export const BalanceHeader: React.FC = () => {
           <View style={styles.actionIconWrap}>
             <Send size={16} color="#0F294A" />
           </View>
-          <Text style={styles.actionBtnText}>Transfer</Text>
+          <Text style={styles.actionBtnText}>{bh.transfer}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -130,7 +133,7 @@ export const BalanceHeader: React.FC = () => {
           <View style={styles.actionIconWrap}>
             <QrCode size={16} color="#0F294A" />
           </View>
-          <Text style={styles.actionBtnText}>Scan QR</Text>
+          <Text style={styles.actionBtnText}>{bh.scanQr}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -142,7 +145,7 @@ export const BalanceHeader: React.FC = () => {
           <View style={styles.actionIconWrap}>
             <FileText size={16} color="#0F294A" />
           </View>
-          <Text style={styles.actionBtnText}>Passbook</Text>
+          <Text style={styles.actionBtnText}>{bh.passbook}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -154,7 +157,7 @@ export const BalanceHeader: React.FC = () => {
           <View style={styles.actionIconWrap}>
             <CreditCard size={16} color="#0F294A" />
           </View>
-          <Text style={styles.actionBtnText}>Cards</Text>
+          <Text style={styles.actionBtnText}>{bh.cards}</Text>
         </TouchableOpacity>
       </View>
     </View>

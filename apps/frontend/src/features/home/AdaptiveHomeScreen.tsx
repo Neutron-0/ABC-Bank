@@ -225,7 +225,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
       Animated.timing(heroScaleAnim, { toValue: 1.0, duration: 150, useNativeDriver: true }),
     ]).start();
 
-    await performPayment({
+    const ok = await performPayment({
       amount: item.amount,
       merchant: item.merchant,
       category: item.category,
@@ -234,13 +234,16 @@ export const AdaptiveHomeScreen: React.FC = () => {
 
     setProcessingIntentId(null);
     if (item.id === 'metro') setIsPayingMetro(false);
-    setPaidIntents(prev => ({ ...prev, [item.id]: true }));
 
-    if (item.id === 'metro') {
-      setIsMetroPaid(true);
-      setTimeout(() => {
-        motion.reorderLayout();
-      }, 400);
+    if (ok) {
+      setPaidIntents(prev => ({ ...prev, [item.id]: true }));
+
+      if (item.id === 'metro') {
+        setIsMetroPaid(true);
+        setTimeout(() => {
+          motion.reorderLayout();
+        }, 400);
+      }
     }
   };
 

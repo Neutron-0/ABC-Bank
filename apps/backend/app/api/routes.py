@@ -318,6 +318,15 @@ def execute_assistant_intent(req: AssistantIntentRequest):
     elif intent_name == "MEDICAL_CLAIM_HELP":
         hosp = req.entities.get("hospital") or state.signals.get("medical_hospital") or "Hospital Provider"
         amt = float(req.entities.get("amount") or state.signals.get("medical_amount") or 48200.0)
+        resp_msg = (
+            f"आपके {hosp} के ₹{amt:,.0f} के बिल के लिए मेडिकल क्लेम सहायता सक्रिय है।"
+            if lang == "hi"
+            else (
+                f"તમારા {hosp} ના ₹{amt:,.0f} ના બિલ માટે મેડિકલ ક્લેમ સહાય સક્રિય છે."
+                if lang == "gu"
+                else f"Medical claim assistance active for your {hosp} bill of ₹{amt:,.0f}."
+            )
+        )
         return AssistantIntentResponse(
             intent="MEDICAL_CLAIM_HELP",
             success=True,
@@ -327,13 +336,22 @@ def execute_assistant_intent(req: AssistantIntentRequest):
                 "fast_track_available": True,
                 "journey_id": "medical_assistance"
             },
-            response_text=f"Medical claim assistance active for your {hosp} bill of ₹{amt:,.0f}.",
+            response_text=resp_msg,
             language=lang,
             suggested_actions=["OPEN_CLAIM_DESK", "TALK_TO_OFFICER"]
         )
 
     elif intent_name == "REVIEW_COMMITMENTS":
         obligations = state.signals.get("upcoming_obligations", 34200)
+        resp_msg = (
+            f"आगामी प्रतिबद्धताएं कुल ₹{obligations:,.0f} हैं। नकदी प्रवाह सुरक्षित रखने के लिए आप अप्रयुक्त सदस्यताओं को रोक सकते हैं।"
+            if lang == "hi"
+            else (
+                f"આગામી નાણાકીય જવાબદારીઓ કુલ ₹{obligations:,.0f} છે. કેશ ફ્લો જાળવી રાખવા માટે તમે બિનઉપયોગી સબ્સ્ક્રિપ્શન્સ થોભાવી શકો છો."
+                if lang == "gu"
+                else f"Upcoming commitments total ₹{obligations:,.0f}. You can pause unused subscriptions to preserve cashflow."
+            )
+        )
         return AssistantIntentResponse(
             intent="REVIEW_COMMITMENTS",
             success=True,
@@ -343,7 +361,7 @@ def execute_assistant_intent(req: AssistantIntentRequest):
                 "pausable_subscriptions_count": 7,
                 "journey_id": "stress_intervention"
             },
-            response_text=f"Upcoming commitments total ₹{obligations:,.0f}. You can pause unused subscriptions to preserve cashflow.",
+            response_text=resp_msg,
             language=lang,
             suggested_actions=["OPEN_STRESS_MODAL", "PAUSE_SUBSCRIPTIONS"]
         )
@@ -372,6 +390,15 @@ def execute_assistant_intent(req: AssistantIntentRequest):
 
     elif intent_name == "SAVE_SURPLUS":
         surplus_amt = state.signals.get("surplus_amount", 38400)
+        resp_msg = (
+            f"हमने ₹{surplus_amt:,.0f} का अधिशेष रिज़र्व चिन्हित किया है जो 7.85% ब्याज कमा सकता है।"
+            if lang == "hi"
+            else (
+                f"અમે ₹{surplus_amt:,.0f} નું સરપ્લસ રિઝર્વ ચિહ્નિત કર્યું છે જે 7.85% વ્યાજ મેળવી શકે છે."
+                if lang == "gu"
+                else f"We identified ₹{surplus_amt:,.0f} in surplus reserves that can earn 7.85% APY."
+            )
+        )
         return AssistantIntentResponse(
             intent="SAVE_SURPLUS",
             success=True,
@@ -380,7 +407,7 @@ def execute_assistant_intent(req: AssistantIntentRequest):
                 "recommended_product": "Smart_FD_7_85",
                 "rate": 7.85
             },
-            response_text=f"We identified ₹{surplus_amt:,.0f} in surplus reserves that can earn 7.85% APY.",
+            response_text=resp_msg,
             language=lang,
             suggested_actions=["EXPLORE_AUTO_SWEEP", "DISMISS"]
         )
@@ -502,7 +529,7 @@ def assistant_init(lang: Optional[str] = Query("en")):
                 "id": "init_msg_1",
                 "sender": "assistant",
                 "text": greeting,
-                "timestamp": "2026-09-12T08:00:00Z",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "suggestedPrompts": prompts
             }
         ]

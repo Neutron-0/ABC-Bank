@@ -55,13 +55,28 @@ export const PaymentsScreen: React.FC = () => {
   };
 
   const handleProceedToPin = () => {
-    if (!payAmount || Number(payAmount) <= 0) return;
+    const trimmed = payAmount.trim();
+    const num = parseFloat(trimmed);
+    if (!trimmed || isNaN(num) || num <= 0 || !/^\d+(\.\d{1,2})?$/.test(trimmed)) {
+      alert('Please enter a valid positive payment amount.');
+      return;
+    }
+    if (num > balance.available) {
+      alert(`Insufficient balance. Your available balance is ₹${balance.available.toLocaleString('en-IN')}`);
+      return;
+    }
     setPayStep('pin');
   };
 
   const handleConfirmPayment = async () => {
+    const trimmed = payAmount.trim();
+    const amountNum = parseFloat(trimmed);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      alert('Invalid payment amount.');
+      return;
+    }
+
     setIsProcessing(true);
-    const amountNum = Number(payAmount);
     const ok = await performPayment({
       amount: amountNum,
       merchant: payRecipient,
@@ -217,7 +232,7 @@ export const PaymentsScreen: React.FC = () => {
                     placeholderTextColor={colors.textMuted}
                     keyboardType="numeric"
                     value={payAmount}
-                    onChangeText={setPayAmount}
+                    onChangeText={(val) => setPayAmount(val.replace(/[^0-9.]/g, ''))}
                     autoFocus
                   />
                 </View>
@@ -242,17 +257,23 @@ export const PaymentsScreen: React.FC = () => {
                   </Text>
                 </View>
 
-                <TouchableOpacity
-                  style={[
-                    styles.primaryActionBtn,
-                    (!payAmount || Number(payAmount) <= 0) && styles.disabledBtn,
-                  ]}
-                  onPress={handleProceedToPin}
-                  disabled={!payAmount || Number(payAmount) <= 0}
-                >
-                  <Text style={styles.primaryActionBtnText}>Proceed to Secure PIN</Text>
-                  <ArrowRight size={16} color={colors.textWhite} />
-                </TouchableOpacity>
+                {(() => {
+                  const val = parseFloat(payAmount.trim());
+                  const isInvalid = !payAmount.trim() || isNaN(val) || val <= 0 || val > balance.available;
+                  return (
+                    <TouchableOpacity
+                      style={[
+                        styles.primaryActionBtn,
+                        isInvalid && styles.disabledBtn,
+                      ]}
+                      onPress={handleProceedToPin}
+                      disabled={isInvalid}
+                    >
+                      <Text style={styles.primaryActionBtnText}>Proceed to Secure PIN</Text>
+                      <ArrowRight size={16} color={colors.textWhite} />
+                    </TouchableOpacity>
+                  );
+                })()}
               </View>
             )}
 
