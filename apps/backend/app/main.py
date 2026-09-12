@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 from pathlib import Path
 
 # Add project root to sys.path
@@ -25,6 +25,18 @@ app.add_middleware(
 )
 
 app.include_router(router)
+
+from fastapi.responses import FileResponse
+
+@app.get("/inspector")
+def get_ai_inspector():
+    inspector_path = root_dir / "ai" / "inspector.html"
+    return FileResponse(inspector_path, media_type="text/html")
+
+@app.get("/voice-inspector")
+def get_voice_inspector():
+    voice_path = root_dir / "ai" / "voice_inspector.html"
+    return FileResponse(voice_path, media_type="text/html")
 
 @app.get("/health")
 def health():

@@ -1,11 +1,12 @@
 import logging
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel
 
 from apps.backend.app.services.state_service import StateService
+from apps.backend.app.db.loader import DataLoader
 from apps.backend.app.experience.composer import ExperienceComposer
 from apps.backend.app.models.experience import ExperienceConfigModel
 from apps.backend.app.models.customer_state import CustomerStateModel
@@ -179,23 +180,75 @@ def execute_assistant_intent(req: AssistantIntentRequest):
 
     # Execute safe backend operation / data lookup
     if intent_name == "CHECK_BALANCE":
-        return AssistantIntentResponse(
-            intent="CHECK_BALANCE",
-            success=True,
-            data={
-                "available": avail_bal,
-                "currency": "INR",
-                "savings": state.balance.savings if state.balance else 0.0
-            },
-            response_text=f"Your current available balance is ₹{avail_bal:,.2f}.",
-            language=lang,
-            suggested_actions=["VIEW_TRANSACTIONS", "SEND_MONEY"]
-        )
+        avail_bal = state.balance.available if state.balance else 42680.0
+        safe_spend = float(state.signals.get("safe_to_spend_today", 3200))
+        is_spending = req.entities.get("query_type") == "spending" or req.entities.get("view") == "activity"
+
+        if is_spending:
+            txs = DataLoader.load_transactions(customer_id)
+            monthly_spending = sum(float(t.get("amount", 0)) for t in txs if str(t.get("type", "")).lower() == "debit")
+            if monthly_spending == 0:
+                monthly_spending = 34969.0
+            resp_msg = (
+                f"इस महीने आपका कुल खर्च ₹{monthly_spending:,.0f} है। आज खर्च करने के लिए सुरक्षित राशि ₹{safe_spend:,.0f} है और उपलब्ध बैलेंस ₹{avail_bal:,.2f} है।"
+                if lang == "hi"
+                else (
+                    f"આ મહિને તમારો કુલ ખર્ચ ₹{monthly_spending:,.0f} છે. આજે સલામત ખર્ચ મર્યાદા ₹{safe_spend:,.0f} છે અને ઉપલબ્ધ બેલેન્સ ₹{avail_bal:,.2f} છે."
+                    if lang == "gu"
+                    else f"Your total monthly spending is ₹{monthly_spending:,.0f} across all categories. Your safe daily spend limit is ₹{safe_spend:,.0f}, and available balance is ₹{avail_bal:,.2f}."
+                )
+            )
+            return AssistantIntentResponse(
+                intent="CHECK_BALANCE",
+                success=True,
+                data={
+                    "available": avail_bal,
+                    "currency": "INR",
+                    "monthly_spending": monthly_spending,
+                    "safe_to_spend_today": safe_spend,
+                    "view": "activity"
+                },
+                response_text=resp_msg,
+                language=lang,
+                suggested_actions=["VIEW_TRANSACTIONS", "DOWNLOAD_STATEMENT"]
+            )
+        else:
+            resp_msg = (
+                f"आपके बचत खाते में उपलब्ध बैलेंस ₹{avail_bal:,.2f} है। आज खर्च करने के लिए सुरक्षित राशि ₹{safe_spend:,.0f} है।"
+                if lang == "hi"
+                else (
+                    f"તમારા ખાતામાં હાલનું ઉપલબ્ધ બેલેન્સ ₹{avail_bal:,.2f} છે. આજે સલામત ખર્ચ મર્યાદા ₹{safe_spend:,.0f} છે."
+                    if lang == "gu"
+                    else f"Your current available balance is ₹{avail_bal:,.2f}. Safe-to-spend limit for today is ₹{safe_spend:,.0f}."
+                )
+            )
+            return AssistantIntentResponse(
+                intent="CHECK_BALANCE",
+                success=True,
+                data={
+                    "available": avail_bal,
+                    "currency": "INR",
+                    "savings": state.balance.savings if state.balance else 0.0,
+                    "safe_to_spend_today": safe_spend
+                },
+                response_text=resp_msg,
+                language=lang,
+                suggested_actions=["VIEW_TRANSACTIONS", "SEND_MONEY"]
+            )
 
     elif intent_name == "CHECK_EMI":
         emi_amt = float(req.entities.get("amount") or state.signals.get("upcoming_emi_amount") or 16500.0)
         due_date = req.entities.get("due_date") or state.signals.get("upcoming_emi_date") or "2026-09-16"
         lender = req.entities.get("lender") or state.signals.get("mandate_lender") or "Linked Mandate"
+        resp_msg = (
+            f"{lender} के लिए आपकी आगामी ईएमआई ₹{emi_amt:,.0f} है, जो {due_date} को देय है।"
+            if lang == "hi"
+            else (
+                f"{lender} માટે તમારું આગામી EMI ₹{emi_amt:,.0f} છે જે {due_date} એ ચૂકવવાનું છે."
+                if lang == "gu"
+                else f"Your upcoming EMI for {lender} is ₹{emi_amt:,.0f} scheduled for {due_date}."
+            )
+        )
         return AssistantIntentResponse(
             intent="CHECK_EMI",
             success=True,
@@ -205,14 +258,23 @@ def execute_assistant_intent(req: AssistantIntentRequest):
                 "lender": lender,
                 "covered_by_balance": (avail_bal >= emi_amt)
             },
-            response_text=f"Your upcoming EMI for {lender} is ₹{emi_amt:,.0f} scheduled for {due_date}.",
+            response_text=resp_msg,
             language=lang,
             suggested_actions=["VIEW_SCHEDULE", "PAY_EARLY"]
         )
 
     elif intent_name == "PAY_METRO":
         amt = float(req.entities.get("amount") or state.signals.get("commute_typical_amount") or 40.0)
-        merchant = req.entities.get("merchant") or state.signals.get("commute_merchant") or "Metro Transit"
+        merchant = req.entities.get("merchant") or state.signals.get("commute_merchant") or "Delhi Metro Smart Card"
+        resp_msg = (
+            f"आपकी {merchant} यात्रा के लिए ₹{amt:,.0f} का टॉप-अप तैयार है। क्या आप 1-टैप यूपीआई से भुगतान करना चाहते हैं?"
+            if lang == "hi"
+            else (
+                f"તમારી {merchant} મુસાફરી માટે ₹{amt:,.0f} નું રિચાર્જ તૈયાર છે. શું તમે 1-ટેપથી પેમેન્ટ કરવા માંગો છો?"
+                if lang == "gu"
+                else f"Ready to top up ₹{amt:,.0f} for your {merchant} commute."
+            )
+        )
         return AssistantIntentResponse(
             intent="PAY_METRO",
             success=True,
@@ -222,9 +284,35 @@ def execute_assistant_intent(req: AssistantIntentRequest):
                 "status": "ready_for_confirmation",
                 "payment_mode": "UPI_AUTO_1TAP"
             },
-            response_text=f"Ready to top up ₹{amt:,.0f} for your {merchant} commute.",
+            response_text=resp_msg,
             language=lang,
             suggested_actions=["CONFIRM_PAYMENT", "DISMISS"]
+        )
+
+    elif intent_name == "PAY_BILL":
+        biller = req.entities.get("biller") or state.signals.get("utility_biller") or "Tata Power Electricity"
+        amt = float(req.entities.get("amount") or state.signals.get("utility_amount") or 1450.0)
+        resp_msg = (
+            f"आपका {biller} का ₹{amt:,.0f} का बिजली बिल भुगतान के लिए तैयार है। क्या आप 1-टैप यूपीआई से भुगतान करना चाहते हैं?"
+            if lang == "hi"
+            else (
+                f"તમારું {biller} નું ₹{amt:,.0f} નું બિલ તૈયાર છે. શું તમે 1-ટેપથી પેમેન્ટ કરવા માંગો છો?"
+                if lang == "gu"
+                else f"Your {biller} bill of ₹{amt:,.0f} is due. Would you like to pay now with 1-tap UPI?"
+            )
+        )
+        return AssistantIntentResponse(
+            intent="PAY_BILL",
+            success=True,
+            data={
+                "biller": biller,
+                "amount": amt,
+                "status": "ready_for_payment",
+                "payment_mode": "UPI_AUTO_1TAP"
+            },
+            response_text=resp_msg,
+            language=lang,
+            suggested_actions=["1_TAP_PAY", "VIEW_BILL", "DISMISS"]
         )
 
     elif intent_name == "MEDICAL_CLAIM_HELP":
@@ -261,6 +349,15 @@ def execute_assistant_intent(req: AssistantIntentRequest):
         )
 
     elif intent_name == "LOCK_CARD":
+        resp_msg = (
+            "आपकी सुरक्षा के लिए आपका एबीसी बैंक डेबिट कार्ड अस्थायी रूप से लॉक कर दिया गया है। अनफ्रीज करने के लिए नीचे टैप करें।"
+            if lang == "hi"
+            else (
+                "તમારી સુરક્ષા માટે તમારું એબીસી બેંક ડેબિટ કાર્ડ અસ્થાયી રૂપે લોક કરવામાં આવ્યું છે."
+                if lang == "gu"
+                else "Your ABC Bank Debit Card has been temporarily locked for security. Tap to manage or unfreeze."
+            )
+        )
         return AssistantIntentResponse(
             intent="LOCK_CARD",
             success=True,
@@ -268,7 +365,7 @@ def execute_assistant_intent(req: AssistantIntentRequest):
                 "card_status": "temporarily_frozen",
                 "action": "FREEZE_DEBIT_CARD"
             },
-            response_text="Your debit card has been temporarily locked for security. Tap to manage or unfreeze.",
+            response_text=resp_msg,
             language=lang,
             suggested_actions=["UNFREEZE_CARD", "REPORT_FRAUD"]
         )
@@ -289,12 +386,80 @@ def execute_assistant_intent(req: AssistantIntentRequest):
         )
 
     else:
-        # Fallback for general queries
+        # Check if query is irrelevant or out-of-domain
+        if req.entities.get("is_relevant") is False or req.entities.get("query_type") == "irrelevant":
+            cant_answer_msg = (
+                "मैं इस प्रश्न का उत्तर नहीं दे सकता। मैं केवल एबीसी बैंक का वित्तीय बैंकिंग सहायक हूँ। आप मुझसे बैंक बैलेंस, बिजली बिल, मेट्रो रिचार्ज, ईएमआई या कार्ड ब्लॉक करने के बारे में पूछ सकते हैं।"
+                if lang == "hi"
+                else (
+                    "હું આ પ્રશ્નનો જવાબ આપી શકતો નથી. હું માત્ર એબીસી બેંકનો બેંકિંગ સહાયક છું. તમે મને બેંક બેલેન્સ, બિલ પેમેન્ટ, મેટ્રો અથવા કાર્ડ લોક વિશે પૂછી શકો છો."
+                    if lang == "gu"
+                    else "I can't answer to this question. I am an on-device Bharat banking assistant for ABC Bank. You can ask me about your account balance, metro recharge, electricity bill, card controls, or EMI due dates."
+                )
+            )
+            return AssistantIntentResponse(
+                intent="GENERAL_QUERY",
+                success=False,
+                data={"reason": "irrelevant_query"},
+                response_text=cant_answer_msg,
+                language=lang,
+                suggested_actions=["CHECK_BALANCE", "PAY_METRO", "PAY_BILL", "LOCK_CARD"]
+            )
+
+        # Check for specific guided journeys (KYC, credit score)
+        if req.entities.get("journey_id") == "kyc" or req.entities.get("query_type") == "kyc":
+            kyc_msg = (
+                "आप वीडियो केवाईसी या आधार के माध्यम से ऑनलाइन अपना केवाईसी पूरा या अपडेट कर सकते हैं। शुरू करने के लिए नीचे टैप करें।"
+                if lang == "hi"
+                else (
+                    "તમે વિડિયો કેવાયસી અથવા આધાર દ્વારા ઓનલાઇન કેવાયસી પૂર્ણ અથવા અપડેટ કરી શકો છો. શરૂ કરવા માટે નીચે ટેપ કરો."
+                    if lang == "gu"
+                    else "You can easily complete or update your KYC verification online using Video KYC or Aadhaar OTP. Tap below to begin."
+                )
+            )
+            return AssistantIntentResponse(
+                intent="GENERAL_QUERY",
+                success=True,
+                data={"journey_id": "kyc", "action": "START_KYC"},
+                response_text=kyc_msg,
+                language=lang,
+                suggested_actions=["START_KYC", "UPLOAD_DOCUMENTS"]
+            )
+
+        if req.entities.get("journey_id") == "credit_score":
+            score_msg = (
+                "आपका नवीनतम सिबिल क्रेडिट स्कोर 742 (अच्छा) है। विस्तृत विश्लेषण देखने के लिए नीचे टैप करें।"
+                if lang == "hi"
+                else (
+                    "તમારો નવીનતમ સિબિલ ક્રેડિટ સ્કોર 742 (સારો) છે. વિગતવાર વિશ્લેષણ જોવા માટે नीचे ટેપ કરો."
+                    if lang == "gu"
+                    else "Your latest CIBIL credit score is 742 (Good). Tap below to view your full credit analysis."
+                )
+            )
+            return AssistantIntentResponse(
+                intent="GENERAL_QUERY",
+                success=True,
+                data={"journey_id": "credit_score", "score": 742},
+                response_text=score_msg,
+                language=lang,
+                suggested_actions=["VIEW_SCORE", "CREDIT_FACTORS"]
+            )
+
+        # Fallback for genuine general queries (greetings, identity, help)
+        greeting_msg = (
+            "नमस्ते! मैं मित्रा हूँ, आपका एबीसी बैंक साथी। मैं आपके खाते का बैलेंस जांचने, मेट्रो रिचार्ज, बिजली बिल भुगतान या कार्ड सुरक्षा में सहायता कर सकता हूँ।"
+            if lang == "hi"
+            else (
+                "નમસ્તે! હું મિત્રા છું, તમારો એબીસી બેંક સહાયક. હું બેંક બેલેન્સ, મેટ્રો રિચાર્જ, વીજળી બિલ અથવા કાર્ડ સુરક્ષામાં મદદ કરી શકું છું."
+                if lang == "gu"
+                else "Hello! I am Mitra, your ABC Bank companion. I can help you check balance, pay metro, settle bills, review EMIs, or manage your card."
+            )
+        )
         return AssistantIntentResponse(
             intent="GENERAL_QUERY",
             success=True,
             data={"query_received": intent_name},
-            response_text="I am your Bharat adaptive banking companion. How can I assist with your accounts today?",
+            response_text=greeting_msg,
             language=lang,
             suggested_actions=["CHECK_BALANCE", "CHECK_EMI", "PAY_METRO"]
         )
@@ -374,22 +539,42 @@ def assistant_chat(req: AssistantChatMessageRequest):
     if not action_chips:
         if intent == "PAY_METRO":
             action_chips.append({"label": "Pay ₹40 Now", "action": "INSTANT_PAY", "payload": {"amount": 40, "merchant": "Delhi Metro Smart Card"}})
+        elif intent == "PAY_BILL":
+            action_chips.append({"label": "Pay ₹1,450 Now", "action": "INSTANT_PAY", "payload": {"amount": 1450, "merchant": "Tata Power Electricity"}})
         elif intent == "CHECK_EMI":
             action_chips.append({"label": "View Schedule", "action": "OPEN_SCREEN", "payload": {"targetScreen": "Activity"}})
+        elif intent == "CHECK_BALANCE":
+            action_chips.append({"label": "View Passbook", "action": "OPEN_SCREEN", "payload": {"targetScreen": "Activity"}})
+        elif intent == "LOCK_CARD":
+            action_chips.append({"label": "Card Security", "action": "OPEN_JOURNEY", "payload": {"journeyId": "debit_card"}})
         elif intent == "MEDICAL_CLAIM_HELP":
             action_chips.append({"label": "Open Claim Desk", "action": "OPEN_JOURNEY", "payload": {"journeyId": "medical_assistance"}})
         elif intent == "REVIEW_COMMITMENTS":
             action_chips.append({"label": "Review Plan", "action": "OPEN_JOURNEY", "payload": {"journeyId": "stress_intervention"}})
+        elif intent == "SAVE_SURPLUS":
+            action_chips.append({"label": "Explore Smart FD", "action": "OPEN_JOURNEY", "payload": {"journeyId": "surplus"}})
 
-    suggested_prompts = classified.get("suggested_prompts") or ["Debit Card", "Score", "Pay Metro", "Send Money"]
+    # If the classifier marked the query as irrelevant, wipe action chips
+    if classified.get("entities", {}).get("is_relevant") is False:
+        action_chips = []
+        suggested_prompts = ["Check Balance", "Pay Metro ₹40", "Electricity Bill", "Lock My Card", "EMI Due Date"]
+    else:
+        suggested_prompts = classified.get("suggested_prompts") or ["Debit Card", "Score", "Pay Metro", "Send Money"]
+
+    # Prefer specific classified response text (e.g. from DialogueManager navigation) if intent_resp was generic
+    final_text = intent_resp.response_text
+    if classified.get("response_text") and (not final_text or "Hello! I am Mitra" in final_text or "नमस्ते! मैं मित्रा हूँ" in final_text or "નમસ્તે! હું મિત્રા છું" in final_text):
+        final_text = classified.get("response_text")
+    if not final_text:
+        final_text = "How can I assist you with your banking?"
 
     return {
         "success": True,
         "reply": {
             "id": f"asst_resp_{intent}_{int(time.time()*1000)}",
             "sender": "assistant",
-            "text": classified.get("response_text") or intent_resp.response_text or "How can I assist you with your banking?",
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "text": final_text,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "actionChips": action_chips,
             "suggestedPrompts": suggested_prompts,
             "pendingClarification": classified.get("pending_clarification"),
