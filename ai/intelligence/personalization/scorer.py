@@ -1,19 +1,30 @@
 """Multi-Factor ML Propensity & Scoring Engine for Bharat Banking Personalization."""
 
 from __future__ import annotations
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Optional
+import numpy as np
+
 from ai.intelligence.personalization.catalog import BankingProduct
 from ai.intelligence.personalization.archetypes import BharatArchetypeProfile
+from ai.intelligence.ml.vectorizer import FinancialFeatureVectorizer
+from ai.intelligence.ml.propensity import SupervisedPropensityModel
+from ai.intelligence.ml.embeddings import ProductEmbeddingSpace
+from ai.intelligence.ml.bandit import LinUCBBandit
 
 
 class MultiFactorScorer:
-    """Computes mathematically calibrated multi-factor propensity scores for candidate products."""
+    """Computes mathematically calibrated multi-factor propensity scores combining Scikit-Learn ML with regulatory constraints."""
 
     # Rigorously tuned multi-factor weights summing to 1.00
     WEIGHT_AFFORDABILITY = 0.30
     WEIGHT_LIFECYCLE_NEED = 0.30
     WEIGHT_TEMPORAL_URGENCY = 0.25
     WEIGHT_ARCHETYPE_AFFINITY = 0.15
+
+    # ML Ensemble Weights
+    WEIGHT_ML_PROPENSITY = 0.45
+    WEIGHT_ML_COSINE = 0.35
+    WEIGHT_ML_BANDIT = 0.20
 
     @classmethod
     def compute_affordability_fit(cls, product: BankingProduct, signals: Dict[str, Any], features: Dict[str, Any], health: str) -> float:
@@ -165,19 +176,48 @@ class MultiFactorScorer:
         archetype: BharatArchetypeProfile,
         signals: Dict[str, Any],
         features: Dict[str, Any],
-        health: str
+        health: str,
+        customer_vector: Optional[np.ndarray] = None
     ) -> Tuple[int, Dict[str, float]]:
-        """Calculates final calibrated priority (10 to 100) using weighted multi-factor formula.
+        """Calculates final calibrated priority (10 to 100) using the ML ensemble and regulatory filters.
 
         Returns:
             (final_priority, component_metrics)
         """
+        # 1. Base Contextual Components
         s_affordability = cls.compute_affordability_fit(product, signals, features, health)
         s_need = cls.compute_lifecycle_need(product, signals, features)
         s_timing = cls.compute_temporal_urgency(product, signals, features)
         s_affinity = cls.compute_archetype_affinity(product, archetype)
         r_penalty = cls.compute_risk_penalty(product, signals, health)
 
+        # 2. Machine Learning Core Models
+        if customer_vector is None:
+            # Reconstruct vector if not passed directly
+            cust_mock = {
+                "monthly_income": features.get("monthly_income", 75000),
+                "credit_score": signals.get("credit_score", 750),
+                "age": features.get("age", 30)
+            }
+            customer_vector = FinancialFeatureVectorizer.vectorize(cust_mock, features, signals, health)
+
+        # A. Supervised ML Propensity
+        ml_propensity = SupervisedPropensityModel.predict_propensity(product.id, customer_vector)
+
+        # B. Cosine Vector Similarity
+        ml_cosine = ProductEmbeddingSpace.compute_cosine_similarity(customer_vector, product.id)
+
+        # C. LinUCB Online Bandit Score
+        ml_bandit = LinUCBBandit.score(product.id, customer_vector)
+
+        # 3. Ensemble Synthesis
+        ml_ensemble_score = (
+            cls.WEIGHT_ML_PROPENSITY * ml_propensity +
+            cls.WEIGHT_ML_COSINE * ml_cosine +
+            cls.WEIGHT_ML_BANDIT * ml_bandit
+        )
+
+        # Baseline heuristic weighted sum for compatibility and stability
         weighted_sum = (
             cls.WEIGHT_AFFORDABILITY * s_affordability +
             cls.WEIGHT_LIFECYCLE_NEED * s_need +
@@ -185,13 +225,16 @@ class MultiFactorScorer:
             cls.WEIGHT_ARCHETYPE_AFFINITY * s_affinity
         )
 
-        effective_multiplier = weighted_sum * (1.0 - r_penalty)
-        raw_score = product.base_priority * (0.5 + 0.5 * effective_multiplier)
+        # Combined utility: 60% ML intelligence + 40% contextual urgency/affordability constraints
+        combined_utility = 0.60 * ml_ensemble_score + 0.20 * s_timing + 0.20 * s_affordability
+
+        effective_multiplier = combined_utility * (1.0 - r_penalty)
+        raw_score = product.base_priority * (0.50 + 0.50 * effective_multiplier)
 
         # Urgent security or medical conditions retain hard floors
         if product.id == "rec_fraud_guard" and (signals.get("anomaly_score", 0) > 80 or signals.get("fraud_alert_detected")):
             raw_score = 100.0
-        elif product.id == "rec_medical_claim" and signals.get("medical_surge"):
+        elif product.id == "rec_medical_claim" and (signals.get("medical_surge") or signals.get("medical_event_detected")):
             raw_score = max(raw_score, 95.0)
         elif product.id == "rec_cashflow_guidance" and health == "stress":
             raw_score = max(raw_score, 92.0)
@@ -204,7 +247,11 @@ class MultiFactorScorer:
             "temporal_urgency": round(s_timing, 3),
             "archetype_affinity": round(s_affinity, 3),
             "risk_penalty": round(r_penalty, 3),
-            "weighted_index": round(weighted_sum, 3)
+            "weighted_index": round(weighted_sum, 3),
+            "ml_propensity_prob": round(ml_propensity, 4),
+            "ml_cosine_similarity": round(ml_cosine, 4),
+            "ml_bandit_ucb": round(ml_bandit, 4),
+            "ml_ensemble_index": round(ml_ensemble_score, 4)
         }
 
         return final_priority, metrics

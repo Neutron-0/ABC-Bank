@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 from typing import Dict, Any, List, Optional
+import numpy as np
+
 from ai.intelligence.personalization.archetypes import ArchetypeClassifier, BharatArchetypeProfile
 from ai.intelligence.personalization.catalog import PRODUCT_CATALOG, BankingProduct
 from ai.intelligence.personalization.compliance import ComplianceEngine, DecisionAuditRecord
 from ai.intelligence.personalization.scorer import MultiFactorScorer
 from ai.intelligence.explanations.explainer import Explainer
+from ai.intelligence.ml.vectorizer import FinancialFeatureVectorizer
+from ai.intelligence.ml.clustering import KMeansClusterer
+from ai.intelligence.ml.propensity import SupervisedPropensityModel
 
 
 class PersonalizationEngine:
-    """Executes 10/10 hyper-personalization across Bharat archetypes with full RBI & DPDP compliance."""
+    """Executes hyper-personalization across Bharat archetypes with Scikit-Learn ML and full RBI & DPDP compliance."""
 
     @classmethod
     def evaluate(
@@ -26,7 +31,18 @@ class PersonalizationEngine:
         # 1. Classify Bharat Archetype
         archetype: BharatArchetypeProfile = ArchetypeClassifier.classify(customer_data, features, signals)
 
-        # 2. Compute Statistical Confidence Score
+        # 2. Continuous 32-Dimensional Financial Vectorization in R^32
+        customer_vector = FinancialFeatureVectorizer.vectorize(
+            customer_data=customer_data,
+            features=features,
+            signals=signals,
+            health=health
+        )
+
+        # 3. Unsupervised KMeans Soft-Cluster Probabilities
+        cluster_probabilities = KMeansClusterer.soft_cluster_probabilities(customer_vector)
+
+        # 4. Compute Statistical Confidence Score
         confidence_score = ComplianceEngine.calculate_confidence_score(features, signals, customer_data)
 
         active_recommendations: List[Dict[str, Any]] = []
@@ -126,13 +142,14 @@ class PersonalizationEngine:
                     counterfactual=counterfactual
                 ))
             elif relevance_flag:
-                # Product is compliant AND relevant to customer context -> calculate multi-factor score
+                # Product is compliant AND relevant to customer context -> calculate multi-factor ML score
                 final_priority, component_metrics = MultiFactorScorer.score_product(
                     product=product,
                     archetype=archetype,
                     signals=signals,
                     features=features,
-                    health=health
+                    health=health,
+                    customer_vector=customer_vector
                 )
                 user_reason = Explainer.explain(product.id, signals)
                 rec_item = {
@@ -182,5 +199,11 @@ class PersonalizationEngine:
                 "rbi_digital_lending_compliant": True,
                 "dpdp_act_2023_compliant": True,
                 "anti_predatory_shield_active": health in ["stress", "tight"] or dti > 0.40
+            },
+            "ml_metadata": {
+                "model_type": "Scikit-Learn ML Hybrid Ensemble",
+                "vector_dimension": FinancialFeatureVectorizer.VECTOR_DIM,
+                "cluster_probabilities": cluster_probabilities,
+                "feature_summary": FinancialFeatureVectorizer.get_feature_dict(customer_vector)
             }
         }
