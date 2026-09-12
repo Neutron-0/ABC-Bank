@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { colors, typography, spacing, radii } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
+import { motion } from '../../motion';
 import { Bell, Globe, Sparkles, SlidersHorizontal, Bot } from 'lucide-react-native';
 
 export const AdaptiveHeader: React.FC = () => {
@@ -17,6 +18,7 @@ export const AdaptiveHeader: React.FC = () => {
   };
 
   const toggleLanguage = () => {
+    motion.gentleLayout();
     if (language === 'en') setLanguage('hi');
     else if (language === 'hi') setLanguage('gu');
     else setLanguage('en');

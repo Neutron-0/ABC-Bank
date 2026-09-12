@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import { ContextCard as ContextCardType } from '../../types';
 import { colors, typography, spacing, radii } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -42,6 +42,28 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   // Tactile press scale animation
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
+  // Entrance & Dismiss Motion Values
+  const cardOpacity = useRef(new Animated.Value(0)).current;
+  const cardTranslateY = useRef(new Animated.Value(14)).current;
+  const cardTranslateX = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(cardOpacity, {
+        toValue: 1,
+        duration: 250,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardTranslateY, {
+        toValue: 0,
+        duration: 250,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   const onPressIn = () => {
     Animated.spring(scaleAnim, {
       toValue: 0.985,
@@ -61,8 +83,32 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   };
 
   const handleDismiss = () => {
-    motion.reorderLayout();
-    dismissCard(card.id);
+    Animated.parallel([
+      Animated.timing(cardOpacity, {
+        toValue: 0,
+        duration: 180,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardTranslateX, {
+        toValue: 90,
+        duration: 180,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      motion.reorderLayout();
+      dismissCard(card.id);
+    });
+  };
+
+  const cardAnimatedStyle = {
+    opacity: cardOpacity,
+    transform: [
+      { scale: scaleAnim },
+      { translateY: cardTranslateY },
+      { translateX: cardTranslateX },
+    ],
   };
 
   const handlePrimaryAction = async () => {
@@ -153,7 +199,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   // =========================================================================
   if (card.type === 'event') {
     return (
-      <Animated.View style={[styles.eventRowWrap, { transform: [{ scale: scaleAnim }] }]}>
+      <Animated.View style={[styles.eventRowWrap, cardAnimatedStyle]}>
         <View style={styles.eventRow}>
           <TouchableOpacity
             style={styles.eventMainArea}
@@ -190,7 +236,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   // =========================================================================
   if (card.type === 'insight') {
     return (
-      <Animated.View style={[styles.insightBlockWrap, { transform: [{ scale: scaleAnim }] }]}>
+      <Animated.View style={[styles.insightBlockWrap, cardAnimatedStyle]}>
         <View style={styles.insightBlock}>
           <View style={styles.insightHeaderRow}>
             <Text style={styles.insightEyebrow}>FINANCIAL INSIGHT</Text>
@@ -227,7 +273,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   // =========================================================================
   if (card.type === 'assistance') {
     return (
-      <Animated.View style={[styles.assistanceWrap, { transform: [{ scale: scaleAnim }] }]}>
+      <Animated.View style={[styles.assistanceWrap, cardAnimatedStyle]}>
         <View style={styles.assistanceBanner}>
           <View style={styles.assistanceTopRow}>
             <View style={styles.assistanceIconBox}>
@@ -280,7 +326,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   // =========================================================================
   if (card.type === 'warning') {
     return (
-      <Animated.View style={[styles.securityWrap, { transform: [{ scale: scaleAnim }] }]}>
+      <Animated.View style={[styles.securityWrap, cardAnimatedStyle]}>
         <View style={styles.securityStrip}>
           <View style={styles.securityTopRow}>
             <View style={styles.securityIconBox}>
@@ -325,7 +371,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   // =========================================================================
   if (card.type === 'action') {
     return (
-      <Animated.View style={[styles.actionSurfaceWrap, { transform: [{ scale: scaleAnim }] }]}>
+      <Animated.View style={[styles.actionSurfaceWrap, cardAnimatedStyle]}>
         <View style={styles.actionSurface}>
           <View style={styles.actionTopRow}>
             <View style={styles.actionIconBox}>
@@ -386,7 +432,7 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   // PATTERN 6: JUSTIFIED PROTECTION / PRODUCT / DEFAULT (Section 24)
   // =========================================================================
   return (
-    <Animated.View style={[styles.defaultCardWrap, { transform: [{ scale: scaleAnim }] }]}>
+    <Animated.View style={[styles.defaultCardWrap, cardAnimatedStyle]}>
       <View style={styles.defaultCard}>
         <View style={styles.defaultTopRow}>
           <View style={styles.defaultIconBox}>

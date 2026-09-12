@@ -7,6 +7,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   Animated,
+  Easing,
 } from 'react-native';
 import { AdaptiveHeader } from '../../components/common/AdaptiveHeader';
 import { BalanceHeader } from '../../components/common/BalanceHeader';
@@ -44,17 +45,36 @@ export const AdaptiveHomeScreen: React.FC = () => {
   const [isMetroPaid, setIsMetroPaid] = useState(false);
   const [isPayingMetro, setIsPayingMetro] = useState(false);
 
-  // Hero scale animation
+  // Hero scale and entrance animations
   const heroScaleAnim = useRef(new Animated.Value(1)).current;
+  const heroFadeAnim = useRef(new Animated.Value(1)).current;
+  const heroTranslateY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     fetchStateAndContext();
   }, []);
 
-  // When switching personas, reset local metro paid state and reorder
+  // When switching personas, reset local metro paid state, reorder layout, and animate hero entrance
   useEffect(() => {
     setIsMetroPaid(false);
     motion.reorderLayout();
+
+    heroFadeAnim.setValue(0.25);
+    heroTranslateY.setValue(12);
+    Animated.parallel([
+      Animated.timing(heroFadeAnim, {
+        toValue: 1,
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(heroTranslateY, {
+        toValue: 0,
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, [currentState]);
 
   const onRefresh = async () => {
@@ -330,8 +350,15 @@ export const AdaptiveHomeScreen: React.FC = () => {
         {/* Calm Editorial Balance Header with Animated Counter */}
         <BalanceHeader />
 
-        {/* Highest-Priority Contextual Experience (Hero Surface) */}
-        {renderHighestPriorityContext()}
+        {/* Highest-Priority Contextual Experience (Hero Surface with Smooth Entrance) */}
+        <Animated.View
+          style={{
+            opacity: heroFadeAnim,
+            transform: [{ translateY: heroTranslateY }],
+          }}
+        >
+          {renderHighestPriorityContext()}
+        </Animated.View>
 
         {/* Upcoming Financial Obligations Strip */}
         {renderUpcomingCommitment()}

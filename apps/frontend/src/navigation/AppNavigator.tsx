@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   SafeAreaView,
   StatusBar,
   Platform,
+  Animated,
+  Easing,
 } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../theme';
 import { useCustomerStore } from '../state/customerStore';
@@ -49,6 +51,129 @@ export const AppNavigator: React.FC = () => {
   const t = getTranslation(language);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [dockWidth, setDockWidth] = useState(0);
+
+  // Motion refs for sliding indicator pill
+  const pillTranslateX = useRef(new Animated.Value(0)).current;
+  const pillOpacity = useRef(new Animated.Value(0)).current;
+
+  // Motion refs for individual tab icon bouncing
+  const iconScales = useRef<{ [key: string]: Animated.Value }>({
+    home: new Animated.Value(1),
+    payments: new Animated.Value(1),
+    activity: new Animated.Value(1),
+    insights: new Animated.Value(1),
+    profile: new Animated.Value(1),
+  }).current;
+
+  // Motion refs for screen transitions
+  const screenOpacity = useRef(new Animated.Value(1)).current;
+  const screenTranslateX = useRef(new Animated.Value(0)).current;
+  const screenScale = useRef(new Animated.Value(1)).current;
+  const prevTabRef = useRef<MainTabType>(activeTab);
+
+  const tabs: { id: MainTabType; label: string; icon: any }[] = [
+    { id: 'home', label: t.tabs.home, icon: Home },
+    { id: 'payments', label: 'Pay', icon: Send },
+    { id: 'activity', label: t.tabs.activity, icon: Clock },
+    { id: 'insights', label: 'Money', icon: TrendingUp },
+    { id: 'profile', label: t.tabs.profile, icon: User },
+  ];
+
+  const TAB_ORDER: Record<string, number> = {
+    home: 0,
+    payments: 1,
+    activity: 2,
+    insights: 3,
+    profile: 4,
+    assistant: 5,
+  };
+
+  const activeTabIndex = tabs.findIndex((t) => t.id === activeTab);
+  const tabItemWidth = dockWidth > 0 ? (dockWidth - 12) / tabs.length : 0;
+
+  // Animate sliding indicator pill when activeTab or dockWidth changes
+  useEffect(() => {
+    if (dockWidth > 0 && activeTabIndex >= 0) {
+      const targetX = 6 + activeTabIndex * tabItemWidth;
+
+      Animated.parallel([
+        Animated.spring(pillTranslateX, {
+          toValue: targetX,
+          friction: 8,
+          tension: 75,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pillOpacity, {
+          toValue: 1,
+          duration: 180,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else if (activeTabIndex === -1) {
+      // If in assistant or another non-dock tab, gently hide pill
+      Animated.timing(pillOpacity, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [activeTab, dockWidth, activeTabIndex, tabItemWidth]);
+
+  // Animate tab icon bounce & screen transition when activeTab changes
+  useEffect(() => {
+    // 1. Icon spring bounce for newly active tab
+    if (iconScales[activeTab]) {
+      Animated.sequence([
+        Animated.timing(iconScales[activeTab], {
+          toValue: 1.24,
+          duration: 110,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.spring(iconScales[activeTab], {
+          toValue: 1.0,
+          friction: 5,
+          tension: 110,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+
+    // 2. Directional screen cross-fade transition
+    if (prevTabRef.current !== activeTab) {
+      const prevIdx = TAB_ORDER[prevTabRef.current] ?? 0;
+      const nextIdx = TAB_ORDER[activeTab] ?? 0;
+      const direction = nextIdx >= prevIdx ? 1 : -1;
+
+      screenOpacity.setValue(0.2);
+      screenTranslateX.setValue(direction * 18);
+      screenScale.setValue(0.985);
+
+      Animated.parallel([
+        Animated.timing(screenOpacity, {
+          toValue: 1,
+          duration: 210,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(screenTranslateX, {
+          toValue: 0,
+          duration: 210,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(screenScale, {
+          toValue: 1,
+          duration: 210,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      prevTabRef.current = activeTab;
+    }
+  }, [activeTab]);
 
   const renderActiveScreen = () => {
     switch (activeTab) {
@@ -68,14 +193,6 @@ export const AppNavigator: React.FC = () => {
         return <AdaptiveHomeScreen />;
     }
   };
-
-  const tabs: { id: MainTabType; label: string; icon: any }[] = [
-    { id: 'home', label: t.tabs.home, icon: Home },
-    { id: 'payments', label: 'Pay', icon: Send },
-    { id: 'activity', label: t.tabs.activity, icon: Clock },
-    { id: 'insights', label: 'Money', icon: TrendingUp },
-    { id: 'profile', label: t.tabs.profile, icon: User },
-  ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -99,30 +216,68 @@ export const AppNavigator: React.FC = () => {
         </View>
       )}
 
-      {/* Screen Container */}
-      <View style={styles.screenContainer}>{renderActiveScreen()}</View>
+      {/* Smooth Directional Screen Transition Container */}
+      <Animated.View
+        style={[
+          styles.screenContainer,
+          {
+            opacity: screenOpacity,
+            transform: [
+              { translateX: screenTranslateX },
+              { scale: screenScale },
+            ],
+          },
+        ]}
+      >
+        {renderActiveScreen()}
+      </Animated.View>
 
-      {/* Calm Editorial Floating Dock Tab Bar */}
+      {/* Fluid Floating Dock Tab Bar with Sliding Indicator Pill */}
       <View style={styles.dockContainer} pointerEvents="box-none">
-        <View style={styles.tabBar}>
+        <View
+          style={styles.tabBar}
+          onLayout={(e) => setDockWidth(e.nativeEvent.layout.width)}
+        >
+          {/* Sliding Pill Indicator */}
+          {dockWidth > 0 && tabItemWidth > 0 && (
+            <Animated.View
+              style={[
+                styles.slidingPill,
+                {
+                  width: tabItemWidth,
+                  opacity: pillOpacity,
+                  transform: [{ translateX: pillTranslateX }],
+                },
+              ]}
+              pointerEvents="none"
+            />
+          )}
+
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
             const IconComp = tab.icon;
+            const scaleValue = iconScales[tab.id] || new Animated.Value(1);
+
             return (
               <TouchableOpacity
                 key={tab.id}
-                style={[styles.tabItem, active && styles.activeTabItem]}
+                style={styles.tabItem}
                 onPress={() => setActiveTab(tab.id)}
                 delayPressIn={0}
-                activeOpacity={0.7}
+                activeOpacity={0.75}
               >
-                <View style={styles.iconContainer}>
+                <Animated.View
+                  style={[
+                    styles.iconContainer,
+                    { transform: [{ scale: scaleValue }] },
+                  ]}
+                >
                   <IconComp
                     size={19}
                     color={active ? '#111318' : '#8E8E93'}
                     strokeWidth={active ? 2.4 : 1.7}
                   />
-                </View>
+                </Animated.View>
                 <Text
                   style={[
                     styles.tabLabel,
@@ -215,7 +370,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 32,
     paddingVertical: 7,
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     width: '100%',
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -226,17 +381,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07,
     shadowRadius: 18,
     elevation: 7,
+    position: 'relative',
+  },
+  slidingPill: {
+    position: 'absolute',
+    top: 6,
+    bottom: 6,
+    borderRadius: 24,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 4,
     borderRadius: 20,
     flex: 1,
-  },
-  activeTabItem: {
-    backgroundColor: '#F5F5F7',
+    zIndex: 2,
   },
   iconContainer: {
     position: 'relative',
