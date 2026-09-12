@@ -55,16 +55,6 @@ export const AdaptiveHeader: React.FC = () => {
           <Text style={styles.chatButtonText}>{t.tabs.assistant}</Text>
         </TouchableOpacity>
 
-        {/* Sandbox Simulation Drawer Shortcut */}
-        <TouchableOpacity
-          style={styles.sandboxButton}
-          onPress={() => openJourney('prototype_lab')}
-          activeOpacity={0.8}
-        >
-          <SlidersHorizontal size={12} color="#334155" />
-          <Text style={styles.sandboxButtonText}>{t.balanceHeader.sandbox}</Text>
-        </TouchableOpacity>
-
         {/* Vernacular Language Selector */}
         <TouchableOpacity
           style={styles.langButton}
