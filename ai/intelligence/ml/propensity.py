@@ -183,6 +183,22 @@ class SupervisedPropensityModel:
         cls._train_dynamic()
 
     @classmethod
+    def load_gpu_models(cls) -> bool:
+        """Loads high-capacity GPU-trained XGBoost models if available."""
+        checkpoints_dir = Path(__file__).resolve().parent / "checkpoints"
+        gpu_path = checkpoints_dir / "gpu_propensity_models_v1.joblib"
+        if gpu_path.exists():
+            try:
+                import joblib
+                artifact = joblib.load(gpu_path)
+                cls._models = artifact["models"]
+                cls._is_trained = True
+                return True
+            except Exception:
+                return False
+        return False
+
+    @classmethod
     def predict_propensity(cls, product_id: str, vector: np.ndarray) -> float:
         """Calculates calibrated probability P(Need_k | x) in [0.0, 1.0]."""
         if not cls._is_trained:
@@ -232,8 +248,15 @@ class SupervisedPropensityModel:
         if clf is None:
             return []
 
-        coefs = clf.coef_[0]
         feature_names = FinancialFeatureVectorizer.FEATURE_NAMES
-        indexed_coefs = [(feature_names[i], float(round(coefs[i], 3))) for i in range(len(feature_names))]
+        if hasattr(clf, "feature_importances_"):
+            importances = clf.feature_importances_
+            indexed_coefs = [(feature_names[i], float(round(importances[i], 3))) for i in range(min(len(feature_names), len(importances)))]
+        elif hasattr(clf, "coef_"):
+            coefs = clf.coef_[0]
+            indexed_coefs = [(feature_names[i], float(round(coefs[i], 3))) for i in range(min(len(feature_names), len(coefs)))]
+        else:
+            return []
+
         indexed_coefs.sort(key=lambda item: item[1], reverse=True)
         return indexed_coefs[:top_n]

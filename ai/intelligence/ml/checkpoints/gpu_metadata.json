@@ -1,0 +1,18 @@
+{
+  "version": "v1.0.0-gpu",
+  "model_type": "XGBoost Histogram Gradient Boosting",
+  "target_hardware": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "mean_holdout_roc_auc": 0.9579,
+  "mean_holdout_log_loss": 0.2182,
+  "completed_epochs": 115,
+  "total_trajectories_trained": 4663825,
+  "gpu_telemetry": {
+    "gpu_util_pct": 44.0,
+    "mem_used_mb": 95.0,
+    "mem_total_mb": 6141.0,
+    "temp_c": 86.0,
+    "power_watts": 25.48,
+    "available": true
+  },
+  "updated_at": "2026-09-12T04:45:49Z"
+}
