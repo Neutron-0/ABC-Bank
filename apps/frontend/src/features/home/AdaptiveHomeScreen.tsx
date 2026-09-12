@@ -16,7 +16,7 @@ import { AdaptiveHeader } from '../../components/common/AdaptiveHeader';
 import { BalanceHeader } from '../../components/common/BalanceHeader';
 import { ContextCardStack } from '../../components/context/ContextCardStack';
 import { useCustomerStore } from '../../state/customerStore';
-import { colors, typography, spacing, radii } from '../../theme';
+import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { getTranslation } from '../../i18n';
 import { motion } from '../../motion';
 import {
@@ -35,6 +35,8 @@ import {
   Wifi,
   ChevronUp,
   ShieldCheck,
+  FileCheck,
+  CreditCard,
 } from 'lucide-react-native';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -67,6 +69,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
     openJourney,
     currentState,
     performPayment,
+    requestPaymentAuth,
     showToast,
   } = useCustomerStore();
   const t = getTranslation(language);
@@ -225,26 +228,31 @@ export const AdaptiveHomeScreen: React.FC = () => {
       Animated.timing(heroScaleAnim, { toValue: 1.0, duration: 150, useNativeDriver: true }),
     ]).start();
 
-    const ok = await performPayment({
-      amount: item.amount,
-      merchant: item.merchant,
-      category: item.category,
-      description: item.description,
-    });
-
-    setProcessingIntentId(null);
-    if (item.id === 'metro') setIsPayingMetro(false);
-
-    if (ok) {
-      setPaidIntents(prev => ({ ...prev, [item.id]: true }));
-
-      if (item.id === 'metro') {
-        setIsMetroPaid(true);
-        setTimeout(() => {
-          motion.reorderLayout();
-        }, 400);
+    // Trigger universal security authentication sheet (PIN / Biometrics)
+    requestPaymentAuth(
+      {
+        amount: item.amount,
+        merchant: item.merchant,
+        category: item.category,
+        description: item.description,
+      },
+      () => {
+        setProcessingIntentId(null);
+        setIsPayingMetro(false);
+        setPaidIntents((prev) => ({ ...prev, [item.id]: true }));
+        if (item.id === 'metro') {
+          setIsMetroPaid(true);
+          setTimeout(() => {
+            motion.reorderLayout();
+          }, 400);
+        }
       }
-    }
+    );
+    // Reset transient tap state after launching auth modal
+    setTimeout(() => {
+      setProcessingIntentId(null);
+      setIsPayingMetro(false);
+    }, 600);
   };
 
   const handlePayMetro = async () => {
@@ -434,11 +442,11 @@ export const AdaptiveHomeScreen: React.FC = () => {
                   delayPressIn={0}
                   activeOpacity={0.75}
                 >
-                  <View style={[styles.compactTileIconWrap, { backgroundColor: item.iconBg }]}>
+                  <View style={[styles.compactTileIconWrap, { backgroundColor: isPaid ? '#ECFDF5' : item.iconBg }]}>
                     {isPaid ? (
-                      <CheckCircle2 size={14} color="#059669" />
+                      <CheckCircle2 size={15} color="#059669" />
                     ) : (
-                      <IconComponent size={14} color={item.iconColor} />
+                      <IconComponent size={15} color={item.iconColor} />
                     )}
                   </View>
                   <View style={styles.compactTileTextWrap}>
@@ -449,7 +457,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
                       {isProcessing
                         ? '...'
                         : isPaid
-                        ? (language === 'hi' ? 'सफल' : language === 'gu' ? 'સફળ' : 'Paid')
+                        ? (language === 'hi' ? 'भुगतान सफल' : language === 'gu' ? 'ચુકવણી સફળ' : 'Paid')
                         : item.amountFormatted}
                     </Text>
                   </View>
@@ -583,6 +591,113 @@ export const AdaptiveHomeScreen: React.FC = () => {
     );
   };
 
+  // =========================================================================
+  // DIRECT BANKING JOURNEYS HUB (KYC, Loans, Surplus Allocation)
+  // =========================================================================
+  const renderDirectBankingHub = () => {
+    return (
+      <View style={styles.bankingHubSection}>
+        <View style={styles.bankingHubHeader}>
+          <Text style={styles.sectionEyebrow}>
+            {language === 'hi' ? 'डिजिटल बैंकिंग उत्पाद एवं सेवाएं' : language === 'gu' ? 'ડિજિટલ બેંકિંગ સેવાઓ અને ઉત્પાદનો' : 'DIRECT BANKING SERVICES & JOURNEYS'}
+          </Text>
+          <Text style={styles.bankingHubSub}>
+            {language === 'hi' ? 'सत्यापित और नियामक-अनुपालक डिजिटल उत्पाद' : language === 'gu' ? 'ચકાસાયેલ ડિજિટલ બેંકિંગ ઉત્પાદનો' : 'Audited and regulatory-compliant digital products'}
+          </Text>
+        </View>
+
+        <View style={styles.bankingHubList}>
+          {/* Journey 1: Digital KYC */}
+          <TouchableOpacity
+            style={styles.journeyCard}
+            onPress={() => openJourney('kyc')}
+            activeOpacity={0.78}
+          >
+            <View style={[styles.journeyIconWrap, { backgroundColor: '#EFF6FF' }]}>
+              <FileCheck size={20} color="#2563EB" />
+            </View>
+            <View style={styles.journeyTextWrap}>
+              <View style={styles.journeyBadgeRow}>
+                <Text style={styles.journeyTitle}>
+                  {language === 'hi' ? 'सरलीकृत डिजिटल केवाईसी' : language === 'gu' ? 'સરળ ડિજિટલ KYC' : 'Simplified Digital KYC'}
+                </Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#ECFDF5' }]}>
+                  <Text style={[styles.statusBadgeText, { color: '#059669' }]}>TIER 2 VERIFIED</Text>
+                </View>
+              </View>
+              <Text style={styles.journeyDesc}>
+                {language === 'hi'
+                  ? 'डिजिलॉकर, पैन व आधार ओटीपी से पेपरलेस पहचान सत्यापन'
+                  : language === 'gu'
+                  ? 'ડિજીલૉકર, PAN અને આધાર OTP વડે પેપરલેસ ચકાસણી'
+                  : 'DigiLocker, PAN & Aadhaar OTP instant tokenization'}
+              </Text>
+            </View>
+            <ArrowRight size={16} color="#94A3B8" />
+          </TouchableOpacity>
+
+          {/* Journey 2: Responsible Affordability Loan */}
+          <TouchableOpacity
+            style={styles.journeyCard}
+            onPress={() => openJourney('loan')}
+            activeOpacity={0.78}
+          >
+            <View style={[styles.journeyIconWrap, { backgroundColor: '#FEF3C7' }]}>
+              <CreditCard size={20} color="#D97706" />
+            </View>
+            <View style={styles.journeyTextWrap}>
+              <View style={styles.journeyBadgeRow}>
+                <Text style={styles.journeyTitle}>
+                  {language === 'hi' ? 'ज़िम्मेदार लोन योजना' : language === 'gu' ? 'જવાબદાર લોન આયોજન' : 'Responsible Affordability Loan'}
+                </Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#FEF3C7' }]}>
+                  <Text style={[styles.statusBadgeText, { color: '#B45309' }]}>₹1,50,000 PRE-APPROVED</Text>
+                </View>
+              </View>
+              <Text style={styles.journeyDesc}>
+                {language === 'hi'
+                  ? '22% डीटीआई सीमा पर आधारित सुरक्षित एवं गैर-शोषणकारी ऋण'
+                  : language === 'gu'
+                  ? '22% DTI મર્યાદા પર આધારિત સલામત ક્રેડિટ આયોજન'
+                  : 'Audited against 22% DTI benchmark • Instant disbursal'}
+              </Text>
+            </View>
+            <ArrowRight size={16} color="#94A3B8" />
+          </TouchableOpacity>
+
+          {/* Journey 3: Surplus Smart Allocation */}
+          <TouchableOpacity
+            style={styles.journeyCard}
+            onPress={() => openJourney('savings_invest')}
+            activeOpacity={0.78}
+          >
+            <View style={[styles.journeyIconWrap, { backgroundColor: '#ECFDF5' }]}>
+              <TrendingUp size={20} color="#059669" />
+            </View>
+            <View style={styles.journeyTextWrap}>
+              <View style={styles.journeyBadgeRow}>
+                <Text style={styles.journeyTitle}>
+                  {language === 'hi' ? 'अधिशेष बचत व स्मार्ट निवेश' : language === 'gu' ? 'સરપ્લસ બચત અને રોકાણ' : 'Surplus & Smart Allocation'}
+                </Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#EFF6FF' }]}>
+                  <Text style={[styles.statusBadgeText, { color: '#2563EB' }]}>7.85% AUTO-SWEEP</Text>
+                </View>
+              </View>
+              <Text style={styles.journeyDesc}>
+                {language === 'hi'
+                  ? 'अतिरिक्त लिक्विड फंड को उच्च-ब्याज ऑटो-स्वीप व फ्लेक्सी-एसआईपी में लगाएं'
+                  : language === 'gu'
+                  ? 'વધારાના નાણાંને ઊંચા વ્યાજવાળા ઓટો-સ્વીપ અને SIP માં રોકો'
+                  : 'Optimize excess cash into high-yield sweep & flexi-SIP'}
+              </Text>
+            </View>
+            <ArrowRight size={16} color="#94A3B8" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <AdaptiveHeader />
@@ -610,6 +725,9 @@ export const AdaptiveHomeScreen: React.FC = () => {
 
         {/* Upcoming Financial Obligations Strip */}
         {renderUpcomingCommitment()}
+
+        {/* Direct Banking Products Hub */}
+        {renderDirectBankingHub()}
 
         {/* Dynamic Contextual Mitra Quick Chat Bar (Personalized Space for Chatbot) */}
         <TouchableOpacity
@@ -1376,5 +1494,73 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#8C95A6',
     textAlign: 'center',
+  },
+  bankingHubSection: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+  },
+  bankingHubHeader: {
+    marginBottom: spacing.sm,
+  },
+  bankingHubSub: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#64748B',
+    marginTop: 2,
+  },
+  bankingHubList: {
+    gap: 10,
+    marginTop: spacing.xs,
+  },
+  journeyCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    gap: 12,
+    ...shadows.sm,
+  },
+  journeyIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  journeyTextWrap: {
+    flex: 1,
+  },
+  journeyBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+  },
+  journeyTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+    flex: 1,
+  },
+  statusBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 6,
+  },
+  statusBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
+  journeyDesc: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#64748B',
+    lineHeight: 15,
   },
 });
