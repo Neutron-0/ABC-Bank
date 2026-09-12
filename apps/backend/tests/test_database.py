@@ -9,7 +9,7 @@ root_dir = Path(__file__).resolve().parents[3]
 if str(root_dir) not in sys.path:
     sys.path.insert(0, str(root_dir))
 
-from apps.backend.app.db.session import SessionLocal, engine
+from apps.backend.app.db.session import SessionLocal, engine, DATABASE_URL
 from apps.backend.app.db.models import (
     Customer, Account, Transaction, RecurringPayment,
     CustomerEvent, Product, ConsentPreference
@@ -18,7 +18,7 @@ from apps.backend.app.db.loader import DataLoader
 from apps.backend.app.db.repositories.customer_repo import CustomerRepository
 from apps.backend.app.db.repositories.transaction_repo import TransactionRepository
 
-@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="PostgreSQL DATABASE_URL not set")
+@pytest.mark.skipif(not DATABASE_URL, reason="PostgreSQL DATABASE_URL not set")
 def test_database_counts_and_integrity():
     """Verify that PostgreSQL contains the large synthetic dataset with no orphan records."""
     with SessionLocal() as db:
@@ -48,7 +48,7 @@ def test_database_counts_and_integrity():
         )
         assert orphans == 0, f"Found {orphans} orphaned transactions"
 
-@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="PostgreSQL DATABASE_URL not set")
+@pytest.mark.skipif(not DATABASE_URL, reason="PostgreSQL DATABASE_URL not set")
 def test_customer_repository_queries():
     """Verify repository methods retrieve customer profile and transactions correctly."""
     with SessionLocal() as db:

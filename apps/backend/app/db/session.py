@@ -1,6 +1,7 @@
 import os
 import subprocess
 import logging
+from pathlib import Path
 from typing import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Session
@@ -15,8 +16,19 @@ def resolve_database_url() -> str:
     3. Falls back to localhost.
     """
     env_url = os.environ.get("DATABASE_URL")
+    if not env_url:
+        env_file = Path(__file__).resolve().parents[4] / ".env"
+        if env_file.exists():
+            for line in env_file.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line.startswith("DATABASE_URL="):
+                    env_url = line.split("=", 1)[1].strip().strip('"').strip("'")
+                    break
+
     if env_url:
-        return env_url
+        if env_url.startswith("postgresql://"):
+            env_url = env_url.replace("postgresql://", "postgresql+psycopg://", 1)
+        return env_url.replace("localhost", "127.0.0.1")
 
     try:
         cmd = ["powershell", "-NoProfile", "-Command", "(Get-NetNeighbor -InterfaceAlias '*WSL*' -AddressFamily IPv4 | Where-Object { $_.IPAddress -like '172.*' -and $_.IPAddress -notlike '*.255' }).IPAddress"]

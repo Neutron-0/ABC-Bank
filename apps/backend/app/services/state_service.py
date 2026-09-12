@@ -23,18 +23,33 @@ class StateService:
     _current_scenario: str = "normal"
     _in_memory_states: Dict[str, CustomerStateModel] = {}
     _in_memory_events: Dict[str, List[BankingEventModel]] = {}
+    _known_customer_ids: Optional[set] = None
 
     @classmethod
     def get_known_customer_ids(cls) -> List[str]:
         """Returns list of all valid customer IDs known to the bank infrastructure."""
-        customers = DataLoader.load_customers()
-        return [c.get("id") for c in customers if c.get("id")]
+        if cls._known_customer_ids is not None:
+            return list(cls._known_customer_ids)
+        try:
+            from apps.backend.app.db.session import SessionLocal
+            from apps.backend.app.db.repositories.customer_repo import CustomerRepository
+            with SessionLocal() as db:
+                ids = CustomerRepository.get_all_ids(db)
+                cls._known_customer_ids = set(ids)
+                return ids
+        except Exception:
+            customers = DataLoader.load_customers()
+            ids = [c.get("id") for c in customers if c.get("id")]
+            cls._known_customer_ids = set(ids)
+            return ids
 
     @classmethod
     def is_valid_customer(cls, customer_id: str) -> bool:
         """Validates if customer exists in the banking records."""
+        if customer_id == "cust_bharat_001":
+            return True
         known = cls.get_known_customer_ids()
-        return customer_id in known or customer_id == "cust_bharat_001"
+        return customer_id in known
 
     @classmethod
     def _create_safe_fallback_state(cls, customer_id: str, scenario_name: str = "normal") -> CustomerStateModel:

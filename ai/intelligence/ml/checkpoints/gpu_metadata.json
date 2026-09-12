@@ -1,18 +1,172 @@
 {
-  "version": "v1.0.0-gpu",
+  "version": "v2.0.0-gpu-postgresql",
   "model_type": "XGBoost Histogram Gradient Boosting",
   "target_hardware": "NVIDIA GeForce RTX 4050 Laptop GPU",
-  "mean_holdout_roc_auc": 0.9579,
-  "mean_holdout_log_loss": 0.2182,
-  "completed_epochs": 115,
-  "total_trajectories_trained": 4663825,
-  "gpu_telemetry": {
-    "gpu_util_pct": 44.0,
-    "mem_used_mb": 95.0,
-    "mem_total_mb": 6141.0,
-    "temp_c": 86.0,
-    "power_watts": 25.48,
-    "available": true
+  "trained_dataset": "PostgreSQL Relational Database (1,200 Customers, 127,689 Transactions)",
+  "n_samples": 1200,
+  "n_products": 19,
+  "evaluation_metrics": {
+    "mean_accuracy": 0.9987,
+    "mean_f1": 0.9961,
+    "mean_roc_auc": 1.0,
+    "duration_sec": 5.5491862297058105,
+    "per_product": {
+      "rec_fraud_guard": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0013
+      },
+      "rec_medical_claim": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0013
+      },
+      "rec_cashflow_guidance": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0035
+      },
+      "rec_commute_metro": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0018
+      },
+      "rec_smart_savings": {
+        "accuracy": 0.9958,
+        "precision": 0.99,
+        "recall": 1.0,
+        "f1_score": 0.995,
+        "roc_auc": 1.0,
+        "log_loss": 0.0097
+      },
+      "rec_personal_loan": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0049
+      },
+      "rec_msme_credit_line": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0024
+      },
+      "rec_sachet_insurance": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0029
+      },
+      "rec_kcc_topup": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0014
+      },
+      "rec_credit_builder": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0042
+      },
+      "rec_senior_scss": {
+        "accuracy": 0.9958,
+        "precision": 1.0,
+        "recall": 0.9524,
+        "f1_score": 0.9756,
+        "roc_auc": 1.0,
+        "log_loss": 0.0086
+      },
+      "srv_ncmc_reload": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0018
+      },
+      "srv_cibil_refresh": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0094
+      },
+      "srv_credit_card_bill": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0013
+      },
+      "srv_fastag_recharge": {
+        "accuracy": 0.9917,
+        "precision": 0.9592,
+        "recall": 1.0,
+        "f1_score": 0.9792,
+        "roc_auc": 0.9991,
+        "log_loss": 0.0408
+      },
+      "srv_mobile_recharge": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0049
+      },
+      "srv_form15g_h": {
+        "accuracy": 0.9917,
+        "precision": 1.0,
+        "recall": 0.9524,
+        "f1_score": 0.9756,
+        "roc_auc": 1.0,
+        "log_loss": 0.0156
+      },
+      "srv_positive_pay": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0074
+      },
+      "srv_pmjjby_pmsby": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "log_loss": 0.0052
+      }
+    }
   },
-  "updated_at": "2026-09-12T04:45:49Z"
+  "mean_holdout_roc_auc": 1.0,
+  "mean_holdout_f1": 0.9961,
+  "mean_holdout_accuracy": 0.9987,
+  "updated_at": "2026-09-12T05:06:24Z"
 }

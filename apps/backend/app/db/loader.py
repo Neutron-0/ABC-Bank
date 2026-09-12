@@ -38,12 +38,35 @@ class DataLoader:
         if not cls._is_db_offline():
             try:
                 with SessionLocal() as db:
+                    from sqlalchemy import select
+                    from apps.backend.app.db.models import Account
                     customers = CustomerRepository.get_all(db, limit=2000)
+                    accounts = list(db.scalars(select(Account)).all())
+                    acc_by_cust: Dict[str, List[Account]] = {}
+                    for a in accounts:
+                        acc_by_cust.setdefault(a.customer_id, []).append(a)
+
                     result = []
-                    for c in customers:
-                        summary = CustomerRepository.get_customer_summary(db, c.id)
-                        if summary:
-                            result.append(summary)
+                    for cust in customers:
+                        accs = acc_by_cust.get(cust.id, [])
+                        savings_acc = next((a for a in accs if a.account_type == "savings"), None)
+                        avail_bal = savings_acc.available_balance if savings_acc else (accs[0].available_balance if accs else 0.0)
+                        sav_reserve = savings_acc.balance if savings_acc else (accs[0].balance if accs else 0.0)
+                        result.append({
+                            "id": cust.id,
+                            "name": cust.name,
+                            "phone": cust.phone,
+                            "email": cust.email,
+                            "monthly_income": cust.monthly_income,
+                            "kyc_tier": cust.kyc_tier,
+                            "credit_score": cust.credit_score,
+                            "language": cust.preferred_language,
+                            "accounts": {
+                                "savings": savings_acc.account_number if savings_acc else "SB-DEFAULT",
+                                "available_balance": avail_bal,
+                                "savings_reserve": sav_reserve
+                            }
+                        })
                     if result:
                         return result
             except Exception as e:
