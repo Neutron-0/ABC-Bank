@@ -1,16 +1,27 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
-import { X, Sparkles, ShieldCheck, ArrowRight, Share2, HelpCircle } from 'lucide-react-native';
+import { X, FileText, ShieldCheck, ArrowRight, Share2, HelpCircle } from 'lucide-react-native';
 
 export const TransactionDetailModal: React.FC = () => {
-  const { selectedTransaction, setSelectedTransaction, openJourney } = useCustomerStore();
+  const { colors: themeColors, isDark } = useAppTheme();
+  const { selectedTransaction, setSelectedTransaction, openJourney, showToast, language } = useCustomerStore();
 
   if (!selectedTransaction) return null;
 
   const isCredit = selectedTransaction.type === 'credit';
   const isFlagged = selectedTransaction.status === 'flagged';
+
+  const handleShareReceipt = () => {
+    showToast(
+      language === 'hi'
+        ? `रसीद साझा की गई: ${selectedTransaction.id}`
+        : language === 'gu'
+        ? `રસીદ શેર કરવામાં આવી: ${selectedTransaction.id}`
+        : `Receipt shared: ${selectedTransaction.id}`
+    );
+  };
 
   return (
     <Modal
@@ -20,83 +31,87 @@ export const TransactionDetailModal: React.FC = () => {
       onRequestClose={() => setSelectedTransaction(null)}
     >
       <View style={styles.overlay}>
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.sheetTitle}>Transaction Details</Text>
+            <Text style={[styles.sheetTitle, { color: themeColors.textPrimary }]}>Transaction Receipt</Text>
             <TouchableOpacity
               onPress={() => setSelectedTransaction(null)}
               style={styles.closeBtn}
             >
-              <X size={20} color={colors.textSecondary} />
+              <X size={20} color={themeColors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* Amount Banner */}
-            <View style={styles.amountBox}>
-              <Text style={[styles.amount, isCredit && styles.creditAmount]}>
-                {isCredit ? '+' : '-'}₹{selectedTransaction.amount.toLocaleString('en-IN')}
+            <View style={[styles.amountBox, { borderBottomColor: themeColors.borderLight }]}>
+              <Text style={[styles.amount, { color: themeColors.textPrimary }, isCredit && { color: themeColors.success }]}>
+                {isCredit ? '+' : '−'}₹{selectedTransaction.amount.toLocaleString('en-IN')}
               </Text>
-              <Text style={styles.merchant}>{selectedTransaction.merchant}</Text>
-              <Text style={styles.timestamp}>
+              <Text style={[styles.merchant, { color: themeColors.textPrimary }]}>{selectedTransaction.merchant}</Text>
+              <Text style={[styles.timestamp, { color: themeColors.textMuted }]}>
                 {new Date(selectedTransaction.timestamp).toLocaleString()}
               </Text>
             </View>
 
-            {/* AI Pattern Understanding */}
+            {/* Reconciliation & Pattern Advisory */}
             {selectedTransaction.aiExplanation && (
-              <View style={styles.aiBox}>
+              <View style={[styles.aiBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                 <View style={styles.aiHeader}>
-                  <Sparkles size={16} color={colors.primary} />
-                  <Text style={styles.aiTitle}>AI Pattern Understanding</Text>
+                  <FileText size={15} color={themeColors.textPrimary} />
+                  <Text style={[styles.aiTitle, { color: themeColors.textPrimary }]}>Reconciliation & Ledger Note</Text>
                 </View>
-                <Text style={styles.aiText}>{selectedTransaction.aiExplanation}</Text>
+                <Text style={[styles.aiText, { color: themeColors.textSecondary }]}>{selectedTransaction.aiExplanation}</Text>
               </View>
             )}
 
             {/* Key Metadata Table */}
-            <View style={styles.metaTable}>
+            <View style={[styles.metaTable, { backgroundColor: themeColors.cardBgSecondary }]}>
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>Status</Text>
+                <Text style={[styles.metaLabel, { color: themeColors.textSecondary }]}>Status</Text>
                 <Text
                   style={[
                     styles.metaVal,
-                    isFlagged ? { color: colors.danger } : { color: colors.success },
+                    isFlagged ? { color: themeColors.danger } : { color: themeColors.success },
                   ]}
                 >
-                  {isFlagged ? 'FLAGGED FOR VERIFICATION' : 'COMPLETED'}
+                  {isFlagged ? 'FLAGGED FOR VERIFICATION' : 'SETTLED & COMPLETED'}
                 </Text>
               </View>
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>Category</Text>
-                <Text style={styles.metaVal}>{selectedTransaction.category.toUpperCase()}</Text>
+                <Text style={[styles.metaLabel, { color: themeColors.textSecondary }]}>Debited Account</Text>
+                <Text style={[styles.metaVal, { color: themeColors.textPrimary }]}>ABC Bank Savings •••• 4092</Text>
               </View>
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>Recurring Signal</Text>
-                <Text style={styles.metaVal}>
+                <Text style={[styles.metaLabel, { color: themeColors.textSecondary }]}>Category</Text>
+                <Text style={[styles.metaVal, { color: themeColors.textPrimary }]}>{selectedTransaction.category.toUpperCase()}</Text>
+              </View>
+              <View style={styles.metaRow}>
+                <Text style={[styles.metaLabel, { color: themeColors.textSecondary }]}>Payment Cadence</Text>
+                <Text style={[styles.metaVal, { color: themeColors.textPrimary }]}>
                   {selectedTransaction.isRecurring
-                    ? `Yes (${selectedTransaction.recurringFrequency || 'Routine'})`
+                    ? `Recurring (${selectedTransaction.recurringFrequency || 'Routine'})`
                     : 'One-off Transaction'}
                 </Text>
               </View>
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>Transaction ID</Text>
-                <Text style={styles.metaVal}>{selectedTransaction.id}</Text>
+                <Text style={[styles.metaLabel, { color: themeColors.textSecondary }]}>Reference / UPI ID</Text>
+                <Text style={[styles.metaVal, { color: themeColors.textPrimary }]}>{selectedTransaction.id}</Text>
               </View>
             </View>
 
             {/* Contextual Action if Flagged or Medical */}
             {isFlagged && (
               <TouchableOpacity
-                style={styles.flaggedActionBtn}
+                style={[styles.flaggedActionBtn, { backgroundColor: themeColors.danger }]}
                 onPress={() => {
                   setSelectedTransaction(null);
                   openJourney('fraud_alert');
                 }}
               >
-                <Text style={styles.flaggedActionText}>Resolve Security Alert</Text>
-                <ArrowRight size={16} color={colors.textWhite} />
+                <Text style={styles.flaggedActionText}>Resolve Security Flag</Text>
+                <ArrowRight size={16} color="#FFFFFF" />
               </TouchableOpacity>
             )}
 
@@ -109,13 +124,22 @@ export const TransactionDetailModal: React.FC = () => {
                 }}
               >
                 <Text style={styles.medicalActionText}>Get Insurance Claim Assistance</Text>
-                <ArrowRight size={16} color={colors.textWhite} />
+                <ArrowRight size={16} color="#FFFFFF" />
               </TouchableOpacity>
             )}
+
+            {/* Share Receipt Action */}
+            <TouchableOpacity
+              style={[styles.shareBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
+              onPress={handleShareReceipt}
+            >
+              <Share2 size={15} color={themeColors.textPrimary} />
+              <Text style={[styles.shareBtnText, { color: themeColors.textPrimary }]}>Share Payment Receipt</Text>
+            </TouchableOpacity>
           </ScrollView>
 
           <TouchableOpacity
-            style={styles.doneBtn}
+            style={[styles.doneBtn, { backgroundColor: themeColors.primary }]}
             onPress={() => setSelectedTransaction(null)}
           >
             <Text style={styles.doneBtnText}>Close</Text>
@@ -123,13 +147,14 @@ export const TransactionDetailModal: React.FC = () => {
         </View>
       </View>
     </Modal>
+
   );
 };
 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'flex-end',
   },
   sheet: {
@@ -249,8 +274,21 @@ const styles = StyleSheet.create({
     ...typography.bodyBold,
     color: colors.textWhite,
   },
+  shareBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    marginBottom: spacing.md,
+  },
+  shareBtnText: {
+    ...typography.bodyMedium,
+    fontWeight: '700',
+  },
   doneBtn: {
-    backgroundColor: colors.cardBgSecondary,
     borderRadius: radii.md,
     paddingVertical: spacing.md,
     alignItems: 'center',
@@ -258,6 +296,7 @@ const styles = StyleSheet.create({
   },
   doneBtnText: {
     ...typography.bodyBold,
-    color: colors.textSecondary,
+    color: '#FFFFFF',
   },
 });
+

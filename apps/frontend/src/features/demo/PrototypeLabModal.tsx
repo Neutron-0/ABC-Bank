@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,10 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { CustomerStateType } from '../../types';
 import {
-  Sparkles,
   X,
   CheckCircle2,
   ShieldAlert,
@@ -25,6 +24,7 @@ import {
 } from 'lucide-react-native';
 
 export const PrototypeLabModal: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const {
     activeJourney,
     closeJourney,
@@ -44,67 +44,61 @@ export const PrototypeLabModal: React.FC = () => {
     title: string;
     subtitle: string;
     icon: any;
-    color: string;
   }[] = [
     {
       id: 'normal',
       title: 'State A: Normal Workday',
       subtitle: 'Routine commute (8:40 AM Metro), salary & predictable bills',
       icon: Train,
-      color: '#2563EB',
     },
     {
       id: 'surplus',
       title: 'State B: Surplus / Saving Moment',
       subtitle: 'Salary credited, surplus ₹38,400, emergency fund 105%',
       icon: TrendingUp,
-      color: colors.success,
     },
     {
       id: 'financial_stress',
       title: 'State C: Financial Stress',
       subtitle: 'Tight cash flow, high EMI obligations -> LOANS SUPPRESSED',
       icon: AlertTriangle,
-      color: colors.accentWarm,
     },
     {
       id: 'medical_event',
       title: 'State D: Large Medical Expense',
       subtitle: '₹48,200 hospital debit -> EMPATHY & claim assistance first',
       icon: HeartHandshake,
-      color: '#0284C7',
     },
     {
       id: 'fraud_alert',
       title: 'State E: Fraud / Security Alert',
       subtitle: '₹31,800 suspicious debit -> Urgent protection & card lock',
       icon: ShieldAlert,
-      color: colors.danger,
     },
   ];
 
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>
       <View style={styles.overlay}>
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={styles.iconWrap}>
-                <Sparkles size={20} color="#D97706" />
+              <View style={[styles.iconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <Cpu size={20} color={themeColors.iconNeutral} />
               </View>
               <View>
-                <Text style={styles.title}>Prototype Lab: State Switcher</Text>
-                <Text style={styles.subtitle}>Test real-time AI UI adaptation</Text>
+                <Text style={[styles.title, { color: themeColors.textPrimary }]}>Prototype Lab: State Switcher</Text>
+                <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>Test real-time AI UI adaptation</Text>
               </View>
             </View>
             <TouchableOpacity onPress={closeJourney} style={styles.closeBtn}>
-              <X size={20} color={colors.textSecondary} />
+              <X size={20} color={themeColors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            <Text style={styles.sectionHeader}>Select Synthetic Customer State:</Text>
+            <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>Select Synthetic Customer State:</Text>
 
             {/* State Buttons */}
             <View style={styles.statesList}>
@@ -116,33 +110,47 @@ export const PrototypeLabModal: React.FC = () => {
                     key={st.id}
                     style={[
                       styles.stateCard,
-                      active && styles.activeStateCard,
-                      active && { borderColor: st.color },
+                      { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                      active && [
+                        styles.activeStateCard,
+                        {
+                          backgroundColor: isDark ? '#172554' : '#FFFFFF',
+                          borderColor: themeColors.primary,
+                        },
+                      ],
                     ]}
                     onPress={() => switchCustomerState(st.id)}
                     disabled={isLoading}
                     activeOpacity={0.8}
                   >
-                    <View style={[styles.stateIcon, { backgroundColor: `${st.color}15` }]}>
-                      <IconComponent size={20} color={st.color} />
+                    <View style={[styles.stateIcon, { backgroundColor: themeColors.cardBgSecondary }]}>
+                      <IconComponent size={20} color={active ? themeColors.primary : themeColors.iconNeutral} />
                     </View>
                     <View style={styles.stateInfo}>
                       <View style={styles.stateTitleRow}>
                         <Text
                           style={[
                             styles.stateTitle,
-                            active && { color: st.color, fontWeight: '700' },
+                            { color: themeColors.textPrimary },
+                            active && { color: themeColors.textPrimary, fontWeight: '700' },
                           ]}
                         >
                           {st.title}
                         </Text>
                         {active && (
-                          <View style={[styles.activeBadge, { backgroundColor: st.color }]}>
-                            <Text style={styles.activeBadgeText}>ACTIVE</Text>
+                          <View
+                            style={[
+                              styles.activeBadge,
+                              { backgroundColor: themeColors.primary },
+                            ]}
+                          >
+                            <Text style={[styles.activeBadgeText, { color: '#FFFFFF' }]}>
+                              ACTIVE
+                            </Text>
                           </View>
                         )}
                       </View>
-                      <Text style={styles.stateSubtitle}>{st.subtitle}</Text>
+                      <Text style={[styles.stateSubtitle, { color: themeColors.textSecondary }]}>{st.subtitle}</Text>
                     </View>
                   </TouchableOpacity>
                 );
@@ -151,14 +159,14 @@ export const PrototypeLabModal: React.FC = () => {
 
             {/* Live Telemetry Checklist */}
             <View style={styles.telemetrySection}>
-              <Text style={styles.sectionHeader}>Live Detected Signals (Extracted Features):</Text>
-              <View style={styles.telemetryCard}>
+              <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>Live Detected Signals (Extracted Features):</Text>
+              <View style={[styles.telemetryCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                 <View style={styles.signalRow}>
                   <CheckCircle2
                     size={16}
-                    color={signals.salaryRecentlyCredited ? colors.success : colors.textMuted}
+                    color={signals.salaryRecentlyCredited ? themeColors.primary : themeColors.textMuted}
                   />
-                  <Text style={styles.signalText}>
+                  <Text style={[styles.signalText, { color: themeColors.textPrimary }]}>
                     Salary Recently Credited: {signals.salaryRecentlyCredited ? 'YES (Sep 10)' : 'NO'}
                   </Text>
                 </View>
@@ -166,9 +174,9 @@ export const PrototypeLabModal: React.FC = () => {
                 <View style={styles.signalRow}>
                   <CheckCircle2
                     size={16}
-                    color={signals.medicalEventDetected ? colors.danger : colors.textMuted}
+                    color={signals.medicalEventDetected ? themeColors.danger : themeColors.textMuted}
                   />
-                  <Text style={styles.signalText}>
+                  <Text style={[styles.signalText, { color: themeColors.textPrimary }]}>
                     Medical Outflow Surge: {signals.medicalEventDetected ? 'DETECTED (₹48,200)' : 'None'}
                   </Text>
                 </View>
@@ -176,9 +184,9 @@ export const PrototypeLabModal: React.FC = () => {
                 <View style={styles.signalRow}>
                   <CheckCircle2
                     size={16}
-                    color={risk.anomalyDetected ? colors.danger : colors.textMuted}
+                    color={risk.anomalyDetected ? themeColors.danger : themeColors.textMuted}
                   />
-                  <Text style={styles.signalText}>
+                  <Text style={[styles.signalText, { color: themeColors.textPrimary }]}>
                     Security Risk Anomaly: {risk.anomalyDetected ? `HIGH (Score ${risk.anomalyScore})` : 'Normal (4/100)'}
                   </Text>
                 </View>
@@ -186,9 +194,9 @@ export const PrototypeLabModal: React.FC = () => {
                 <View style={styles.signalRow}>
                   <CheckCircle2
                     size={16}
-                    color={financialHealth.status === 'stress' ? colors.accentWarm : colors.success}
+                    color={financialHealth.status === 'stress' ? themeColors.danger : themeColors.primary}
                   />
-                  <Text style={styles.signalText}>
+                  <Text style={[styles.signalText, { color: themeColors.textPrimary }]}>
                     Cash-Flow Health Status: {financialHealth.status.toUpperCase()}
                   </Text>
                 </View>
@@ -197,14 +205,14 @@ export const PrototypeLabModal: React.FC = () => {
 
             {/* Decision Engine Order */}
             <View style={styles.telemetrySection}>
-              <Text style={styles.sectionHeader}>Resulting AI Attention Stack ({cards.length} Cards):</Text>
-              <View style={styles.cardsOrderBox}>
+              <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>Resulting AI Attention Stack ({cards.length} Cards):</Text>
+              <View style={[styles.cardsOrderBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                 {cards.map((c, i) => (
-                  <View key={c.id} style={styles.cardOrderItem}>
-                    <Text style={styles.orderRank}>#{i + 1}</Text>
+                  <View key={c.id} style={[styles.cardOrderItem, { borderBottomColor: themeColors.border }]}>
+                    <Text style={[styles.orderRank, { color: themeColors.primary }]}>#{i + 1}</Text>
                     <View style={styles.orderInfo}>
-                      <Text style={styles.orderTitle}>{c.title}</Text>
-                      <Text style={styles.orderMeta}>
+                      <Text style={[styles.orderTitle, { color: themeColors.textPrimary }]}>{c.title}</Text>
+                      <Text style={[styles.orderMeta, { color: themeColors.textSecondary }]}>
                         Layer: {c.layer} • Priority: {c.priority} • Type: {c.type}
                       </Text>
                     </View>
@@ -214,8 +222,11 @@ export const PrototypeLabModal: React.FC = () => {
             </View>
           </ScrollView>
 
-          <TouchableOpacity style={styles.doneBtn} onPress={closeJourney}>
-            <Text style={styles.doneBtnText}>Apply & Return to Home</Text>
+          <TouchableOpacity
+            style={[styles.doneBtn, { backgroundColor: themeColors.primary }]}
+            onPress={closeJourney}
+          >
+            <Text style={[styles.doneBtnText, { color: '#FFFFFF' }]}>Apply & Return to Home</Text>
           </TouchableOpacity>
         </View>
       </View>

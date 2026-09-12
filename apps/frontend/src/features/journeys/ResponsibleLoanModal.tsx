@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import {
@@ -13,13 +13,13 @@ import {
   Calculator,
   Briefcase,
   TrendingUp,
-  Sparkles,
   DollarSign,
   Layers,
   HeartHandshake,
 } from 'lucide-react-native';
 
 export const ResponsibleLoanModal: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const {
     activeJourney,
     closeJourney,
@@ -96,22 +96,22 @@ export const ResponsibleLoanModal: React.FC = () => {
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={handleClose}>
       <View style={styles.overlay}>
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           {/* Header */}
-          <View style={styles.header}>
+          <View style={[styles.header, { borderBottomColor: themeColors.border }]}>
             <View style={styles.headerLeft}>
-              <View style={styles.iconWrap}>
-                <CreditCard size={20} color={colors.primary} />
+              <View style={[styles.iconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <CreditCard size={20} color={themeColors.primary} />
               </View>
               <View>
-                <Text style={styles.title}>
+                <Text style={[styles.title, { color: themeColors.textPrimary }]}>
                   {language === 'hi'
                     ? 'क्षमता-आधारित सुरक्षित ऋण योजना'
                     : language === 'gu'
                     ? 'ક્ષમતા-આધારિત સુરક્ષિત લોન આયોજન'
                     : 'Affordability-First Loan Planning'}
                 </Text>
-                <Text style={styles.subtitle}>
+                <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>
                   {language === 'hi'
                     ? 'वास्तविक नकदी प्रवाह पर आधारित ज़िम्मेदार मूल्यांकन'
                     : language === 'gu'
@@ -122,11 +122,11 @@ export const ResponsibleLoanModal: React.FC = () => {
             </View>
             <TouchableOpacity
               onPress={handleClose}
-              style={styles.closeBtn}
+              style={[styles.closeBtn, { backgroundColor: themeColors.cardBgSecondary }]}
               delayPressIn={0}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <X size={20} color={colors.textSecondary} />
+              <X size={20} color={themeColors.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -134,14 +134,14 @@ export const ResponsibleLoanModal: React.FC = () => {
             {/* 1. DISBURSAL CELEBRATION RECEIPT */}
             {isDisbursed ? (
               <View style={styles.disbursedBox}>
-                <View style={styles.disbursedIconCircle}>
-                  <CheckCircle2 size={44} color="#059669" />
+                <View style={[styles.disbursedIconCircle, { backgroundColor: isDark ? '#0C2417' : '#F4F5F7' }]}>
+                  <CheckCircle2 size={44} color={themeColors.success} />
                 </View>
-                <Text style={styles.disbursedTitle}>
+                <Text style={[styles.disbursedTitle, { color: themeColors.textPrimary }]}>
                   {language === 'hi' ? 'ऋण राशि तुरंत जमा हो गई!' : language === 'gu' ? 'લોન રકમ તાત્કાલિક જમા થઈ!' : 'Loan Disbursed Instantly!'}
                 </Text>
-                <Text style={styles.disbursedAmount}>+₹{loanAmount.toLocaleString('en-IN')}</Text>
-                <Text style={styles.disbursedSub}>
+                <Text style={[styles.disbursedAmount, { color: themeColors.success }]}>+₹{loanAmount.toLocaleString('en-IN')}</Text>
+                <Text style={[styles.disbursedSub, { color: themeColors.textSecondary }]}>
                   {language === 'hi'
                     ? 'यह राशि सीधे आपके प्राथमिक खाते में जोड़ दी गई है।'
                     : language === 'gu'
@@ -149,29 +149,29 @@ export const ResponsibleLoanModal: React.FC = () => {
                     : 'Credited directly to your active ABC Bank account.'}
                 </Text>
 
-                <View style={styles.receiptCard}>
+                <View style={[styles.receiptCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                   <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>Transaction Reference</Text>
-                    <Text style={styles.receiptVal}>{disbursedTxId}</Text>
+                    <Text style={[styles.receiptLabel, { color: themeColors.textSecondary }]}>Transaction Reference</Text>
+                    <Text style={[styles.receiptVal, { color: themeColors.textPrimary }]}>{disbursedTxId}</Text>
                   </View>
                   <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>Repayment Tenure</Text>
-                    <Text style={styles.receiptVal}>{tenureMonths} Months</Text>
+                    <Text style={[styles.receiptLabel, { color: themeColors.textSecondary }]}>Repayment Tenure</Text>
+                    <Text style={[styles.receiptVal, { color: themeColors.textPrimary }]}>{tenureMonths} Months</Text>
                   </View>
                   <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>Monthly EMI</Text>
-                    <Text style={styles.receiptVal}>₹{estimatedEmi.toLocaleString('en-IN')} / mo</Text>
+                    <Text style={[styles.receiptLabel, { color: themeColors.textSecondary }]}>Monthly EMI</Text>
+                    <Text style={[styles.receiptVal, { color: themeColors.textPrimary }]}>₹{estimatedEmi.toLocaleString('en-IN')} / mo</Text>
                   </View>
                   <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>Updated Account Balance</Text>
-                    <Text style={[styles.receiptVal, { color: '#059669', fontWeight: '800' }]}>
+                    <Text style={[styles.receiptLabel, { color: themeColors.textSecondary }]}>Updated Account Balance</Text>
+                    <Text style={[styles.receiptVal, { color: themeColors.textPrimary, fontWeight: '800' }]}>
                       ₹{(balance.available).toLocaleString('en-IN')}
                     </Text>
                   </View>
                 </View>
 
                 <TouchableOpacity
-                  style={styles.primaryBtn}
+                  style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]}
                   onPress={handleClose}
                   delayPressIn={0}
                   activeOpacity={0.8}
@@ -182,7 +182,7 @@ export const ResponsibleLoanModal: React.FC = () => {
             ) : isStress ? (
               /* 2. ETHICAL SUPPRESSION: Financial Stress Warning */
               <View style={styles.stressWarningBox}>
-                <AlertTriangle size={28} color={colors.danger} />
+                <AlertTriangle size={28} color={themeColors.danger} />
                 <Text style={styles.stressTitle}>
                   {language === 'hi'
                     ? 'लोन प्रस्ताव रोक दिया गया है (सुरक्षा हेतु)'
@@ -190,7 +190,7 @@ export const ResponsibleLoanModal: React.FC = () => {
                     ? 'લોન ઑફર અટકાવી દેવાઈ છે (સુરક્ષા માટે)'
                     : 'Credit Paused for Your Protection'}
                 </Text>
-                <Text style={styles.stressDesc}>
+                <Text style={[styles.stressDesc, { color: themeColors.textSecondary }]}>
                   {language === 'hi'
                     ? 'हमारे जिम्मेदार बैंकिंग इंजन ने पाया कि इस महीने आपकी देनदारियां (₹32,000) सामान्य से अधिक हैं। आपको कर्ज के जाल से बचाने के लिए नए लोन को रोक दिया गया है।'
                     : language === 'gu'
@@ -198,9 +198,9 @@ export const ResponsibleLoanModal: React.FC = () => {
                     : 'Our responsible banking engine detected that your upcoming commitments (₹32,000) are elevated this cycle. Predatory credit is strictly paused.'}
                 </Text>
 
-                <View style={styles.pledgeCard}>
-                  <ShieldCheck size={16} color="#0D9488" />
-                  <Text style={styles.pledgeText}>
+                <View style={[styles.pledgeCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                  <ShieldCheck size={16} color={themeColors.primary} />
+                  <Text style={[styles.pledgeText, { color: themeColors.textPrimary }]}>
                     {language === 'hi'
                       ? 'एबीसी बैंक की नैतिक प्रतिज्ञा: हम ग्राहकों को कभी भी वित्तीय तनाव के समय ऋण नहीं बेचते।'
                       : language === 'gu'
@@ -210,7 +210,7 @@ export const ResponsibleLoanModal: React.FC = () => {
                 </View>
 
                 <TouchableOpacity
-                  style={styles.stressHelpBtn}
+                  style={[styles.stressHelpBtn, { backgroundColor: isDark ? '#27272A' : '#DC2626' }]}
                   onPress={() => {
                     closeJourney();
                     useCustomerStore.getState().openJourney('financial_stress');
@@ -229,8 +229,8 @@ export const ResponsibleLoanModal: React.FC = () => {
               <View>
                 {/* How AI Verified Eligibility (Real Transaction Signals) */}
                 <View style={styles.signalHeaderRow}>
-                  <Sparkles size={14} color="#4F46E5" />
-                  <Text style={styles.signalHeaderText}>
+                  <ShieldCheck size={14} color={themeColors.primary} />
+                  <Text style={[styles.signalHeaderText, { color: themeColors.textPrimary }]}>
                     {language === 'hi'
                       ? 'एआई ने आपके वास्तविक लेनदेन संकेतों का सत्यापन किया:'
                       : language === 'gu'
@@ -239,52 +239,56 @@ export const ResponsibleLoanModal: React.FC = () => {
                   </Text>
                 </View>
 
-                <View style={styles.signalBox}>
+                <View style={[styles.signalBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                   <View style={styles.signalItem}>
-                    <CheckCircle2 size={16} color="#059669" />
+                    <CheckCircle2 size={16} color={themeColors.primary} />
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.signalTitle}>
+                      <Text style={[styles.signalTitle, { color: themeColors.textPrimary }]}>
                         {language === 'hi' ? 'स्थिर वेतन क्रेडिट' : language === 'gu' ? 'સ્થિર પગાર જમા' : 'Salary Regularity'}
                       </Text>
-                      <Text style={styles.signalDetail}>₹75,000 received on 1st of every month (100% on-time)</Text>
+                      <Text style={[styles.signalDetail, { color: themeColors.textSecondary }]}>₹75,000 received on 1st of every month (100% on-time)</Text>
                     </View>
                   </View>
 
                   <View style={styles.signalItem}>
-                    <CheckCircle2 size={16} color="#059669" />
+                    <CheckCircle2 size={16} color={themeColors.primary} />
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.signalTitle}>
+                      <Text style={[styles.signalTitle, { color: themeColors.textPrimary }]}>
                         {language === 'hi' ? 'स्वस्थ ऋण-से-आय (DTI)' : language === 'gu' ? 'તંદુરસ્ત ઋણ-આવક ગુણોત્તર' : 'Debt-to-Income (DTI)'}
                       </Text>
-                      <Text style={styles.signalDetail}>22% DTI ratio (well below safe 40% regulatory cap)</Text>
+                      <Text style={[styles.signalDetail, { color: themeColors.textSecondary }]}>22% DTI ratio (well below safe 40% regulatory cap)</Text>
                     </View>
                   </View>
 
                   <View style={styles.signalItem}>
-                    <CheckCircle2 size={16} color="#059669" />
+                    <CheckCircle2 size={16} color={themeColors.primary} />
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.signalTitle}>
+                      <Text style={[styles.signalTitle, { color: themeColors.textPrimary }]}>
                         {language === 'hi' ? 'मासिक सरप्लस कुशन' : language === 'gu' ? 'માસિક સરપ્લસ કુશન' : 'Safe Monthly Disposable Cushion'}
                       </Text>
-                      <Text style={styles.signalDetail}>₹24,000 average surplus after rent and routine bills</Text>
+                      <Text style={[styles.signalDetail, { color: themeColors.textSecondary }]}>₹24,000 average surplus after rent and routine bills</Text>
                     </View>
                   </View>
                 </View>
 
                 {/* Amount Selector */}
-                <Text style={styles.sectionHeader}>
+                <Text style={[styles.sectionHeader, { color: themeColors.textPrimary }]}>
                   {language === 'hi' ? 'ऋण राशि चुनें:' : language === 'gu' ? 'લોન રકમ પસંદ કરો:' : 'Select Loan Amount:'}
                 </Text>
                 <View style={styles.chipsRow}>
                   {[50000, 100000, 150000, 250000, 500000].map((amt) => (
                     <TouchableOpacity
                       key={amt}
-                      style={[styles.amtChip, loanAmount === amt && styles.activeAmtChip]}
+                      style={[
+                        styles.amtChip,
+                        { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                        loanAmount === amt && [styles.activeAmtChip, { backgroundColor: themeColors.primary, borderColor: themeColors.primary }],
+                      ]}
                       onPress={() => setLoanAmount(amt)}
                       delayPressIn={0}
                       activeOpacity={0.75}
                     >
-                      <Text style={[styles.amtChipText, loanAmount === amt && styles.activeAmtChipText]}>
+                      <Text style={[styles.amtChipText, { color: themeColors.textSecondary }, loanAmount === amt && { color: '#FFFFFF', fontWeight: '700' }]}>
                         ₹{(amt >= 100000 ? `${amt / 100000} Lakh` : `${amt / 1000}k`)}
                       </Text>
                     </TouchableOpacity>
@@ -292,19 +296,23 @@ export const ResponsibleLoanModal: React.FC = () => {
                 </View>
 
                 {/* Tenure Selector */}
-                <Text style={styles.sectionHeader}>
+                <Text style={[styles.sectionHeader, { color: themeColors.textPrimary }]}>
                   {language === 'hi' ? 'चुकौती अवधि:' : language === 'gu' ? 'ચુકવણી સમયગાળો:' : 'Repayment Tenure:'}
                 </Text>
                 <View style={styles.chipsRow}>
                   {[12, 24, 36].map((m) => (
                     <TouchableOpacity
                       key={m}
-                      style={[styles.amtChip, tenureMonths === m && styles.activeAmtChip]}
+                      style={[
+                        styles.amtChip,
+                        { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                        tenureMonths === m && [styles.activeAmtChip, { backgroundColor: themeColors.primary, borderColor: themeColors.primary }],
+                      ]}
                       onPress={() => setTenureMonths(m)}
                       delayPressIn={0}
                       activeOpacity={0.75}
                     >
-                      <Text style={[styles.amtChipText, tenureMonths === m && styles.activeAmtChipText]}>
+                      <Text style={[styles.amtChipText, { color: themeColors.textSecondary }, tenureMonths === m && { color: '#FFFFFF', fontWeight: '700' }]}>
                         {m} Months
                       </Text>
                     </TouchableOpacity>
@@ -312,36 +320,36 @@ export const ResponsibleLoanModal: React.FC = () => {
                 </View>
 
                 {/* Live Transparent EMI Breakdown Box */}
-                <View style={styles.calcBox}>
+                <View style={[styles.calcBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                   <View style={styles.calcRow}>
-                    <Text style={styles.calcLabel}>
+                    <Text style={[styles.calcLabel, { color: themeColors.textSecondary }]}>
                       {language === 'hi' ? 'अनुमानित मासिक ईएमआई:' : language === 'gu' ? 'અંદાજિત માસિક EMI:' : 'Estimated Monthly EMI:'}
                     </Text>
-                    <Text style={styles.calcValue}>₹{estimatedEmi.toLocaleString('en-IN')} / mo</Text>
+                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>₹{estimatedEmi.toLocaleString('en-IN')} / mo</Text>
                   </View>
                   <View style={styles.calcRow}>
-                    <Text style={styles.calcLabel}>
+                    <Text style={[styles.calcLabel, { color: themeColors.textSecondary }]}>
                       {language === 'hi' ? 'ब्याज दर (पारदर्शी):' : language === 'gu' ? 'વ્યાજ દર (પારદર્શક):' : 'Fixed Interest Rate:'}
                     </Text>
-                    <Text style={styles.calcValue}>11.5% p.a. Fixed</Text>
+                    <Text style={[styles.calcValue, { color: themeColors.brandSecondary }]}>11.5% p.a. Fixed</Text>
                   </View>
                   <View style={styles.calcRow}>
-                    <Text style={styles.calcLabel}>
+                    <Text style={[styles.calcLabel, { color: themeColors.textSecondary }]}>
                       {language === 'hi' ? 'प्री-पेमेंट चार्ज:' : language === 'gu' ? 'પ્રી-પેમેન્ટ ચાર્જ:' : 'Pre-payment Penalty:'}
                     </Text>
-                    <Text style={[styles.calcValue, { color: colors.success }]}>₹0 (Zero Charges)</Text>
+                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>₹0 (Zero Charges)</Text>
                   </View>
                   <View style={styles.calcRow}>
-                    <Text style={styles.calcLabel}>
+                    <Text style={[styles.calcLabel, { color: themeColors.textSecondary }]}>
                       {language === 'hi' ? 'दस्तावेजीकरण:' : language === 'gu' ? 'દસ્તાવેજીકરણ:' : 'Documentation:'}
                     </Text>
-                    <Text style={[styles.calcValue, { color: '#4F46E5' }]}>100% Paperless DigiLocker</Text>
+                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>100% Paperless DigiLocker</Text>
                   </View>
                 </View>
 
                 {/* Action Button: 1-Tap Mock Disbursal */}
                 <TouchableOpacity
-                  style={styles.primaryBtn}
+                  style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]}
                   onPress={handleDisburseLoan}
                   delayPressIn={0}
                   activeOpacity={0.8}
@@ -429,7 +437,7 @@ const styles = StyleSheet.create({
   signalHeaderText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#4F46E5',
+    color: '#002970',
     letterSpacing: 0.5,
   },
   signalBox: {
@@ -478,8 +486,8 @@ const styles = StyleSheet.create({
     borderColor: '#ECEEF2',
   },
   activeAmtChip: {
-    backgroundColor: '#111318',
-    borderColor: '#111318',
+    backgroundColor: '#002970',
+    borderColor: '#002970',
   },
   amtChipText: {
     fontSize: 13,
@@ -514,7 +522,7 @@ const styles = StyleSheet.create({
     color: '#111318',
   },
   primaryBtn: {
-    backgroundColor: '#111318',
+    backgroundColor: '#002970',
     paddingVertical: 15,
     borderRadius: 14,
     flexDirection: 'row',
@@ -537,7 +545,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#F4F5F7',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
@@ -551,7 +559,7 @@ const styles = StyleSheet.create({
   disbursedAmount: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#059669',
+    color: '#002970',
     marginTop: 4,
   },
   disbursedSub: {
@@ -608,16 +616,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#F0FDFA',
+    backgroundColor: '#F4F5F7',
     padding: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#CCFBF1',
+    borderColor: '#ECEEF2',
     marginBottom: spacing.xl,
   },
   pledgeText: {
     fontSize: 12,
-    color: '#0F766E',
+    color: '#111318',
     fontWeight: '600',
     flex: 1,
   },

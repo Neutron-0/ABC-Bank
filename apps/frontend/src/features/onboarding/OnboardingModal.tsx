@@ -10,7 +10,7 @@ import {
   Animated,
   ActivityIndicator,
 } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { LanguageCode } from '../../types';
@@ -35,6 +35,7 @@ interface Props {
 }
 
 export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { language, setLanguage, setSecurityCredentials, showToast } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -144,31 +145,31 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
 
   return (
     <Modal visible={visible} transparent={false} animationType="slide" onRequestClose={onFinish}>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
         {/* Progress Tracker */}
         <View style={styles.headerBar}>
-          <Text style={styles.headerStepText}>
+          <Text style={[styles.headerStepText, { color: themeColors.textPrimary }]}>
             STEP {step} OF 6 • {step === 1 ? 'LANGUAGE' : step === 2 ? 'MOBILE' : step === 3 ? 'VERIFY OTP' : step === 4 ? 'SECURITY PIN' : step === 5 ? 'BIOMETRICS' : 'LINKED'}
           </Text>
           <TouchableOpacity onPress={onFinish} style={styles.skipBtn}>
-            <X size={18} color="#64748B" />
+            <X size={18} color={themeColors.iconNeutral} />
           </TouchableOpacity>
         </View>
-        <View style={styles.progressBarTrack}>
-          <View style={[styles.progressBarFill, { width: `${(step / 6) * 100}%` }]} />
+        <View style={[styles.progressBarTrack, { backgroundColor: themeColors.border }]}>
+          <View style={[styles.progressBarFill, { width: `${(step / 6) * 100}%`, backgroundColor: isDark ? '#FFFFFF' : '#0F294A' }]} />
         </View>
 
         {/* STEP 1: WELCOME & LANGUAGE SELECTION */}
         {step === 1 && (
           <ScrollView contentContainerStyle={styles.centerContent} showsVerticalScrollIndicator={false}>
-            <View style={styles.heroLogoWrap}>
-              <Building2 size={36} color="#0F294A" />
+            <View style={[styles.heroLogoWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <Building2 size={36} color={themeColors.textPrimary} />
             </View>
-            <Text style={styles.heroTitle}>{t.onboarding.welcomeTitle}</Text>
-            <Text style={styles.heroSubtitle}>{t.onboarding.welcomeSubtitle}</Text>
+            <Text style={[styles.heroTitle, { color: themeColors.textPrimary }]}>{t.onboarding.welcomeTitle}</Text>
+            <Text style={[styles.heroSubtitle, { color: themeColors.textSecondary }]}>{t.onboarding.welcomeSubtitle}</Text>
 
-            <View style={styles.cardContainer}>
-              <Text style={styles.cardSectionLabel}>{t.onboarding.chooseLanguage}</Text>
+            <View style={[styles.cardContainer, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+              <Text style={[styles.cardSectionLabel, { color: themeColors.textSecondary }]}>{t.onboarding.chooseLanguage}</Text>
               {[
                 { code: 'en' as LanguageCode, label: 'English', sub: 'Institutional standard' },
                 { code: 'hi' as LanguageCode, label: 'हिंदी (Hindi)', sub: 'सुगम और सुरक्षित बैंकिंग' },
@@ -178,22 +179,26 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                 return (
                   <TouchableOpacity
                     key={item.code}
-                    style={[styles.langRow, active && styles.activeLangRow]}
+                    style={[
+                      styles.langRow,
+                      { backgroundColor: themeColors.cardBg, borderColor: themeColors.border },
+                      active && [styles.activeLangRow, { borderColor: isDark ? '#FFFFFF' : '#0F294A', backgroundColor: isDark ? '#27272A' : '#F1F5F9' }],
+                    ]}
                     onPress={() => setLanguage(item.code)}
                   >
                     <View>
-                      <Text style={[styles.langName, active && styles.activeLangName]}>
+                      <Text style={[styles.langName, { color: themeColors.textPrimary }]}>
                         {item.label}
                       </Text>
-                      <Text style={styles.langSub}>{item.sub}</Text>
+                      <Text style={[styles.langSub, { color: themeColors.textSecondary }]}>{item.sub}</Text>
                     </View>
-                    {active && <Check size={18} color="#0F294A" />}
+                    {active && <Check size={18} color={themeColors.textPrimary} />}
                   </TouchableOpacity>
                 );
               })}
             </View>
 
-            <TouchableOpacity style={styles.primaryBtn} onPress={() => setStep(2)}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={() => setStep(2)}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'आगे बढ़ें' : language === 'gu' ? 'આગળ વધો' : 'Continue'}
               </Text>
@@ -205,13 +210,13 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
         {/* STEP 2: MOBILE NUMBER ENTRY */}
         {step === 2 && (
           <ScrollView contentContainerStyle={styles.centerContent} showsVerticalScrollIndicator={false}>
-            <View style={[styles.heroLogoWrap, { backgroundColor: '#EFF6FF' }]}>
-              <Phone size={32} color="#2563EB" />
+            <View style={[styles.heroLogoWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <Phone size={32} color={themeColors.textPrimary} />
             </View>
-            <Text style={styles.heroTitle}>
+            <Text style={[styles.heroTitle, { color: themeColors.textPrimary }]}>
               {language === 'hi' ? 'अपना मोबाइल नंबर दर्ज करें' : language === 'gu' ? 'તમારો મોબાઇલ નંબર દાખલ કરો' : 'Enter Your Mobile Number'}
             </Text>
-            <Text style={styles.heroSubtitle}>
+            <Text style={[styles.heroSubtitle, { color: themeColors.textSecondary }]}>
               {language === 'hi'
                 ? 'हम आपके बैंक-लिंक्ड खाते को खोजने के लिए एक सुरक्षित ओटीपी भेजेंगे।'
                 : language === 'gu'
@@ -219,34 +224,35 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                 : 'We will send a one-time passcode to securely link your bank account.'}
             </Text>
 
-            <View style={styles.phoneInputCard}>
-              <Text style={styles.inputPrefix}>+91</Text>
-              <View style={styles.inputDivider} />
+            <View style={[styles.phoneInputCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+              <Text style={[styles.inputPrefix, { color: themeColors.textPrimary }]}>+91</Text>
+              <View style={[styles.inputDivider, { backgroundColor: themeColors.border }]} />
               <TextInput
-                style={styles.phoneTextInput}
+                style={[styles.phoneTextInput, { color: themeColors.textPrimary }]}
                 value={phone}
                 onChangeText={(val) => setPhone(val.replace(/[^0-9]/g, '').slice(0, 10))}
                 keyboardType="numeric"
                 placeholder="9876543210"
+                placeholderTextColor={themeColors.textMuted}
                 maxLength={10}
               />
             </View>
 
             {errorMsg && (
-              <View style={styles.errorBanner}>
+              <View style={[styles.errorBanner, { backgroundColor: isDark ? '#2A0E0E' : '#FEF2F2', borderColor: isDark ? '#EF4444' : '#FECACA' }]}>
                 <AlertCircle size={14} color="#DC2626" />
                 <Text style={styles.errorBannerText}>{errorMsg}</Text>
               </View>
             )}
 
-            <View style={styles.trustBadge}>
-              <ShieldCheck size={16} color="#059669" />
-              <Text style={styles.trustBadgeText}>
+            <View style={[styles.trustBadge, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
+              <ShieldCheck size={16} color={themeColors.success} />
+              <Text style={[styles.trustBadgeText, { color: themeColors.success }]}>
                 RBI Regulated • 256-Bit Bank-Grade Tokenization
               </Text>
             </View>
 
-            <TouchableOpacity style={styles.primaryBtn} onPress={handleSendOtp}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={handleSendOtp}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'ओटीपी प्राप्त करें' : language === 'gu' ? 'OTP મેળવો' : 'Send 6-Digit OTP'}
               </Text>
@@ -260,23 +266,23 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
           <ScrollView contentContainerStyle={styles.centerContent} showsVerticalScrollIndicator={false}>
             {/* Simulated SMS Notification Banner */}
             <TouchableOpacity
-              style={styles.smsBanner}
+              style={[styles.smsBanner, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
               onPress={() => setOtp('482910')}
               activeOpacity={0.85}
             >
               <View style={styles.smsHeader}>
-                <MessageSquare size={13} color="#2563EB" />
-                <Text style={styles.smsSender}>MESSAGES • ABC BANK</Text>
+                <MessageSquare size={13} color={themeColors.textPrimary} />
+                <Text style={[styles.smsSender, { color: themeColors.textPrimary }]}>MESSAGES • ABC BANK</Text>
               </View>
-              <Text style={styles.smsBody}>
+              <Text style={[styles.smsBody, { color: themeColors.textSecondary }]}>
                 482910 is your ABC Bank registration code. Tap here to auto-fill.
               </Text>
             </TouchableOpacity>
 
-            <Text style={styles.heroTitle}>
+            <Text style={[styles.heroTitle, { color: themeColors.textPrimary }]}>
               {language === 'hi' ? 'ओटीपी सत्यापित करें' : language === 'gu' ? 'OTP ચકાસો' : 'Verify Mobile OTP'}
             </Text>
-            <Text style={styles.heroSubtitle}>
+            <Text style={[styles.heroSubtitle, { color: themeColors.textSecondary }]}>
               {language === 'hi'
                 ? `+91 ${phone} पर 6-अंकीय कोड भेजा गया है`
                 : language === 'gu'
@@ -291,10 +297,11 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                   key={idx}
                   style={[
                     styles.otpBox,
-                    otp.length > idx && styles.otpBoxFilled,
+                    { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                    otp.length > idx && [styles.otpBoxFilled, { borderColor: isDark ? '#FFFFFF' : '#0F294A', backgroundColor: themeColors.cardBg }],
                   ]}
                 >
-                  <Text style={styles.otpBoxDigit}>{otp[idx] || ''}</Text>
+                  <Text style={[styles.otpBoxDigit, { color: themeColors.textPrimary }]}>{otp[idx] || ''}</Text>
                 </View>
               ))}
             </View>
@@ -310,22 +317,22 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
             />
 
             {errorMsg && (
-              <View style={styles.errorBanner}>
+              <View style={[styles.errorBanner, { backgroundColor: isDark ? '#2A0E0E' : '#FEF2F2', borderColor: isDark ? '#EF4444' : '#FECACA' }]}>
                 <AlertCircle size={14} color="#DC2626" />
                 <Text style={styles.errorBannerText}>{errorMsg}</Text>
               </View>
             )}
 
             <TouchableOpacity
-              style={styles.autoFillButton}
+              style={[styles.autoFillButton, { backgroundColor: themeColors.cardBgSecondary }]}
               onPress={() => setOtp('482910')}
             >
-              <Text style={styles.autoFillButtonText}>
+              <Text style={[styles.autoFillButtonText, { color: themeColors.textPrimary }]}>
                 {language === 'hi' ? 'कोड 482910 स्वतः भरें' : language === 'gu' ? 'કોડ 482910 આપોઆપ ભરો' : 'Tap to Auto-Fill 482910'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.primaryBtn} onPress={handleVerifyOtp}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={handleVerifyOtp}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'ओटीपी सत्यापित करें' : language === 'gu' ? 'OTP ચકાસો' : 'Verify & Set PIN'}
               </Text>
@@ -337,10 +344,10 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
         {/* STEP 4: SET 4-DIGIT SECURITY PIN */}
         {step === 4 && (
           <ScrollView contentContainerStyle={styles.centerContent} showsVerticalScrollIndicator={false}>
-            <View style={[styles.heroLogoWrap, { backgroundColor: '#F1F5F9' }]}>
-              <Lock size={32} color="#0F294A" />
+            <View style={[styles.heroLogoWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+              <Lock size={32} color={themeColors.textPrimary} />
             </View>
-            <Text style={styles.heroTitle}>
+            <Text style={[styles.heroTitle, { color: themeColors.textPrimary }]}>
               {!isConfirmingPin
                 ? language === 'hi'
                   ? '4-अंकीय सुरक्षा पिन सेट करें'
@@ -353,7 +360,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                 ? 'તમારા PIN ની પુષ્ટિ કરો'
                 : 'Confirm Your 4-Digit PIN'}
             </Text>
-            <Text style={styles.heroSubtitle}>
+            <Text style={[styles.heroSubtitle, { color: themeColors.textSecondary }]}>
               {!isConfirmingPin
                 ? 'Use this PIN for fast sign-in and authorizing UPI transactions'
                 : 'Re-enter your 4-digit PIN to ensure accuracy'}
@@ -367,14 +374,18 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                 return (
                   <View
                     key={idx}
-                    style={[styles.pinCircle, filled && styles.pinCircleFilled]}
+                    style={[
+                      styles.pinCircle,
+                      { borderColor: themeColors.border },
+                      filled && [styles.pinCircleFilled, { backgroundColor: themeColors.textPrimary, borderColor: themeColors.textPrimary }],
+                    ]}
                   />
                 );
               })}
             </View>
 
             {errorMsg && (
-              <View style={styles.errorBanner}>
+              <View style={[styles.errorBanner, { backgroundColor: isDark ? '#2A0E0E' : '#FEF2F2', borderColor: isDark ? '#EF4444' : '#FECACA' }]}>
                 <AlertCircle size={14} color="#DC2626" />
                 <Text style={styles.errorBannerText}>{errorMsg}</Text>
               </View>
@@ -395,20 +406,20 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                       return (
                         <TouchableOpacity
                           key={cIdx}
-                          style={styles.keypadButton}
+                          style={[styles.keypadButton, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
                           onPress={handlePinDelete}
                         >
-                          <Delete size={20} color="#334155" />
+                          <Delete size={20} color={themeColors.iconNeutral} />
                         </TouchableOpacity>
                       );
                     }
                     return (
                       <TouchableOpacity
                         key={cIdx}
-                        style={styles.keypadButton}
+                        style={[styles.keypadButton, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
                         onPress={() => handlePinKeyPress(val)}
                       >
-                        <Text style={styles.keypadButtonText}>{val}</Text>
+                        <Text style={[styles.keypadButtonText, { color: themeColors.textPrimary }]}>{val}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -421,13 +432,13 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
         {/* STEP 5: BIOMETRIC REGISTRATION & TESTING */}
         {step === 5 && (
           <ScrollView contentContainerStyle={styles.centerContent} showsVerticalScrollIndicator={false}>
-            <View style={[styles.heroLogoWrap, { backgroundColor: '#ECFDF5' }]}>
-              <Fingerprint size={36} color="#059669" />
+            <View style={[styles.heroLogoWrap, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
+              <Fingerprint size={36} color={themeColors.success} />
             </View>
-            <Text style={styles.heroTitle}>
+            <Text style={[styles.heroTitle, { color: themeColors.textPrimary }]}>
               {language === 'hi' ? 'बायोमेट्रिक प्रमाणीकरण सक्षम करें' : language === 'gu' ? 'બાયોમેટ્રિક પ્રમાણીકરણ સક્ષમ કરો' : 'Enable Biometric Security'}
             </Text>
-            <Text style={styles.heroSubtitle}>
+            <Text style={[styles.heroSubtitle, { color: themeColors.textSecondary }]}>
               {language === 'hi'
                 ? 'फ़िंगरप्रिंट या फ़ेस आईडी से 1-टैप त्वरित और सुरक्षित लॉगिन एवं भुगतान'
                 : language === 'gu'
@@ -439,22 +450,23 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
             <TouchableOpacity
               style={[
                 styles.bioTestCard,
-                bioTested && styles.bioTestCardSuccess,
-                isBioTesting && styles.bioTestCardScanning,
+                { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                bioTested && (isDark ? { borderColor: '#10B981', backgroundColor: '#0C2417' } : styles.bioTestCardSuccess),
+                isBioTesting && (isDark ? { borderColor: '#52525B', backgroundColor: '#27272A' } : styles.bioTestCardScanning),
               ]}
               onPress={handleTestBiometrics}
               activeOpacity={0.8}
             >
               <Animated.View style={{ transform: [{ scale: bioPulse }] }}>
                 {bioTested ? (
-                  <CheckCircle2 size={40} color="#059669" />
+                  <CheckCircle2 size={40} color={themeColors.success} />
                 ) : isBioTesting ? (
-                  <ActivityIndicator size="large" color="#2563EB" />
+                  <ActivityIndicator size="large" color={themeColors.textPrimary} />
                 ) : (
-                  <Fingerprint size={40} color="#0F294A" />
+                  <Fingerprint size={40} color={themeColors.iconNeutral} />
                 )}
               </Animated.View>
-              <Text style={styles.bioTestCardTitle}>
+              <Text style={[styles.bioTestCardTitle, { color: themeColors.textPrimary }]}>
                 {bioTested
                   ? language === 'hi'
                     ? 'बायोमेट्रिक सेंसर सत्यापित!'
@@ -469,14 +481,14 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
                   ? 'ચકાસણી માટે ફિંગરપ્રિન્ટ સ્પર્શ કરો'
                   : 'Tap to Test Fingerprint / Face ID'}
               </Text>
-              <Text style={styles.bioTestCardSub}>
+              <Text style={[styles.bioTestCardSub, { color: themeColors.textSecondary }]}>
                 {bioTested
                   ? 'Hardware enclave authentication active'
                   : 'Device hardware sensor simulation active'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.primaryBtn} onPress={handleCompleteRegistration}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={handleCompleteRegistration}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'सहमति और पूर्ण करें' : language === 'gu' ? 'સંમતિ અને પૂર્ણ કરો' : 'Confirm & Complete'}
               </Text>
@@ -488,39 +500,39 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
         {/* STEP 6: ACCOUNT LINKED SUCCESS */}
         {step === 6 && (
           <ScrollView contentContainerStyle={styles.centerContent} showsVerticalScrollIndicator={false}>
-            <View style={[styles.heroLogoWrap, { backgroundColor: '#ECFDF5' }]}>
-              <CheckCircle2 size={42} color="#059669" />
+            <View style={[styles.heroLogoWrap, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
+              <CheckCircle2 size={42} color={themeColors.success} />
             </View>
-            <Text style={styles.heroTitle}>
+            <Text style={[styles.heroTitle, { color: themeColors.textPrimary }]}>
               {language === 'hi' ? 'खाता सफलतापूर्वक लिंक हुआ!' : language === 'gu' ? 'ખાતું સફળતાપૂર્વક લિંક થયું!' : 'Account Linked & Verified!'}
             </Text>
-            <Text style={styles.heroSubtitle}>
+            <Text style={[styles.heroSubtitle, { color: themeColors.textSecondary }]}>
               Your ABC Bank Premier Savings account is ready with 4-digit PIN and Biometrics protection.
             </Text>
 
-            <View style={styles.accountLinkedCard}>
+            <View style={[styles.accountLinkedCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.accountHeaderRow}>
                 <View>
-                  <Text style={styles.accTypeLabel}>PRIMARY SAVINGS ACCOUNT</Text>
-                  <Text style={styles.accNumber}>A/C 5010 •••• 4092</Text>
+                  <Text style={[styles.accTypeLabel, { color: themeColors.textSecondary }]}>PRIMARY SAVINGS ACCOUNT</Text>
+                  <Text style={[styles.accNumber, { color: themeColors.textPrimary }]}>A/C 5010 •••• 4092</Text>
                 </View>
-                <View style={styles.kycVerifiedBadge}>
-                  <ShieldCheck size={13} color="#059669" />
-                  <Text style={styles.kycBadgeText}>KYC TIER 2</Text>
+                <View style={[styles.kycVerifiedBadge, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
+                  <ShieldCheck size={13} color={themeColors.success} />
+                  <Text style={[styles.kycBadgeText, { color: themeColors.success }]}>KYC TIER 2</Text>
                 </View>
               </View>
-              <View style={styles.cardDivider} />
+              <View style={[styles.cardDivider, { backgroundColor: themeColors.border }]} />
               <View style={styles.secRow}>
-                <Text style={styles.secLabel}>SECURITY CREDENTIALS</Text>
-                <Text style={styles.secValue}>PIN (••••) & Biometrics Active</Text>
+                <Text style={[styles.secLabel, { color: themeColors.textSecondary }]}>SECURITY CREDENTIALS</Text>
+                <Text style={[styles.secValue, { color: themeColors.textPrimary }]}>PIN (••••) & Biometrics Active</Text>
               </View>
               <View style={styles.secRow}>
-                <Text style={styles.secLabel}>REGISTERED MOBILE</Text>
-                <Text style={styles.secValue}>+91 {phone}</Text>
+                <Text style={[styles.secLabel, { color: themeColors.textSecondary }]}>REGISTERED MOBILE</Text>
+                <Text style={[styles.secValue, { color: themeColors.textPrimary }]}>+91 {phone}</Text>
               </View>
             </View>
 
-            <TouchableOpacity style={styles.primaryBtn} onPress={handleFinishAndEnter}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: isDark ? '#27272A' : '#0F294A' }]} onPress={handleFinishAndEnter}>
               <Text style={styles.primaryBtnText}>
                 {language === 'hi' ? 'एबीसी बैंक में प्रवेश करें' : language === 'gu' ? 'એબીસી બેંકમાં પ્રવેશ કરો' : 'Enter ABC Bank'}
               </Text>

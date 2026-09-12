@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import {
   HeartHandshake,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react-native';
 
 export const MedicalAssistanceModal: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { activeJourney, closeJourney, journeyPayload, showToast, setActiveTab } =
     useCustomerStore();
 
@@ -31,90 +32,90 @@ export const MedicalAssistanceModal: React.FC = () => {
 
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>
-      <View style={styles.overlay}>
-        <View style={styles.sheet}>
+      <View style={[styles.overlay, { backgroundColor: 'rgba(0, 0, 0, 0.7)' }]}>
+        <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={styles.iconWrap}>
-                <HeartHandshake size={20} color="#0284C7" />
+              <View style={[styles.iconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <HeartHandshake size={20} color={themeColors.iconNeutral} />
               </View>
               <View>
-                <Text style={styles.title}>Medical Expense Support</Text>
-                <Text style={styles.subtitle}>Empathy First • Reimbursement & Care</Text>
+                <Text style={[styles.title, { color: themeColors.textPrimary }]}>Medical Expense Support</Text>
+                <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>Empathy First • Reimbursement & Care</Text>
               </View>
             </View>
             <TouchableOpacity onPress={closeJourney} style={styles.closeBtn}>
-              <X size={20} color={colors.textSecondary} />
+              <X size={20} color={themeColors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Empathy Banner */}
-            <View style={styles.empathyBanner}>
-              <Text style={styles.empathyTitle}>We are here to support your recovery</Text>
-              <Text style={styles.empathyText}>
+            <View style={[styles.empathyBanner, { backgroundColor: isDark ? '#1C1C1E' : '#F0F9FF', borderColor: isDark ? themeColors.border : '#BAE6FD' }]}>
+              <Text style={[styles.empathyTitle, { color: isDark ? '#FFFFFF' : '#0369A1' }]}>We are here to support your recovery</Text>
+              <Text style={[styles.empathyText, { color: isDark ? '#A1A1AA' : '#0C4A6E' }]}>
                 We noticed your recent payment of ₹{amount.toLocaleString('en-IN')} to {hospital}.
                 Our digital desk is ready to help you gather bills, file reimbursement claims, and reorganize upcoming monthly cash flow.
               </Text>
             </View>
 
             {/* Assistance Options */}
-            <Text style={styles.sectionHeader}>How would you like help?</Text>
+            <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>How would you like help?</Text>
 
             <TouchableOpacity
-              style={styles.actionCard}
+              style={[styles.actionCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
               onPress={() => {
                 showToast('Initiating Digital Insurance Claim Filing...');
                 closeJourney();
               }}
               activeOpacity={0.8}
             >
-              <View style={styles.actionIconBox}>
-                <FileText size={22} color="#0284C7" />
+              <View style={[styles.actionIconBox, { backgroundColor: isDark ? '#27272A' : '#E0F2FE' }]}>
+                <FileText size={22} color={themeColors.iconNeutral} />
               </View>
               <View style={styles.actionInfo}>
-                <Text style={styles.actionTitle}>File Insurance Reimbursement Claim</Text>
-                <Text style={styles.actionDesc}>
+                <Text style={[styles.actionTitle, { color: themeColors.textPrimary }]}>File Insurance Reimbursement Claim</Text>
+                <Text style={[styles.actionDesc, { color: themeColors.textSecondary }]}>
                   Upload hospital discharge summary and inpatient receipts for fast-track processing.
                 </Text>
               </View>
-              <ArrowRight size={18} color="#0284C7" />
+              <ArrowRight size={18} color={themeColors.primary} />
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.actionCard}
+              style={[styles.actionCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
               onPress={() => {
                 closeJourney();
                 setActiveTab('assistant');
               }}
               activeOpacity={0.8}
             >
-              <View style={[styles.actionIconBox, { backgroundColor: '#F0FDF4' }]}>
-                <Bot size={22} color={colors.success} />
+              <View style={[styles.actionIconBox, { backgroundColor: isDark ? '#27272A' : '#E0F2FE' }]}>
+                <Bot size={22} color={themeColors.iconNeutral} />
               </View>
               <View style={styles.actionInfo}>
-                <Text style={styles.actionTitle}>Plan Cash Flow with Mitra</Text>
-                <Text style={styles.actionDesc}>
+                <Text style={[styles.actionTitle, { color: themeColors.textPrimary }]}>Plan Cash Flow with Mitra</Text>
+                <Text style={[styles.actionDesc, { color: themeColors.textSecondary }]}>
                   Review remaining liquid funds and adjust upcoming bill dates to stay stress-free.
                 </Text>
               </View>
-              <ArrowRight size={18} color={colors.success} />
+              <ArrowRight size={18} color={themeColors.primary} />
             </TouchableOpacity>
 
             {/* Optional Financial Protection Review (Ethically surfaced gently) */}
-            <View style={styles.protectionCard}>
+            <View style={[styles.protectionCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.protectionHeader}>
-                <Shield size={16} color={colors.primary} />
-                <Text style={styles.protectionTitle}>Long-Term Protection Check (Optional)</Text>
+                <Shield size={16} color={themeColors.iconNeutral} />
+                <Text style={[styles.protectionTitle, { color: themeColors.textPrimary }]}>Long-Term Protection Check (Optional)</Text>
               </View>
-              <Text style={styles.protectionDesc}>
+              <Text style={[styles.protectionDesc, { color: themeColors.textSecondary }]}>
                 Once you are settled, review if higher cashless coverage would benefit your family without out-of-pocket stress.
               </Text>
             </View>
           </ScrollView>
 
-          <TouchableOpacity style={styles.doneBtn} onPress={closeJourney}>
-            <Text style={styles.doneBtnText}>Close</Text>
+          <TouchableOpacity style={[styles.doneBtn, { backgroundColor: themeColors.primary }]} onPress={closeJourney}>
+            <Text style={[styles.doneBtnText, { color: '#FFFFFF' }]}>Close</Text>
           </TouchableOpacity>
         </View>
       </View>

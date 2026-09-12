@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ScrollView } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import {
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react-native';
 
 export const KycModal: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { activeJourney, closeJourney, showToast, language } = useCustomerStore();
   const t = getTranslation(language);
   const [step, setStep] = useState<number>(1);
@@ -39,18 +40,18 @@ export const KycModal: React.FC = () => {
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>
       <View style={styles.overlay}>
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={styles.iconWrap}>
-                <ShieldCheck size={20} color={colors.primary} />
+              <View style={[styles.iconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <ShieldCheck size={20} color={themeColors.primary} />
               </View>
               <View>
-                <Text style={styles.title}>
+                <Text style={[styles.title, { color: themeColors.textPrimary }]}>
                   {language === 'hi' ? 'सरलीकृत डिजिटल केवाईसी' : language === 'gu' ? 'સરળ ડિજિટલ KYC' : 'Simplified Digital KYC'}
                 </Text>
-                <Text style={styles.subtitle}>
+                <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>
                   {language === 'hi'
                     ? `चरण ${step} / 4 • पेपरलेस और त्वरित`
                     : language === 'gu'
@@ -65,23 +66,23 @@ export const KycModal: React.FC = () => {
               delayPressIn={0}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <X size={20} color={colors.textSecondary} />
+              <X size={20} color={themeColors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           {/* Progress Bar */}
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressBar, { width: `${(step / 4) * 100}%` }]} />
+          <View style={[styles.progressTrack, { backgroundColor: themeColors.border }]}>
+            <View style={[styles.progressBar, { width: `${(step / 4) * 100}%`, backgroundColor: themeColors.primary }]} />
           </View>
 
           <ScrollView style={styles.scrollArea} showsVerticalScrollIndicator={false}>
             {/* STEP 1: DigiLocker Identity */}
             {step === 1 && (
               <View style={styles.content}>
-                <Text style={styles.stepHeading}>
+                <Text style={[styles.stepHeading, { color: themeColors.textPrimary }]}>
                   {language === 'hi' ? 'पहचान दस्तावेज सत्यापन' : language === 'gu' ? 'ઓળખ દસ્તાવેજ ચકાસણી' : 'Verify Identity Documents'}
                 </Text>
-                <Text style={styles.stepDesc}>
+                <Text style={[styles.stepDesc, { color: themeColors.textSecondary }]}>
                   {language === 'hi'
                     ? 'हम सुरक्षित डिजिलॉकर के माध्यम से सरकारी-प्रमाणित पहचान प्राप्त करते हैं।'
                     : language === 'gu'
@@ -90,32 +91,32 @@ export const KycModal: React.FC = () => {
                 </Text>
 
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>PAN Number</Text>
+                  <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>PAN Number</Text>
                   <TextInput
-                    style={styles.textInput}
+                    style={[styles.textInput, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, color: themeColors.textPrimary }]}
                     value={panInput}
                     onChangeText={setPanInput}
                   />
                 </View>
 
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Aadhaar Number (Virtual ID)</Text>
+                  <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Aadhaar Number (Virtual ID)</Text>
                   <TextInput
-                    style={styles.textInput}
+                    style={[styles.textInput, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, color: themeColors.textPrimary }]}
                     value={aadhaarInput}
                     onChangeText={setAadhaarInput}
                   />
                 </View>
 
-                <View style={styles.securityBadge}>
-                  <ShieldCheck size={14} color="#059669" />
-                  <Text style={styles.securityBadgeText}>
+                <View style={[styles.securityBadge, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}>
+                  <ShieldCheck size={14} color={themeColors.primary} />
+                  <Text style={[styles.securityBadgeText, { color: themeColors.textPrimary }]}>
                     {language === 'hi' ? '256-बिट बैंक एन्क्रिप्शन द्वारा सुरक्षित' : language === 'gu' ? '256-બીટ બેંક એન્ક્રિપ્શન દ્વારા સુરક્ષિત' : '256-bit bank-grade encryption'}
                   </Text>
                 </View>
 
                 <TouchableOpacity
-                  style={styles.primaryBtn}
+                  style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]}
                   onPress={() => setStep(2)}
                   delayPressIn={0}
                   activeOpacity={0.8}
@@ -131,10 +132,10 @@ export const KycModal: React.FC = () => {
             {/* STEP 2: Address & Live Geo-Match */}
             {step === 2 && (
               <View style={styles.content}>
-                <Text style={styles.stepHeading}>
+                <Text style={[styles.stepHeading, { color: themeColors.textPrimary }]}>
                   {language === 'hi' ? 'पता और भू-स्थान सत्यापन' : language === 'gu' ? 'સરનામું અને સ્થાન ચકાસણી' : 'Address & Geo-Match Verification'}
                 </Text>
-                <Text style={styles.stepDesc}>
+                <Text style={[styles.stepDesc, { color: themeColors.textSecondary }]}>
                   {language === 'hi'
                     ? 'यूआईडीएआई से प्राप्त आपका आधिकारिक आवासीय पता:'
                     : language === 'gu'
@@ -142,21 +143,21 @@ export const KycModal: React.FC = () => {
                     : 'Address retrieved from UIDAI matching your primary account:'}
                 </Text>
 
-                <View style={styles.addressBox}>
-                  <Text style={styles.addressTitle}>
+                <View style={[styles.addressBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                  <Text style={[styles.addressTitle, { color: themeColors.textSecondary }]}>
                     {language === 'hi' ? 'आवासीय पता' : language === 'gu' ? 'રહેણાંક સરનામું' : 'Residential Address'}
                   </Text>
-                  <Text style={styles.addressText}>
+                  <Text style={[styles.addressText, { color: themeColors.textPrimary }]}>
                     Tower 4, Flat 1204, Cyber Heights, Sector 62, Noida, Uttar Pradesh - 201309
                   </Text>
                   <View style={styles.verifiedRow}>
-                    <CheckCircle2 size={14} color={colors.success} />
-                    <Text style={styles.verifiedText}>Aadhaar & GPS Geo-Matched</Text>
+                    <CheckCircle2 size={14} color={themeColors.primary} />
+                    <Text style={[styles.verifiedText, { color: themeColors.primary }]}>Aadhaar & GPS Geo-Matched</Text>
                   </View>
                 </View>
 
                 <TouchableOpacity
-                  style={styles.primaryBtn}
+                  style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]}
                   onPress={() => setStep(3)}
                   delayPressIn={0}
                   activeOpacity={0.8}
@@ -169,69 +170,61 @@ export const KycModal: React.FC = () => {
               </View>
             )}
 
-            {/* STEP 3: Verifiable Life-Stage Signal Analysis (Key Hackathon Requirement) */}
+            {/* STEP 3: Life-Stage Signals & Verification */}
             {step === 3 && (
               <View style={styles.content}>
-                <View style={styles.aiTag}>
-                  <ShieldCheck size={14} color="#0F294A" />
-                  <Text style={styles.aiTagText}>
-                    {language === 'hi' ? 'क्रेडिट योग्यता एवं जीवन-चरण सत्यापन' : language === 'gu' ? 'ક્રેડિટ યોગ્યતા અને જીવન-તબક્કા ચકાસણી' : 'CREDITWORTHINESS & LIFE-STAGE VERIFICATION'}
-                  </Text>
-                </View>
-
-                <Text style={styles.stepHeading}>
-                  {language === 'hi' ? 'आपकी लेनदेन आदतों का पारदर्शी विश्लेषण' : language === 'gu' ? 'તમારી વ્યવહાર ટેવોનું પારદર્શક વિશ્લેષણ' : 'Transparent Transaction Signal Analysis'}
+                <Text style={[styles.stepHeading, { color: themeColors.textPrimary }]}>
+                  {language === 'hi' ? 'वित्तीय स्थिति और आय सत्यापन' : language === 'gu' ? 'નાણાકીય સ્થિતિ અને આવક ચકાસણી' : 'Financial Signals & Income Verification'}
                 </Text>
-                <Text style={styles.stepDesc}>
+                <Text style={[styles.stepDesc, { color: themeColors.textSecondary }]}>
                   {language === 'hi'
-                    ? 'हम बिना किसी कागजी कार्रवाई के आपके वास्तविक बैंकिंग पैटर्न को सत्यापित करते हैं:'
+                    ? 'अकाउंट एग्रीगेटर से प्राप्त आपके सत्यापित वित्तीय संकेत:'
                     : language === 'gu'
-                    ? 'અમે કોઈપણ કાગળ વગર તમારી વાસ્તવિક બેંકિંગ પેટર્નની ચકાસણી કરીએ છીએ:'
-                    : 'Institutional ledger analysis verifying financial stability without manual documentation:'}
+                    ? 'એકાઉન્ટ એગ્રીગેટર તરફથી ચકાસેલા નાણાકીય સંકેતો:'
+                    : 'Authoritative cash-flow signals fetched via RBI Account Aggregator framework:'}
                 </Text>
 
-                {/* Signals breakdown cards */}
-                <View style={styles.signalCard}>
+                <View style={[styles.signalCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                   <View style={styles.signalRow}>
-                    <Briefcase size={16} color="#059669" />
-                    <Text style={styles.signalTitle}>
-                      {language === 'hi' ? 'वेतन क्रेडिट निरंतरता' : language === 'gu' ? 'પગાર જમા નિયમિતતા' : 'Salary Credit Regularity'}
+                    <Briefcase size={16} color={themeColors.iconNeutral} />
+                    <Text style={[styles.signalTitle, { color: themeColors.textSecondary }]}>
+                      {language === 'hi' ? 'मासिक वेतन क्रेडिट स्थिरता' : language === 'gu' ? 'માસિક પગાર જમા સ્થિરતા' : 'Monthly Salary Credit Regularity'}
                     </Text>
                   </View>
-                  <Text style={styles.signalValue}>₹75,000 / month (Acme Corp)</Text>
-                  <Text style={styles.signalNote}>
-                    {language === 'hi' ? 'हर महीने की 1 तारीख को 100% समय पर जमा' : language === 'gu' ? 'દર મહિનાની 1 તારીખે 100% સમયસર જમા' : '100% on-time credit on 1st of every month'}
+                  <Text style={[styles.signalValue, { color: themeColors.textPrimary }]}>₹75,000 / month (100% on-time)</Text>
+                  <Text style={[styles.signalNote, { color: themeColors.primary }]}>
+                    {language === 'hi' ? 'नियोक्ता: टेक सॉल्यूशंस इंडिया प्राइवेट लिमिटेड' : language === 'gu' ? 'નોકરીદાતા: ટેક સોલ્યુશન્સ ઇન્ડિયા પ્રા. લી.' : 'Employer: Tech Solutions India Pvt Ltd'}
                   </Text>
                 </View>
 
-                <View style={styles.signalCard}>
+                <View style={[styles.signalCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                   <View style={styles.signalRow}>
-                    <Home size={16} color="#D97706" />
-                    <Text style={styles.signalTitle}>
+                    <Home size={16} color={themeColors.iconNeutral} />
+                    <Text style={[styles.signalTitle, { color: themeColors.textSecondary }]}>
                       {language === 'hi' ? 'मासिक देनदारियां और ईएमआई' : language === 'gu' ? 'માસિક જવાબદારીઓ અને EMI' : 'Monthly Obligations & EMIs'}
                     </Text>
                   </View>
-                  <Text style={styles.signalValue}>₹16,500 / month (DTI: 22%)</Text>
-                  <Text style={styles.signalNote}>
+                  <Text style={[styles.signalValue, { color: themeColors.textPrimary }]}>₹16,500 / month (DTI: 22%)</Text>
+                  <Text style={[styles.signalNote, { color: themeColors.primary }]}>
                     {language === 'hi' ? '40% सुरक्षित सीमा से काफी नीचे' : language === 'gu' ? '40% સલામત મર્યાદા કરતાં ઘણું નીચે' : 'Well within the safe 40% benchmark'}
                   </Text>
                 </View>
 
-                <View style={styles.signalCard}>
+                <View style={[styles.signalCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                   <View style={styles.signalRow}>
-                    <TrendingUp size={16} color="#2563EB" />
-                    <Text style={styles.signalTitle}>
+                    <TrendingUp size={16} color={themeColors.iconNeutral} />
+                    <Text style={[styles.signalTitle, { color: themeColors.textSecondary }]}>
                       {language === 'hi' ? 'औसत मासिक बचत व्यवहार' : language === 'gu' ? 'સરેરાશ માસિક બચત વર્તણૂક' : 'Average Monthly Savings Habit'}
                     </Text>
                   </View>
-                  <Text style={styles.signalValue}>₹24,000 / month surplus</Text>
-                  <Text style={styles.signalNote}>
+                  <Text style={[styles.signalValue, { color: themeColors.textPrimary }]}>₹24,000 / month surplus</Text>
+                  <Text style={[styles.signalNote, { color: themeColors.primary }]}>
                     {language === 'hi' ? '3.8 महीने का लिक्विड इमरजेंसी बफर उपलब्ध' : language === 'gu' ? '3.8 મહિનાનું લિક્વિડ ઇમરજન્સી બફર ઉપલબ્ધ' : '3.8 months emergency runway preserved'}
                   </Text>
                 </View>
 
                 <TouchableOpacity
-                  style={styles.primaryBtn}
+                  style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]}
                   onPress={() => setStep(4)}
                   delayPressIn={0}
                   activeOpacity={0.8}
@@ -247,13 +240,13 @@ export const KycModal: React.FC = () => {
             {/* STEP 4: Success Certificate */}
             {step === 4 && (
               <View style={styles.content}>
-                <View style={styles.successIconWrap}>
-                  <FileCheck size={48} color={colors.success} />
+                <View style={[styles.successIconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+                  <FileCheck size={48} color={themeColors.primary} />
                 </View>
-                <Text style={styles.successTitle}>
+                <Text style={[styles.successTitle, { color: themeColors.textPrimary }]}>
                   {language === 'hi' ? 'केवाईसी सत्यापन सफल!' : language === 'gu' ? 'KYC ચકાસણી સફળ!' : 'KYC Verification Complete!'}
                 </Text>
-                <Text style={styles.successDesc}>
+                <Text style={[styles.successDesc, { color: themeColors.textSecondary }]}>
                   {language === 'hi'
                     ? 'आपका खाता टियर-2 पूर्ण केवाईसी में अपग्रेड हो चुका है। सभी लेनदेन सीमाएं और व्यक्तिगत सुविधाएं सक्रिय हैं।'
                     : language === 'gu'
@@ -261,13 +254,13 @@ export const KycModal: React.FC = () => {
                     : 'Your account is now upgraded to Tier-2 Full KYC. All transaction limits and intelligent features are fully unlocked.'}
                 </Text>
 
-                <View style={styles.badgeWrap}>
-                  <CheckCircle2 size={16} color="#059669" />
-                  <Text style={styles.badgeText}>Verified Bharat Tier-2 Account</Text>
+                <View style={[styles.badgeWrap, { backgroundColor: themeColors.cardBgSecondary, borderWidth: 1, borderColor: themeColors.border }]}>
+                  <CheckCircle2 size={16} color={themeColors.primary} />
+                  <Text style={[styles.badgeText, { color: themeColors.primary }]}>Verified ABC Bank Tier-2 Account</Text>
                 </View>
 
                 <TouchableOpacity
-                  style={styles.primaryBtn}
+                  style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]}
                   onPress={handleFinish}
                   delayPressIn={0}
                   activeOpacity={0.8}

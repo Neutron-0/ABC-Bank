@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
-import { TrendingUp, X, CheckCircle2, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react-native';
+import { TrendingUp, X, CheckCircle2, ArrowRight, ShieldCheck } from 'lucide-react-native';
 
 export const SavingsInvestModal: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { activeJourney, closeJourney, balance, signals, showToast } = useCustomerStore();
   const [selectedPlan, setSelectedPlan] = useState<'smart_fd' | 'index_sip'>('smart_fd');
 
@@ -27,78 +28,86 @@ export const SavingsInvestModal: React.FC = () => {
 
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>
-      <View style={styles.overlay}>
-        <View style={styles.sheet}>
+      <View style={[styles.overlay, { backgroundColor: 'rgba(0, 0, 0, 0.7)' }]}>
+        <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={styles.iconWrap}>
-                <TrendingUp size={20} color={colors.success} />
+              <View style={[styles.iconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <TrendingUp size={20} color={themeColors.iconNeutral} />
               </View>
               <View>
-                <Text style={styles.title}>Put Surplus Cash to Work</Text>
-                <Text style={styles.subtitle}>High Yield • 100% Liquid Safety</Text>
+                <Text style={[styles.title, { color: themeColors.textPrimary }]}>Put Surplus Cash to Work</Text>
+                <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>High Yield • 100% Liquid Safety</Text>
               </View>
             </View>
             <TouchableOpacity onPress={closeJourney} style={styles.closeBtn}>
-              <X size={20} color={colors.textSecondary} />
+              <X size={20} color={themeColors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Surplus Explanation */}
-            <View style={styles.surplusBox}>
-              <Text style={styles.surplusLabel}>Detected Surplus Balance</Text>
-              <Text style={styles.surplusAmount}>₹{surplus.toLocaleString('en-IN')}</Text>
-              <Text style={styles.surplusDesc}>
+            <View style={[styles.surplusBox, { backgroundColor: isDark ? '#0C2417' : '#F0FDF4', borderColor: isDark ? '#10B981' : '#BBF7D0' }]}>
+              <Text style={[styles.surplusLabel, { color: isDark ? '#34D399' : '#166534' }]}>Detected Surplus Balance</Text>
+              <Text style={[styles.surplusAmount, { color: isDark ? '#10B981' : '#15803D' }]}>₹{surplus.toLocaleString('en-IN')}</Text>
+              <Text style={[styles.surplusDesc, { color: isDark ? '#A7F3D0' : '#166534' }]}>
                 Available balance is ₹{balance.available.toLocaleString('en-IN')} with all monthly commitments covered.
               </Text>
             </View>
 
-            <Text style={styles.sectionHeader}>Select Allocation Preference:</Text>
+            <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>Select Allocation Preference:</Text>
 
             <TouchableOpacity
-              style={[styles.planCard, selectedPlan === 'smart_fd' && styles.activePlanCard]}
+              style={[
+                styles.planCard,
+                { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                selectedPlan === 'smart_fd' && [styles.activePlanCard, { borderColor: themeColors.primary, backgroundColor: isDark ? '#172554' : '#FFFFFF' }],
+              ]}
               onPress={() => setSelectedPlan('smart_fd')}
               activeOpacity={0.8}
             >
               <View style={styles.planHeader}>
-                <Text style={styles.planTitle}>Smart High-Yield Deposit</Text>
-                <View style={styles.returnBadge}>
-                  <Text style={styles.returnText}>7.85% p.a.</Text>
+                <Text style={[styles.planTitle, { color: themeColors.textPrimary }]}>Smart High-Yield Deposit</Text>
+                <View style={[styles.returnBadge, { backgroundColor: isDark ? '#261C05' : '#FEF3C7', borderWidth: 1, borderColor: isDark ? '#B45309' : '#FDE68A' }]}>
+                  <Text style={[styles.returnText, { color: isDark ? '#FBBF24' : '#92400E' }]}>7.85% p.a.</Text>
                 </View>
               </View>
-              <Text style={styles.planDesc}>
+              <Text style={[styles.planDesc, { color: themeColors.textSecondary }]}>
                 Instant auto-sweep back to your UPI account whenever balance drops. Zero lock-in.
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.planCard, selectedPlan === 'index_sip' && styles.activePlanCard]}
+              style={[
+                styles.planCard,
+                { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+                selectedPlan === 'index_sip' && [styles.activePlanCard, { borderColor: themeColors.primary, backgroundColor: isDark ? '#172554' : '#FFFFFF' }],
+              ]}
               onPress={() => setSelectedPlan('index_sip')}
               activeOpacity={0.8}
             >
               <View style={styles.planHeader}>
-                <Text style={styles.planTitle}>Disciplined Index SIP</Text>
-                <View style={[styles.returnBadge, { backgroundColor: '#DCFCE7' }]}>
-                  <Text style={[styles.returnText, { color: '#15803D' }]}>₹2,500/mo</Text>
+                <Text style={[styles.planTitle, { color: themeColors.textPrimary }]}>Disciplined Index SIP</Text>
+                <View style={[styles.returnBadge, { backgroundColor: isDark ? '#27272A' : '#FEF3C7', borderWidth: 1, borderColor: isDark ? themeColors.border : '#FDE68A' }]}>
+                  <Text style={[styles.returnText, { color: themeColors.textPrimary }]}>₹2,500/mo</Text>
                 </View>
               </View>
-              <Text style={styles.planDesc}>
+              <Text style={[styles.planDesc, { color: themeColors.textSecondary }]}>
                 Automated monthly wealth building into Bharat 50 index fund suited for moderate risk.
               </Text>
             </TouchableOpacity>
 
-            <View style={styles.safetyCard}>
-              <ShieldCheck size={16} color={colors.success} />
-              <Text style={styles.safetyText}>
+            <View style={[styles.safetyCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+              <ShieldCheck size={16} color={themeColors.iconNeutral} />
+              <Text style={[styles.safetyText, { color: themeColors.textSecondary }]}>
                 DICGC Insured up to ₹5,00,000. Capital is protected.
               </Text>
             </View>
           </ScrollView>
 
-          <TouchableOpacity style={styles.primaryBtn} onPress={handleDeposit}>
+          <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]} onPress={handleDeposit}>
             <Text style={styles.primaryBtnText}>Confirm Allocation</Text>
-            <ArrowRight size={16} color={colors.textWhite} />
+            <ArrowRight size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>

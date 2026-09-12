@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import {
   ShieldAlert,
@@ -13,6 +13,7 @@ import {
 } from 'lucide-react-native';
 
 export const FraudAlertModal: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { activeJourney, closeJourney, showToast } = useCustomerStore();
   const [resolution, setResolution] = useState<'prompt' | 'locked' | 'verified'>('prompt');
 
@@ -37,56 +38,60 @@ export const FraudAlertModal: React.FC = () => {
 
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>
-      <View style={styles.overlay}>
-        <View style={styles.sheet}>
+      <View style={[styles.overlay, { backgroundColor: 'rgba(0, 0, 0, 0.7)' }]}>
+        <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={styles.iconWrap}>
-                <ShieldAlert size={20} color={colors.danger} />
+              <View style={[styles.iconWrap, { backgroundColor: isDark ? '#2A0E0E' : '#FEE2E2' }]}>
+                <ShieldAlert size={20} color={themeColors.danger} />
               </View>
               <View>
-                <Text style={styles.title}>Fraud Protection Intervention</Text>
-                <Text style={styles.subtitle}>Behavioral Anomaly Detected</Text>
+                <Text style={[styles.title, { color: themeColors.textPrimary }]}>Fraud Protection Intervention</Text>
+                <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>Behavioral Anomaly Detected</Text>
               </View>
             </View>
             <TouchableOpacity onPress={closeJourney} style={styles.closeBtn}>
-              <X size={20} color={colors.textSecondary} />
+              <X size={20} color={themeColors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {resolution === 'prompt' && (
               <View>
-                <View style={styles.warningBox}>
-                  <Text style={styles.amount}>₹31,800</Text>
-                  <Text style={styles.merchant}>GlobalTech Gaming Digital Ltd</Text>
-                  <Text style={styles.timeTag}>Today at 02:14 AM • Virtual POS</Text>
+                <View style={[styles.warningBox, { backgroundColor: isDark ? '#2A0E0E' : '#FEF2F2', borderColor: isDark ? '#EF4444' : '#FCA5A5', borderWidth: 1 }]}>
+                  <Text style={[styles.amount, { color: themeColors.danger }]}>₹31,800</Text>
+                  <Text style={[styles.merchant, { color: themeColors.textPrimary }]}>GlobalTech Gaming Digital Ltd</Text>
+                  <Text style={[styles.timeTag, { color: themeColors.textSecondary }]}>Today at 02:14 AM • Virtual POS</Text>
                 </View>
 
-                <View style={styles.anomalyReasonBox}>
-                  <Text style={styles.anomalyHeading}>Why this triggered an alert:</Text>
-                  <Text style={styles.anomalyBullet}>
+                <View style={[styles.anomalyReasonBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}>
+                  <Text style={[styles.anomalyHeading, { color: themeColors.textPrimary }]}>Why this triggered an alert:</Text>
+                  <Text style={[styles.anomalyBullet, { color: themeColors.textSecondary }]}>
                     • You have never made purchases at this international merchant category.
                   </Text>
-                  <Text style={styles.anomalyBullet}>
+                  <Text style={[styles.anomalyBullet, { color: themeColors.textSecondary }]}>
                     • Unusual transaction time window (02:14 AM).
                   </Text>
-                  <Text style={styles.anomalyBullet}>
+                  <Text style={[styles.anomalyBullet, { color: themeColors.textSecondary }]}>
                     • Geolocation IP differs from your regular Delhi-NCR phone network.
                   </Text>
                 </View>
 
-                <Text style={styles.question}>Was this payment authorized by you?</Text>
+                <Text style={[styles.question, { color: themeColors.textPrimary }]}>Was this payment authorized by you?</Text>
 
                 <View style={styles.buttonStack}>
-                  <TouchableOpacity style={styles.freezeBtn} onPress={handleFreeze} activeOpacity={0.85}>
-                    <Lock size={18} color={colors.textWhite} />
+                  <TouchableOpacity style={[styles.freezeBtn, { backgroundColor: themeColors.danger }]} onPress={handleFreeze} activeOpacity={0.85}>
+                    <Lock size={18} color="#FFFFFF" />
                     <Text style={styles.freezeBtnText}>No, Freeze Card & Secure Account</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.verifyBtn} onPress={handleVerifyMe} activeOpacity={0.8}>
-                    <CheckCircle2 size={18} color={colors.textSecondary} />
-                    <Text style={styles.verifyBtnText}>Yes, this was me</Text>
+                  <TouchableOpacity
+                    style={[styles.verifyBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}
+                    onPress={handleVerifyMe}
+                    activeOpacity={0.8}
+                  >
+                    <CheckCircle2 size={18} color={themeColors.iconNeutral} />
+                    <Text style={[styles.verifyBtnText, { color: themeColors.textPrimary }]}>Yes, this was me</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -94,22 +99,22 @@ export const FraudAlertModal: React.FC = () => {
 
             {resolution === 'locked' && (
               <View style={styles.resultBox}>
-                <View style={[styles.resultIcon, { backgroundColor: colors.dangerLight }]}>
-                  <Lock size={36} color={colors.danger} />
+                <View style={[styles.resultIcon, { backgroundColor: isDark ? '#2A0E0E' : '#FEE2E2' }]}>
+                  <Lock size={36} color={themeColors.danger} />
                 </View>
-                <Text style={styles.resultTitle}>Card Frozen & Account Secured</Text>
-                <Text style={styles.resultDesc}>
+                <Text style={[styles.resultTitle, { color: themeColors.textPrimary }]}>Card Frozen & Account Secured</Text>
+                <Text style={[styles.resultDesc, { color: themeColors.textSecondary }]}>
                   Your primary debit card ending in 4102 has been temporarily locked. No further transactions can occur without biometric unlock.
                 </Text>
 
-                <View style={styles.supportBox}>
-                  <PhoneCall size={16} color={colors.primary} />
-                  <Text style={styles.supportText}>
+                <View style={[styles.supportBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}>
+                  <PhoneCall size={16} color={themeColors.primary} />
+                  <Text style={[styles.supportText, { color: themeColors.textSecondary }]}>
                     Fraud desk ticket #FR-2026-904 opened. Our 24/7 security officer will reach out.
                   </Text>
                 </View>
 
-                <TouchableOpacity style={styles.doneBtn} onPress={closeJourney}>
+                <TouchableOpacity style={[styles.doneBtn, { backgroundColor: themeColors.primary }]} onPress={closeJourney}>
                   <Text style={styles.doneBtnText}>Return to App</Text>
                 </TouchableOpacity>
               </View>
@@ -117,14 +122,14 @@ export const FraudAlertModal: React.FC = () => {
 
             {resolution === 'verified' && (
               <View style={styles.resultBox}>
-                <View style={[styles.resultIcon, { backgroundColor: colors.successLight }]}>
-                  <CheckCircle2 size={36} color={colors.success} />
+                <View style={[styles.resultIcon, { backgroundColor: isDark ? '#0C2417' : '#ECFDF5' }]}>
+                  <CheckCircle2 size={36} color={themeColors.success} />
                 </View>
-                <Text style={styles.resultTitle}>Transaction Verified</Text>
-                <Text style={styles.resultDesc}>
+                <Text style={[styles.resultTitle, { color: themeColors.textPrimary }]}>Transaction Verified</Text>
+                <Text style={[styles.resultDesc, { color: themeColors.textSecondary }]}>
                   Thank you. We have updated your behavioral risk profile to reflect this approved merchant.
                 </Text>
-                <TouchableOpacity style={styles.doneBtn} onPress={closeJourney}>
+                <TouchableOpacity style={[styles.doneBtn, { backgroundColor: themeColors.primary }]} onPress={closeJourney}>
                   <Text style={styles.doneBtnText}>Return to Home</Text>
                 </TouchableOpacity>
               </View>

@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { Cpu, X, Database, ArrowDown, ShieldCheck, Layers, Bot } from 'lucide-react-native';
 
 export const ArchitectureFlowModal: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { activeJourney, closeJourney } = useCustomerStore();
 
   if (activeJourney !== 'architecture_flow') return null;
@@ -44,52 +45,52 @@ export const ArchitectureFlowModal: React.FC = () => {
 
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>
-      <View style={styles.overlay}>
-        <View style={styles.sheet}>
+      <View style={[styles.overlay, { backgroundColor: 'rgba(0, 0, 0, 0.7)' }]}>
+        <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={styles.iconWrap}>
-                <Cpu size={20} color={colors.primary} />
+              <View style={[styles.iconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <Cpu size={20} color={themeColors.iconNeutral} />
               </View>
               <View>
-                <Text style={styles.title}>System Architecture</Text>
-                <Text style={styles.subtitle}>End-to-End Decision Pipeline for Bharat</Text>
+                <Text style={[styles.title, { color: themeColors.textPrimary }]}>System Architecture</Text>
+                <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>End-to-End Decision Pipeline for ABC Bank</Text>
               </View>
             </View>
             <TouchableOpacity onPress={closeJourney} style={styles.closeBtn}>
-              <X size={20} color={colors.textSecondary} />
+              <X size={20} color={themeColors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {pipelineSteps.map((step, idx) => (
               <View key={idx} style={styles.pipelineWrap}>
-                <View style={styles.stepCard}>
+                <View style={[styles.stepCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
                   <View style={styles.stepHeader}>
-                    <Text style={styles.stepTitle}>{step.step}</Text>
-                    <View style={styles.techBadge}>
-                      <Text style={styles.techText}>{step.tech}</Text>
+                    <Text style={[styles.stepTitle, { color: themeColors.textPrimary }]}>{step.step}</Text>
+                    <View style={[styles.techBadge, { backgroundColor: themeColors.cardBgSecondary, borderWidth: 1, borderColor: themeColors.border }]}>
+                      <Text style={[styles.techText, { color: themeColors.textPrimary }]}>{step.tech}</Text>
                     </View>
                   </View>
-                  <Text style={styles.stepDesc}>{step.desc}</Text>
+                  <Text style={[styles.stepDesc, { color: themeColors.textSecondary }]}>{step.desc}</Text>
                 </View>
                 {idx < pipelineSteps.length - 1 && (
                   <View style={styles.arrowWrap}>
-                    <ArrowDown size={18} color={colors.primary} />
+                    <ArrowDown size={18} color={themeColors.iconNeutral} />
                   </View>
                 )}
               </View>
             ))}
 
-            <View style={styles.ethicalPledge}>
-              <ShieldCheck size={18} color={colors.success} />
-              <Text style={styles.pledgeText}>
+            <View style={[styles.ethicalPledge, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}>
+              <ShieldCheck size={18} color={themeColors.success} />
+              <Text style={[styles.pledgeText, { color: themeColors.textSecondary }]}>
                 Engine Guardrail: Ethical AI policy guarantees that financial vulnerability is met with assistance, never predatory lending.
               </Text>
             </View>
           </ScrollView>
 
-          <TouchableOpacity style={styles.doneBtn} onPress={closeJourney}>
+          <TouchableOpacity style={[styles.doneBtn, { backgroundColor: themeColors.primary }]} onPress={closeJourney}>
             <Text style={styles.doneBtnText}>Close Visualizer</Text>
           </TouchableOpacity>
         </View>

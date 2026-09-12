@@ -67,16 +67,16 @@ export const CreditScoreModal: React.FC = () => {
         en: 'Excellent',
         hi: 'उत्कृष्ट (शानदार)',
         gu: 'ઉત્કૃષ્ટ (ખૂબ સારું)',
-        color: '#10B981',
-        bgColor: isDark ? '#064E3B' : '#DCFCE7',
+        color: colors.brandSecondary,
+        bgColor: colors.brandSecondarySubtle,
       };
     }
     return {
       en: 'Good',
       hi: 'अच्छा',
       gu: 'સારું',
-      color: '#3B82F6',
-      bgColor: isDark ? '#1E3A8A' : '#DBEAFE',
+      color: colors.primary,
+      bgColor: colors.cardBgSecondary,
     };
   };
 
@@ -94,8 +94,8 @@ export const CreditScoreModal: React.FC = () => {
           {/* Header */}
           <View style={[styles.header, { borderBottomColor: colors.border }]}>
             <View style={styles.headerLeft}>
-              <View style={[styles.iconWrap, { backgroundColor: isDark ? '#1E3A8A' : colors.pastelBlue }]}>
-                <TrendingUp size={20} color={isDark ? colors.accent : colors.primaryRoyal} />
+              <View style={[styles.iconWrap, { backgroundColor: colors.cardBgSecondary }]}>
+                <TrendingUp size={20} color={colors.primary} />
               </View>
               <View>
                 <Text style={[styles.title, { color: colors.textPrimary }]}>
@@ -126,7 +126,7 @@ export const CreditScoreModal: React.FC = () => {
 
           <ScrollView style={styles.scrollArea} showsVerticalScrollIndicator={false}>
             {/* Score Showcase Gauge */}
-            <View style={[styles.scoreHeroCard, { backgroundColor: isDark ? colors.cardBgSecondary : '#F8FAFC', borderColor: colors.border }]}>
+            <View style={[styles.scoreHeroCard, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
               <View style={styles.scoreHeaderRow}>
                 <View style={[styles.ratingBadge, { backgroundColor: rating.bgColor }]}>
                   <CheckCircle2 size={13} color={rating.color} />
@@ -144,7 +144,7 @@ export const CreditScoreModal: React.FC = () => {
                   <Text style={[styles.refreshBtnText, { color: colors.textSecondary }]}>
                     {isRefreshing
                       ? (language === 'hi' ? 'रिफ्रेश...' : language === 'gu' ? 'રિફ્રેશ...' : 'Refreshing...')
-                      : (language === 'hi' ? 'नया स्कोर' : language === 'gu' ? 'નવો સ્કોર' : 'Refresh Score')}
+                      : (language === 'hi' ? 'नया स्कोर' : language === 'gu' ? 'નવો સ્कोर' : 'Refresh Score')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -152,33 +152,19 @@ export const CreditScoreModal: React.FC = () => {
               {/* Bespoke Radial Arc Gauge */}
               <View style={styles.gaugeContainer}>
                 <Svg width={MODAL_WIDTH} height={145}>
-                  {/* Arc Segments: Poor (red), Fair (amber), Good (blue), Excellent (emerald) */}
+                  {/* Background Track */}
                   <Path
-                    d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, -10, 40)}
+                    d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, -10, 190)}
                     fill="none"
-                    stroke="#EF4444"
+                    stroke={colors.border}
                     strokeWidth={9}
                     strokeLinecap="round"
-                    opacity={0.8}
                   />
+                  {/* Filled Arc */}
                   <Path
-                    d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, 44, 95)}
+                    d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, -10, indicatorAngle)}
                     fill="none"
-                    stroke="#F59E0B"
-                    strokeWidth={9}
-                    opacity={0.85}
-                  />
-                  <Path
-                    d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, 99, 145)}
-                    fill="none"
-                    stroke="#3B82F6"
-                    strokeWidth={9}
-                    opacity={0.85}
-                  />
-                  <Path
-                    d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, 149, 190)}
-                    fill="none"
-                    stroke="#10B981"
+                    stroke={colors.primary}
                     strokeWidth={9}
                     strokeLinecap="round"
                   />
@@ -188,14 +174,14 @@ export const CreditScoreModal: React.FC = () => {
                     cx={indicatorPos.x}
                     cy={indicatorPos.y}
                     r={9}
-                    fill={isDark ? '#38BDF8' : '#002970'}
+                    fill={colors.brandSecondary}
                     opacity={0.25}
                   />
                   <Circle
                     cx={indicatorPos.x}
                     cy={indicatorPos.y}
                     r={6}
-                    fill={rating.color}
+                    fill={colors.brandSecondary}
                     stroke="#FFFFFF"
                     strokeWidth={2}
                   />
@@ -204,39 +190,44 @@ export const CreditScoreModal: React.FC = () => {
                   <SvgText x={GAUGE_CX - GAUGE_R - 4} y={GAUGE_CY + 18} fontSize="9" fontWeight="600" fill={colors.textMuted} textAnchor="middle">
                     300
                   </SvgText>
-                  <SvgText x={GAUGE_CX} y={GAUGE_CY - GAUGE_R - 6} fontSize="9" fontWeight="600" fill={colors.textMuted} textAnchor="middle">
+                  <SvgText x={GAUGE_CX} y={GAUGE_CY - GAUGE_R - 12} fontSize="9" fontWeight="600" fill={colors.textMuted} textAnchor="middle">
                     650
                   </SvgText>
                   <SvgText x={GAUGE_CX + GAUGE_R + 4} y={GAUGE_CY + 18} fontSize="9" fontWeight="600" fill={colors.textMuted} textAnchor="middle">
                     900
                   </SvgText>
+
+                  {/* Centered Large Numeric Score */}
+                  <SvgText
+                    x={GAUGE_CX}
+                    y={GAUGE_CY + 4}
+                    fontSize="38"
+                    fontWeight="800"
+                    fill={colors.textPrimary}
+                    textAnchor="middle"
+                    letterSpacing="-1.5"
+                  >
+                    {score}
+                  </SvgText>
+                  <SvgText
+                    x={GAUGE_CX}
+                    y={GAUGE_CY + 22}
+                    fontSize="11"
+                    fontWeight="600"
+                    fill={colors.textSecondary}
+                    textAnchor="middle"
+                    letterSpacing="0.6"
+                  >
+                    TRANSUNION CIBIL
+                  </SvgText>
                 </Svg>
-
-                {/* Score Number Centered inside Arc */}
-                <View style={styles.gaugeInnerContent}>
-                  <View style={styles.scoreNumberWrap}>
-                    <Text style={[styles.scoreNumber, { color: colors.textPrimary }]}>{score}</Text>
-                    <Text style={[styles.scoreMax, { color: colors.textMuted }]}>/ 900</Text>
-                  </View>
-                  <Text style={[styles.bureauBadgeText, { color: isDark ? colors.accent : colors.primaryRoyal }]}>
-                    CIBIL TransUnion Verified
-                  </Text>
-                </View>
               </View>
-
-              <Text style={[styles.scoreSubtext, { color: colors.textSecondary }]}>
-                {language === 'hi'
-                  ? 'अंतिम रिफ्रेश: 2 दिन पहले • अगला निःशुल्क रिफ्रेश 28 दिनों में'
-                  : language === 'gu'
-                  ? 'છેલ્લું રિફ્રેશ: 2 દિવસ પહેલા • આગામી મફત રિફ્રેશ 28 દિવસમાં'
-                  : 'Top 8% credit profile nationwide • Instant pre-approved loan eligible'}
-              </Text>
             </View>
 
-            {/* 4 Pillars Grid */}
+            {/* 4 Pillars Impact Section */}
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
               {language === 'hi'
-                ? 'स्कोर के 4 मुख्य आधार'
+                ? 'स्कोर को प्रभावित करने वाले 4 घटक'
                 : language === 'gu'
                 ? 'સ્કોરના 4 મુખ્ય આધાર'
                 : 'Key Pillars Impacting Your Score'}
@@ -246,8 +237,8 @@ export const CreditScoreModal: React.FC = () => {
               {/* Factor 1: On-time payments */}
               <View style={[styles.factorCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
                 <View style={styles.factorLeft}>
-                  <View style={[styles.factorIconWrap, { backgroundColor: isDark ? '#064E3B' : '#DCFCE7' }]}>
-                    <CheckCircle2 size={16} color="#16A34A" />
+                  <View style={[styles.factorIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
+                    <CheckCircle2 size={16} color={colors.primary} />
                   </View>
                   <View>
                     <Text style={[styles.factorTitle, { color: colors.textPrimary }]}>
@@ -267,8 +258,8 @@ export const CreditScoreModal: React.FC = () => {
               {/* Factor 2: Credit Utilization */}
               <View style={[styles.factorCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
                 <View style={styles.factorLeft}>
-                  <View style={[styles.factorIconWrap, { backgroundColor: isDark ? '#1E3A8A' : '#DBEAFE' }]}>
-                    <CreditCard size={16} color="#2563EB" />
+                  <View style={[styles.factorIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
+                    <CreditCard size={16} color={colors.iconNeutral} />
                   </View>
                   <View>
                     <Text style={[styles.factorTitle, { color: colors.textPrimary }]}>
@@ -288,8 +279,8 @@ export const CreditScoreModal: React.FC = () => {
               {/* Factor 3: Credit Age */}
               <View style={[styles.factorCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
                 <View style={styles.factorLeft}>
-                  <View style={[styles.factorIconWrap, { backgroundColor: isDark ? '#451A03' : '#FEF3C7' }]}>
-                    <Clock size={16} color="#D97706" />
+                  <View style={[styles.factorIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
+                    <Clock size={16} color={colors.iconNeutral} />
                   </View>
                   <View>
                     <Text style={[styles.factorTitle, { color: colors.textPrimary }]}>
@@ -309,8 +300,8 @@ export const CreditScoreModal: React.FC = () => {
               {/* Factor 4: Inquiries */}
               <View style={[styles.factorCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
                 <View style={styles.factorLeft}>
-                  <View style={[styles.factorIconWrap, { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' }]}>
-                    <Building size={16} color={colors.textSecondary} />
+                  <View style={[styles.factorIconWrap, { backgroundColor: colors.cardBgSecondary }]}>
+                    <Building size={16} color={colors.iconNeutral} />
                   </View>
                   <View>
                     <Text style={[styles.factorTitle, { color: colors.textPrimary }]}>
@@ -329,9 +320,9 @@ export const CreditScoreModal: React.FC = () => {
             </View>
 
             {/* Strategic Advisory */}
-            <View style={[styles.adviceBox, { backgroundColor: isDark ? colors.cardBgSecondary : '#F8FAFC', borderColor: colors.border }]}>
+            <View style={[styles.adviceBox, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
               <View style={styles.adviceHeader}>
-                <Info size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
+                <Info size={16} color={colors.primary} />
                 <Text style={[styles.adviceTitle, { color: colors.textPrimary }]}>Institutional Bureau Insights</Text>
               </View>
               <Text style={[styles.adviceBody, { color: colors.textSecondary }]}>
@@ -340,7 +331,7 @@ export const CreditScoreModal: React.FC = () => {
             </View>
 
             <TouchableOpacity
-              style={[styles.doneBtn, { backgroundColor: isDark ? colors.primaryRoyal : '#002970' }]}
+              style={[styles.doneBtn, { backgroundColor: colors.primary }]}
               onPress={closeJourney}
               activeOpacity={0.85}
             >

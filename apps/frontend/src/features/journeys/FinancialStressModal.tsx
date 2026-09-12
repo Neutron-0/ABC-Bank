@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import {
   LifeBuoy,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react-native';
 
 export const FinancialStressModal: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { activeJourney, closeJourney, financialHealth, balance, setActiveTab, showToast } =
     useCustomerStore();
 
@@ -39,64 +40,64 @@ export const FinancialStressModal: React.FC = () => {
 
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>
-      <View style={styles.overlay}>
-        <View style={styles.sheet}>
+      <View style={[styles.overlay, { backgroundColor: 'rgba(0, 0, 0, 0.7)' }]}>
+        <View style={[styles.sheet, { backgroundColor: themeColors.cardBg }]}>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={styles.iconWrap}>
-                <LifeBuoy size={20} color="#D97706" />
+              <View style={[styles.iconWrap, { backgroundColor: themeColors.cardBgSecondary }]}>
+                <LifeBuoy size={20} color={themeColors.iconNeutral} />
               </View>
               <View>
-                <Text style={styles.title}>Cash-Flow Guidance Desk</Text>
-                <Text style={styles.subtitle}>Empathetic & Stress-Free Budget Planning</Text>
+                <Text style={[styles.title, { color: themeColors.textPrimary }]}>Cash-Flow Guidance Desk</Text>
+                <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>Empathetic & Stress-Free Budget Planning</Text>
               </View>
             </View>
             <TouchableOpacity onPress={closeJourney} style={styles.closeBtn}>
-              <X size={20} color={colors.textSecondary} />
+              <X size={20} color={themeColors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Empathetic Advisory Header */}
-            <View style={styles.advisoryBanner}>
-              <Text style={styles.advisoryTitle}>Your monthly cash flow looks tighter than usual</Text>
-              <Text style={styles.advisoryText}>
+            <View style={[styles.advisoryBanner, { backgroundColor: isDark ? '#261C05' : '#FFFBEB', borderColor: isDark ? '#B45309' : '#FDE68A' }]}>
+              <Text style={[styles.advisoryTitle, { color: isDark ? '#FBBF24' : '#92400E' }]}>Your monthly cash flow looks tighter than usual</Text>
+              <Text style={[styles.advisoryText, { color: isDark ? '#F59E0B' : '#78350F' }]}>
                 We observed unusual emergency repair debits combined with upcoming EMI obligations.
                 Let’s review upcoming dates and pause discretionary subscriptions together.
               </Text>
             </View>
 
             {/* Upcoming Commitments Breakdown */}
-            <Text style={styles.sectionHeader}>Upcoming Fixed Commitments:</Text>
-            <View style={styles.commitmentsCard}>
+            <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>Upcoming Fixed Commitments:</Text>
+            <View style={[styles.commitmentsCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.commitmentRow}>
                 <View>
-                  <Text style={styles.commitmentTitle}>HDFC Home Loan EMI</Text>
-                  <Text style={styles.commitmentDate}>Due Sep 16 • Mandatory</Text>
+                  <Text style={[styles.commitmentTitle, { color: themeColors.textPrimary }]}>HDFC Home Loan EMI</Text>
+                  <Text style={[styles.commitmentDate, { color: themeColors.textSecondary }]}>Due Sep 16 • Mandatory</Text>
                 </View>
-                <Text style={styles.commitmentAmt}>₹16,500</Text>
+                <Text style={[styles.commitmentAmt, { color: themeColors.textPrimary }]}>₹16,500</Text>
               </View>
 
               <View style={styles.commitmentRow}>
                 <View>
-                  <Text style={styles.commitmentTitle}>Bajaj Auto Loan EMI</Text>
-                  <Text style={styles.commitmentDate}>Due Sep 20 • Mandatory</Text>
+                  <Text style={[styles.commitmentTitle, { color: themeColors.textPrimary }]}>Bajaj Auto Loan EMI</Text>
+                  <Text style={[styles.commitmentDate, { color: themeColors.textSecondary }]}>Due Sep 20 • Mandatory</Text>
                 </View>
-                <Text style={styles.commitmentAmt}>₹14,800</Text>
+                <Text style={[styles.commitmentAmt, { color: themeColors.textPrimary }]}>₹14,800</Text>
               </View>
 
               <View style={styles.commitmentRow}>
                 <View>
-                  <Text style={styles.commitmentTitle}>Electricity Utility (Tata Power)</Text>
-                  <Text style={styles.commitmentDate}>Due Sep 24 • Utility</Text>
+                  <Text style={[styles.commitmentTitle, { color: themeColors.textPrimary }]}>Electricity Utility (Tata Power)</Text>
+                  <Text style={[styles.commitmentDate, { color: themeColors.textSecondary }]}>Due Sep 24 • Utility</Text>
                 </View>
-                <Text style={styles.commitmentAmt}>₹1,450</Text>
+                <Text style={[styles.commitmentAmt, { color: themeColors.textPrimary }]}>₹1,450</Text>
               </View>
             </View>
 
             {/* 1-Tap Subscription Trimming */}
-            <Text style={styles.sectionHeader}>1-Tap Subscription Pause (Free Up Cash):</Text>
-            <View style={styles.subsList}>
+            <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>1-Tap Subscription Pause (Free Up Cash):</Text>
+            <View style={[styles.subsList, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               {[
                 { name: 'Netflix Premium 4K', cost: 649 },
                 { name: 'Spotify Duo Family', cost: 199 },
@@ -106,14 +107,18 @@ export const FinancialStressModal: React.FC = () => {
                 return (
                   <View key={sub.name} style={styles.subItem}>
                     <View>
-                      <Text style={styles.subTitle}>{sub.name}</Text>
-                      <Text style={styles.subCost}>₹{sub.cost} / month</Text>
+                      <Text style={[styles.subTitle, { color: themeColors.textPrimary }]}>{sub.name}</Text>
+                      <Text style={[styles.subCost, { color: themeColors.textSecondary }]}>₹{sub.cost} / month</Text>
                     </View>
                     <TouchableOpacity
-                      style={[styles.pauseBtn, isPaused && styles.pausedBtn]}
+                      style={[
+                        styles.pauseBtn,
+                        { backgroundColor: themeColors.cardBg, borderColor: themeColors.border },
+                        isPaused && { backgroundColor: themeColors.primary, borderColor: themeColors.primary },
+                      ]}
                       onPress={() => togglePauseSub(sub.name)}
                     >
-                      <Text style={[styles.pauseBtnText, isPaused && styles.pausedBtnText]}>
+                      <Text style={[styles.pauseBtnText, { color: isPaused ? '#FFFFFF' : themeColors.textPrimary }]}>
                         {isPaused ? 'Paused' : 'Pause for 30 Days'}
                       </Text>
                     </TouchableOpacity>
@@ -124,30 +129,30 @@ export const FinancialStressModal: React.FC = () => {
 
             {/* Talk to Mitra Guidance */}
             <TouchableOpacity
-              style={styles.mitraCard}
+              style={[styles.mitraCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
               onPress={() => {
                 closeJourney();
                 setActiveTab('assistant');
               }}
               activeOpacity={0.8}
             >
-              <Bot size={22} color={colors.primary} />
+              <Bot size={22} color={themeColors.textPrimary} />
               <View style={styles.mitraInfo}>
-                <Text style={styles.mitraTitle}>Create a Personalized Cash Plan with Mitra</Text>
-                <Text style={styles.mitraDesc}>Ask Mitra how to safely bridge upcoming bill dates.</Text>
+                <Text style={[styles.mitraTitle, { color: themeColors.textPrimary }]}>Create a Personalized Cash Plan with Mitra</Text>
+                <Text style={[styles.mitraDesc, { color: themeColors.textSecondary }]}>Ask Mitra how to safely bridge upcoming bill dates.</Text>
               </View>
-              <ArrowRight size={16} color={colors.primary} />
+              <ArrowRight size={16} color={themeColors.textPrimary} />
             </TouchableOpacity>
 
-            <View style={styles.ethicalNote}>
-              <ShieldCheck size={16} color={colors.success} />
-              <Text style={styles.ethicalText}>
+            <View style={[styles.ethicalNote, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}>
+              <ShieldCheck size={16} color={themeColors.iconNeutral} />
+              <Text style={[styles.ethicalText, { color: themeColors.textSecondary }]}>
                 Guaranteed: No loans or credit cards are being promoted to you during this period.
               </Text>
             </View>
           </ScrollView>
 
-          <TouchableOpacity style={styles.doneBtn} onPress={closeJourney}>
+          <TouchableOpacity style={[styles.doneBtn, { backgroundColor: themeColors.primary }]} onPress={closeJourney}>
             <Text style={styles.doneBtnText}>Understood & Done</Text>
           </TouchableOpacity>
         </View>
