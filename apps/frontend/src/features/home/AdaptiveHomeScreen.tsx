@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { AdaptiveHeader } from '../../components/common/AdaptiveHeader';
 import { BalanceHeader } from '../../components/common/BalanceHeader';
@@ -26,9 +29,34 @@ import {
   Calendar,
   AlertCircle,
   Clock,
-  Sparkles,
   Bot,
+  Zap,
+  Home,
+  Wifi,
+  ChevronUp,
+  ShieldCheck,
 } from 'lucide-react-native';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+interface RepeatedIntentItem {
+  id: 'metro' | 'power' | 'rent' | 'mobile';
+  shortTitle: string;
+  fullTitle: string;
+  subtitle: string;
+  amount: number;
+  amountFormatted: string;
+  merchant: string;
+  category: 'transport' | 'bills' | 'transfers';
+  icon: typeof Train;
+  iconColor: string;
+  iconBg: string;
+  recurrenceTag: string;
+  description: string;
+  actionLabel: string;
+}
 
 export const AdaptiveHomeScreen: React.FC = () => {
   const {
@@ -39,11 +67,15 @@ export const AdaptiveHomeScreen: React.FC = () => {
     openJourney,
     currentState,
     performPayment,
+    showToast,
   } = useCustomerStore();
   const t = getTranslation(language);
   const [refreshing, setRefreshing] = useState(false);
   const [isMetroPaid, setIsMetroPaid] = useState(false);
   const [isPayingMetro, setIsPayingMetro] = useState(false);
+  const [expandedIntentId, setExpandedIntentId] = useState<string | null>(null);
+  const [processingIntentId, setProcessingIntentId] = useState<string | null>(null);
+  const [paidIntents, setPaidIntents] = useState<Record<string, boolean>>({});
 
   // Hero scale and entrance animations
   const heroScaleAnim = useRef(new Animated.Value(1)).current;
@@ -57,6 +89,8 @@ export const AdaptiveHomeScreen: React.FC = () => {
   // When switching personas, reset local metro paid state, reorder layout, and animate hero entrance
   useEffect(() => {
     setIsMetroPaid(false);
+    setPaidIntents({});
+    setExpandedIntentId(null);
     motion.reorderLayout();
 
     heroFadeAnim.setValue(0.25);
@@ -83,30 +117,135 @@ export const AdaptiveHomeScreen: React.FC = () => {
     setRefreshing(false);
   };
 
-  // 1-Tap Routine Payment Handler with smooth Hero Demotion (Section 32)
-  const handlePayMetro = async () => {
-    setIsPayingMetro(true);
-    // Subtle tactile scale
+  // 4 Repeated Intent definitions learned from customer habits
+  const repeatedIntents: RepeatedIntentItem[] = [
+    {
+      id: 'metro',
+      shortTitle: language === 'hi' ? 'मेट्रो' : language === 'gu' ? 'મેટ્રો' : 'Metro',
+      fullTitle: t.heroes.metroTitle,
+      subtitle: t.heroes.metroSubtitle,
+      amount: 40,
+      amountFormatted: '₹40',
+      merchant: 'Delhi Metro Smart Card',
+      category: 'transport',
+      icon: Train,
+      iconColor: '#0F294A',
+      iconBg: '#F0F4F8',
+      recurrenceTag: language === 'hi' ? 'दैनिक आदत • सुबह 8:40' : language === 'gu' ? 'દૈનિક ટેવ • સવારે 8:40' : 'DAILY HABIT • 8:40 AM',
+      description: t.heroes.metroDesc,
+      actionLabel: t.heroes.payAgain,
+    },
+    {
+      id: 'power',
+      shortTitle: language === 'hi' ? 'बिजली' : language === 'gu' ? 'વીજળી' : 'Power',
+      fullTitle: language === 'hi' ? 'टाटा पावर बिजली बिल' : language === 'gu' ? 'ટાટા પાવર વીજળી બિલ' : 'Tata Power Electricity',
+      subtitle: language === 'hi' ? '₹1,450 · मासिक बिल' : language === 'gu' ? '₹1,450 · માસિક બિલ' : '₹1,450 · Monthly Bill',
+      amount: 1450,
+      amountFormatted: '₹1,450',
+      merchant: 'Tata Power Residential',
+      category: 'bills',
+      icon: Zap,
+      iconColor: '#D97706',
+      iconBg: '#FEF3C7',
+      recurrenceTag: language === 'hi' ? 'मासिक मैंडेट • 15 तारीख' : language === 'gu' ? 'માસિક મેન્ડેટ • 15 તારીખ' : 'MONTHLY MANDATE • 15TH',
+      description: language === 'hi'
+        ? 'नियमित मासिक आवासीय बिजली बिल। सत्यापित उपभोक्ता मैंडेट के साथ स्वचालित चालान समाधान।'
+        : language === 'gu'
+        ? 'નિયમિત માસિક રહેણાંક વીજળી બિલ. આપોઆપ ઇન્વૉઇસ સમાધાન સાથે સીધું ચુકવણું.'
+        : 'Regular monthly power utility bill. Direct institutional clearing with automated invoice reconciliation.',
+      actionLabel: language === 'hi' ? '₹1,450 भरें →' : language === 'gu' ? '₹1,450 ભરો →' : 'Pay ₹1,450 via UPI →',
+    },
+    {
+      id: 'rent',
+      shortTitle: language === 'hi' ? 'किराया' : language === 'gu' ? 'ભાડું' : 'Rent',
+      fullTitle: language === 'hi' ? 'अपार्टमेंट किराया' : language === 'gu' ? 'એપાર્ટમેન્ટ ભાડું' : 'House Rent Transfer',
+      subtitle: language === 'hi' ? '₹18,000 · मकान मालिक' : language === 'gu' ? '₹18,000 · મકાનમાલિક' : '₹18,000 · Landlord Account',
+      amount: 18000,
+      amountFormatted: '₹18,000',
+      merchant: 'Monthly House Rent',
+      category: 'transfers',
+      icon: Home,
+      iconColor: '#2563EB',
+      iconBg: '#EFF6FF',
+      recurrenceTag: language === 'hi' ? 'मासिक मैंडेट • 1 तारीख' : language === 'gu' ? 'માસિક મેન્ડેટ • 1 તારીખ' : 'MONTHLY MANDATE • 1ST',
+      description: language === 'hi'
+        ? 'मकान मालिक के पंजीकृत खाते में मासिक किराया ट्रांसफर। शून्य लेनदेन शुल्क के साथ त्वरित सुरक्षित यूपीआई।'
+        : language === 'gu'
+        ? 'મકાનમાલિકના નોંધાયેલા ખાતામાં માસિક એપાર્ટમેન્ટ ભાડું ટ્રાન્સફર. શૂન્ય શુલ્ક સુરક્ષિત બેંકિંગ.'
+        : 'Monthly residential apartment rent transfer to landlord registered account. Zero transaction fees via instant UPI.',
+      actionLabel: language === 'hi' ? '₹18,000 भेजें →' : language === 'gu' ? '₹18,000 મોકલો →' : 'Pay ₹18,000 via UPI →',
+    },
+    {
+      id: 'mobile',
+      shortTitle: language === 'hi' ? 'मोबाइल' : language === 'gu' ? 'મોબાઇલ' : 'Mobile',
+      fullTitle: language === 'hi' ? 'एयरटेल 5G रिचार्ज' : language === 'gu' ? 'એરટેલ 5G રિચાર્જ' : 'Airtel 5G Unlimited',
+      subtitle: language === 'hi' ? '₹499 · 28-दिवसीय चक्र' : language === 'gu' ? '₹499 · 28-દિવસનું ચક્ર' : '₹499 · 28-Day Plan Cycle',
+      amount: 499,
+      amountFormatted: '₹499',
+      merchant: 'Airtel Prepaid Recharge',
+      category: 'bills',
+      icon: Wifi,
+      iconColor: '#059669',
+      iconBg: '#ECFDF5',
+      recurrenceTag: language === 'hi' ? '28-दिवसीय चक्र • नियमित' : language === 'gu' ? '28-દિવસનું ચક્ર • નિયમિત' : '28-DAY CYCLE • RECURRING',
+      description: language === 'hi'
+        ? 'प्राथमिक पंजीकृत नंबर के लिए 28-दिवसीय असीमित 5G डेटा और कॉलिंग प्लान नवीनीकरण।'
+        : language === 'gu'
+        ? 'પ્રાથમિક નોંધાયેલા નંબર માટે 28 દિવસનું અમર્યાદિત 5G ડેટા અને કૉલિંગ પ્લાન નવીકરણ.'
+        : '28-day cycle renewal for primary registered mobile number with unlimited 5G data & calling.',
+      actionLabel: language === 'hi' ? '₹499 रिचार्ज करें →' : language === 'gu' ? '₹499 રિચાર્જ કરો →' : 'Recharge ₹499 via UPI →',
+    },
+  ];
+
+  // Fluid toggle between compact 4-component view and expanded card
+  const toggleExpandIntent = (id: string | null) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpandedIntentId(current => (current === id ? null : id));
+  };
+
+  // 1-Tap Routine Payment Handler for Repeated Intents
+  const handlePayRepeatedIntent = async (item: RepeatedIntentItem) => {
+    const alreadyPaid = paidIntents[item.id] || (item.id === 'metro' && isMetroPaid);
+    if (alreadyPaid) {
+      showToast(
+        language === 'hi'
+          ? `${item.shortTitle} का भुगतान पहले ही हो चुका है`
+          : language === 'gu'
+          ? `${item.shortTitle} ની ચુકવણી પહેલેથી જ થઈ ગઈ છે`
+          : `${item.shortTitle} payment already completed`
+      );
+      return;
+    }
+
+    setProcessingIntentId(item.id);
+    if (item.id === 'metro') setIsPayingMetro(true);
+
     Animated.sequence([
       Animated.timing(heroScaleAnim, { toValue: 0.97, duration: 100, useNativeDriver: true }),
       Animated.timing(heroScaleAnim, { toValue: 1.0, duration: 150, useNativeDriver: true }),
     ]).start();
 
-    // Perform payment through customerStore (updates balance smoothly)
     await performPayment({
-      amount: 40,
-      merchant: 'Delhi Metro Smart Card',
-      category: 'transport',
-      description: 'Daily 8:40 AM Metro Commute recharge',
+      amount: item.amount,
+      merchant: item.merchant,
+      category: item.category,
+      description: item.description,
     });
 
-    setIsPayingMetro(false);
-    setIsMetroPaid(true);
+    setProcessingIntentId(null);
+    if (item.id === 'metro') setIsPayingMetro(false);
+    setPaidIntents(prev => ({ ...prev, [item.id]: true }));
 
-    // Trigger layout reorder so the compressed hero shrinks and next priorities rise!
-    setTimeout(() => {
-      motion.reorderLayout();
-    }, 400);
+    if (item.id === 'metro') {
+      setIsMetroPaid(true);
+      setTimeout(() => {
+        motion.reorderLayout();
+      }, 400);
+    }
+  };
+
+  const handlePayMetro = async () => {
+    await handlePayRepeatedIntent(repeatedIntents[0]);
   };
 
   // =========================================================================
@@ -260,48 +399,154 @@ export const AdaptiveHomeScreen: React.FC = () => {
       );
     }
 
-    // 5. NORMAL STATE (Section 11, 20) - 1-Tap Repeated Habit (Metro Commute)
-    if (!isMetroPaid) {
+    // 5. NORMAL STATE - 4 Repeated Intent Components in Half Space
+    // (Tap for 1-tap payment, Hold/Long-press to expand into full normal card)
+    if (!expandedIntentId) {
       return (
         <Animated.View style={[styles.heroSection, { transform: [{ scale: heroScaleAnim }] }]}>
-          <Text style={styles.sectionEyebrow}>{t.heroes.metroTag}</Text>
-          <View style={styles.metroBox}>
-            <View style={styles.metroTopRow}>
-              <View style={styles.metroIconWrap}>
-                <Train size={20} color="#111318" />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.metroTitle}>{t.heroes.metroTitle}</Text>
-                <Text style={styles.metroSubtitle}>{t.heroes.metroSubtitle}</Text>
-              </View>
-            </View>
+          <View style={styles.heroSectionHeader}>
+            <Text style={styles.sectionEyebrow}>{t.heroes.metroTag}</Text>
+            <Text style={styles.holdHintText}>
+              {language === 'hi'
+                ? 'विस्तार के लिए दबाकर रखें'
+                : language === 'gu'
+                ? 'વિગતો માટે દબાવી રાખો'
+                : 'Hold to expand'}
+            </Text>
+          </View>
 
-            <Text style={styles.metroDesc}>{t.heroes.metroDesc}</Text>
+          <View style={styles.compactIntentGrid}>
+            {repeatedIntents.map(item => {
+              const isPaid = paidIntents[item.id] || (item.id === 'metro' && isMetroPaid);
+              const isProcessing = processingIntentId === item.id;
+              const IconComponent = item.icon;
 
-            <TouchableOpacity
-              style={styles.metroActionBtn}
-              onPress={handlePayMetro}
-              disabled={isPayingMetro}
-              delayPressIn={0}
-              activeOpacity={0.82}
-            >
-              <Text style={styles.metroActionBtnText}>
-                {isPayingMetro ? t.heroes.recharging : t.heroes.payAgain}
-              </Text>
-            </TouchableOpacity>
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[styles.compactTile, isPaid && styles.compactTilePaid]}
+                  onPress={() => handlePayRepeatedIntent(item)}
+                  onLongPress={() => toggleExpandIntent(item.id)}
+                  delayLongPress={280}
+                  delayPressIn={0}
+                  activeOpacity={0.75}
+                >
+                  <View style={[styles.compactTileIconWrap, { backgroundColor: item.iconBg }]}>
+                    {isPaid ? (
+                      <CheckCircle2 size={14} color="#059669" />
+                    ) : (
+                      <IconComponent size={14} color={item.iconColor} />
+                    )}
+                  </View>
+                  <View style={styles.compactTileTextWrap}>
+                    <Text style={styles.compactTileTitle} numberOfLines={1}>
+                      {item.shortTitle}
+                    </Text>
+                    <Text style={[styles.compactTileAmount, isPaid && styles.compactTileAmountPaid]}>
+                      {isProcessing
+                        ? '...'
+                        : isPaid
+                        ? (language === 'hi' ? 'सफल' : language === 'gu' ? 'સફળ' : 'Paid')
+                        : item.amountFormatted}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </Animated.View>
       );
     }
 
-    // When Metro is paid, compress gracefully (Section 32)
+    // EXPANDED NORMAL CARD COMPONENT (Triggered on holding any repeated intent button)
+    const expandedItem = repeatedIntents.find(i => i.id === expandedIntentId) || repeatedIntents[0];
+    const isExpandedPaid = paidIntents[expandedItem.id] || (expandedItem.id === 'metro' && isMetroPaid);
+    const isExpandedProcessing = processingIntentId === expandedItem.id;
+    const ExpandedIconComponent = expandedItem.icon;
+
     return (
-      <View style={styles.heroSection}>
-        <View style={styles.paidMetroRow}>
-          <CheckCircle2 size={16} color="#059669" />
-          <Text style={styles.paidMetroText}>{t.heroes.metroDone}</Text>
+      <Animated.View style={[styles.heroSection, { transform: [{ scale: heroScaleAnim }] }]}>
+        <View style={styles.heroSectionHeader}>
+          <Text style={styles.sectionEyebrow}>{t.heroes.metroTag}</Text>
+          <TouchableOpacity
+            style={styles.collapseHeaderBtn}
+            onPress={() => toggleExpandIntent(null)}
+            delayPressIn={0}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.collapseHeaderBtnText}>
+              {language === 'hi' ? 'संक्षिप्त करें' : language === 'gu' ? 'સંક્ષિપ્ત કરો' : 'Collapse'}
+            </Text>
+            <ChevronUp size={14} color="#525866" />
+          </TouchableOpacity>
         </View>
-      </View>
+
+        <View style={styles.metroBox}>
+          <View style={styles.metroTopRow}>
+            <View style={[styles.metroIconWrap, { backgroundColor: expandedItem.iconBg }]}>
+              <ExpandedIconComponent size={20} color={expandedItem.iconColor} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.metroTitle}>{expandedItem.fullTitle}</Text>
+              <Text style={styles.metroSubtitle}>{expandedItem.subtitle}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.collapseIconBtn}
+              onPress={() => toggleExpandIntent(null)}
+              delayPressIn={0}
+              activeOpacity={0.7}
+            >
+              <ChevronUp size={16} color="#525866" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.expandedTagRow}>
+            <View style={styles.expandedTagBadge}>
+              <ShieldCheck size={12} color="#0F294A" />
+              <Text style={styles.expandedTagText}>{expandedItem.recurrenceTag}</Text>
+            </View>
+            <Text style={styles.expandedTagCategory}>{expandedItem.category.toUpperCase()}</Text>
+          </View>
+
+          <Text style={styles.metroDesc}>{expandedItem.description}</Text>
+
+          <View style={styles.expandedActionRow}>
+            <TouchableOpacity
+              style={[styles.metroActionBtn, isExpandedPaid && styles.metroActionBtnPaid]}
+              onPress={() => handlePayRepeatedIntent(expandedItem)}
+              disabled={isExpandedProcessing || isExpandedPaid}
+              delayPressIn={0}
+              activeOpacity={0.82}
+            >
+              {isExpandedPaid ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <CheckCircle2 size={15} color="#FFFFFF" />
+                  <Text style={styles.metroActionBtnText}>
+                    {language === 'hi' ? 'भुगतान सफल' : language === 'gu' ? 'ચુકવણી સફળ' : 'Payment Cleared'}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.metroActionBtnText}>
+                  {isExpandedProcessing
+                    ? (language === 'hi' ? 'भुगतान हो रहा है...' : language === 'gu' ? 'ચુકવણી થઈ રહી છે...' : 'Processing...')
+                    : expandedItem.actionLabel}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.collapseSecondaryBtn}
+              onPress={() => toggleExpandIntent(null)}
+              delayPressIn={0}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.collapseSecondaryBtnText}>
+                {language === 'hi' ? '4 शॉर्टकट' : language === 'gu' ? '4 શોર્ટકટ્સ' : '4 Shortcuts'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animated.View>
     );
   };
 
@@ -490,7 +735,76 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md + 2,
   },
 
-  // Normal Hero: Metro Commute
+  // Header row for hero with hold hint / collapse toggle
+  heroSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  holdHintText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#8C95A6',
+    letterSpacing: 0.2,
+    textTransform: 'uppercase',
+  },
+
+  // Compact 4-Component Repeated Intent Grid (fits in half the space)
+  compactIntentGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'space-between',
+  },
+  compactTile: {
+    width: '48.5%',
+    height: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 13,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    gap: 8,
+    shadowColor: '#111318',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  compactTilePaid: {
+    backgroundColor: '#F0FDF4',
+    borderColor: '#BBF7D0',
+  },
+  compactTileIconWrap: {
+    width: 26,
+    height: 26,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  compactTileTextWrap: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  compactTileTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#111318',
+    letterSpacing: -0.1,
+  },
+  compactTileAmount: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#0F294A',
+  },
+  compactTileAmountPaid: {
+    color: '#059669',
+  },
+
+  // Normal Hero: Metro Commute & Expanded Repeated Intent Card
   metroBox: {
     backgroundColor: '#FFFFFF',
     borderRadius: 22,
@@ -508,6 +822,58 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     marginBottom: 8,
+  },
+  collapseHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#F4F5F7',
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 99,
+  },
+  collapseHeaderBtnText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#525866',
+  },
+  collapseIconBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F4F5F7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  expandedTagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    marginTop: 2,
+  },
+  expandedTagBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#F0F4F8',
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#D9E2EC',
+  },
+  expandedTagText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#0F294A',
+    letterSpacing: 0.3,
+  },
+  expandedTagCategory: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#8C95A6',
+    letterSpacing: 0.5,
   },
   metroIconWrap: {
     width: 40,
@@ -536,6 +902,11 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: 16,
   },
+  expandedActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
   metroActionBtn: {
     backgroundColor: '#111318',
     paddingVertical: 12,
@@ -543,11 +914,27 @@ const styles = StyleSheet.create({
     borderRadius: 99,
     alignSelf: 'flex-start',
   },
+  metroActionBtnPaid: {
+    backgroundColor: '#059669',
+  },
   metroActionBtnText: {
     fontSize: 13,
     fontWeight: '700',
     color: '#FFFFFF',
     letterSpacing: 0.1,
+  },
+  collapseSecondaryBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 99,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    backgroundColor: '#F8F9FA',
+  },
+  collapseSecondaryBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#525866',
   },
   paidMetroRow: {
     flexDirection: 'row',
