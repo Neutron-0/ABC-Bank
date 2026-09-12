@@ -106,7 +106,8 @@ export const PaymentsScreen: React.FC = () => {
 
     setIsProcessing(false);
     if (ok) {
-      setLastTxId(`UPI/2026/${Math.floor(10000000 + Math.random() * 90000000)}`);
+      const latestTx = useCustomerStore.getState().transactions[0];
+      setLastTxId(latestTx?.id || `TXN_UPI_${Date.now()}`);
       setTimestamp(new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }));
       setPayStep('success');
     } else {
@@ -139,7 +140,8 @@ export const PaymentsScreen: React.FC = () => {
 
     setIsProcessing(false);
     if (ok) {
-      setLastTxId(`UPI/2026/${Math.floor(10000000 + Math.random() * 90000000)}`);
+      const latestTx = useCustomerStore.getState().transactions[0];
+      setLastTxId(latestTx?.id || `TXN_UPI_${Date.now()}`);
       setTimestamp(new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }));
       setPayStep('success');
     } else {

@@ -59,7 +59,9 @@ export const ProfileScreen: React.FC = () => {
             <View style={[styles.kycBadge, { backgroundColor: colors.cardBgSecondary }]}>
               <Check size={12} color={colors.primary} />
               <Text style={[styles.kycBadgeText, { color: colors.textPrimary }]}>
-                KYC Verified • Tier 2 Account
+                {profile.kycStatus === 'verified'
+                  ? 'KYC Verified • Tier 3 Verified Account'
+                  : 'KYC Pending • Tier 1 Basic'}
               </Text>
             </View>
           </View>
