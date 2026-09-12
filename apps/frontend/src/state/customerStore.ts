@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import { Platform } from 'react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
+import * as SecureStore from 'expo-secure-store';
 import {
   CustomerStateType,
   LanguageCode,
@@ -675,9 +678,34 @@ interface CustomerStateStore {
     onAuthSuccess?: () => void
   ) => void;
   closePaymentAuth: () => void;
-  validatePin: (pin: string) => boolean;
+  validatePin: (pin: string) => Promise<{ valid: boolean; message?: string; locked?: boolean }>;
   setSecurityCredentials: (pin: string, biometrics: boolean, phone?: string) => void;
   triggerBiometricAuth: () => Promise<boolean>;
+
+  // Persistent Card Controls
+  cardControls: {
+    card_id: string;
+    customer_id: string;
+    is_locked: boolean;
+    atmLimit: number;
+    contactlessEnabled: boolean;
+    onlineEnabled: boolean;
+    intlEnabled: boolean;
+    card_last_four: string;
+    card_network: string;
+  };
+  fetchCardControls: () => Promise<void>;
+  updateCardControls: (controls: Partial<{
+    is_locked: boolean;
+    atmLimit: number;
+    contactlessEnabled: boolean;
+    onlineEnabled: boolean;
+    intlEnabled: boolean;
+  }>) => Promise<boolean>;
+
+  // Authentic Banking Operations
+  disburseLoan: (payload: { amount: number; tenureMonths?: number; annualRate?: number }) => Promise<{ success: boolean; contract_id?: string; error?: string }>;
+  submitKyc: (payload: { pan: string; aadhaar: string; latitude?: number; longitude?: number; selfieVerified?: boolean }) => Promise<{ success: boolean; error?: string }>;
 
   setLanguage: (lang: LanguageCode) => void;
   setActiveTab: (tab: MainTabType) => void;
@@ -829,10 +857,107 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     themeMode: 'light',
     setThemeMode: () => {},
 
-    userPin: '1234',
+    userPin: '8492',
     biometricsEnabled: true,
     phoneNumber: '+91 98765 43210',
     authModal: null,
+
+    // Persistent Card Controls initial state
+    cardControls: {
+      card_id: 'card_rupay_platinum_8492',
+      customer_id: 'cust_bharat_001',
+      is_locked: false,
+      atmLimit: 50000,
+      contactlessEnabled: true,
+      onlineEnabled: true,
+      intlEnabled: false,
+      card_last_four: '8492',
+      card_network: 'RuPay Platinum Contactless',
+    },
+
+    fetchCardControls: async () => {
+      try {
+        const res = await BankingApi.getCardControls(get().profile.id);
+        if (res && res.card_id) {
+          set({ cardControls: res });
+        }
+      } catch (err) {
+        console.warn('[CardControls] Failed to fetch live card controls:', err);
+      }
+    },
+
+    updateCardControls: async (controls) => {
+      set((state) => ({ cardControls: { ...state.cardControls, ...controls } }));
+      try {
+        const res = await BankingApi.updateCardControls(controls, get().profile.id);
+        if (res && res.controls) {
+          set({ cardControls: res.controls });
+          return true;
+        }
+      } catch (err) {
+        console.warn('[CardControls] Failed to sync card controls with backend:', err);
+      }
+      return false;
+    },
+
+    disburseLoan: async (payload) => {
+      set({ isLoading: true });
+      try {
+        const res = await BankingApi.disburseLoan({
+          amount: payload.amount,
+          tenureMonths: payload.tenureMonths,
+          annualRate: payload.annualRate,
+          customerId: get().profile.id,
+        });
+        if (res && res.success) {
+          set((state) => ({
+            balance: {
+              ...state.balance,
+              available: res.balance.available,
+              savings: res.balance.savings,
+            },
+            transactions: [res.transaction, ...state.transactions],
+            isLoading: false,
+            toastMessage: `₹${payload.amount.toLocaleString('en-IN')} disbursed into your account!`,
+          }));
+          return { success: true, contract_id: res.contract_id };
+        }
+      } catch (err: any) {
+        console.error('[Loan] Backend loan origination error:', err);
+      }
+      set({ isLoading: false });
+      return { success: false, error: 'Loan origination failed.' };
+    },
+
+    submitKyc: async (payload) => {
+      set({ isLoading: true });
+      try {
+        const res = await BankingApi.submitKyc({
+          ...payload,
+          customerId: get().profile.id,
+        });
+        if (res && res.success) {
+          set((state) => ({
+            profile: {
+              ...state.profile,
+              kycTier: res.kyc_tier,
+            },
+            signals: {
+              ...state.signals,
+              kyc_tier: res.kyc_tier,
+              kyc_verified: true,
+            },
+            isLoading: false,
+            toastMessage: 'Digital KYC Completed Successfully!',
+          }));
+          return { success: true };
+        }
+      } catch (err: any) {
+        console.error('[KYC] Backend submit error:', err);
+      }
+      set({ isLoading: false });
+      return { success: false, error: 'KYC submission failed.' };
+    },
 
     requestPaymentAuth: (paymentData, onAuthSuccess) => {
       set({
@@ -848,9 +973,29 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       set({ authModal: null });
     },
 
-    validatePin: (pin: string) => {
+    validatePin: async (pin: string) => {
+      // 1. Authoritative backend cryptographic verification
+      try {
+        const remote = await BankingApi.verifyPin(pin, get().profile.id);
+        if (remote) {
+          if (remote.locked) {
+            return { valid: false, locked: true, message: remote.message || 'Account locked due to consecutive failed attempts.' };
+          }
+          if (remote.valid) {
+            return { valid: true };
+          }
+          return { valid: false, message: remote.message || 'Incorrect PIN.' };
+        }
+      } catch (e) {
+        console.warn('[PIN] Backend verification unreachable, checking secure local vault.');
+      }
+
+      // 2. Local fallback strictly to configured userPin (no universal '1234' bypass)
       const { userPin } = get();
-      return pin === userPin || pin === '1234';
+      if (userPin && pin === userPin) {
+        return { valid: true };
+      }
+      return { valid: false, message: 'Incorrect PIN.' };
     },
 
     setSecurityCredentials: (pin, biometrics, phone) => {
@@ -859,13 +1004,45 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
         biometricsEnabled: biometrics !== undefined ? biometrics : state.biometricsEnabled,
         phoneNumber: phone || state.phoneNumber,
       }));
+
+      // Async backend setup & hardware secure store registration
+      if (pin) {
+        BankingApi.setupPin(pin, get().profile.id).catch(() => {});
+        if (Platform.OS !== 'web') {
+          SecureStore.setItemAsync('user_banking_pin', pin).catch(() => {});
+        }
+      }
     },
 
     triggerBiometricAuth: async () => {
       const { biometricsEnabled } = get();
       if (!biometricsEnabled) return false;
-      await new Promise((res) => setTimeout(res, 500));
-      return true;
+
+      try {
+        const hasHardware = await LocalAuthentication.hasHardwareAsync();
+        if (!hasHardware) {
+          console.log('[Biometrics] Device hardware does not support local authentication');
+          return false;
+        }
+
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        if (!isEnrolled) {
+          console.log('[Biometrics] No biometrics enrolled on this device');
+          return false;
+        }
+
+        const result = await LocalAuthentication.authenticateAsync({
+          promptMessage: 'Authorize payment with biometrics',
+          cancelLabel: 'Cancel',
+          fallbackLabel: 'Use PIN',
+          disableDeviceFallback: false,
+        });
+
+        return result.success;
+      } catch (err) {
+        console.warn('[Biometrics] Local authentication error:', err);
+        return false;
+      }
     },
 
     setLanguage: (lang: LanguageCode) => {
@@ -894,12 +1071,12 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
         isLoading: false,
       });
 
-      // Background non-blocking notification to backend
+      // Background notification to backend
       BankingApi.switchScenario(state).catch(() => {});
     },
 
     fetchStateAndContext: async () => {
-      // Background non-blocking sync
+      // Background sync with authoritative backend
       BankingApi.getExperience(get().profile.id, get().language)
         .then((exp) => {
           if (exp && exp.context_cards && exp.context_cards.length > 0) {
@@ -908,6 +1085,9 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
           }
         })
         .catch(() => {});
+
+      // Fetch persistent card switch status
+      get().fetchCardControls();
     },
 
     dismissCard: async (cardId: string) => {
@@ -937,32 +1117,38 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       }
 
       set({ isLoading: true });
-      const newTx: Transaction = {
-        id: `tx_live_${Date.now()}`,
-        amount: data.amount,
-        type: 'debit',
-        category: data.category || 'transport',
-        merchant: data.merchant,
-        description: data.description || `Payment to ${data.merchant}`,
-        timestamp: new Date().toISOString(),
-        status: 'completed',
-        isRecurring: false,
-        confidenceScore: 0.98,
-        aiExplanation: `Interactive UPI payment processed at ${new Date().toLocaleTimeString()}.`,
-        icon: 'arrow-up-right',
-      };
 
-      set((state) => {
-        const updatedBal = Math.round(Math.max(0, state.balance.available - data.amount) * 100) / 100;
-        return {
-          balance: { ...state.balance, available: updatedBal },
-          transactions: [newTx, ...state.transactions],
-          toastMessage: `Paid ₹${data.amount.toLocaleString('en-IN')} to ${data.merchant}!`,
-        };
+      try {
+        const res = await BankingApi.transferMoney({
+          amount: data.amount,
+          merchant: data.merchant,
+          category: data.category || 'transport',
+          description: data.description,
+          customerId: currentState.profile.id,
+        });
+
+        if (res && res.success && res.transaction) {
+          set((state) => ({
+            balance: {
+              ...state.balance,
+              available: res.balance.available,
+              savings: res.balance.savings || state.balance.savings,
+            },
+            transactions: [res.transaction, ...state.transactions],
+            toastMessage: `Paid ₹${data.amount.toLocaleString('en-IN')} to ${data.merchant}!`,
+            isLoading: false,
+          }));
+          return true;
+        }
+      } catch (err: any) {
+        console.error('[Payment] Backend transfer failed:', err);
+      }
+
+      set({
+        isLoading: false,
+        toastMessage: 'Payment failed: Unable to connect to bank payment switch.',
       });
-
-      set({ isLoading: false });
-      return true;
+      return false;
     },
 
     openJourney: (journeyId: string, payload?: Record<string, any>) => {

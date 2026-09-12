@@ -5,6 +5,8 @@
   "dependencies": {
     "expo": "^57.0.22",
     "expo-constants": "~57.0.18",
+    "expo-local-authentication": "^57.0.3",
+    "expo-secure-store": "^57.0.4",
     "expo-status-bar": "~57.0.1",
     "lucide-react-native": "^1.45.0",
     "onnxruntime-react-native": "^1.24.3",

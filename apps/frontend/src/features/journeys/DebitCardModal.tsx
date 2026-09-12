@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useAppTheme } from '../../theme/ThemeContext';
@@ -21,14 +21,25 @@ import {
 
 export const DebitCardModal: React.FC = () => {
   const { colors: themeColors } = useAppTheme();
-  const { activeJourney, closeJourney, language, showToast } = useCustomerStore();
+  const {
+    activeJourney,
+    closeJourney,
+    language,
+    showToast,
+    cardControls,
+    updateCardControls,
+    fetchCardControls,
+  } = useCustomerStore();
 
-  // Card Controls State
-  const [isLocked, setIsLocked] = useState(false);
-  const [contactlessEnabled, setContactlessEnabled] = useState(true);
-  const [onlineEnabled, setOnlineEnabled] = useState(true);
-  const [intlEnabled, setIntlEnabled] = useState(false);
-  const [atmLimit, setAtmLimit] = useState<number>(50000);
+  useEffect(() => {
+    fetchCardControls();
+  }, []);
+
+  const isLocked = cardControls?.is_locked ?? false;
+  const contactlessEnabled = cardControls?.contactlessEnabled ?? true;
+  const onlineEnabled = cardControls?.onlineEnabled ?? true;
+  const intlEnabled = cardControls?.intlEnabled ?? false;
+  const atmLimit = cardControls?.atmLimit ?? 50000;
   const [showCvv, setShowCvv] = useState(false);
 
   const isVisible =
@@ -39,12 +50,28 @@ export const DebitCardModal: React.FC = () => {
   if (!isVisible) return null;
 
   const handleToggleLock = (val: boolean) => {
-    setIsLocked(val);
+    updateCardControls({ is_locked: val });
     showToast(
       val
         ? (language === 'hi' ? 'डेबिट कार्ड तुरंत फ्रीज / लॉक कर दिया गया!' : language === 'gu' ? 'ડેબિટ કાર્ડ તરત જ લોક કરી દેવાયું!' : 'Debit Card Frozen for Security!')
         : (language === 'hi' ? 'डेबिट कार्ड अनब्लॉक / सक्रिय किया गया!' : language === 'gu' ? 'ડેબિટ કાર્ડ અનબ્લોક કરવામાં આવ્યું!' : 'Debit Card Unlocked & Active!')
     );
+  };
+
+  const handleSetContactless = (val: boolean) => {
+    updateCardControls({ contactlessEnabled: val });
+  };
+
+  const handleSetOnline = (val: boolean) => {
+    updateCardControls({ onlineEnabled: val });
+  };
+
+  const handleSetIntl = (val: boolean) => {
+    updateCardControls({ intlEnabled: val });
+  };
+
+  const handleSetAtmLimit = (val: number) => {
+    updateCardControls({ atmLimit: val });
   };
 
   return (
@@ -173,7 +200,7 @@ export const DebitCardModal: React.FC = () => {
                 <Switch
                   value={contactlessEnabled && !isLocked}
                   disabled={isLocked}
-                  onValueChange={setContactlessEnabled}
+                  onValueChange={handleSetContactless}
                   trackColor={{ false: themeColors.border, true: themeColors.primary }}
                   thumbColor="#FFFFFF"
                 />
@@ -197,7 +224,7 @@ export const DebitCardModal: React.FC = () => {
                 <Switch
                   value={onlineEnabled && !isLocked}
                   disabled={isLocked}
-                  onValueChange={setOnlineEnabled}
+                  onValueChange={handleSetOnline}
                   trackColor={{ false: themeColors.border, true: themeColors.primary }}
                   thumbColor="#FFFFFF"
                 />
@@ -221,7 +248,7 @@ export const DebitCardModal: React.FC = () => {
                 <Switch
                   value={intlEnabled && !isLocked}
                   disabled={isLocked}
-                  onValueChange={setIntlEnabled}
+                  onValueChange={handleSetIntl}
                   trackColor={{ false: themeColors.border, true: themeColors.primary }}
                   thumbColor="#FFFFFF"
                 />
@@ -245,7 +272,7 @@ export const DebitCardModal: React.FC = () => {
                       isSelected && { backgroundColor: themeColors.primary, borderColor: themeColors.primary },
                     ]}
                     onPress={() => {
-                      setAtmLimit(amt);
+                      handleSetAtmLimit(amt);
                       showToast(
                         language === 'hi'
                           ? `दैनिक एटीएम सीमा ₹${amt.toLocaleString('en-IN')} सेट की गई`
@@ -280,7 +307,7 @@ export const DebitCardModal: React.FC = () => {
               <TouchableOpacity
                 style={[styles.actionCardBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: '#FCA5A5' }]}
                 onPress={() => {
-                  setIsLocked(true);
+                  handleToggleLock(true);
                   showToast(language === 'hi' ? 'कार्ड ब्लॉक रिपोर्ट दर्ज की गई' : language === 'gu' ? 'કાર્ડ બ્લોક રિપોર્ટ નોંધાઈ' : 'Card Blocked & Re-issue Ticket Generated');
                 }}
                 activeOpacity={0.8}

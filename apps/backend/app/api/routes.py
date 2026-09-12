@@ -614,3 +614,204 @@ def assistant_chat(req: AssistantChatMessageRequest):
             "navigation": classified.get("navigation")
         }
     }
+
+
+# ---------------------------------------------------------------------------
+# 7. Cryptographic PIN Authentication Endpoints
+# ---------------------------------------------------------------------------
+class PinSetupRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    pin: str
+
+class PinVerifyRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    pin: str
+
+@router.post("/auth/pin/setup")
+def setup_pin(req: PinSetupRequest):
+    """
+    Establishes cryptographically salted and PBKDF2-HMAC-SHA256 hashed PIN
+    for the customer profile.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        res = StateService.set_customer_pin(cid, req.pin)
+        return res
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to setup PIN for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="PIN setup failed.")
+
+@router.post("/auth/pin/verify")
+def verify_pin(req: PinVerifyRequest):
+    """
+    Authenticates entered PIN using constant-time comparison against PBKDF2 hash.
+    Enforces 5-attempt rate-limiting and 15-minute lockouts.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        res = StateService.verify_customer_pin(cid, req.pin)
+        if res.get("locked"):
+            raise HTTPException(status_code=status.HTTP_423_LOCKED, detail=res.get("message"))
+        return res
+    except HTTPException:
+        raise
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to verify PIN for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="PIN verification failed.")
+
+
+# ---------------------------------------------------------------------------
+# 8. Persistent Card Switch Controls
+# ---------------------------------------------------------------------------
+class CardControlsRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    is_locked: Optional[bool] = None
+    atmLimit: Optional[int] = None
+    contactlessEnabled: Optional[bool] = None
+    onlineEnabled: Optional[bool] = None
+    intlEnabled: Optional[bool] = None
+
+@router.get("/cards/{customer_id}")
+def get_card_controls(customer_id: str):
+    """Returns persistent card switch configuration, limits, and lock state."""
+    try:
+        return StateService.get_card_controls(customer_id)
+    except Exception as e:
+        logger.error(f"Failed to fetch card controls for {customer_id}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Card lookup failed.")
+
+@router.post("/cards/controls")
+def update_card_controls(req: CardControlsRequest):
+    """Persistently updates debit card switch lock, ATM limits, and flags."""
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        controls_dict = {k: v for k, v in req.model_dump().items() if v is not None and k != "customer_id"}
+        updated = StateService.update_card_controls(cid, controls_dict)
+        return {"success": True, "controls": updated}
+    except Exception as e:
+        logger.error(f"Failed to update card controls for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Card update failed.")
+
+
+# ---------------------------------------------------------------------------
+# 9. Authoritative Transaction Ledger & Payments
+# ---------------------------------------------------------------------------
+class PaymentTransferRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    amount: float
+    merchant: str
+    category: Optional[str] = "transport"
+    description: Optional[str] = None
+
+@router.get("/transactions/{customer_id}")
+def get_transactions(customer_id: str):
+    """Returns authoritative transaction history combining live events and records."""
+    try:
+        txs = StateService.get_customer_transactions(customer_id)
+        return {"success": True, "customer_id": customer_id, "transactions": txs}
+    except Exception as e:
+        logger.error(f"Failed to fetch transactions for {customer_id}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to load transactions.")
+
+@router.post("/payments/transfer")
+def transfer_payment(req: PaymentTransferRequest):
+    """
+    Authoritative money transfer:
+    Debits payer balance, verifies card switch status, appends ledger entry,
+    emits banking event, and returns verified state and receipt.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        res = StateService.execute_payment(
+            customer_id=cid,
+            amount=req.amount,
+            merchant=req.merchant,
+            category=req.category or "transport",
+            description=req.description
+        )
+        return res
+    except PermissionError as pe:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(pe))
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to execute transfer for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Payment processing failed.")
+
+
+# ---------------------------------------------------------------------------
+# 10. Loan Underwriting & Disbursal
+# ---------------------------------------------------------------------------
+class LoanDisburseRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    amount: float
+    tenure_months: Optional[int] = 12
+    annual_rate: Optional[float] = 10.5
+
+@router.post("/loans/disburse")
+def disburse_loan(req: LoanDisburseRequest):
+    """
+    Underwrites and disburses instant credit into customer available & savings ledger.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        res = StateService.disburse_loan(
+            customer_id=cid,
+            amount=req.amount,
+            tenure_months=req.tenure_months or 12,
+            annual_rate=req.annual_rate or 10.5
+        )
+        return res
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to disburse loan for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Loan origination failed.")
+
+
+# ---------------------------------------------------------------------------
+# 11. Digital KYC Submission & Profile Verification
+# ---------------------------------------------------------------------------
+class KycSubmitRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    pan: str
+    aadhaar: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    selfie_verified: Optional[bool] = True
+
+@router.post("/kyc/submit")
+def submit_kyc(req: KycSubmitRequest):
+    """
+    Authentic KYC submission: validates PAN & Aadhaar, checks geo-coordinates,
+    and updates customer tier to verified status.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        res = StateService.submit_kyc(
+            customer_id=cid,
+            pan=req.pan,
+            aadhaar=req.aadhaar,
+            latitude=req.latitude,
+            longitude=req.longitude,
+            selfie_verified=req.selfie_verified if req.selfie_verified is not None else True
+        )
+        return res
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to submit KYC for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="KYC submission failed.")
+

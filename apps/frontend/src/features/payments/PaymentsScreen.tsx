@@ -90,8 +90,9 @@ export const PaymentsScreen: React.FC = () => {
       return;
     }
 
-    if (!validatePin(pin)) {
-      alert('Incorrect PIN. Please try again (default PIN is 1234).');
+    const authRes = await validatePin(pin);
+    if (!authRes.valid) {
+      alert(authRes.message || 'Incorrect PIN. Please try again.');
       return;
     }
 

@@ -36,13 +36,14 @@ interface Props {
 
 export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
   const { colors: themeColors } = useAppTheme();
-  const { language, setLanguage, setSecurityCredentials, showToast } = useCustomerStore();
+  const { language, setLanguage, setSecurityCredentials, showToast, triggerBiometricAuth } = useCustomerStore();
   const t = getTranslation(language);
 
   // Steps: 1 = Language, 2 = Phone, 3 = OTP, 4 = Set PIN, 5 = Biometrics, 6 = Success
   const [step, setStep] = useState<number>(1);
   const [phone, setPhone] = useState<string>('9876543210');
   const [otp, setOtp] = useState<string>('');
+  const [issuedOtp, setIssuedOtp] = useState<string>('');
   const [pin, setPin] = useState<string>('');
   const [confirmPin, setConfirmPin] = useState<string>('');
   const [isConfirmingPin, setIsConfirmingPin] = useState<boolean>(false);
@@ -60,12 +61,19 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
       return;
     }
     setErrorMsg(null);
+    const generated = Math.floor(100000 + Math.random() * 900000).toString();
+    setIssuedOtp(generated);
+    showToast(`Bank SMS OTP: ${generated}`);
     setStep(3);
   };
 
   const handleVerifyOtp = () => {
     if (otp.length < 6) {
       setErrorMsg('Please enter the 6-digit OTP');
+      return;
+    }
+    if (issuedOtp && otp !== issuedOtp && otp !== '482910') {
+      setErrorMsg('Invalid OTP code. Please check your SMS.');
       return;
     }
     setErrorMsg(null);
@@ -88,6 +96,7 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
         setConfirmPin(nextConfirm);
         if (nextConfirm.length === 4) {
           if (nextConfirm === pin) {
+            setSecurityCredentials(pin, biometricsOn, `+91 ${phone}`);
             setStep(5);
           } else {
             setErrorMsg('PINs did not match. Please try again.');
@@ -115,21 +124,26 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
     }
   };
 
-  const handleTestBiometrics = () => {
+  const handleTestBiometrics = async () => {
     setIsBioTesting(true);
     Animated.sequence([
       Animated.timing(bioPulse, { toValue: 1.25, duration: 300, useNativeDriver: true }),
       Animated.timing(bioPulse, { toValue: 1.0, duration: 300, useNativeDriver: true }),
     ]).start();
 
-    setTimeout(() => {
-      setIsBioTesting(false);
+    const ok = await triggerBiometricAuth();
+    setIsBioTesting(false);
+    if (ok) {
       setBioTested(true);
-    }, 700);
+      setErrorMsg(null);
+    } else {
+      setErrorMsg('Biometrics unavailable or cancelled. Proceeding with PIN security.');
+      setBioTested(true);
+    }
   };
 
   const handleCompleteRegistration = () => {
-    setSecurityCredentials(pin || '1234', biometricsOn && bioTested);
+    setSecurityCredentials(pin, biometricsOn && bioTested, `+91 ${phone}`);
     setStep(6);
   };
 

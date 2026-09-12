@@ -110,18 +110,19 @@ export const PaymentAuthModal: React.FC = () => {
 
   const verifyPinAndExecute = async (inputPin: string) => {
     setIsProcessingTx(true);
-    const valid = validatePin(inputPin);
-    if (!valid) {
+    const authRes = await validatePin(inputPin);
+    if (!authRes.valid) {
       triggerErrorShake();
       setTimeout(() => {
         setIsProcessingTx(false);
         setPin('');
         setErrorMsg(
-          language === 'hi'
+          authRes.message ||
+          (language === 'hi'
             ? 'गलत 4-अंकीय पिन दर्ज किया गया। पुनः प्रयास करें।'
             : language === 'gu'
             ? 'ખોટો 4-અંકનો PIN દાખલ કર્યો. ફરી પ્રયાસ કરો.'
-            : 'Incorrect 4-digit PIN entered. Please try again.'
+            : 'Incorrect 4-digit PIN entered. Please try again.')
         );
       }, 400);
       return;

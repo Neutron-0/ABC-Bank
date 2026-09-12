@@ -29,19 +29,22 @@ export const ResponsibleLoanModal: React.FC = () => {
     balance,
     transactions,
     language,
+    disburseLoan,
   } = useCustomerStore();
   const t = getTranslation(language);
 
   const [loanAmount, setLoanAmount] = useState<number>(150000);
   const [tenureMonths, setTenureMonths] = useState<number>(24);
   const [isDisbursed, setIsDisbursed] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [disbursedTxId, setDisbursedTxId] = useState<string>('');
 
   if (activeJourney !== 'loan' && !activeJourney?.includes('loan')) return null;
 
   const isStress = currentState === 'financial_stress' || financialHealth.status === 'stress';
 
-  const calculateEmi = (principal: number, months: number, annualRate = 11.5) => {
+  // Transparent EMI calculation: P * r * (1+r)^n / ((1+r)^n - 1)
+  const calculateEmi = (principal: number, months: number, annualRate: number = 11.5) => {
     const r = annualRate / (12 * 100);
     const emi = (principal * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
     return Math.round(emi);
@@ -49,43 +52,28 @@ export const ResponsibleLoanModal: React.FC = () => {
 
   const estimatedEmi = calculateEmi(loanAmount, tenureMonths);
 
-  const handleDisburseLoan = () => {
-    const txId = `ABC/LN/2026/${Math.floor(100000 + Math.random() * 900000)}`;
-    setDisbursedTxId(txId);
-
-    // Live state update: Credit to account balance & append transaction
-    useCustomerStore.setState({
-      balance: {
-        ...balance,
-        available: Math.round((balance.available + loanAmount) * 100) / 100,
-        savings: Math.round(((balance.savings || 185000) + loanAmount) * 100) / 100,
-      },
-      transactions: [
-        {
-          id: `tx_loan_${Date.now()}`,
-          amount: loanAmount,
-          type: 'credit',
-          category: 'salary',
-          merchant: 'ABC Bank Instant Credit',
-          description: `Disbursal of ₹${loanAmount.toLocaleString('en-IN')} Affordability Loan`,
-          timestamp: new Date().toISOString(),
-          status: 'completed',
-          isRecurring: false,
-          confidenceScore: 0.99,
-          aiExplanation: 'Verified against salary regularity and healthy 22% DTI benchmark.',
-        },
-        ...transactions,
-      ],
+  const handleDisburseLoan = async () => {
+    setIsProcessing(true);
+    const res = await disburseLoan({
+      amount: loanAmount,
+      tenureMonths,
+      annualRate: 11.5,
     });
+    setIsProcessing(false);
 
-    setIsDisbursed(true);
-    showToast(
-      language === 'hi'
-        ? `₹${loanAmount.toLocaleString('en-IN')} आपके खाते में जमा कर दिए गए हैं!`
-        : language === 'gu'
-        ? `₹${loanAmount.toLocaleString('en-IN')} તમારા ખાતામાં જમા કરવામાં આવ્યા છે!`
-        : `₹${loanAmount.toLocaleString('en-IN')} has been disbursed into your account!`
-    );
+    if (res.success && res.contract_id) {
+      setDisbursedTxId(res.contract_id);
+      setIsDisbursed(true);
+      showToast(
+        language === 'hi'
+          ? `₹${loanAmount.toLocaleString('en-IN')} आपके खाते में जमा कर दिए गए हैं!`
+          : language === 'gu'
+          ? `₹${loanAmount.toLocaleString('en-IN')} તમારા ખાતામાં જમા કરવામાં આવ્યા છે!`
+          : `₹${loanAmount.toLocaleString('en-IN')} has been disbursed into your account!`
+      );
+    } else {
+      showToast(res.error || 'Loan origination failed. Please verify eligibility.');
+    }
   };
 
   const handleClose = () => {

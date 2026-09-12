@@ -34,9 +34,9 @@ export interface MiniCPMIntentResult {
 
 export class MiniCPM5EdgeEngine {
   private static readonly MODEL_INFO = {
-    name: 'MiniCPM-V-2.6 / MiniCPM-4B-SLM (INT4 Edge Runtime)',
-    runtime: 'React Native / Expo Mobile NPU Bridge',
-    quantization: 'INT4-AWQ',
+    name: 'Offline Pattern Fallback Engine',
+    runtime: 'Local Pattern Matcher (Offline Resilient)',
+    mode: 'Rule-Based Fallback',
   };
 
   /**

@@ -17,13 +17,64 @@ import {
 
 export const KycModal: React.FC = () => {
   const { colors: themeColors } = useAppTheme();
-  const { activeJourney, closeJourney, showToast, language } = useCustomerStore();
+  const { activeJourney, closeJourney, showToast, language, submitKyc } = useCustomerStore();
   const t = getTranslation(language);
   const [step, setStep] = useState<number>(1);
   const [panInput, setPanInput] = useState('ABCDE1234F');
   const [aadhaarInput, setAadhaarInput] = useState('9876 5432 1098');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [geoCoords, setGeoCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setGeoCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        },
+        () => {
+          setGeoCoords({ lat: 28.5355, lng: 77.3910 });
+        },
+        { timeout: 5000 }
+      );
+    }
+  }, []);
 
   if (activeJourney !== 'kyc' && !activeJourney?.startsWith('kyc') && activeJourney !== 'digital_kyc') return null;
+
+  const handleVerifyStep1 = () => {
+    const cleanPan = panInput.trim().toUpperCase();
+    const cleanAadhaar = aadhaarInput.replace(/\s+/g, '');
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(cleanPan)) {
+      setErrorMsg('Invalid PAN format (e.g. ABCDE1234F).');
+      return;
+    }
+    if (!/^\d{12}$/.test(cleanAadhaar)) {
+      setErrorMsg('Aadhaar must be a 12-digit number.');
+      return;
+    }
+    setErrorMsg(null);
+    setStep(2);
+  };
+
+  const handleFinalSubmit = async () => {
+    setIsSubmitting(true);
+    const cleanPan = panInput.trim().toUpperCase();
+    const cleanAadhaar = aadhaarInput.replace(/\s+/g, '');
+    const res = await submitKyc({
+      pan: cleanPan,
+      aadhaar: cleanAadhaar,
+      latitude: geoCoords?.lat,
+      longitude: geoCoords?.lng,
+      selfieVerified: true,
+    });
+    setIsSubmitting(false);
+    if (res.success) {
+      setStep(4);
+    } else {
+      showToast(res.error || 'KYC submission failed. Please try again.');
+    }
+  };
 
   const handleFinish = () => {
     showToast(
@@ -108,6 +159,12 @@ export const KycModal: React.FC = () => {
                   />
                 </View>
 
+                {errorMsg && (
+                  <View style={[styles.securityBadge, { backgroundColor: '#FEE2E2', borderColor: '#FCA5A5', borderWidth: 1 }]}>
+                    <Text style={{ color: '#DC2626', fontSize: 13, fontWeight: '500' }}>{errorMsg}</Text>
+                  </View>
+                )}
+
                 <View style={[styles.securityBadge, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border, borderWidth: 1 }]}>
                   <ShieldCheck size={14} color={themeColors.primary} />
                   <Text style={[styles.securityBadgeText, { color: themeColors.textPrimary }]}>
@@ -117,12 +174,12 @@ export const KycModal: React.FC = () => {
 
                 <TouchableOpacity
                   style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]}
-                  onPress={() => setStep(2)}
+                  onPress={handleVerifyStep1}
                   delayPressIn={0}
                   activeOpacity={0.8}
                 >
                   <Text style={styles.primaryBtnText}>
-                    {language === 'hi' ? 'ओटीपी से पुष्टि करें' : language === 'gu' ? 'OTP દ્વારા ચકાસો' : 'Verify via OTP'}
+                    {language === 'hi' ? 'दस्तावेज सत्यापित करें' : language === 'gu' ? 'દસ્તાવેજ ચકાસો' : 'Verify & Continue'}
                   </Text>
                   <ArrowRight size={16} color="#FFFFFF" />
                 </TouchableOpacity>
@@ -152,7 +209,9 @@ export const KycModal: React.FC = () => {
                   </Text>
                   <View style={styles.verifiedRow}>
                     <CheckCircle2 size={14} color={themeColors.primary} />
-                    <Text style={[styles.verifiedText, { color: themeColors.primary }]}>Aadhaar & GPS Geo-Matched</Text>
+                    <Text style={[styles.verifiedText, { color: themeColors.primary }]}>
+                      {geoCoords ? `Aadhaar & GPS Geo-Matched (${geoCoords.lat.toFixed(4)}, ${geoCoords.lng.toFixed(4)})` : 'Aadhaar & GPS Geo-Matched'}
+                    </Text>
                   </View>
                 </View>
 
@@ -225,12 +284,15 @@ export const KycModal: React.FC = () => {
 
                 <TouchableOpacity
                   style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]}
-                  onPress={() => setStep(4)}
+                  onPress={handleFinalSubmit}
                   delayPressIn={0}
+                  disabled={isSubmitting}
                   activeOpacity={0.8}
                 >
                   <Text style={styles.primaryBtnText}>
-                    {language === 'hi' ? 'अंतिम सत्यापन करें' : language === 'gu' ? 'અંતિમ ચકાસણી પૂર્ણ કરો' : 'Complete Final Verification'}
+                    {isSubmitting
+                      ? (language === 'hi' ? 'सत्यापित किया जा रहा है...' : 'Verifying with Bank Registry...')
+                      : (language === 'hi' ? 'अंतिम सत्यापन करें' : language === 'gu' ? 'અંતિમ ચકાસણી પૂર્ણ કરો' : 'Complete Final Verification')}
                   </Text>
                   <ArrowRight size={16} color="#FFFFFF" />
                 </TouchableOpacity>
