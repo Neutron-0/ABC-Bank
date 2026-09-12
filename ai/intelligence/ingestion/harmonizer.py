@@ -10,6 +10,7 @@ Ingests, normalizes, deduplicates, and fuses disparate feeds:
 - Customer KYC & Demographics
 """
 
+from __future__ import annotations
 import re
 import hashlib
 from datetime import datetime, timezone

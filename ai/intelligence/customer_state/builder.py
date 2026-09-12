@@ -3,7 +3,6 @@
 from __future__ import annotations
 from typing import Dict, Any, List, Optional
 from ai.intelligence.signals.detector import SignalDetector
-from ai.intelligence.personalization.engine import PersonalizationEngine
 from ai.intelligence.customer_state.models import CustomerStateModel, FinancialHealth, StateType, BalanceModel
 from ai.intelligence.features.forecaster import PredictiveCashFlowEngine
 from ai.intelligence.personalization.cryptoledger import CryptographicDecisionChain
@@ -91,6 +90,7 @@ class CustomerStateBuilder:
             currency = "INR"
 
         # High-dimensional Personalization Engine execution
+        from ai.intelligence.personalization.engine import PersonalizationEngine
         personalization_result = PersonalizationEngine.evaluate(
             customer_data=scenario_data,
             features=features,

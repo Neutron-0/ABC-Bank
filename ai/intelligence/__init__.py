@@ -3,7 +3,6 @@
 from __future__ import annotations
 from typing import Dict, Any, List, Optional
 from ai.intelligence.features.extractor import FeatureExtractor
-from ai.intelligence.customer_state.builder import CustomerStateBuilder
 from ai.intelligence.customer_state.models import CustomerStateModel
 from ai.intelligence.explanations.explainer import Explainer
 from ai.intelligence.ingestion.harmonizer import MultiSourceDataHarmonizer
@@ -91,7 +90,15 @@ def build_customer_state(
         txs = transactions or customer_data.get("transactions", [])
 
     features = FeatureExtractor.extract(txs, profile=effective_data)
+    from ai.intelligence.customer_state.builder import CustomerStateBuilder
     return CustomerStateBuilder.build(effective_data, features)
+
+
+def __getattr__(name: str):
+    if name == "CustomerStateBuilder":
+        from ai.intelligence.customer_state.builder import CustomerStateBuilder
+        return CustomerStateBuilder
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 __all__ = [
