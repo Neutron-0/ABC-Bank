@@ -124,3 +124,43 @@ def test_kyc_submission():
     assert kyc_res.status_code == 200
     assert kyc_res.json()["kyc_tier"] == 3
     assert kyc_res.json()["status"] == "verified"
+
+def test_medical_claim_submission():
+    """Verify healthcare insurance reimbursement claim filing."""
+    cid = "cust_bharat_001"
+    claim_res = client.post("/api/v1/claims/submit", json={
+        "customer_id": cid,
+        "hospital": "Max Super Speciality Hospital",
+        "amount": 48200.0,
+        "notes": "Emergency surgery reimbursement"
+    })
+    assert claim_res.status_code == 200
+    data = claim_res.json()
+    assert data["success"] is True
+    assert data["claim_id"].startswith("CLM_MED_")
+    assert data["status"] == "in_review"
+    assert data["amount"] == 48200.0
+
+def test_mandate_pause_and_resume():
+    """Verify recurring mandate pausing and resumption."""
+    cid = "cust_bharat_001"
+    # Pause mandate
+    pause_res = client.post("/api/v1/mandates/pause", json={
+        "customer_id": cid,
+        "mandate_name": "Netflix Entertainment",
+        "is_paused": True
+    })
+    assert pause_res.status_code == 200
+    assert pause_res.json()["success"] is True
+    assert pause_res.json()["is_paused"] is True
+    assert pause_res.json()["active_paused_count"] >= 1
+
+    # Resume mandate
+    resume_res = client.post("/api/v1/mandates/pause", json={
+        "customer_id": cid,
+        "mandate_name": "Netflix Entertainment",
+        "is_paused": False
+    })
+    assert resume_res.status_code == 200
+    assert resume_res.json()["is_paused"] is False
+

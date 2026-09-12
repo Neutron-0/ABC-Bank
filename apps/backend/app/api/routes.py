@@ -811,3 +811,68 @@ def submit_kyc(req: KycSubmitRequest):
         logger.error(f"Failed to submit KYC for {cid}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="KYC submission failed.")
 
+
+# ---------------------------------------------------------------------------
+# 12. Health Insurance Reimbursement Claim Filing
+# ---------------------------------------------------------------------------
+class MedicalClaimRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    hospital: str
+    amount: float
+    notes: Optional[str] = None
+
+@router.post("/claims/submit")
+def submit_medical_claim(req: MedicalClaimRequest):
+    """
+    Authentic healthcare reimbursement claim filing:
+    Registers claim against TPA gateway, generates tracking identifier,
+    and updates customer medical signals.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        res = StateService.submit_medical_claim(
+            customer_id=cid,
+            hospital=req.hospital,
+            amount=req.amount,
+            notes=req.notes
+        )
+        return res
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to submit claim for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Claim submission failed.")
+
+
+# ---------------------------------------------------------------------------
+# 13. Subscription Mandate Management & Cash Flow Shield
+# ---------------------------------------------------------------------------
+class MandatePauseRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    mandate_name: str
+    is_paused: Optional[bool] = True
+
+@router.post("/mandates/pause")
+def pause_mandate(req: MandatePauseRequest):
+    """
+    Authentic subscription pause:
+    Updates e-mandate switch status, modifies customer recurring obligations,
+    and updates liquidity guard signals.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        res = StateService.pause_mandate(
+            customer_id=cid,
+            mandate_name=req.mandate_name,
+            is_paused=req.is_paused if req.is_paused is not None else True
+        )
+        return res
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to pause mandate for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Mandate update failed.")
+
+

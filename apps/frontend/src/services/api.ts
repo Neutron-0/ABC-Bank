@@ -297,5 +297,58 @@ export class BankingApi {
       }),
     });
   }
+
+  // -------------------------------------------------------------------------
+  // 9. Authentic Health Insurance Claim Filing APIs
+  // -------------------------------------------------------------------------
+  public static async submitMedicalClaim(payload: {
+    hospital: string;
+    amount: number;
+    notes?: string;
+    customerId?: string;
+  }): Promise<{
+    success: boolean;
+    claim_id: string;
+    status: string;
+    hospital: string;
+    amount: number;
+    timestamp: string;
+    message: string;
+  } | null> {
+    return this.request('/claims/submit', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer_id: payload.customerId || 'cust_bharat_001',
+        hospital: payload.hospital,
+        amount: payload.amount,
+        notes: payload.notes,
+      }),
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // 10. Authentic Subscription Mandate Management APIs
+  // -------------------------------------------------------------------------
+  public static async pauseMandate(payload: {
+    mandateName: string;
+    isPaused?: boolean;
+    customerId?: string;
+  }): Promise<{
+    success: boolean;
+    mandate_name: string;
+    is_paused: boolean;
+    active_paused_count: number;
+    timestamp: string;
+  } | null> {
+    return this.request('/mandates/pause', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer_id: payload.customerId || 'cust_bharat_001',
+        mandate_name: payload.mandateName,
+        is_paused: payload.isPaused !== undefined ? payload.isPaused : true,
+      }),
+    });
+  }
 }
+
 

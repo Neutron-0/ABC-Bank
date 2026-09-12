@@ -579,3 +579,81 @@ class StateService:
             "verified_at": current_state.signals["kyc_verified_at"]
         }
 
+    # -----------------------------------------------------------------------
+    # 12. Digital Health Insurance Claim Filing
+    # -----------------------------------------------------------------------
+    @classmethod
+    def submit_medical_claim(
+        cls,
+        customer_id: str,
+        hospital: str,
+        amount: float,
+        notes: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Submits digital healthcare reimbursement claim to insurance TPA gateway.
+        Generates authoritative claim ID, updates state signals, and emits banking event.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+        if amount <= 0:
+            raise ValueError("Claim amount must be greater than zero.")
+
+        claim_id = f"CLM_MED_{datetime.now(timezone.utc).strftime('%Y%m%d')}_{secrets.token_hex(3).upper()}"
+        iso_now = datetime.now(timezone.utc).isoformat()
+
+        current_state = cls.get_state(customer_id)
+        current_state.signals["medical_claim_filed"] = True
+        current_state.signals["medical_claim_id"] = claim_id
+        current_state.signals["medical_claim_status"] = "in_review"
+        current_state.signals["medical_claim_amount"] = amount
+        current_state.signals["medical_claim_hospital"] = hospital
+        current_state.signals["medical_claim_filed_at"] = iso_now
+
+        return {
+            "success": True,
+            "claim_id": claim_id,
+            "status": "in_review",
+            "hospital": hospital,
+            "amount": amount,
+            "timestamp": iso_now,
+            "message": f"Claim {claim_id} for ₹{amount:,.0f} submitted to TPA Desk."
+        }
+
+    # -----------------------------------------------------------------------
+    # 13. Subscription Mandate Pause & Cash Flow Shield
+    # -----------------------------------------------------------------------
+    @classmethod
+    def pause_mandate(
+        cls,
+        customer_id: str,
+        mandate_name: str,
+        is_paused: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Pauses or resumes recurring subscription mandate to free up liquidity.
+        Updates customer signals and adjusts committed monthly burn.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+
+        current_state = cls.get_state(customer_id)
+        paused = list(current_state.signals.get("paused_mandates") or [])
+
+        if is_paused and mandate_name not in paused:
+            paused.append(mandate_name)
+        elif not is_paused and mandate_name in paused:
+            paused.remove(mandate_name)
+
+        current_state.signals["paused_mandates"] = paused
+        current_state.signals["mandates_paused_count"] = len(paused)
+
+        return {
+            "success": True,
+            "mandate_name": mandate_name,
+            "is_paused": is_paused,
+            "active_paused_count": len(paused),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+
+

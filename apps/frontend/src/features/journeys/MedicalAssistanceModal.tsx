@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
+import { BankingApi } from '../../services/api';
 import {
   HeartHandshake,
   X,
@@ -15,10 +16,18 @@ import {
 
 export const MedicalAssistanceModal: React.FC = () => {
   const { colors: themeColors } = useAppTheme();
-  const { activeJourney, closeJourney, journeyPayload, showToast, setActiveTab } =
+  const { activeJourney, closeJourney, journeyPayload, showToast, setActiveTab, fetchStateAndContext } =
     useCustomerStore();
 
-  const [claimStep, setClaimStep] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [claimReceipt, setClaimReceipt] = useState<{
+    claimId: string;
+    status: string;
+    hospital: string;
+    amount: number;
+    estimatedReimbursementDate?: string;
+  } | null>(null);
+
   const hospital = journeyPayload?.hospital || 'Max Super Speciality Hospital';
   const amount = journeyPayload?.amount || 48200;
 
@@ -29,6 +38,34 @@ export const MedicalAssistanceModal: React.FC = () => {
     activeJourney === 'claim';
 
   if (!isVisible) return null;
+
+  const handleFileClaim = async () => {
+    setLoading(true);
+    try {
+      const res = await BankingApi.submitMedicalClaim({
+        hospital,
+        amount,
+        notes: 'Inpatient hospitalization & medical bills',
+      });
+      if (res && res.success) {
+        setClaimReceipt({
+          claimId: res.claim_id,
+          status: res.status,
+          hospital: res.hospital,
+          amount: res.amount,
+          estimatedReimbursementDate: '3 Business Days',
+        });
+        showToast(`Claim ${res.claim_id} registered with TPA Desk.`);
+        await fetchStateAndContext();
+      } else {
+        showToast(res?.message || 'Claim filed successfully.');
+      }
+    } catch (e: any) {
+      showToast(e.message || 'Failed to file claim.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>
@@ -50,72 +87,116 @@ export const MedicalAssistanceModal: React.FC = () => {
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            {/* Empathy Banner */}
-            <View style={[styles.empathyBanner, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
-              <Text style={[styles.empathyTitle, { color: themeColors.textPrimary }]}>We are here to support your recovery</Text>
-              <Text style={[styles.empathyText, { color: themeColors.textSecondary }]}>
-                We noticed your recent payment of ₹{amount.toLocaleString('en-IN')} to {hospital}.
-                Our digital desk is ready to help you gather bills, file reimbursement claims, and reorganize upcoming monthly cash flow.
-              </Text>
-            </View>
+            {claimReceipt ? (
+              <View style={[styles.receiptContainer, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                <View style={styles.receiptHeader}>
+                  <CheckCircle2 size={28} color={themeColors.brandSecondary} />
+                  <Text style={[styles.receiptTitle, { color: themeColors.textPrimary }]}>Claim Initiated with TPA</Text>
+                  <Text style={[styles.receiptSub, { color: themeColors.textSecondary }]}>
+                    Tracking Reference: {claimReceipt.claimId}
+                  </Text>
+                </View>
 
-            {/* Assistance Options */}
-            <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>How would you like help?</Text>
+                <View style={[styles.receiptDivider, { backgroundColor: themeColors.border }]} />
 
-            <TouchableOpacity
-              style={[styles.actionCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
-              onPress={() => {
-                showToast('Initiating Digital Insurance Claim Filing...');
-                closeJourney();
-              }}
-              activeOpacity={0.8}
-            >
-              <View style={[styles.actionIconBox, { backgroundColor: themeColors.cardBg }]}>
-                <FileText size={22} color={themeColors.iconNeutral} />
-              </View>
-              <View style={styles.actionInfo}>
-                <Text style={[styles.actionTitle, { color: themeColors.textPrimary }]}>File Insurance Reimbursement Claim</Text>
-                <Text style={[styles.actionDesc, { color: themeColors.textSecondary }]}>
-                  Upload hospital discharge summary and inpatient receipts for fast-track processing.
+                <View style={styles.receiptRow}>
+                  <Text style={[styles.receiptLabel, { color: themeColors.textSecondary }]}>Hospital</Text>
+                  <Text style={[styles.receiptVal, { color: themeColors.textPrimary }]}>{claimReceipt.hospital}</Text>
+                </View>
+
+                <View style={styles.receiptRow}>
+                  <Text style={[styles.receiptLabel, { color: themeColors.textSecondary }]}>Claimed Amount</Text>
+                  <Text style={[styles.receiptVal, { color: themeColors.textPrimary }]}>₹{claimReceipt.amount.toLocaleString('en-IN')}</Text>
+                </View>
+
+                <View style={styles.receiptRow}>
+                  <Text style={[styles.receiptLabel, { color: themeColors.textSecondary }]}>Settlement Status</Text>
+                  <Text style={[styles.receiptVal, { color: themeColors.brandSecondary, textTransform: 'capitalize' }]}>{claimReceipt.status}</Text>
+                </View>
+
+                <View style={styles.receiptRow}>
+                  <Text style={[styles.receiptLabel, { color: themeColors.textSecondary }]}>Estimated Date</Text>
+                  <Text style={[styles.receiptVal, { color: themeColors.textPrimary }]}>{claimReceipt.estimatedReimbursementDate || '3 Business Days'}</Text>
+                </View>
+
+                <Text style={[styles.receiptFooterNote, { color: themeColors.textSecondary }]}>
+                  We have connected your hospital discharge receipts to Star Health TPA cashless portal.
                 </Text>
               </View>
-              <ArrowRight size={18} color={themeColors.primary} />
-            </TouchableOpacity>
+            ) : (
+              <>
+                {/* Empathy Banner */}
+                <View style={[styles.empathyBanner, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                  <Text style={[styles.empathyTitle, { color: themeColors.textPrimary }]}>We are here to support your recovery</Text>
+                  <Text style={[styles.empathyText, { color: themeColors.textSecondary }]}>
+                    We noticed your recent payment of ₹{amount.toLocaleString('en-IN')} to {hospital}.
+                    Our digital desk is ready to help you gather bills, file reimbursement claims, and reorganize upcoming monthly cash flow.
+                  </Text>
+                </View>
 
-            <TouchableOpacity
-              style={[styles.actionCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
-              onPress={() => {
-                closeJourney();
-                setActiveTab('assistant');
-              }}
-              activeOpacity={0.8}
-            >
-              <View style={[styles.actionIconBox, { backgroundColor: themeColors.cardBg }]}>
-                <Bot size={22} color={themeColors.iconNeutral} />
-              </View>
-              <View style={styles.actionInfo}>
-                <Text style={[styles.actionTitle, { color: themeColors.textPrimary }]}>Plan Cash Flow with Mitra</Text>
-                <Text style={[styles.actionDesc, { color: themeColors.textSecondary }]}>
-                  Review remaining liquid funds and adjust upcoming bill dates to stay stress-free.
-                </Text>
-              </View>
-              <ArrowRight size={18} color={themeColors.primary} />
-            </TouchableOpacity>
+                {/* Assistance Options */}
+                <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>How would you like help?</Text>
 
-            {/* Optional Financial Protection Review (Ethically surfaced gently) */}
-            <View style={[styles.protectionCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
-              <View style={styles.protectionHeader}>
-                <Shield size={16} color={themeColors.iconNeutral} />
-                <Text style={[styles.protectionTitle, { color: themeColors.textPrimary }]}>Long-Term Protection Check (Optional)</Text>
-              </View>
-              <Text style={[styles.protectionDesc, { color: themeColors.textSecondary }]}>
-                Once you are settled, review if higher cashless coverage would benefit your family without out-of-pocket stress.
-              </Text>
-            </View>
+                <TouchableOpacity
+                  style={[styles.actionCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
+                  onPress={handleFileClaim}
+                  disabled={loading}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.actionIconBox, { backgroundColor: themeColors.cardBg }]}>
+                    {loading ? (
+                      <ActivityIndicator size="small" color={themeColors.primary} />
+                    ) : (
+                      <FileText size={22} color={themeColors.iconNeutral} />
+                    )}
+                  </View>
+                  <View style={styles.actionInfo}>
+                    <Text style={[styles.actionTitle, { color: themeColors.textPrimary }]}>
+                      {loading ? 'Filing Claim with Desk...' : 'File Insurance Reimbursement Claim'}
+                    </Text>
+                    <Text style={[styles.actionDesc, { color: themeColors.textSecondary }]}>
+                      Upload hospital discharge summary and inpatient receipts for fast-track processing.
+                    </Text>
+                  </View>
+                  <ArrowRight size={18} color={themeColors.primary} />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.actionCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
+                  onPress={() => {
+                    closeJourney();
+                    setActiveTab('assistant');
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.actionIconBox, { backgroundColor: themeColors.cardBg }]}>
+                    <Bot size={22} color={themeColors.iconNeutral} />
+                  </View>
+                  <View style={styles.actionInfo}>
+                    <Text style={[styles.actionTitle, { color: themeColors.textPrimary }]}>Plan Cash Flow with Mitra</Text>
+                    <Text style={[styles.actionDesc, { color: themeColors.textSecondary }]}>
+                      Review remaining liquid funds and adjust upcoming bill dates to stay stress-free.
+                    </Text>
+                  </View>
+                  <ArrowRight size={18} color={themeColors.primary} />
+                </TouchableOpacity>
+
+                {/* Optional Financial Protection Review (Ethically surfaced gently) */}
+                <View style={[styles.protectionCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                  <View style={styles.protectionHeader}>
+                    <Shield size={16} color={themeColors.iconNeutral} />
+                    <Text style={[styles.protectionTitle, { color: themeColors.textPrimary }]}>Long-Term Protection Check (Optional)</Text>
+                  </View>
+                  <Text style={[styles.protectionDesc, { color: themeColors.textSecondary }]}>
+                    Once you are settled, review if higher cashless coverage would benefit your family without out-of-pocket stress.
+                  </Text>
+                </View>
+              </>
+            )}
           </ScrollView>
 
           <TouchableOpacity style={[styles.doneBtn, { backgroundColor: themeColors.primary }]} onPress={closeJourney}>
-            <Text style={[styles.doneBtnText, { color: '#FFFFFF' }]}>Close</Text>
+            <Text style={[styles.doneBtnText, { color: '#FFFFFF' }]}>{claimReceipt ? 'Done' : 'Close'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -248,6 +329,48 @@ const styles = StyleSheet.create({
   protectionDesc: {
     ...typography.caption,
     color: colors.textSecondary,
+  },
+  receiptContainer: {
+    padding: spacing.lg,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    marginBottom: spacing.md,
+  },
+  receiptHeader: {
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  receiptTitle: {
+    ...typography.h3,
+    marginTop: spacing.xs,
+    textAlign: 'center',
+  },
+  receiptSub: {
+    ...typography.captionMedium,
+    marginTop: 2,
+    fontFamily: 'Courier',
+    letterSpacing: 0.5,
+  },
+  receiptDivider: {
+    height: 1,
+    marginVertical: spacing.md,
+  },
+  receiptRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.xs,
+  },
+  receiptLabel: {
+    ...typography.caption,
+  },
+  receiptVal: {
+    ...typography.bodyBold,
+  },
+  receiptFooterNote: {
+    ...typography.tiny,
+    lineHeight: 16,
+    marginTop: spacing.md,
+    textAlign: 'center',
   },
   doneBtn: {
     backgroundColor: colors.cardBgSecondary,

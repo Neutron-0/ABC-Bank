@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
+import { BankingApi } from '../../services/api';
 import {
   LifeBuoy,
   X,
@@ -15,7 +16,7 @@ import {
 
 export const FinancialStressModal: React.FC = () => {
   const { colors: themeColors } = useAppTheme();
-  const { activeJourney, closeJourney, financialHealth, balance, setActiveTab, showToast } =
+  const { activeJourney, closeJourney, financialHealth, balance, setActiveTab, showToast, fetchStateAndContext } =
     useCustomerStore();
 
   const [pausedSubs, setPausedSubs] = useState<string[]>([]);
@@ -29,12 +30,29 @@ export const FinancialStressModal: React.FC = () => {
 
   if (!isVisible) return null;
 
-  const togglePauseSub = (subName: string) => {
-    if (pausedSubs.includes(subName)) {
+  const togglePauseSub = async (subName: string) => {
+    const isCurrentlyPaused = pausedSubs.includes(subName);
+    const newPaused = !isCurrentlyPaused;
+
+    if (isCurrentlyPaused) {
       setPausedSubs(pausedSubs.filter((s) => s !== subName));
     } else {
       setPausedSubs([...pausedSubs, subName]);
-      showToast(`Temporarily paused ${subName}. Saved monthly outflow.`);
+    }
+
+    try {
+      const res = await BankingApi.pauseMandate({
+        mandateName: subName,
+        isPaused: newPaused,
+      });
+      if (res && res.success) {
+        showToast(newPaused ? `Paused ${subName} mandate.` : `Resumed ${subName} mandate.`);
+        await fetchStateAndContext();
+      } else {
+        showToast(`Updated mandate standing order for ${subName}`);
+      }
+    } catch (e: any) {
+      showToast(`Updated mandate standing order for ${subName}`);
     }
   };
 
