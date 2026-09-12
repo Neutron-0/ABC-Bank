@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, spacing } from '../../theme';
+import { colors, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { AnimatedBalance } from './AnimatedBalance';
@@ -9,8 +9,11 @@ import {
   EyeOff,
   QrCode,
   Send,
-  FileText,
-  CreditCard,
+  Building2,
+  Receipt,
+  Copy,
+  Plus,
+  ArrowRight,
   ShieldCheck,
 } from 'lucide-react-native';
 
@@ -24,140 +27,178 @@ export const BalanceHeader: React.FC = () => {
     currentState,
     setActiveTab,
     openJourney,
+    showToast,
   } = useCustomerStore();
   const t = getTranslation(language);
-
-  const getSubtleContextText = () => {
-    const bh = t.balanceHeader;
-    if (currentState === 'fraud_alert') {
-      return bh.fraudProtocol;
-    }
-    if (currentState === 'medical_event') {
-      return bh.medicalTagged;
-    }
-    if (financialHealth.status === 'stress') {
-      return bh.liquidityGuard;
-    }
-    if (financialHealth.status === 'thriving') {
-      return `${bh.surplusCashFlow} • ${financialHealth.emergencyFundMonths} ${bh.moReserve}`;
-    }
-    return `${bh.operatingReserve}: ${financialHealth.emergencyFundMonths} ${bh.months} • ${bh.autoSweepActive}`;
-  };
-
   const bh = t.balanceHeader;
+
+  const handleCopyUpiId = () => {
+    showToast(
+      language === 'hi'
+        ? 'यूपीआई आईडी कॉपी की गई: rahul@abcbank'
+        : language === 'gu'
+        ? 'UPI ID કૉપિ થઈ: rahul@abcbank'
+        : 'UPI ID copied: rahul@abcbank'
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {/* Institutional Account Card */}
-      <View style={styles.accountCard}>
-        {/* Top Card Row */}
-        <View style={styles.cardHeaderRow}>
-          <View style={styles.accountTypeWrap}>
-            <Text style={styles.accountTypeText}>{bh.primarySavings}</Text>
-            <Text style={styles.accountNumText}>{bh.accountNumber}</Text>
+      {/* JioFinance-Style Floating Account Balance Hero Card */}
+      <View style={styles.heroCard}>
+        {/* Top Account Identifier Row */}
+        <View style={styles.cardTopRow}>
+          <View style={styles.bankTagGroup}>
+            <View style={styles.shieldIconWrap}>
+              <ShieldCheck size={14} color="#002970" />
+            </View>
+            <View>
+              <Text style={styles.bankTagTitle}>ABC PAYMENTS BANK</Text>
+              <Text style={styles.accountNumberText}>Savings A/C •••• 4092</Text>
+            </View>
           </View>
+
+          {/* UPI ID Pill with Copy */}
           <TouchableOpacity
-            onPress={toggleBalanceHide}
-            style={styles.eyeBtn}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            style={styles.upiPill}
+            onPress={handleCopyUpiId}
             activeOpacity={0.7}
           >
-            {isBalanceHidden ? (
-              <EyeOff size={16} color="#64748B" />
-            ) : (
-              <Eye size={16} color="#64748B" />
-            )}
+            <Text style={styles.upiPillText}>rahul@abcbank</Text>
+            <Copy size={11} color="#0052CC" />
           </TouchableOpacity>
         </View>
 
-        {/* Available Balance Large Numerical Figure */}
-        <View style={styles.balanceWrap}>
-          <Text style={styles.balanceLabel}>{bh.availableForWithdrawal}</Text>
-          <AnimatedBalance
-            value={balance.available}
-            isPrivacyHidden={isBalanceHidden}
-            currencyPrefix="₹"
-            fractionSuffix=".00"
-          />
-        </View>
+        {/* Available Balance Figure */}
+        <View style={styles.balanceContainer}>
+          <View style={styles.balanceLabelRow}>
+            <Text style={styles.balanceLabel}>
+              {language === 'hi' ? 'उपलब्ध शेष राशि' : language === 'gu' ? 'ઉપલબ્ધ બેલેન્સ' : 'AVAILABLE BALANCE'}
+            </Text>
+            <TouchableOpacity
+              onPress={toggleBalanceHide}
+              style={styles.eyeBtn}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              activeOpacity={0.7}
+            >
+              {isBalanceHidden ? (
+                <EyeOff size={16} color="#64748B" />
+              ) : (
+                <Eye size={16} color="#64748B" />
+              )}
+            </TouchableOpacity>
+          </View>
 
-        {/* Secondary Financial Ledger Metrics */}
-        <View style={styles.ledgerRow}>
-          <View style={styles.ledgerCol}>
-            <Text style={styles.ledgerLabel}>{bh.totalDeposits}</Text>
-            <Text style={styles.ledgerValue}>
-              {isBalanceHidden ? '••••••' : `₹${(balance.savings || 185000).toLocaleString('en-IN')}`}
-            </Text>
-          </View>
-          <View style={styles.ledgerDivider} />
-          <View style={styles.ledgerCol}>
-            <Text style={styles.ledgerLabel}>{bh.autoSweepFd}</Text>
-            <Text style={styles.ledgerValue}>
-              {isBalanceHidden ? '••••••' : `₹${(balance.fixedDeposits || 250000).toLocaleString('en-IN')}`}
-            </Text>
-          </View>
-          <View style={styles.ledgerDivider} />
-          <View style={styles.ledgerCol}>
-            <Text style={styles.ledgerLabel}>{bh.ifscCode}</Text>
-            <Text style={styles.ledgerValue}>ABCD0001048</Text>
+          <View style={styles.balanceAmountWrap}>
+            <AnimatedBalance
+              value={balance.available}
+              isPrivacyHidden={isBalanceHidden}
+              currencyPrefix="₹"
+              fractionSuffix=".00"
+            />
           </View>
         </View>
 
-        {/* Regulatory Protection Trust Mark */}
-        <View style={styles.trustMarkRow}>
-          <ShieldCheck size={13} color="#059669" />
-          <Text style={styles.trustMarkText}>{getSubtleContextText()}</Text>
+        {/* Integrated Quick Action Strip inside Hero Card */}
+        <View style={styles.cardActionRow}>
+          <TouchableOpacity
+            style={styles.addMoneyBtn}
+            onPress={() => setActiveTab('payments')}
+            activeOpacity={0.8}
+          >
+            <Plus size={14} color="#002970" />
+            <Text style={styles.addMoneyText}>
+              {language === 'hi' ? 'पैसे जोड़ें' : language === 'gu' ? 'પૈસા ઉમેરો' : 'Add Money'}
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.actionDivider} />
+
+          <TouchableOpacity
+            style={styles.viewPassbookBtn}
+            onPress={() => setActiveTab('activity')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.viewPassbookText}>
+              {language === 'hi' ? 'पासबुक देखें' : language === 'gu' ? 'પાસબુક જુઓ' : 'View Passbook'}
+            </Text>
+            <ArrowRight size={13} color="#0052CC" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Micro Trust & Regulatory Footnote */}
+        <View style={styles.cardFooterRow}>
+          <Text style={styles.cardFooterText}>
+            DICGC Insured up to ₹5 Lakhs • RBI Regulated
+          </Text>
+          {currentState === 'surplus' && (
+            <View style={styles.surplusBadge}>
+              <Text style={styles.surplusBadgeText}>7.2% Sweep Active</Text>
+            </View>
+          )}
         </View>
       </View>
 
-      {/* Authoritative Banking Actions */}
-      <View style={styles.actionGrid}>
+      {/* JioFinance-Style 4-Column Quick Actions Bar */}
+      <View style={styles.quickActionsBar}>
+        {/* 1. Scan QR */}
         <TouchableOpacity
-          style={styles.actionBtn}
+          style={styles.quickActionItem}
           onPress={() => setActiveTab('payments')}
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={styles.actionIconWrap}>
-            <Send size={16} color="#0F294A" />
+          <View style={[styles.quickActionCircle, { backgroundColor: '#EFF6FF' }]}>
+            <QrCode size={20} color="#0052CC" />
           </View>
-          <Text style={styles.actionBtnText}>{bh.transfer}</Text>
+          <Text style={styles.quickActionLabel}>
+            {language === 'hi' ? 'क्यूआर स्कैन' : language === 'gu' ? 'QR સ્કેન' : 'Scan QR'}
+          </Text>
         </TouchableOpacity>
 
+        {/* 2. Pay to UPI / Mobile */}
         <TouchableOpacity
-          style={styles.actionBtn}
+          style={styles.quickActionItem}
           onPress={() => setActiveTab('payments')}
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={styles.actionIconWrap}>
-            <QrCode size={16} color="#0F294A" />
+          <View style={[styles.quickActionCircle, { backgroundColor: '#F5F3FF' }]}>
+            <Send size={19} color="#7C3AED" />
           </View>
-          <Text style={styles.actionBtnText}>{bh.scanQr}</Text>
+          <Text style={styles.quickActionLabel}>
+            {language === 'hi' ? 'यूपीआई पे' : language === 'gu' ? 'UPI પે' : 'To Mobile'}
+          </Text>
         </TouchableOpacity>
 
+        {/* 3. To Bank Account */}
         <TouchableOpacity
-          style={styles.actionBtn}
+          style={styles.quickActionItem}
+          onPress={() => setActiveTab('payments')}
+          delayPressIn={0}
+          activeOpacity={0.75}
+        >
+          <View style={[styles.quickActionCircle, { backgroundColor: '#ECFDF5' }]}>
+            <Building2 size={20} color="#059669" />
+          </View>
+          <Text style={styles.quickActionLabel}>
+            {language === 'hi' ? 'बैंक खाता' : language === 'gu' ? 'બેંક ખાતું' : 'To Bank'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* 4. Passbook / Check Balance */}
+        <TouchableOpacity
+          style={styles.quickActionItem}
           onPress={() => setActiveTab('activity')}
           delayPressIn={0}
           activeOpacity={0.75}
         >
-          <View style={styles.actionIconWrap}>
-            <FileText size={16} color="#0F294A" />
+          <View style={[styles.quickActionCircle, { backgroundColor: '#FEF3C7' }]}>
+            <Receipt size={20} color="#D97706" />
           </View>
-          <Text style={styles.actionBtnText}>{bh.passbook}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.actionBtn}
-          onPress={() => openJourney('debit_card')}
-          delayPressIn={0}
-          activeOpacity={0.75}
-        >
-          <View style={styles.actionIconWrap}>
-            <CreditCard size={16} color="#0F294A" />
-          </View>
-          <Text style={styles.actionBtnText}>{bh.cards}</Text>
+          <Text style={styles.quickActionLabel}>
+            {language === 'hi' ? 'पासबुक' : language === 'gu' ? 'પાસબુક' : 'Passbook'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -168,136 +209,178 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xs,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.sm,
   },
-  accountCard: {
+  heroCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: radii.card,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    ...shadows.soft,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    padding: spacing.md + 2,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    borderColor: '#ECEEF2',
   },
-  cardHeaderRow: {
+  cardTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
+    alignItems: 'center',
+    marginBottom: spacing.md,
   },
-  accountTypeWrap: {
-    gap: 2,
+  bankTagGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
-  accountTypeText: {
+  shieldIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bankTagTitle: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#002970',
+    letterSpacing: 0.5,
+  },
+  accountNumberText: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#64748B',
+    marginTop: 1,
+  },
+  upiPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#F0F5FF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: radii.pill,
+  },
+  upiPillText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#0052CC',
+  },
+  balanceContainer: {
+    marginBottom: spacing.md,
+  },
+  balanceLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  balanceLabel: {
     fontSize: 10,
     fontWeight: '700',
     color: '#64748B',
     letterSpacing: 0.8,
   },
-  accountNumText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#0F172A',
-    letterSpacing: 0.2,
-  },
   eyeBtn: {
-    padding: 4,
+    padding: 2,
   },
-  balanceWrap: {
-    marginVertical: 4,
+  balanceAmountWrap: {
+    marginVertical: 2,
   },
-  balanceLabel: {
-    fontSize: 9.5,
-    fontWeight: '700',
-    color: '#64748B',
-    letterSpacing: 0.8,
-    marginBottom: 4,
-  },
-  ledgerRow: {
+  cardActionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#F8FAFC',
-    borderRadius: 8,
-    paddingVertical: 9,
+    borderRadius: radii.md,
+    paddingVertical: 8,
     paddingHorizontal: 12,
-    marginTop: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#F1F5F9',
   },
-  ledgerCol: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  ledgerDivider: {
-    width: 1,
-    height: 22,
-    backgroundColor: '#E2E8F0',
-  },
-  ledgerLabel: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: '#64748B',
-    letterSpacing: 0.5,
-  },
-  ledgerValue: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginTop: 2,
-  },
-  trustMarkRow: {
+  addMoneyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  addMoneyText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#002970',
+  },
+  actionDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: '#E2E8F0',
+  },
+  viewPassbookBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  viewPassbookText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#0052CC',
+  },
+  cardFooterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 10,
     paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: '#F1F5F9',
   },
-  trustMarkText: {
-    fontSize: 11,
+  cardFooterText: {
+    fontSize: 9,
     fontWeight: '500',
-    color: '#475569',
-    flex: 1,
+    color: '#94A3B8',
   },
-  actionGrid: {
+  surplusBadge: {
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: radii.sm,
+  },
+  surplusBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#059669',
+  },
+
+  // 4-Column Quick Actions Bar
+  quickActionsBar: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
-    marginTop: spacing.md,
-  },
-  actionBtn: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
     backgroundColor: '#FFFFFF',
-    borderRadius: 10,
+    borderRadius: radii.card,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    ...shadows.soft,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 1,
-    gap: 5,
+    borderColor: '#ECEEF2',
   },
-  actionIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#F1F5F9',
+  quickActionItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  quickActionCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 6,
   },
-  actionBtnText: {
+  quickActionLabel: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#0F172A',
+    textAlign: 'center',
   },
 });

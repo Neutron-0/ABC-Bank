@@ -4,28 +4,30 @@ export const colors = {
   primaryDark: '#0A0C0F',
   primaryLight: '#2D3748',
   primarySubtle: '#F4F5F7',
+  primaryRoyal: '#002970', // JioFinance Deep Trust Royal Blue
+  jioBlue: '#0A2540', // JioFinance Institutional Navy
 
-  // Canvas & Surfaces (Warm, Calm Off-White)
-  bg: '#FBFBFB', // Warm Alabaster Canvas
+  // Canvas & Surfaces (Airy, Calm Light-Slate)
+  bg: '#F6F8FA', // JioFinance Soft Slate Canvas
   cardBg: '#FFFFFF', // Pure Crisp White
-  cardBgSecondary: '#F7F8F9', // Subtle Secondary Tint
+  cardBgSecondary: '#F8FAFC', // Subtle Secondary Tint
   surfaceElevated: '#FFFFFF',
 
   // Hairline & Structural Dividers
   border: '#ECEEF2', // Soft Hairline Border
-  borderLight: '#F3F4F6',
-  divider: '#E5E7EB',
+  borderLight: '#F1F5F9',
+  divider: '#E2E8F0',
 
   // Typography Scale (High-Legibility Charcoal)
-  textPrimary: '#111318', // Near-Black Primary
-  textSecondary: '#525866', // Calm Muted Charcoal
-  textMuted: '#8C95A6', // Secondary Metadata
+  textPrimary: '#0F172A', // Deep Slate / Near-Black
+  textSecondary: '#475569', // Calm Muted Slate
+  textMuted: '#94A3B8', // Secondary Metadata
   textWhite: '#FFFFFF',
 
   // Restrained Semantic Accents
-  accent: '#2563EB', // Informational Blue
+  accent: '#0052CC', // JioFinance Electric Blue
   accentIndigo: '#4F46E5', // Assistant / Intelligence
-  accentPurple: '#6366F1',
+  accentPurple: '#7C3AED',
   success: '#059669', // Calm Positive Emerald
   successLight: '#ECFDF5',
   warning: '#D97706', // Cash Flow Attention Amber
@@ -35,6 +37,13 @@ export const colors = {
   dangerLight: '#FEF2F2',
   info: '#2563EB',
   infoLight: '#EFF6FF',
+
+  // Pastel Container Backgrounds for 4-Grid / Services
+  pastelBlue: '#EFF6FF',
+  pastelEmerald: '#ECFDF5',
+  pastelAmber: '#FEF3C7',
+  pastelPurple: '#F5F3FF',
+  pastelCyan: '#ECFEFF',
 
   // Attention Hierarchy Layers
   layerDo: '#F0F5FF',

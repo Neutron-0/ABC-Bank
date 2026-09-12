@@ -410,24 +410,30 @@ export const AdaptiveHomeScreen: React.FC = () => {
       );
     }
 
-    // 5. NORMAL STATE - 4 Repeated Intent Components in Half Space
-    // (Tap for 1-tap payment, Hold/Long-press to expand into full normal card)
+    // 5. NORMAL STATE - JioFinance-Style Smart Routine Payments Carousel
     if (!expandedIntentId) {
       return (
         <Animated.View style={[styles.heroSection, { transform: [{ scale: heroScaleAnim }] }]}>
-          <View style={styles.heroSectionHeader}>
-            <Text style={styles.sectionEyebrow}>{t.heroes.metroTag}</Text>
-            <Text style={styles.holdHintText}>
-              {language === 'hi'
-                ? 'विस्तार के लिए दबाकर रखें'
-                : language === 'gu'
-                ? 'વિગતો માટે દબાવી રાખો'
-                : 'Hold to expand'}
-            </Text>
+          <View style={styles.sectionHeaderRow}>
+            <View style={styles.sectionTitleGroup}>
+              <Text style={styles.sectionTitleText}>
+                {language === 'hi' ? 'स्मार्ट आवर्ती भुगतान' : language === 'gu' ? 'સ્માર્ટ નિયમિત ચુકવણીઓ' : 'SMART ROUTINE PAYMENTS'}
+              </Text>
+              <Text style={styles.sectionSubText}>
+                {language === 'hi' ? 'दैनिक व नियमित बिल मैंडेट' : language === 'gu' ? 'દૈનિક અને નિયમિત બિલ મેન્ડેટ' : 'Routine bills & recurring mandates'}
+              </Text>
+            </View>
+            <View style={styles.mandateCountBadge}>
+              <Text style={styles.mandateCountText}>4 SCHEDULED</Text>
+            </View>
           </View>
 
-          <View style={styles.compactIntentGrid}>
-            {repeatedIntents.map(item => {
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.carouselScrollContent}
+          >
+            {repeatedIntents.map((item) => {
               const isPaid = paidIntents[item.id] || (item.id === 'metro' && isMetroPaid);
               const isProcessing = processingIntentId === item.id;
               const IconComponent = item.icon;
@@ -435,36 +441,57 @@ export const AdaptiveHomeScreen: React.FC = () => {
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[styles.compactTile, isPaid && styles.compactTilePaid]}
+                  style={[styles.routineCard, isPaid && styles.routineCardPaid]}
                   onPress={() => handlePayRepeatedIntent(item)}
                   onLongPress={() => toggleExpandIntent(item.id)}
-                  delayLongPress={280}
+                  delayLongPress={300}
                   delayPressIn={0}
-                  activeOpacity={0.75}
+                  activeOpacity={0.8}
                 >
-                  <View style={[styles.compactTileIconWrap, { backgroundColor: isPaid ? '#ECFDF5' : item.iconBg }]}>
-                    {isPaid ? (
-                      <CheckCircle2 size={15} color="#059669" />
-                    ) : (
-                      <IconComponent size={15} color={item.iconColor} />
-                    )}
+                  <View style={styles.routineCardTop}>
+                    <View style={[styles.routineIconCircle, { backgroundColor: isPaid ? '#ECFDF5' : item.iconBg }]}>
+                      {isPaid ? (
+                        <CheckCircle2 size={16} color="#059669" />
+                      ) : (
+                        <IconComponent size={16} color={item.iconColor} />
+                      )}
+                    </View>
+                    <View style={styles.routineCategoryBadge}>
+                      <Text style={styles.routineCategoryText}>{item.category.toUpperCase()}</Text>
+                    </View>
                   </View>
-                  <View style={styles.compactTileTextWrap}>
-                    <Text style={styles.compactTileTitle} numberOfLines={1}>
-                      {item.shortTitle}
+
+                  <Text style={styles.routineCardTitle} numberOfLines={1}>
+                    {item.shortTitle}
+                  </Text>
+                  <Text style={styles.routineCardSub} numberOfLines={1}>
+                    {item.recurrenceTag}
+                  </Text>
+
+                  <View style={styles.routineCardBottom}>
+                    <Text style={[styles.routineCardAmount, isPaid && styles.routineCardAmountPaid]}>
+                      {item.amountFormatted}
                     </Text>
-                    <Text style={[styles.compactTileAmount, isPaid && styles.compactTileAmountPaid]}>
-                      {isProcessing
-                        ? '...'
-                        : isPaid
-                        ? (language === 'hi' ? 'भुगतान सफल' : language === 'gu' ? 'ચુકવણી સફળ' : 'Paid')
-                        : item.amountFormatted}
-                    </Text>
+
+                    {isPaid ? (
+                      <View style={styles.routinePaidBadge}>
+                        <CheckCircle2 size={11} color="#059669" />
+                        <Text style={styles.routinePaidBadgeText}>
+                          {language === 'hi' ? 'सफल' : language === 'gu' ? 'સફળ' : 'Paid'}
+                        </Text>
+                      </View>
+                    ) : (
+                      <View style={styles.routinePayBtn}>
+                        <Text style={styles.routinePayBtnText}>
+                          {isProcessing ? '...' : (language === 'hi' ? 'भरें →' : language === 'gu' ? 'ચૂકવો →' : 'Pay →')}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </ScrollView>
         </Animated.View>
       );
     }
@@ -592,107 +619,88 @@ export const AdaptiveHomeScreen: React.FC = () => {
   };
 
   // =========================================================================
-  // DIRECT BANKING JOURNEYS HUB (KYC, Loans, Surplus Allocation)
+  // FINANCIAL PRODUCTS & SERVICES GRID (JioFinance Clean 4-Column Layout)
   // =========================================================================
   const renderDirectBankingHub = () => {
     return (
-      <View style={styles.bankingHubSection}>
-        <View style={styles.bankingHubHeader}>
-          <Text style={styles.sectionEyebrow}>
-            {language === 'hi' ? 'डिजिटल बैंकिंग उत्पाद एवं सेवाएं' : language === 'gu' ? 'ડિજિટલ બેંકિંગ સેવાઓ અને ઉત્પાદનો' : 'DIRECT BANKING SERVICES & JOURNEYS'}
-          </Text>
-          <Text style={styles.bankingHubSub}>
-            {language === 'hi' ? 'सत्यापित और नियामक-अनुपालक डिजिटल उत्पाद' : language === 'gu' ? 'ચકાસાયેલ ડિજિટલ બેંકિંગ ઉત્પાદનો' : 'Audited and regulatory-compliant digital products'}
-          </Text>
+      <View style={styles.servicesSection}>
+        <View style={styles.sectionHeaderRow}>
+          <View style={styles.sectionTitleGroup}>
+            <Text style={styles.sectionTitleText}>
+              {language === 'hi' ? 'वित्तीय उत्पाद एवं सेवाएं' : language === 'gu' ? 'નાણાકીય સેવાઓ અને ઉત્પાદનો' : 'FINANCIAL PRODUCTS & SERVICES'}
+            </Text>
+            <Text style={styles.sectionSubText}>
+              {language === 'hi' ? 'आरबीआई-अनुपालक डिजिटल बैंकिंग' : language === 'gu' ? 'આરબીઆઈ-સુસંગત ડિજિટલ બેંકિંગ' : 'Audited RBI-compliant institutional banking'}
+            </Text>
+          </View>
         </View>
 
-        <View style={styles.bankingHubList}>
-          {/* Journey 1: Digital KYC */}
-          <TouchableOpacity
-            style={styles.journeyCard}
-            onPress={() => openJourney('kyc')}
-            activeOpacity={0.78}
-          >
-            <View style={[styles.journeyIconWrap, { backgroundColor: '#EFF6FF' }]}>
-              <FileCheck size={20} color="#2563EB" />
-            </View>
-            <View style={styles.journeyTextWrap}>
-              <View style={styles.journeyBadgeRow}>
-                <Text style={styles.journeyTitle}>
-                  {language === 'hi' ? 'सरलीकृत डिजिटल केवाईसी' : language === 'gu' ? 'સરળ ડિજિટલ KYC' : 'Simplified Digital KYC'}
-                </Text>
-                <View style={[styles.statusBadge, { backgroundColor: '#ECFDF5' }]}>
-                  <Text style={[styles.statusBadgeText, { color: '#059669' }]}>TIER 2 VERIFIED</Text>
-                </View>
+        <View style={styles.servicesGridCard}>
+          <View style={styles.servicesRow}>
+            {/* 1. Digital KYC */}
+            <TouchableOpacity
+              style={styles.serviceCol}
+              onPress={() => openJourney('kyc')}
+              delayPressIn={0}
+              activeOpacity={0.75}
+            >
+              <View style={[styles.serviceCircle, { backgroundColor: '#EFF6FF' }]}>
+                <FileCheck size={20} color="#0052CC" />
               </View>
-              <Text style={styles.journeyDesc}>
-                {language === 'hi'
-                  ? 'डिजिलॉकर, पैन व आधार ओटीपी से पेपरलेस पहचान सत्यापन'
-                  : language === 'gu'
-                  ? 'ડિજીલૉકર, PAN અને આધાર OTP વડે પેપરલેસ ચકાસણી'
-                  : 'DigiLocker, PAN & Aadhaar OTP instant tokenization'}
-              </Text>
-            </View>
-            <ArrowRight size={16} color="#94A3B8" />
-          </TouchableOpacity>
+              <Text style={styles.serviceColTitle}>Digital KYC</Text>
+              <View style={[styles.servicePill, { backgroundColor: '#ECFDF5' }]}>
+                <Text style={[styles.servicePillText, { color: '#059669' }]}>Tier-2</Text>
+              </View>
+            </TouchableOpacity>
 
-          {/* Journey 2: Responsible Affordability Loan */}
-          <TouchableOpacity
-            style={styles.journeyCard}
-            onPress={() => openJourney('loan')}
-            activeOpacity={0.78}
-          >
-            <View style={[styles.journeyIconWrap, { backgroundColor: '#FEF3C7' }]}>
-              <CreditCard size={20} color="#D97706" />
-            </View>
-            <View style={styles.journeyTextWrap}>
-              <View style={styles.journeyBadgeRow}>
-                <Text style={styles.journeyTitle}>
-                  {language === 'hi' ? 'ज़िम्मेदार लोन योजना' : language === 'gu' ? 'જવાબદાર લોન આયોજન' : 'Responsible Affordability Loan'}
-                </Text>
-                <View style={[styles.statusBadge, { backgroundColor: '#FEF3C7' }]}>
-                  <Text style={[styles.statusBadgeText, { color: '#B45309' }]}>₹1,50,000 PRE-APPROVED</Text>
-                </View>
+            {/* 2. Quick Loan */}
+            <TouchableOpacity
+              style={styles.serviceCol}
+              onPress={() => openJourney('loan')}
+              delayPressIn={0}
+              activeOpacity={0.75}
+            >
+              <View style={[styles.serviceCircle, { backgroundColor: '#FEF3C7' }]}>
+                <CreditCard size={20} color="#D97706" />
               </View>
-              <Text style={styles.journeyDesc}>
-                {language === 'hi'
-                  ? '22% डीटीआई सीमा पर आधारित सुरक्षित एवं गैर-शोषणकारी ऋण'
-                  : language === 'gu'
-                  ? '22% DTI મર્યાદા પર આધારિત સલામત ક્રેડિટ આયોજન'
-                  : 'Audited against 22% DTI benchmark • Instant disbursal'}
-              </Text>
-            </View>
-            <ArrowRight size={16} color="#94A3B8" />
-          </TouchableOpacity>
+              <Text style={styles.serviceColTitle}>Quick Loan</Text>
+              <View style={[styles.servicePill, { backgroundColor: '#FEF3C7' }]}>
+                <Text style={[styles.servicePillText, { color: '#B45309' }]}>₹1.5L Pre</Text>
+              </View>
+            </TouchableOpacity>
 
-          {/* Journey 3: Surplus Smart Allocation */}
-          <TouchableOpacity
-            style={styles.journeyCard}
-            onPress={() => openJourney('savings_invest')}
-            activeOpacity={0.78}
-          >
-            <View style={[styles.journeyIconWrap, { backgroundColor: '#ECFDF5' }]}>
-              <TrendingUp size={20} color="#059669" />
-            </View>
-            <View style={styles.journeyTextWrap}>
-              <View style={styles.journeyBadgeRow}>
-                <Text style={styles.journeyTitle}>
-                  {language === 'hi' ? 'अधिशेष बचत व स्मार्ट निवेश' : language === 'gu' ? 'સરપ્લસ બચત અને રોકાણ' : 'Surplus & Smart Allocation'}
-                </Text>
-                <View style={[styles.statusBadge, { backgroundColor: '#EFF6FF' }]}>
-                  <Text style={[styles.statusBadgeText, { color: '#2563EB' }]}>7.85% AUTO-SWEEP</Text>
-                </View>
+            {/* 3. Investments */}
+            <TouchableOpacity
+              style={styles.serviceCol}
+              onPress={() => openJourney('savings_invest')}
+              delayPressIn={0}
+              activeOpacity={0.75}
+            >
+              <View style={[styles.serviceCircle, { backgroundColor: '#ECFDF5' }]}>
+                <TrendingUp size={20} color="#059669" />
               </View>
-              <Text style={styles.journeyDesc}>
-                {language === 'hi'
-                  ? 'अतिरिक्त लिक्विड फंड को उच्च-ब्याज ऑटो-स्वीप व फ्लेक्सी-एसआईपी में लगाएं'
-                  : language === 'gu'
-                  ? 'વધારાના નાણાંને ઊંચા વ્યાજવાળા ઓટો-સ્વીપ અને SIP માં રોકો'
-                  : 'Optimize excess cash into high-yield sweep & flexi-SIP'}
-              </Text>
-            </View>
-            <ArrowRight size={16} color="#94A3B8" />
-          </TouchableOpacity>
+              <Text style={styles.serviceColTitle}>Smart FD</Text>
+              <View style={[styles.servicePill, { backgroundColor: '#EFF6FF' }]}>
+                <Text style={[styles.servicePillText, { color: '#0052CC' }]}>7.2% Sweep</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* 4. Card Security */}
+            <TouchableOpacity
+              style={styles.serviceCol}
+              onPress={() => openJourney('debit_card')}
+              delayPressIn={0}
+              activeOpacity={0.75}
+            >
+              <View style={[styles.serviceCircle, { backgroundColor: '#ECFEFF' }]}>
+                <ShieldCheck size={20} color="#0891B2" />
+              </View>
+              <Text style={styles.serviceColTitle}>Card Safety</Text>
+              <View style={[styles.servicePill, { backgroundColor: '#F1F5F9' }]}>
+                <Text style={[styles.servicePillText, { color: '#475569' }]}>Lock</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -729,97 +737,8 @@ export const AdaptiveHomeScreen: React.FC = () => {
         {/* Direct Banking Products Hub */}
         {renderDirectBankingHub()}
 
-        {/* Dynamic Contextual Mitra Quick Chat Bar (Personalized Space for Chatbot) */}
-        <TouchableOpacity
-          style={styles.ambientMitraBar}
-          onPress={() => setActiveTab('assistant')}
-          delayPressIn={0}
-          activeOpacity={0.8}
-        >
-          <View style={styles.ambientMitraLeft}>
-            <View style={styles.ambientMitraIconCircle}>
-              <Bot size={16} color="#4F46E5" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.ambientMitraTag}>
-                {language === 'hi' ? 'बैंकिंग सलाहकार' : language === 'gu' ? 'નાણાકીય સલાહકાર' : 'FINANCIAL CONCIERGE'}
-              </Text>
-              <Text style={styles.ambientMitraPrompt} numberOfLines={1}>
-                {currentState === 'normal'
-                  ? (language === 'hi' ? 'मेट्रो स्मार्ट कार्ड रिचार्ज (₹40)' : language === 'gu' ? 'મેટ્રો સ્માર્ટ કાર્ડ રિચાર્જ (₹40)' : 'Recharge Metro Smart Card (₹40)')
-                  : currentState === 'medical_event'
-                  ? (language === 'hi' ? 'मैक्स अस्पताल क्लेम व धारा 80D टैक्स रसीद' : language === 'gu' ? 'મેક્સ હોસ્પિટલ ક્લેમ અને કલમ 80D ટેક્સ રસીદ' : 'Max Hospital Claim & Sec 80D Tax Paperwork')
-                  : currentState === 'financial_stress'
-                  ? (language === 'hi' ? 'आगामी देनदारियां व अधिस्थगन विकल्प देखें' : language === 'gu' ? 'આગામી જવાબદારીઓ અને મોરેટોરિયમ વિકલ્પો જુઓ' : 'Review Scheduled Commitments & Moratorium Options')
-                  : currentState === 'surplus'
-                  ? (language === 'hi' ? 'अतिरिक्त नकदी को 7.2% ऑटो-स्वीप डिपॉजिट में लगाएं' : language === 'gu' ? 'વધારાની રોકડ 7.2% ઑટો-સ્વીપ ડિપોઝિટમાં મૂકો' : 'Auto-Sweep Idle Cash into 7.2% Multi-Option Deposit')
-                  : (language === 'hi' ? 'संदिग्ध विदेशी लेनदेन की जांच करें (संदर्भ: SEC-8921)' : language === 'gu' ? 'શંકાસ્પદ વિદેશી વ્યવહાર તપાસો (સંદર્ભ: SEC-8921)' : 'Review Flagged Overseas Transaction (Ref: SEC-8921)')}
-              </Text>
-            </View>
-          </View>
-          <ArrowRight size={14} color="#525866" />
-        </TouchableOpacity>
-
         {/* Adaptive Attention Hierarchy Stack (Different visual patterns per type) */}
         <ContextCardStack cards={cards} />
-
-        {/* Conversational Mitra Assistant Entry (Section 39) */}
-        <View style={styles.assistantCard}>
-          <View style={styles.assistantHeader}>
-            <View style={styles.assistantIconCircle}>
-              <Bot size={18} color="#111318" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.assistantTitle}>
-                {language === 'hi'
-                  ? 'एबीसी बैंक वित्तीय सहायक'
-                  : language === 'gu'
-                  ? 'એબીસી બેંક નાણાકીય સહાયક'
-                  : 'ABC Bank Financial Assistant'}
-              </Text>
-              <Text style={styles.assistantSubtitle}>
-                {language === 'hi'
-                  ? 'भारतीय रिज़र्व बैंक के डिजिटल दिशानिर्देशों के अनुरूप 256-बिट एन्क्रिप्टेड सहायक।'
-                  : language === 'gu'
-                  ? 'ભારતીય રિઝર્વ બેંકના ડિજિટલ માર્ગદર્શિકા અનુસાર 256-બીટ એન્ક્રિપ્ટેડ સહાયક.'
-                  : '256-bit encrypted banking assistant compliant with RBI digital guidelines.'}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.promptChips}>
-            <TouchableOpacity
-              style={styles.chip}
-              onPress={() => setActiveTab('assistant')}
-              delayPressIn={0}
-              activeOpacity={0.75}
-            >
-              <Text style={styles.chipText}>
-                {language === 'hi' ? 'पारगमन अधिदेश' : language === 'gu' ? 'ટ્રાન્ઝિટ આદેશ' : 'Transit Mandate'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.chip}
-              onPress={() => setActiveTab('assistant')}
-              delayPressIn={0}
-              activeOpacity={0.75}
-            >
-              <Text style={styles.chipText}>
-                {language === 'hi' ? 'व्यय लेखापरीक्षा' : language === 'gu' ? 'ખર્ચ ઓડિટ' : 'Expense Audit'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.chip}
-              onPress={() => setActiveTab('assistant')}
-              delayPressIn={0}
-              activeOpacity={0.75}
-            >
-              <Text style={styles.chipText}>
-                {language === 'hi' ? 'चिकित्सा क्लेम' : language === 'gu' ? 'તબીબી ક્લેમ' : 'Medical Claims'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
 
         {/* Quiet Institutional Banking Footer */}
         <View style={styles.footerNote}>
@@ -835,7 +754,7 @@ export const AdaptiveHomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FBFBFB',
+    backgroundColor: colors.bg,
   },
   scroll: {
     flex: 1,
@@ -1384,104 +1303,194 @@ const styles = StyleSheet.create({
     color: '#111318',
   },
 
-  // Conversational Assistant Surface
-  // Ambient Mitra Quick Chat Bar
-  ambientMitraBar: {
+  // Section Header Row (JioFinance-style clean uppercase title with subtle subtitle)
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  sectionTitleGroup: {
+    flex: 1,
+  },
+  sectionTitleText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+  },
+  sectionSubText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#94A3B8',
+    marginTop: 2,
+  },
+  mandateCountBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    backgroundColor: '#EEF2FF',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#E0E7FF',
+  },
+  mandateCountText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#0052CC',
+    letterSpacing: 0.4,
+  },
+
+  // Smart Routine Payments Carousel (Horizontal Cards)
+  carouselScrollContent: {
+    paddingRight: spacing.lg,
+    gap: 12,
+  },
+  routineCard: {
+    width: 154,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    ...shadows.sm,
+    justifyContent: 'space-between',
+  },
+  routineCardPaid: {
+    backgroundColor: '#F8FAFC',
+    borderColor: '#E2E8F0',
+  },
+  routineCardTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    shadowColor: '#111318',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  ambientMitraLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  ambientMitraIconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#EEF2FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ambientMitraTag: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#4F46E5',
-    letterSpacing: 0.5,
-  },
-  ambientMitraPrompt: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#111318',
-    marginTop: 1,
-  },
-  assistantCard: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-  },
-  assistantHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
     marginBottom: 12,
   },
-  assistantIconCircle: {
+  routineIconCircle: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F4F5F7',
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  assistantTitle: {
-    fontSize: 15,
+  routineCategoryBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    backgroundColor: '#F1F5F9',
+  },
+  routineCategoryText: {
+    fontSize: 9,
     fontWeight: '700',
-    color: '#111318',
+    color: '#64748B',
+    letterSpacing: 0.3,
+  },
+  routineCardTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.2,
+    marginBottom: 2,
+  },
+  routineCardSub: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#94A3B8',
+    marginBottom: 12,
+  },
+  routineCardBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
+  },
+  routineCardAmount: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#0F172A',
     letterSpacing: -0.2,
   },
-  assistantSubtitle: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#525866',
-    marginTop: 2,
-    lineHeight: 16,
+  routineCardAmountPaid: {
+    color: '#64748B',
   },
-  promptChips: {
+  routinePaidBadge: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 9999,
+    backgroundColor: '#ECFDF5',
   },
-  chip: {
+  routinePaidBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#059669',
+  },
+  routinePayBtn: {
     paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 99,
-    backgroundColor: '#F4F5F7',
+    paddingVertical: 4,
+    borderRadius: 9999,
+    backgroundColor: '#002970',
   },
-  chipText: {
+  routinePayBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+
+  // Financial Products & Services Grid (JioFinance Clean 4-Column Layout)
+  servicesSection: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md + 4,
+  },
+  servicesGridCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingVertical: 18,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: '#ECEEF2',
+    ...shadows.sm,
+  },
+  servicesRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-around',
+  },
+  serviceCol: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  serviceCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  serviceColTitle: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#111318',
+    color: '#1E293B',
+    textAlign: 'center',
+    marginBottom: 4,
   },
+  servicePill: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 9999,
+  },
+  servicePillText: {
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
+
+  // Quiet Institutional Banking Footer
   footerNote: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -1494,73 +1503,5 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#8C95A6',
     textAlign: 'center',
-  },
-  bankingHubSection: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-  bankingHubHeader: {
-    marginBottom: spacing.sm,
-  },
-  bankingHubSub: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#64748B',
-    marginTop: 2,
-  },
-  bankingHubList: {
-    gap: 10,
-    marginTop: spacing.xs,
-  },
-  journeyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    gap: 12,
-    ...shadows.sm,
-  },
-  journeyIconWrap: {
-    width: 42,
-    height: 42,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  journeyTextWrap: {
-    flex: 1,
-  },
-  journeyBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 2,
-  },
-  journeyTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#0F172A',
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginLeft: 6,
-  },
-  statusBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 0.4,
-  },
-  journeyDesc: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#64748B',
-    lineHeight: 15,
   },
 });
