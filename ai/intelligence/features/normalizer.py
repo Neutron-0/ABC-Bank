@@ -48,8 +48,20 @@ class TransactionNormalizer:
         (re.compile(r"(?i)\b(netflix|prime\s*video|spotify|disney|hotstar|youtube\s*prem|apple\.com/bill)\b"), "Digital Subscription", "entertainment"),
 
         # Food & Grocery
-        (re.compile(r"(?i)\b(swiggy|zomato|eats|dineout)\b"), "Food Delivery", "food"),
-        (re.compile(r"(?i)\b(blinkit|zepto|instamart|bigbasket|dmart|reliance\s*retail)\b"), "Grocery & Essentials", "groceries"),
+        (re.compile(r"(?i)\b(swiggy|dineout)\b"), "Swiggy Food & Dining", "food"),
+        (re.compile(r"(?i)\b(zomato|eats)\b"), "Zomato Food Delivery", "food"),
+        (re.compile(r"(?i)\b(zepto)\b"), "Zepto Quick Commerce", "groceries"),
+        (re.compile(r"(?i)\b(blinkit)\b"), "Blinkit Groceries", "groceries"),
+        (re.compile(r"(?i)\b(instamart|bigbasket|dmart|reliance\s*retail)\b"), "Grocery & Essentials", "groceries"),
+
+        # Fuel & Auto Spends
+        (re.compile(r"(?i)\b(iocl|bpcl|hpcl|petrol|diesel|fuel|shell\s*petrol)\b"), "Fuel & Highway Station", "transport"),
+
+        # Agriculture & Rural
+        (re.compile(r"(?i)\b(fertilizer|iffco|kisan|seeds|tractor|krishi|apmc)\b"), "Agricultural Supplies & Seeds", "agriculture"),
+
+        # Pension & Social Welfare
+        (re.compile(r"(?i)\b(pension|treasury|epfo|pm-kisan|dbt\s*credit)\b"), "Government Pension Credit", "salary"),
 
         # Suspicious / High-Risk Gaming / International
         (re.compile(r"(?i)\b(globaltech|gaming\s*dublin|casino|betting|odd\s*hours\s*gaming)\b"), "GlobalTech Gaming Dublin", "gaming")
@@ -58,6 +70,8 @@ class TransactionNormalizer:
     # High-throughput resolution and narration caches for massive load handling
     _NARRATION_CACHE: Dict[str, str] = {}
     _RESOLVE_CACHE: Dict[str, Tuple[str, str]] = {}
+    _UPI_VPA_REGEX = re.compile(r"(?i)@[a-zA-Z0-9.\-_]+")
+    _BANKING_TAGS_REGEX = re.compile(r"(?i)\b(nach|ach|neft|rtgs|imps|bil/onl|ecom|pos|p2a|p2p|p2m|dr|cr)\b")
 
     @classmethod
     def clean_narration(cls, text: str) -> str:
@@ -70,6 +84,8 @@ class TransactionNormalizer:
         s = cls._UPI_REF_REGEX.sub("", text)
         s = cls._IFSC_REGEX.sub("", s)
         s = cls._POS_TERMINAL_REGEX.sub("", s)
+        s = cls._UPI_VPA_REGEX.sub("", s)
+        s = cls._BANKING_TAGS_REGEX.sub("", s)
         s = cls._SPECIAL_CHARS_REGEX.sub(" ", s)
         cleaned = " ".join(s.split()).strip() or "General Transaction"
         if len(cls._NARRATION_CACHE) < 10000:
