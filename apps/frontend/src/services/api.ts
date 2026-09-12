@@ -95,10 +95,18 @@ export class BankingApi {
     return this.request(`/assistant/init?lang=${lang}`);
   }
 
-  public static async sendAssistantMessage(query: string, language: LanguageCode = 'en'): Promise<any | null> {
+  public static async sendAssistantMessage(
+    query: string,
+    language: LanguageCode = 'en',
+    pendingClarification?: string | null
+  ): Promise<any | null> {
     return this.request('/assistant/chat', {
       method: 'POST',
-      body: JSON.stringify({ query, language }),
+      body: JSON.stringify({
+        query,
+        language,
+        pending_clarification: pendingClarification || null,
+      }),
     });
   }
 }

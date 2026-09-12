@@ -1,0 +1,38 @@
+{
+  "name": "fraud_anomaly",
+  "title": "Unusual Midnight Transaction Alert",
+  "customer_id": "cust_bharat_001",
+  "customer_name": "Rahul Sharma",
+  "balance": {
+    "available": 18200,
+    "savings": 160000,
+    "currency": "INR"
+  },
+  "signals": {
+    "anomaly_score": 88,
+    "unusual_hour": true,
+    "unusual_amount": 31800,
+    "unfamiliar_merchant": "GlobalTech Gaming Dublin",
+    "location_mismatch": true
+  },
+  "transactions": [
+    {
+      "id": "tx_frd_01",
+      "amount": 31800.0,
+      "type": "debit",
+      "category": "gaming",
+      "merchant": "GlobalTech Gaming Dublin IE",
+      "timestamp": "2026-09-12T02:14:00+05:30",
+      "is_recurring": false
+    },
+    {
+      "id": "tx_frd_02",
+      "amount": 75000.0,
+      "type": "credit",
+      "category": "salary",
+      "merchant": "Infosys Tech Salary",
+      "timestamp": "2026-09-01T09:00:00+05:30",
+      "is_recurring": true
+    }
+  ]
+}

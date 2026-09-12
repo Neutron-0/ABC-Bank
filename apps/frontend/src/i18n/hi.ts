@@ -101,6 +101,11 @@ export const hi: typeof en = {
     send: 'भेजें',
     suggestedTopics: 'वर्तमान स्थिति के अनुसार सुझाव',
     disclaimer: 'मित्रा नैतिक नियमों और प्रासंगिक डेटा के साथ आपकी सहायता करता है।',
+    voiceListening: 'सुन रहा हूँ...',
+    voiceSpeakNow: 'सुन रहा हूँ... बोलिए (हिंदी, गुजराती, या अंग्रेजी)',
+    voiceTapToSpeak: 'बोलने के लिए माइक दबाएं',
+    voicePillsLabel: 'त्वरित आवाज़ और टेक्स्ट शॉर्टकट',
+    navigatingTo: 'पेज खोला जा रहा है:',
   },
   products: {
     title: 'वित्तीय उत्पाद',

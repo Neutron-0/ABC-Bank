@@ -1,15 +1,17 @@
 {
-  "intent": "PAY_METRO",
+  "intent": "CHECK_EMI",
   "language": "en",
-  "confidence": 0.94,
+  "confidence": 0.96,
   "entities": {
-    "merchant": "Delhi Metro Smart Card",
-    "amount": 40
+    "inquiry_type": "loan_application",
+    "action": "loan_application",
+    "category": "personal_loan",
+    "amount": 50000
   },
-  "response_text": "Your routine morning Metro commute is \u20b940 at 8:40 AM. Would you like to proceed with instant UPI recharge?",
+  "response_text": "Under RBI fair lending guidelines and your active debt commitments, cash flow stabilization is recommended before taking new credit. Would you like to review your commitments?",
   "suggested_actions": [
-    "CONFIRM",
-    "DISMISS",
-    "DETAILS"
+    "REVIEW_COMMITMENTS",
+    "SPEAK_TO_COUNSELOR",
+    "DISMISS"
   ]
 }
