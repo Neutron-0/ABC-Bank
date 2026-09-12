@@ -1,51 +1,68 @@
+/**
+ * STRICT TWO-COLOR BANKING DESIGN SYSTEM
+ *
+ * Color A: Primary Brand (~15% visual weight) - Deep Trust Royal Navy (#002970 / #2563EB)
+ * Color B: Secondary Accent (~5% visual weight) - Heritage Warm Amber (#B45309 / #F59E0B)
+ * Neutrals: Everything else (~80% visual weight) - Charcoal, Slate, Hairline borders, and Tonal Canvas
+ */
+
 export interface ThemeColors {
-  // Primary Brand & Deep Charcoal Neutrals
+  // --- COLOR A: PRIMARY BRAND (Dominant Identity ~15%) ---
   primary: string;
   primaryDark: string;
   primaryLight: string;
   primarySubtle: string;
   primaryRoyal: string;
-  jioBlue: string;
+  jioBlue: string; // Compatibility alias to Color A
 
-  // Canvas & Surfaces
-  bg: string;
-  cardBg: string;
-  cardBgSecondary: string;
-  surfaceElevated: string;
+  // --- COLOR B: SECONDARY BRAND (Selective Milestone Accent ~5%) ---
+  brandSecondary: string;
+  brandSecondaryLight: string;
+  brandSecondarySubtle: string;
+  accentWarm: string; // Alias to Color B
+  warning: string; // Restrained semantic alignment to Color B
+  warningLight: string;
+
+  // --- NEUTRAL FOUNDATION (~80% Visual Weight) ---
+  bg: string; // Canvas with subtle tonal depth (not stark clinical white)
+  cardBg: string; // Primary Crisp Surface
+  cardBgSecondary: string; // Secondary Neutral Surface for wells/chips
+  surfaceElevated: string; // Elevated neutral sheet
 
   // Hairline & Structural Dividers
   border: string;
   borderLight: string;
   divider: string;
 
-  // Typography Scale
+  // Monochromatic Iconography Tokens
+  iconNeutral: string;
+  iconNeutralSubtle: string;
+
+  // Typography Scale (High-Legibility Charcoal/Slate)
   textPrimary: string;
   textSecondary: string;
   textMuted: string;
   textWhite: string;
 
-  // Restrained Semantic Accents
-  accent: string;
-  accentIndigo: string;
-  accentPurple: string;
+  // --- RESTRAINED SEMANTIC INDICATORS ---
+  accent: string; // Maps strictly to Color A
+  accentIndigo: string; // Strict fallback to Color A
+  accentPurple: string; // Strict fallback to Color A
   success: string;
   successLight: string;
-  warning: string;
-  warningLight: string;
-  accentWarm: string;
   danger: string;
   dangerLight: string;
   info: string;
   infoLight: string;
 
-  // Pastel Container Backgrounds for 4-Grid / Services
+  // Monochromatic Neutral Replacements for Legacy Pastel Containers
   pastelBlue: string;
   pastelEmerald: string;
   pastelAmber: string;
   pastelPurple: string;
   pastelCyan: string;
 
-  // Attention Hierarchy Layers
+  // Attention Hierarchy Layers (Mapped to Neutral & Color A subtle wells)
   layerDo: string;
   layerKnow: string;
   layerPlan: string;
@@ -53,112 +70,121 @@ export interface ThemeColors {
 }
 
 export const lightColors: ThemeColors = {
-  // Primary Brand & Deep Charcoal Neutrals
-  primary: '#111318',
-  primaryDark: '#0A0C0F',
-  primaryLight: '#2D3748',
-  primarySubtle: '#F4F5F7',
-  primaryRoyal: '#002970', // JioFinance Deep Trust Royal Blue
-  jioBlue: '#0A2540',
+  // Color A: Primary Brand
+  primary: '#002970', // Deep Trust Royal Navy
+  primaryDark: '#001A4D',
+  primaryLight: '#1E3A8A',
+  primarySubtle: '#F0F4FA',
+  primaryRoyal: '#002970',
+  jioBlue: '#002970',
 
-  // Canvas & Surfaces (Airy, Calm Light-Slate)
-  bg: '#F6F8FA', // JioFinance Soft Slate Canvas
-  cardBg: '#FFFFFF', // Pure Crisp White
-  cardBgSecondary: '#F8FAFC', // Subtle Secondary Tint
+  // Color B: Secondary Brand (Heritage Warm Amber)
+  brandSecondary: '#B45309', // Amber-700
+  brandSecondaryLight: '#D97706',
+  brandSecondarySubtle: '#FEF3C7',
+  accentWarm: '#B45309',
+  warning: '#B45309',
+  warningLight: '#FEF3C7',
+
+  // Neutral Foundation (~80% Visual Field)
+  bg: '#F4F5F7', // Neutral slate canvas (warm, calm, anti-glare)
+  cardBg: '#FFFFFF', // Crisp White surface
+  cardBgSecondary: '#EDEFF2', // Neutral well/input surface
   surfaceElevated: '#FFFFFF',
 
-  // Hairline & Structural Dividers
-  border: '#ECEEF2', // Soft Hairline Border
-  borderLight: '#F1F5F9',
+  border: '#E2E8F0', // Hairline neutral divider
+  borderLight: '#EDEFF2',
   divider: '#E2E8F0',
 
-  // Typography Scale (High-Legibility Charcoal)
-  textPrimary: '#0F172A', // Deep Slate / Near-Black
-  textSecondary: '#475569', // Calm Muted Slate
-  textMuted: '#94A3B8', // Secondary Metadata
+  iconNeutral: '#475569', // Slate-600 default icon
+  iconNeutralSubtle: '#94A3B8',
+
+  textPrimary: '#0F172A', // Slate-900
+  textSecondary: '#475569', // Slate-600
+  textMuted: '#94A3B8', // Slate-400
   textWhite: '#FFFFFF',
 
-  // Restrained Semantic Accents
-  accent: '#0052CC', // JioFinance Electric Blue
-  accentIndigo: '#4F46E5',
-  accentPurple: '#7C3AED',
-  success: '#059669',
+  // Subordinate Semantics
+  accent: '#002970', // Bound to Color A
+  accentIndigo: '#002970',
+  accentPurple: '#002970',
+  success: '#059669', // Restrained emerald for confirmation dots
   successLight: '#ECFDF5',
-  warning: '#D97706',
-  warningLight: '#FFFBEB',
-  accentWarm: '#D97706',
-  danger: '#DC2626',
+  danger: '#DC2626', // Restrained crimson for critical alert tags
   dangerLight: '#FEF2F2',
-  info: '#2563EB',
-  infoLight: '#EFF6FF',
+  info: '#002970', // Bound to Color A
+  infoLight: '#F0F4FA',
 
-  // Pastel Container Backgrounds for 4-Grid / Services
-  pastelBlue: '#EFF6FF',
-  pastelEmerald: '#ECFDF5',
-  pastelAmber: '#FEF3C7',
-  pastelPurple: '#F5F3FF',
-  pastelCyan: '#ECFEFF',
+  // Unified Monochromatic Tiles (Banished Pastel Rainbows)
+  pastelBlue: '#F0F4FA', // Color A subtle
+  pastelEmerald: '#EDEFF2', // Neutral slate well
+  pastelAmber: '#FEF3C7', // Color B subtle
+  pastelPurple: '#EDEFF2', // Neutral slate well
+  pastelCyan: '#EDEFF2', // Neutral slate well
 
-  // Attention Hierarchy Layers
-  layerDo: '#F0F5FF',
-  layerKnow: '#F0FDF4',
-  layerPlan: '#FAF5FF',
-  layerConsider: '#FFFBEB',
+  layerDo: '#F0F4FA',
+  layerKnow: '#EDEFF2',
+  layerPlan: '#EDEFF2',
+  layerConsider: '#FEF3C7',
 };
 
 export const darkColors: ThemeColors = {
-  // Primary Brand & Inverted High-Contrast Slate
-  primary: '#F8FAFC',
-  primaryDark: '#E2E8F0',
-  primaryLight: '#94A3B8',
-  primarySubtle: '#1E293B',
-  primaryRoyal: '#2563EB', // Vibrant royal in dark mode
-  jioBlue: '#1E3A8A',
+  // Color A: Primary Brand (Vibrant Electric Sapphire Accent in Dark Mode ~15%)
+  primary: '#2563EB', // Vibrant Brand Blue for CTAs, active tabs, graph curves & indicators
+  primaryDark: '#1D4ED8',
+  primaryLight: '#3B82F6',
+  primarySubtle: '#172554', // Midnight Sapphire well
+  primaryRoyal: '#2563EB',
+  jioBlue: '#2563EB',
 
-  // Canvas & Surfaces (Luxury Midnight Obsidian)
-  bg: '#0B0F19', // Deepest Obsidian
-  cardBg: '#131B2E', // High-Contrast Elevated Card Slate
-  cardBgSecondary: '#1C2740', // Secondary Elevated Tile
-  surfaceElevated: '#202E4C',
+  // Color B: Secondary Brand (Luminous Warm Amber Milestone ~5%)
+  brandSecondary: '#F59E0B',
+  brandSecondaryLight: '#FBBF24',
+  brandSecondarySubtle: '#261C05',
+  accentWarm: '#F59E0B',
+  warning: '#F59E0B',
+  warningLight: '#261C05',
 
-  // Hairline & Structural Dividers
-  border: '#23324D', // Crisp border for dark surfaces
-  borderLight: '#2C3E60',
-  divider: '#1F2C45',
+  // Neutral Foundation (~80% Visual Field) - Pure Deep True Black
+  bg: '#000000', // Pure True Black canvas
+  cardBg: '#121212', // Material True Dark surface
+  cardBgSecondary: '#1C1C1E', // Neutral dark grey well
+  surfaceElevated: '#242426',
 
-  // Typography Scale (Luminous Crisp Slate)
-  textPrimary: '#F8FAFC', // Crisp Pure White
-  textSecondary: '#94A3B8', // Cool Muted Slate
-  textMuted: '#64748B', // Secondary Metadata
+  border: '#2C2C2E', // Neutral hairline border
+  borderLight: '#3A3A3C',
+  divider: '#242426',
+
+  iconNeutral: '#A1A1AA', // Neutral silver-grey icon
+  iconNeutralSubtle: '#71717A',
+
+  textPrimary: '#FFFFFF', // High-Contrast Pure White (guarantees NO blue text on dark backgrounds)
+  textSecondary: '#A1A1AA', // Neutral silver-grey
+  textMuted: '#71717A',
   textWhite: '#FFFFFF',
 
-  // Restrained Semantic Accents (Luminous contrast)
-  accent: '#38BDF8', // Luminous Sky Blue
-  accentIndigo: '#818CF8',
-  accentPurple: '#A78BFA',
+  // Subordinate Semantics
+  accent: '#2563EB',
+  accentIndigo: '#2563EB',
+  accentPurple: '#2563EB',
   success: '#10B981',
-  successLight: '#064E3B',
-  warning: '#F59E0B',
-  warningLight: '#451A03',
-  accentWarm: '#F59E0B',
+  successLight: '#0C2417',
   danger: '#EF4444',
-  dangerLight: '#450A0A',
-  info: '#38BDF8',
-  infoLight: '#082F49',
+  dangerLight: '#2A0E0E',
+  info: '#3B82F6',
+  infoLight: '#172554',
 
-  // Pastel / Subtle Container Backgrounds
   pastelBlue: '#172554',
-  pastelEmerald: '#064E3B',
-  pastelAmber: '#451A03',
-  pastelPurple: '#2E1065',
-  pastelCyan: '#083344',
+  pastelEmerald: '#1C1C1E',
+  pastelAmber: '#261C05',
+  pastelPurple: '#1C1C1E',
+  pastelCyan: '#1C1C1E',
 
-  // Attention Hierarchy Layers
-  layerDo: '#1E293B',
-  layerKnow: '#064E3B',
-  layerPlan: '#2E1065',
-  layerConsider: '#451A03',
+  layerDo: '#172554',
+  layerKnow: '#1C1C1E',
+  layerPlan: '#1C1C1E',
+  layerConsider: '#261C05',
 };
 
-// Default static fallback for legacy non-reactive imports
+// Static default fallback
 export const colors: ThemeColors = lightColors;
