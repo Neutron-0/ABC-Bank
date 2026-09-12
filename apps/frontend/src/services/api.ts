@@ -39,6 +39,8 @@ export const getApiBaseUrl = (): string => {
   return 'http://localhost:8000/api/v1';
 };
 
+import { MiniCPM5EdgeEngine } from './MiniCPM5EdgeEngine';
+
 export class BankingApi {
   private static get baseUrl(): string {
     return getApiBaseUrl();
@@ -47,7 +49,7 @@ export class BankingApi {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout for reliable neural SLM pipeline response
+      const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s timeout for fast on-device fallback
 
       const res = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
@@ -64,7 +66,7 @@ export class BankingApi {
       }
       return await res.json();
     } catch (err) {
-      console.log(`[BankingApi] Offline/fallback mode active for ${endpoint}`);
+      console.log(`[BankingApi] Edge on-device fallback mode active for ${endpoint}`);
       return null;
     }
   }
@@ -85,10 +87,24 @@ export class BankingApi {
   }
 
   public static async sendVoiceQuery(query: string, language: LanguageCode = 'en'): Promise<any | null> {
-    return this.request('/voice/intent', {
+    const remote = await this.request('/voice/intent', {
       method: 'POST',
       body: JSON.stringify({ query, language }),
     });
+    if (remote) return remote;
+
+    // On-device MiniCPM-5 edge execution fallback
+    const edge = MiniCPM5EdgeEngine.processQuery(query, language);
+    return {
+      intent: edge.intent,
+      confidence: edge.confidence,
+      language: edge.language,
+      entities: edge.entities,
+      response_text: edge.responseText,
+      suggested_actions: ['CONFIRM', 'DETAILS'],
+      runtime_device: 'On-Device Mobile NPU / MiniCPM-5 Edge',
+      latency_ms: edge.latencyMs,
+    };
   }
 
   public static async getAssistantInit(lang: LanguageCode = 'en'): Promise<any | null> {
@@ -100,7 +116,7 @@ export class BankingApi {
     language: LanguageCode = 'en',
     pendingClarification?: string | null
   ): Promise<any | null> {
-    return this.request('/assistant/chat', {
+    const remote = await this.request<any>('/assistant/chat', {
       method: 'POST',
       body: JSON.stringify({
         query,
@@ -108,5 +124,15 @@ export class BankingApi {
         pending_clarification: pendingClarification || null,
       }),
     });
+    if (remote && remote.reply) return remote;
+
+    // On-device MiniCPM-5 edge execution fallback (0ms latency, zero server required)
+    const edge = MiniCPM5EdgeEngine.processQuery(query, language);
+    return {
+      success: true,
+      reply: MiniCPM5EdgeEngine.toAssistantMessage(edge),
+      isEdgeExecution: true,
+      runtimeDevice: 'On-Device Mobile NPU / MiniCPM-5 Edge',
+    };
   }
 }
