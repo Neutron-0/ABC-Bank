@@ -120,69 +120,136 @@ export const ContextCard: React.FC<Props> = ({ card }) => {
   const handlePrimaryAction = async () => {
     const action = primaryAction;
     if (!action) return;
-    const actionType = action.actionType || (action as any).action_type;
+    const rawActionType = (action.actionType || (action as any).action_type || '').toUpperCase();
     const journeyId = action.journeyId || (action as any).journey_id;
-    const targetScreen = action.targetScreen || (action as any).target_screen;
+    const targetScreen = (action.targetScreen || (action as any).target_screen || '').toLowerCase();
     const payload = action.payload;
 
-    if (actionType === 'INSTANT_PAY' && payload) {
+    if (rawActionType === 'INSTANT_PAY' || rawActionType === 'INSTANT_METRO_PAY' || rawActionType === 'QUICK_PAY') {
       await performPayment({
-        amount: payload.amount,
-        merchant: payload.merchant,
-        category: payload.category,
-        description: `Instant repeated payment for ${payload.merchant}`,
+        amount: payload?.amount || 40,
+        merchant: payload?.merchant || card.title || 'Instant Payment',
+        category: payload?.category || card.category || 'transport',
+        description: `Instant payment for ${payload?.merchant || card.title}`,
       });
       return;
     }
 
-    if (actionType === 'OPEN_JOURNEY' && journeyId) {
+    if (journeyId) {
       openJourney(journeyId, payload);
       return;
     }
 
-    if (actionType === 'OPEN_SCREEN' && targetScreen) {
-      if (targetScreen === 'Payments') setActiveTab('payments');
-      else if (targetScreen === 'Activity') setActiveTab('activity');
-      else if (targetScreen === 'Insights' || targetScreen === 'Money') setActiveTab('insights');
-      else if (targetScreen === 'Products') setActiveTab('profile');
+    if (rawActionType === 'OPEN_JOURNEY' && journeyId) {
+      openJourney(journeyId, payload);
       return;
     }
 
-    if (actionType === 'OPEN_ASSISTANT') {
+    if (rawActionType === 'OPEN_STRESS_MODAL') {
+      openJourney('financial_stress', payload);
+      return;
+    }
+
+    if (rawActionType === 'OPEN_PASSBOOK') {
+      setActiveTab('activity');
+      return;
+    }
+
+    if (rawActionType === 'OPEN_ASSISTANT' || rawActionType === 'TALK_MITRA') {
       setActiveTab('assistant');
       return;
     }
+
+    if (targetScreen) {
+      if (targetScreen.includes('pay')) setActiveTab('payments');
+      else if (targetScreen.includes('activ') || targetScreen.includes('passbook') || targetScreen.includes('transact')) setActiveTab('activity');
+      else if (targetScreen.includes('insight') || targetScreen.includes('money') || targetScreen.includes('wealth')) setActiveTab('insights');
+      else if (targetScreen.includes('product') || targetScreen.includes('profile') || targetScreen.includes('service')) setActiveTab('profile');
+      else if (targetScreen.includes('assist') || targetScreen.includes('chat') || targetScreen.includes('mitra')) setActiveTab('assistant');
+      return;
+    }
+
+    // Default card ID routing
+    if (card.id.includes('metro')) {
+      await performPayment({
+        amount: 40,
+        merchant: 'Delhi Metro Smart Card',
+        category: 'transport',
+        description: 'Morning Metro Commute',
+      });
+      return;
+    }
+    if (card.id.includes('sweep') || card.id.includes('sip') || card.id.includes('invest') || card.id.includes('emergency')) {
+      openJourney('savings_invest');
+      return;
+    }
+    if (card.id.includes('medical')) {
+      openJourney('medical_claim');
+      return;
+    }
+    if (card.id.includes('fraud') || card.id.includes('unrecognized')) {
+      openJourney('fraud_alert');
+      return;
+    }
+    if (card.id.includes('stress') || card.id.includes('moratorium')) {
+      openJourney('financial_stress');
+      return;
+    }
+    if (card.id.includes('loan')) {
+      openJourney('loan');
+      return;
+    }
+    if (card.id.includes('kyc')) {
+      openJourney('kyc');
+      return;
+    }
+    if (card.id.includes('credit')) {
+      openJourney('credit_score');
+      return;
+    }
+    if (card.id.includes('card') || card.id.includes('debit')) {
+      openJourney('debit_card');
+      return;
+    }
+
+    // Default fallback: show why modal or details
+    setWhyCard(card);
   };
 
   const handleSecondaryAction = () => {
-    if (!secondaryAction) return;
+    if (!secondaryAction) {
+      handleDismiss();
+      return;
+    }
     const action = secondaryAction;
-    const actionType = action.actionType || (action as any).action_type;
+    const rawActionType = (action.actionType || (action as any).action_type || '').toUpperCase();
     const journeyId = action.journeyId || (action as any).journey_id;
-    const targetScreen = action.targetScreen || (action as any).target_screen;
+    const targetScreen = (action.targetScreen || (action as any).target_screen || '').toLowerCase();
     const payload = action.payload;
 
-    if (actionType === 'DISMISS_CARD') {
+    if (rawActionType === 'DISMISS_CARD' || rawActionType === 'DISMISS') {
       handleDismiss();
       return;
     }
 
-    if (actionType === 'OPEN_JOURNEY' && journeyId) {
+    if (journeyId) {
       openJourney(journeyId, payload);
       return;
     }
 
-    if (actionType === 'OPEN_ASSISTANT') {
+    if (rawActionType === 'OPEN_ASSISTANT') {
       setActiveTab('assistant');
       return;
     }
 
-    if (actionType === 'OPEN_SCREEN' && targetScreen) {
-      if (targetScreen === 'Payments') setActiveTab('payments');
-      else if (targetScreen === 'Activity') setActiveTab('activity');
-      else if (targetScreen === 'Insights') setActiveTab('insights');
+    if (targetScreen) {
+      if (targetScreen.includes('pay')) setActiveTab('payments');
+      else if (targetScreen.includes('activ') || targetScreen.includes('passbook')) setActiveTab('activity');
+      else if (targetScreen.includes('insight') || targetScreen.includes('wealth')) setActiveTab('insights');
       return;
     }
+
+    handleDismiss();
   };
 
   // Icon mapping

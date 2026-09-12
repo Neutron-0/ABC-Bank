@@ -20,7 +20,9 @@ export const CreditScoreModal: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [score, setScore] = useState(785);
 
-  if (activeJourney !== 'credit_score') return null;
+  const isVisible = activeJourney === 'credit_score' || activeJourney === 'credit';
+
+  if (!isVisible) return null;
 
   const handleRefresh = () => {
     setIsRefreshing(true);

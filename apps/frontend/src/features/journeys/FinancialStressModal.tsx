@@ -19,7 +19,14 @@ export const FinancialStressModal: React.FC = () => {
 
   const [pausedSubs, setPausedSubs] = useState<string[]>([]);
 
-  if (activeJourney !== 'stress_intervention') return null;
+  const isVisible =
+    activeJourney === 'stress_intervention' ||
+    activeJourney === 'financial_stress' ||
+    activeJourney === 'stress' ||
+    activeJourney === 'moratorium' ||
+    activeJourney === 'budget_shield';
+
+  if (!isVisible) return null;
 
   const togglePauseSub = (subName: string) => {
     if (pausedSubs.includes(subName)) {

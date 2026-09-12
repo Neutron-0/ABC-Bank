@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -21,7 +21,13 @@ export const MedicalAssistanceModal: React.FC = () => {
   const hospital = journeyPayload?.hospital || 'Max Super Speciality Hospital';
   const amount = journeyPayload?.amount || 48200;
 
-  if (activeJourney !== 'medical_assistance') return null;
+  const isVisible =
+    activeJourney === 'medical_assistance' ||
+    activeJourney === 'medical_claim' ||
+    activeJourney === 'medical' ||
+    activeJourney === 'claim';
+
+  if (!isVisible) return null;
 
   return (
     <Modal visible={true} transparent animationType="slide" onRequestClose={closeJourney}>

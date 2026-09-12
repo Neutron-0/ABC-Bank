@@ -818,9 +818,7 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     },
 
     switchCustomerState: async (state: CustomerStateType) => {
-      set({ isLoading: true });
-
-      // Apply offline bundle instantly so Expo Go transitions are immediate
+      // Apply offline bundle instantly with 0ms latency
       const bundle = OFFLINE_STATE_BUNDLES[state] || OFFLINE_STATE_BUNDLES.normal;
       const currentLang = get().language;
       const localized = localizeCardList(bundle.cards, currentLang);
@@ -832,29 +830,23 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
         risk: { ...bundle.risk },
         cards: localized,
         transactions: [...bundle.transactions],
+        isLoading: false,
       });
 
-      // Also notify backend if reachable
-      try {
-        await BankingApi.switchScenario(state);
-      } catch (err) {
-        // Fallback already active
-      } finally {
-        set({ isLoading: false });
-      }
+      // Background non-blocking notification to backend
+      BankingApi.switchScenario(state).catch(() => {});
     },
 
     fetchStateAndContext: async () => {
-      try {
-        const exp = await BankingApi.getExperience(get().profile.id, get().language);
-        if (exp && exp.context_cards && exp.context_cards.length > 0) {
-          // Sync and normalize cards from backend experience contract
-          const normalized = localizeCardList(exp.context_cards, get().language);
-          set({ cards: normalized });
-        }
-      } catch (err) {
-        // Guaranteed fallback cards already loaded
-      }
+      // Background non-blocking sync
+      BankingApi.getExperience(get().profile.id, get().language)
+        .then((exp) => {
+          if (exp && exp.context_cards && exp.context_cards.length > 0) {
+            const normalized = localizeCardList(exp.context_cards, get().language);
+            set({ cards: normalized });
+          }
+        })
+        .catch(() => {});
     },
 
     dismissCard: async (cardId: string) => {

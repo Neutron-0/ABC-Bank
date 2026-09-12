@@ -29,7 +29,12 @@ export const DebitCardModal: React.FC = () => {
   const [atmLimit, setAtmLimit] = useState<number>(50000);
   const [showCvv, setShowCvv] = useState(false);
 
-  if (activeJourney !== 'debit_card') return null;
+  const isVisible =
+    activeJourney === 'debit_card' ||
+    activeJourney === 'card' ||
+    activeJourney === 'cards';
+
+  if (!isVisible) return null;
 
   const handleToggleLock = (val: boolean) => {
     setIsLocked(val);

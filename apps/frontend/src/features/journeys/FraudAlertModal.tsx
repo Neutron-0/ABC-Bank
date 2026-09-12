@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -16,7 +16,14 @@ export const FraudAlertModal: React.FC = () => {
   const { activeJourney, closeJourney, showToast } = useCustomerStore();
   const [resolution, setResolution] = useState<'prompt' | 'locked' | 'verified'>('prompt');
 
-  if (activeJourney !== 'fraud_alert' && activeJourney !== 'freeze_card') return null;
+  const isVisible =
+    activeJourney === 'fraud_alert' ||
+    activeJourney === 'freeze_card' ||
+    activeJourney === 'security' ||
+    activeJourney === 'fraud' ||
+    activeJourney === 'dispute';
+
+  if (!isVisible) return null;
 
   const handleFreeze = () => {
     setResolution('locked');

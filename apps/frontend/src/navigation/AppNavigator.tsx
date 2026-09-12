@@ -112,26 +112,26 @@ export const AppNavigator: React.FC = () => {
       const nextIdx = TAB_ORDER[activeTab] ?? 0;
       const direction = nextIdx >= prevIdx ? 1 : -1;
 
-      screenOpacity.setValue(0.2);
-      screenTranslateX.setValue(direction * 18);
-      screenScale.setValue(0.985);
+      screenOpacity.setValue(0.7);
+      screenTranslateX.setValue(direction * 10);
+      screenScale.setValue(0.99);
 
       Animated.parallel([
         Animated.timing(screenOpacity, {
           toValue: 1,
-          duration: 210,
+          duration: 120,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.timing(screenTranslateX, {
           toValue: 0,
-          duration: 210,
+          duration: 120,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.timing(screenScale, {
           toValue: 1,
-          duration: 210,
+          duration: 120,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),

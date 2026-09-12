@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -8,7 +8,15 @@ export const SavingsInvestModal: React.FC = () => {
   const { activeJourney, closeJourney, balance, signals, showToast } = useCustomerStore();
   const [selectedPlan, setSelectedPlan] = useState<'smart_fd' | 'index_sip'>('smart_fd');
 
-  if (activeJourney !== 'savings_invest') return null;
+  const isVisible =
+    activeJourney === 'savings_invest' ||
+    activeJourney === 'auto_sweep' ||
+    activeJourney === 'flexi_sip' ||
+    activeJourney === 'savings' ||
+    activeJourney === 'invest' ||
+    activeJourney === 'emergency_fund';
+
+  if (!isVisible) return null;
 
   const surplus = signals.surplusAmount > 0 ? signals.surplusAmount : 38400;
 

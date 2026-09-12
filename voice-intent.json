@@ -1,35 +1,36 @@
 {
-  "intent": "LOCK_CARD",
+  "intent": "PAY_METRO",
   "language": "en",
-  "confidence": 0.997,
+  "confidence": 0.9968,
   "entities": {
-    "action": "biometric_freeze",
-    "status": "card_locked"
+    "merchant": "Delhi Metro Smart Card",
+    "amount": 40.0
   },
-  "response_text": "Your debit card has been instantly frozen for your security.",
+  "response_text": "Your routine morning metro fare is \u20b940.0. Would you like to pay with 1-tap UPI?",
   "suggested_actions": [
-    "UNFREEZE",
-    "DISPUTE_CHARGE",
-    "CALL_HELPLINE"
+    "1_TAP_PAY",
+    "CHANGE_AMOUNT",
+    "VIEW_PASS"
   ],
   "suggested_prompts": [
-    "Lock Card",
-    "Change ATM Limit",
-    "Credit Score"
+    "Pay Metro \u20b940",
+    "View Commute Card",
+    "Passbook"
   ],
   "pending_clarification": null,
   "navigation": {
-    "type": "JOURNEY",
-    "target": "debit_card",
-    "auto_navigate": true,
-    "action_label": "Open Debit Card"
+    "type": "TAB",
+    "target": "payments",
+    "auto_navigate": false,
+    "action_label": "Pay \u20b940 Metro"
   },
   "action_chips": [
     {
-      "label": "Open Debit Card",
-      "action": "OPEN_JOURNEY",
+      "label": "Pay \u20b940 Metro",
+      "action": "INSTANT_PAY",
       "payload": {
-        "journeyId": "debit_card"
+        "amount": 40,
+        "merchant": "Delhi Metro Smart Card"
       }
     }
   ]

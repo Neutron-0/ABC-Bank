@@ -136,26 +136,10 @@ class SupervisedPropensityModel:
         return x_all, labels
 
     @classmethod
-    def train(cls) -> None:
-        """Loads pre-trained Scikit-Learn LogisticRegression models from checkpoints or trains dynamically."""
-        if cls._is_trained:
-            return
-
-        checkpoint_path = Path(__file__).resolve().parent / "checkpoints" / "propensity_models_v1.joblib"
-        if checkpoint_path.exists():
-            try:
-                import joblib
-                artifact = joblib.load(checkpoint_path)
-                cls._models = artifact["models"]
-                cls._is_trained = True
-                return
-            except Exception:
-                pass
-
+    def _train_dynamic(cls) -> None:
         x_train, labels_dict = cls._synthesize_training_dataset()
 
         for product_id, y_train in labels_dict.items():
-            # Ensure at least 2 classes present
             if len(np.unique(y_train)) < 2:
                 y_train = y_train.copy()
                 y_train[0] = 0
@@ -169,9 +153,34 @@ class SupervisedPropensityModel:
                 random_state=42
             )
             clf.fit(x_train, y_train)
+            if not hasattr(clf, "multi_class"):
+                setattr(clf, "multi_class", "auto")
             cls._models[product_id] = clf
 
         cls._is_trained = True
+
+    @classmethod
+    def train(cls) -> None:
+        """Loads pre-trained Scikit-Learn LogisticRegression models from checkpoints or trains dynamically."""
+        if cls._is_trained:
+            return
+
+        checkpoint_path = Path(__file__).resolve().parent / "checkpoints" / "propensity_models_v1.joblib"
+        if checkpoint_path.exists():
+            try:
+                import joblib
+                artifact = joblib.load(checkpoint_path)
+                cls._models = artifact["models"]
+                # Ensure all loaded estimators have multi_class attribute for current sklearn
+                for clf in cls._models.values():
+                    if not hasattr(clf, "multi_class"):
+                        setattr(clf, "multi_class", "auto")
+                cls._is_trained = True
+                return
+            except Exception:
+                pass
+
+        cls._train_dynamic()
 
     @classmethod
     def predict_propensity(cls, product_id: str, vector: np.ndarray) -> float:
@@ -184,7 +193,21 @@ class SupervisedPropensityModel:
             return 0.50
 
         x = np.asarray(vector, dtype=np.float64).reshape(1, -1)
-        prob_positive = float(clf.predict_proba(x)[0, 1])
+        if not hasattr(clf, "multi_class"):
+            setattr(clf, "multi_class", "auto")
+        try:
+            prob_positive = float(clf.predict_proba(x)[0, 1])
+        except Exception:
+            cls._is_trained = False
+            cls._models.clear()
+            cls._train_dynamic()
+            clf = cls._models.get(product_id)
+            if clf is not None:
+                if not hasattr(clf, "multi_class"):
+                    setattr(clf, "multi_class", "auto")
+                prob_positive = float(clf.predict_proba(x)[0, 1])
+            else:
+                prob_positive = 0.50
         return float(round(np.clip(prob_positive, 0.0, 1.0), 4))
 
     @classmethod
@@ -195,9 +218,8 @@ class SupervisedPropensityModel:
 
         x = np.asarray(vector, dtype=np.float64).reshape(1, -1)
         results: Dict[str, float] = {}
-        for pid, clf in cls._models.items():
-            prob = float(clf.predict_proba(x)[0, 1])
-            results[pid] = float(round(np.clip(prob, 0.0, 1.0), 4))
+        for pid in list(cls._models.keys()):
+            results[pid] = cls.predict_propensity(pid, vector)
         return results
 
     @classmethod

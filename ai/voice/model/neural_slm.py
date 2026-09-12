@@ -16,9 +16,19 @@ import math
 from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 import numpy as np
-import onnx
-from onnx import helper, TensorProto
-import onnxruntime as ort
+try:
+    import onnx
+    from onnx import helper, TensorProto
+except ImportError:
+    onnx = None
+    helper = None
+    TensorProto = None
+
+try:
+    import onnxruntime as ort
+except ImportError:
+    ort = None
+
 from sklearn.neural_network import MLPClassifier
 
 
@@ -128,22 +138,24 @@ class IndicSubwordTokenizer:
 class MiniCPM5ONNXModel:
     """Manages the genuine ONNX Neural Computation Graph and ONNX Runtime execution session."""
 
-    _session: ort.InferenceSession | None = None
+    _session: Any = None
+    _w1: Optional[np.ndarray] = None
+    _b1: Optional[np.ndarray] = None
+    _w2: Optional[np.ndarray] = None
+    _b2: Optional[np.ndarray] = None
 
     INPUT_DIM: int = 64
     HIDDEN_DIM: int = 128
     OUTPUT_DIM: int = 9  # 9 Intent classes
 
     @classmethod
-    def _train_and_export_onnx_model(cls, onnx_file_path: Path) -> None:
-        """Trains neural MLP projection weights and serializes the computational graph to ONNX."""
+    def _train_weights(cls) -> None:
+        if cls._w1 is not None:
+            return
         rng = np.random.default_rng(42)
         centroids = IndicSubwordTokenizer.CENTROIDS
-
         X_train = []
         y_train = []
-
-        # Train on clustered centroid neighborhoods with Gaussian perturbation
         for c_idx in range(cls.OUTPUT_DIM):
             c_vec = centroids[c_idx]
             for _ in range(80):
@@ -161,11 +173,22 @@ class MiniCPM5ONNXModel:
             random_state=42
         )
         clf.fit(np.array(X_train), np.array(y_train))
+        cls._w1 = clf.coefs_[0].astype(np.float32)
+        cls._b1 = clf.intercepts_[0].astype(np.float32)
+        cls._w2 = clf.coefs_[1].astype(np.float32)
+        cls._b2 = clf.intercepts_[1].astype(np.float32)
 
-        w1_data = clf.coefs_[0].astype(np.float32)
-        b1_data = clf.intercepts_[0].astype(np.float32)
-        w2_data = clf.coefs_[1].astype(np.float32)
-        b2_data = clf.intercepts_[1].astype(np.float32)
+    @classmethod
+    def _train_and_export_onnx_model(cls, onnx_file_path: Path) -> None:
+        """Trains neural MLP projection weights and serializes the computational graph to ONNX."""
+        cls._train_weights()
+        if helper is None or onnx is None:
+            return
+
+        w1_data = cls._w1
+        b1_data = cls._b1
+        w2_data = cls._w2
+        b2_data = cls._b2
 
         # Create input/output tensor value info
         input_info = helper.make_tensor_value_info("input_embedding", TensorProto.FLOAT, [1, cls.INPUT_DIM])
@@ -196,8 +219,10 @@ class MiniCPM5ONNXModel:
         onnx.save(model, str(onnx_file_path))
 
     @classmethod
-    def get_session(cls, force_rebuild: bool = False) -> ort.InferenceSession:
+    def get_session(cls, force_rebuild: bool = False) -> Any:
         """Returns initialized ONNX Runtime Inference Session, training and exporting graph if missing."""
+        if ort is None:
+            return None
         if cls._session is None or force_rebuild:
             if not ONNX_MODEL_PATH.exists() or force_rebuild:
                 cls._train_and_export_onnx_model(ONNX_MODEL_PATH)
@@ -210,8 +235,16 @@ class MiniCPM5ONNXModel:
         return cls._session
 
     @classmethod
+    def _predict_numpy(cls, embedding: np.ndarray) -> np.ndarray:
+        cls._train_weights()
+        hidden = np.maximum(0, np.dot(embedding, cls._w1) + cls._b1)
+        logits = np.dot(hidden, cls._w2) + cls._b2
+        exp_logits = np.exp(logits - np.max(logits))
+        return (exp_logits / np.sum(exp_logits)).astype(np.float32)
+
+    @classmethod
     def predict(cls, text: str) -> Dict[str, Any]:
-        """Executes real on-device neural forward pass over ONNX computation graph."""
+        """Executes real on-device neural forward pass over ONNX computation graph or direct matrix execution."""
         clean_text = str(text or "").strip()
         if not clean_text:
             return {
@@ -223,10 +256,17 @@ class MiniCPM5ONNXModel:
 
         t_start = time.perf_counter()
         embedding = IndicSubwordTokenizer.embed_text(clean_text)
-        session = cls.get_session()
 
-        raw_outputs = session.run(None, {"input_embedding": embedding})
-        probabilities = raw_outputs[0][0]
+        if ort is not None and ONNX_MODEL_PATH.exists():
+            try:
+                session = cls.get_session()
+                raw_outputs = session.run(None, {"input_embedding": embedding})
+                probabilities = raw_outputs[0][0]
+            except Exception:
+                probabilities = cls._predict_numpy(embedding)[0]
+        else:
+            probabilities = cls._predict_numpy(embedding)[0]
+
         pred_idx = int(np.argmax(probabilities))
         confidence = float(probabilities[pred_idx])
         t_end = time.perf_counter()
