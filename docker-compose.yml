@@ -1,25 +1,24 @@
-﻿version: '3.8'
+version: '3.8'
 
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: apps/backend/Dockerfile
-    ports:
-      - "8000:8000"
+  db:
+    image: postgres:16-alpine
+    container_name: abc_bank_db
+    restart: unless-stopped
     environment:
-      - BACKEND_PORT=8000
+      POSTGRES_DB: abc_bank
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
     volumes:
-      - ./contracts:/app/contracts
-      - ./data:/app/data
-      - ./ai:/app/ai
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d abc_bank"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  frontend:
-    build:
-      context: apps/frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - EXPO_PUBLIC_API_URL=http://localhost:8000/api/v1
-    depends_on:
-      - backend
+volumes:
+  postgres_data:
+    driver: local

@@ -89,7 +89,9 @@ def switch_scenario(req: ScenarioRequest):
     valid_scenarios = [
         "normal",
         "life-change",
+        "life_change",
         "financial-stress",
+        "financial_stress",
         "medical_event",
         "medical-event",
         "fraud_alert",

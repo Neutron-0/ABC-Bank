@@ -1,7 +1,10 @@
-﻿# Environment & Secrets
+# Environment & Secrets
 .env
 .env.local
 *.env
+*.key
+key.key
+.venv_wsl/
 
 # Python
 __pycache__/

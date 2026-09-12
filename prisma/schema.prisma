@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model accounts {
+  id                 String               @id @db.VarChar(64)
+  customer_id        String               @db.VarChar(64)
+  account_type       String               @db.VarChar(32)
+  account_number     String               @unique @db.VarChar(32)
+  balance            Float
+  available_balance  Float
+  currency           String               @db.VarChar(8)
+  status             String               @db.VarChar(16)
+  opened_at          DateTime             @db.Timestamp(6)
+  customers          customers            @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  recurring_payments recurring_payments[]
+  transactions       transactions[]
+
+  @@index([customer_id], map: "ix_accounts_customer_id")
+  @@index([id], map: "ix_accounts_id")
+}
+
+model alembic_version {
+  version_num String @id(map: "alembic_version_pkc") @db.VarChar(32)
+}
+
+model consent_preferences {
+  customer_id             String    @id @db.VarChar(64)
+  personalization_consent Boolean
+  marketing_consent       Boolean
+  data_sharing_consent    Boolean
+  communication_channel   String    @db.VarChar(32)
+  updated_at              DateTime  @db.Timestamp(6)
+  customers               customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model customer_events {
+  id              String    @id @db.VarChar(64)
+  customer_id     String    @db.VarChar(64)
+  event_type      String    @db.VarChar(64)
+  description     String    @db.VarChar(256)
+  amount          Float?
+  event_timestamp DateTime  @db.Timestamp(6)
+  metadata        Json?     @db.Json
+  customers       customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([customer_id], map: "ix_customer_events_customer_id")
+  @@index([event_timestamp], map: "ix_customer_events_event_timestamp")
+  @@index([event_type], map: "ix_customer_events_event_type")
+  @@index([id], map: "ix_customer_events_id")
+}
+
+model customer_products {
+  id          String    @id @db.VarChar(64)
+  customer_id String    @db.VarChar(64)
+  product_id  String    @db.VarChar(64)
+  status      String    @db.VarChar(16)
+  acquired_at DateTime  @db.Timestamp(6)
+  customers   customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  products    products  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([customer_id], map: "ix_customer_products_customer_id")
+  @@index([id], map: "ix_customer_products_id")
+}
+
+model customers {
+  id                  String               @id @db.VarChar(64)
+  name                String               @db.VarChar(128)
+  age                 Int?
+  occupation          String?              @db.VarChar(128)
+  city                String               @db.VarChar(64)
+  state               String               @db.VarChar(64)
+  tier                String               @db.VarChar(16)
+  preferred_language  String               @db.VarChar(8)
+  phone               String?              @db.VarChar(32)
+  email               String?              @db.VarChar(128)
+  monthly_income      Float
+  income_type         String               @db.VarChar(32)
+  kyc_tier            Int
+  credit_score        Int
+  archetype           String?              @db.VarChar(64)
+  created_at          DateTime             @db.Timestamp(6)
+  accounts            accounts[]
+  consent_preferences consent_preferences?
+  customer_events     customer_events[]
+  customer_products   customer_products[]
+  recurring_payments  recurring_payments[]
+  transactions        transactions[]
+
+  @@index([archetype], map: "ix_customers_archetype")
+  @@index([city], map: "ix_customers_city")
+  @@index([id], map: "ix_customers_id")
+  @@index([state], map: "ix_customers_state")
+  @@index([tier], map: "ix_customers_tier")
+}
+
+model products {
+  id                String              @id @db.VarChar(64)
+  code              String              @unique @db.VarChar(32)
+  name              String              @db.VarChar(128)
+  category          String              @db.VarChar(32)
+  description       String
+  interest_rate     Float?
+  status            String              @db.VarChar(16)
+  customer_products customer_products[]
+
+  @@index([category], map: "ix_products_category")
+  @@index([id], map: "ix_products_id")
+}
+
+model recurring_payments {
+  id          String    @id @db.VarChar(64)
+  customer_id String    @db.VarChar(64)
+  account_id  String    @db.VarChar(64)
+  category    String    @db.VarChar(32)
+  merchant    String    @db.VarChar(128)
+  amount      Float
+  frequency   String    @db.VarChar(16)
+  due_day     Int
+  status      String    @db.VarChar(16)
+  accounts    accounts  @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  customers   customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([customer_id], map: "ix_recurring_payments_customer_id")
+  @@index([id], map: "ix_recurring_payments_id")
+}
+
+model transactions {
+  id              String    @id @db.VarChar(64)
+  customer_id     String    @db.VarChar(64)
+  account_id      String    @db.VarChar(64)
+  amount          Float
+  type            String    @db.VarChar(16)
+  category        String    @db.VarChar(32)
+  merchant        String    @db.VarChar(128)
+  timestamp       DateTime  @db.Timestamp(6)
+  payment_channel String    @db.VarChar(32)
+  is_recurring    Boolean
+  frequency       String?   @db.VarChar(16)
+  location        String?   @db.VarChar(64)
+  metadata        Json?     @db.Json
+  accounts        accounts  @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  customers       customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([account_id], map: "ix_transactions_account_id")
+  @@index([category], map: "ix_transactions_category")
+  @@index([customer_id], map: "ix_transactions_customer_id")
+  @@index([id], map: "ix_transactions_id")
+  @@index([timestamp], map: "ix_transactions_timestamp")
+  @@index([customer_id, category], map: "ix_tx_cust_cat")
+  @@index([customer_id, timestamp], map: "ix_tx_cust_time")
+}

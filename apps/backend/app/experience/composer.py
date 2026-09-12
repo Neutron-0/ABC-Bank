@@ -86,10 +86,24 @@ class ExperienceComposer:
             return "#64748B"
 
     @classmethod
-    def compose(cls, state: CustomerStateModel, lang: str = "en") -> ExperienceConfigModel:
+    def compose(
+        cls,
+        state: CustomerStateModel,
+        lang: str = "en",
+        current_time: Optional[Any] = None
+    ) -> ExperienceConfigModel:
         signals = state.signals or {}
         health = state.financial_health or "stable"
-        raw_recommendations = state.recommendations or []
+        raw_recommendations = list(state.recommendations or [])
+
+        # Evaluate contextual habits if behavioral analysis is available in signals
+        from apps.backend.app.services.behavior_engine import BehavioralEngine
+        habits = signals.get("habits", {})
+        ctx_time = current_time or signals.get("current_context_time")
+        if habits:
+            ctx_recs = BehavioralEngine.evaluate_current_relevance(habits, current_time=ctx_time)
+            for cr in ctx_recs:
+                raw_recommendations.append(Recommendation(**cr))
 
         # 1. Determine financial stress state
         is_stress = SafetyPolicyFilter.evaluate_financial_stress(health, signals)

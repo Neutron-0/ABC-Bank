@@ -113,6 +113,13 @@ class StateService:
             features = FeatureExtractor.extract(transactions)
             raw_state = CustomerStateGenerator.generate(scenario_data, features)
 
+            # Extract longitudinal behavioral habits from transaction history
+            from apps.backend.app.services.behavior_engine import BehavioralEngine
+            habits = BehavioralEngine.analyze_habits(transactions)
+            if "signals" not in raw_state or not isinstance(raw_state["signals"], dict):
+                raw_state["signals"] = {}
+            raw_state["signals"]["habits"] = habits
+
             # Validate against Pydantic model contract
             customer_state = CustomerStateModel(**raw_state)
             cls._in_memory_states[cache_key] = customer_state
