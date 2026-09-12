@@ -1,6 +1,6 @@
 """Unsupervised KMeans Clustering Engine for Bharat Banking Archetypes."""
 
-from __future__ import annotations
+from pathlib import Path
 from typing import Dict, Any, List, Tuple
 import numpy as np
 from sklearn.cluster import KMeans
@@ -119,37 +119,50 @@ class KMeansClusterer:
 
     @classmethod
     def get_model(cls) -> KMeans:
-        """Lazily initializes and fits the KMeans model deterministically."""
-        if cls._model is None:
-            x_train, y_train = cls._generate_synthetic_seed_profiles()
-            # Initialize with centroids matching the 7 prototype distributions
-            initial_centers = []
-            for arch_idx in range(len(cls.ARCHETYPE_ORDER)):
-                cluster_samples = x_train[y_train == arch_idx]
-                initial_centers.append(np.mean(cluster_samples, axis=0))
-            init_matrix = np.array(initial_centers)
+        """Lazily initializes or loads the pre-trained KMeans model from checkpoints."""
+        if cls._model is not None:
+            return cls._model
 
-            kmeans = KMeans(
-                n_clusters=7,
-                init=init_matrix,
-                n_init=1,
-                max_iter=300,
-                random_state=42
-            )
-            kmeans.fit(x_train)
+        checkpoint_path = Path(__file__).resolve().parent / "checkpoints" / "kmeans_archetypes_v1.joblib"
+        if checkpoint_path.exists():
+            try:
+                import joblib
+                artifact = joblib.load(checkpoint_path)
+                cls._model = artifact["model"]
+                raw_map = artifact["centroid_map"]
+                cls._archetype_centroid_map = {int(k): ArchetypeId(v) for k, v in raw_map.items()}
+                return cls._model
+            except Exception:
+                pass
 
-            # Bipartite matching ensures exact 1-to-1 optimal assignment between cluster centers and archetypes
-            from scipy.optimize import linear_sum_assignment
-            cost_matrix = np.zeros((7, 7), dtype=np.float64)
-            for c_idx, center in enumerate(kmeans.cluster_centers_):
-                for a_idx, proto in enumerate(init_matrix):
-                    cost_matrix[c_idx, a_idx] = np.linalg.norm(center - proto)
+        # Fallback: train on the fly deterministically
+        x_train, y_train = cls._generate_synthetic_seed_profiles()
+        initial_centers = []
+        for arch_idx in range(len(cls.ARCHETYPE_ORDER)):
+            cluster_samples = x_train[y_train == arch_idx]
+            initial_centers.append(np.mean(cluster_samples, axis=0))
+        init_matrix = np.array(initial_centers)
 
-            row_ind, col_ind = linear_sum_assignment(cost_matrix)
-            cls._archetype_centroid_map = {int(r): cls.ARCHETYPE_ORDER[int(c)] for r, c in zip(row_ind, col_ind)}
+        kmeans = KMeans(
+            n_clusters=7,
+            init=init_matrix,
+            n_init=1,
+            max_iter=300,
+            random_state=42
+        )
+        kmeans.fit(x_train)
 
-            cls._model = kmeans
+        # Bipartite matching ensures exact 1-to-1 optimal assignment between cluster centers and archetypes
+        from scipy.optimize import linear_sum_assignment
+        cost_matrix = np.zeros((7, 7), dtype=np.float64)
+        for c_idx, center in enumerate(kmeans.cluster_centers_):
+            for a_idx, proto in enumerate(init_matrix):
+                cost_matrix[c_idx, a_idx] = np.linalg.norm(center - proto)
 
+        row_ind, col_ind = linear_sum_assignment(cost_matrix)
+        cls._archetype_centroid_map = {int(r): cls.ARCHETYPE_ORDER[int(c)] for r, c in zip(row_ind, col_ind)}
+
+        cls._model = kmeans
         return cls._model
 
     @classmethod

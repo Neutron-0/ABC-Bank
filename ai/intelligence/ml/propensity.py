@@ -1,6 +1,6 @@
 """Supervised Multi-Product Propensity Model for Bharat Banking using Scikit-Learn Logistic Regression."""
 
-from __future__ import annotations
+from pathlib import Path
 from typing import Dict, Any, List, Tuple
 import numpy as np
 from sklearn.linear_model import LogisticRegression
@@ -137,9 +137,20 @@ class SupervisedPropensityModel:
 
     @classmethod
     def train(cls) -> None:
-        """Trains Scikit-Learn LogisticRegression models for each product."""
+        """Loads pre-trained Scikit-Learn LogisticRegression models from checkpoints or trains dynamically."""
         if cls._is_trained:
             return
+
+        checkpoint_path = Path(__file__).resolve().parent / "checkpoints" / "propensity_models_v1.joblib"
+        if checkpoint_path.exists():
+            try:
+                import joblib
+                artifact = joblib.load(checkpoint_path)
+                cls._models = artifact["models"]
+                cls._is_trained = True
+                return
+            except Exception:
+                pass
 
         x_train, labels_dict = cls._synthesize_training_dataset()
 

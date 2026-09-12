@@ -204,20 +204,25 @@ def test_linucb_online_learning_update():
     LinUCBBandit.reset()
     vec = np.random.uniform(0.1, 0.9, size=32)
 
-    initial_score = LinUCBBandit.score("rec_commute_metro", vec)
+    # 1. Cold arm online learning: initial score starts at prior, positive rewards increase score
+    initial_score = LinUCBBandit.score("test_arm_online", vec)
     assert 0.0 <= initial_score <= 1.0
 
     # User repeatedly accepts product recommendation (reward = +1.0)
     for _ in range(5):
-        LinUCBBandit.update("rec_commute_metro", vec, reward=1.0)
+        LinUCBBandit.update("test_arm_online", vec, reward=1.0)
 
-    updated_score = LinUCBBandit.score("rec_commute_metro", vec)
-    assert updated_score >= initial_score, "Score must increase or stay high after repeated positive reward."
+    updated_score = LinUCBBandit.score("test_arm_online", vec)
+    assert updated_score > initial_score, f"Score must increase after repeated positive reward (got {initial_score} -> {updated_score})"
+
+    # 2. Pre-warmed catalog arm maintains strong baseline
+    metro_score = LinUCBBandit.score("rec_commute_metro", vec)
+    assert metro_score >= 0.70
 
     # Export state verification
     state = LinUCBBandit.export_state()
-    assert "rec_commute_metro" in state
-    assert len(state["rec_commute_metro"]["b"]) == 32
+    assert "test_arm_online" in state
+    assert len(state["test_arm_online"]["b"]) == 32
 
 
 def test_ml_inference_latency():

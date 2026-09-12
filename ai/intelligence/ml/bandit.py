@@ -5,6 +5,10 @@ from typing import Dict, Any, List
 import numpy as np
 
 
+from pathlib import Path
+import json
+
+
 class LinUCBBandit:
     """Disjoint LinUCB (Linear Upper Confidence Bound) Contextual Bandit in R^32.
 
@@ -22,11 +26,28 @@ class LinUCBBandit:
 
     @classmethod
     def _init_arm(cls, product_id: str) -> None:
-        """Initializes identity covariance matrix and zero reward vector for a new arm."""
-        if product_id not in cls._A:
-            cls._A[product_id] = np.identity(cls.DIMENSION, dtype=np.float64)
-            cls._b[product_id] = np.zeros(cls.DIMENSION, dtype=np.float64)
-            cls._inv_A[product_id] = np.identity(cls.DIMENSION, dtype=np.float64)
+        """Initializes covariance matrix and reward vector for an arm, using pre-warmed checkpoint if available."""
+        if product_id in cls._A:
+            return
+
+        cls._A[product_id] = np.identity(cls.DIMENSION, dtype=np.float64)
+        cls._b[product_id] = np.zeros(cls.DIMENSION, dtype=np.float64)
+
+        checkpoint_path = Path(__file__).resolve().parent / "checkpoints" / "linucb_bandit_prior_v1.json"
+        if checkpoint_path.exists():
+            try:
+                with open(checkpoint_path, "r", encoding="utf-8") as f:
+                    priors = json.load(f)
+                if product_id in priors:
+                    arm_prior = priors[product_id]
+                    if "b" in arm_prior:
+                        cls._b[product_id] = np.array(arm_prior["b"], dtype=np.float64)
+                    if "A_diag" in arm_prior:
+                        np.fill_diagonal(cls._A[product_id], arm_prior["A_diag"])
+            except Exception:
+                pass
+
+        cls._inv_A[product_id] = np.linalg.inv(cls._A[product_id])
 
     @classmethod
     def score(cls, product_id: str, vector: np.ndarray, alpha: float | None = None) -> float:
