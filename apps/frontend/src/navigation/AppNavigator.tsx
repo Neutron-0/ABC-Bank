@@ -36,6 +36,7 @@ import { FinancialStressModal } from '../features/journeys/FinancialStressModal'
 import { CreditScoreModal } from '../features/journeys/CreditScoreModal';
 import { DebitCardModal } from '../features/journeys/DebitCardModal';
 import { OnboardingModal } from '../features/onboarding/OnboardingModal';
+import { PaymentAuthModal } from '../components/common/PaymentAuthModal';
 
 // Icons
 import {
@@ -279,6 +280,7 @@ export const AppNavigator: React.FC = () => {
       <FinancialStressModal />
       <CreditScoreModal />
       <DebitCardModal />
+      <PaymentAuthModal />
       <OnboardingModal
         visible={showOnboarding || activeJourney === 'onboarding'}
         onFinish={() => {

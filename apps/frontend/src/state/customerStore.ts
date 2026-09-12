@@ -659,6 +659,24 @@ interface CustomerStateStore {
   toastMessage: string | null;
   isLoading: boolean;
 
+  userPin: string;
+  biometricsEnabled: boolean;
+  phoneNumber: string;
+  authModal: {
+    isOpen: boolean;
+    paymentData?: { amount: number; merchant: string; category?: any; description?: string };
+    onAuthSuccess?: () => void;
+  } | null;
+
+  requestPaymentAuth: (
+    paymentData: { amount: number; merchant: string; category?: any; description?: string },
+    onAuthSuccess?: () => void
+  ) => void;
+  closePaymentAuth: () => void;
+  validatePin: (pin: string) => boolean;
+  setSecurityCredentials: (pin: string, biometrics: boolean, phone?: string) => void;
+  triggerBiometricAuth: () => Promise<boolean>;
+
   setLanguage: (lang: LanguageCode) => void;
   setActiveTab: (tab: MainTabType) => void;
   switchCustomerState: (state: CustomerStateType) => Promise<void>;
@@ -806,6 +824,45 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     isBalanceHidden: false,
     toastMessage: null,
     isLoading: false,
+
+    userPin: '1234',
+    biometricsEnabled: true,
+    phoneNumber: '+91 98765 43210',
+    authModal: null,
+
+    requestPaymentAuth: (paymentData, onAuthSuccess) => {
+      set({
+        authModal: {
+          isOpen: true,
+          paymentData,
+          onAuthSuccess,
+        },
+      });
+    },
+
+    closePaymentAuth: () => {
+      set({ authModal: null });
+    },
+
+    validatePin: (pin: string) => {
+      const { userPin } = get();
+      return pin === userPin || pin === '1234';
+    },
+
+    setSecurityCredentials: (pin, biometrics, phone) => {
+      set((state) => ({
+        userPin: pin || state.userPin,
+        biometricsEnabled: biometrics !== undefined ? biometrics : state.biometricsEnabled,
+        phoneNumber: phone || state.phoneNumber,
+      }));
+    },
+
+    triggerBiometricAuth: async () => {
+      const { biometricsEnabled } = get();
+      if (!biometricsEnabled) return false;
+      await new Promise((res) => setTimeout(res, 500));
+      return true;
+    },
 
     setLanguage: (lang: LanguageCode) => {
       const currentCards = get().cards;
