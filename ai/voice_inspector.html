@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABC Bank — Mitra Vernacular Voice SLM Inspector (MiniCPM-5)</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --surface: #0f172a;
+      --surface-border: #1e293b;
+      --primary: #3b82f6;
+      --primary-light: #60a5fa;
+      --success: #10b981;
+      --purple: #a855f7;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--surface-border);
+      margin-bottom: 24px;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, #a855f7, #6b21a8);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 20px; color: #fff;
+    }
+    .badge {
+      font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 9999px;
+      background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-muted); margin-bottom: 14px; display: flex; justify-content: space-between;
+    }
+    .query-input {
+      width: 100%;
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #fff;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .query-input:focus { outline: 2px solid var(--purple); }
+    .presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .preset-btn {
+      background: #1e293b; border: 1px solid #334155; color: var(--text-muted);
+      padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;
+    }
+    .preset-btn:hover { background: #334155; color: #fff; }
+    .voice-output-box {
+      background: #090f1d;
+      border-radius: 10px;
+      padding: 16px;
+      border-left: 4px solid var(--purple);
+      margin-top: 14px;
+    }
+    .voice-text { font-size: 16px; font-weight: 500; color: #fff; margin-top: 6px; }
+    .intent-tag {
+      font-size: 11px; padding: 2px 8px; border-radius: 4px;
+      background: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: 700;
+    }
+    pre {
+      background: #020617; padding: 14px; border-radius: 8px; font-size: 12px;
+      overflow-x: auto; color: #94a3b8; margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="brand-logo">VOICE</div>
+        <div>
+          <h1 style="font-size: 20px;">ABC Bank — Mitra Vernacular Voice Assistant</h1>
+          <p style="font-size: 12px; color: var(--text-muted);">
+            On-Device MiniCPM-5 INT4 SLM • Isolated Conversational Interface • Zero Personal Recommendation Coupling
+          </p>
+        </div>
+      </div>
+      <span class="badge">Edge NPU ~1.85 GB RAM</span>
+    </header>
+
+    <div class="card" style="border-color: rgba(59, 130, 246, 0.3); background: rgba(37, 99, 235, 0.05);">
+      <div style="font-size: 12px; color: var(--primary-light);">
+        [ARCHITECTURAL INVARIANT] This Voice SLM subsystem processes spoken conversational dialogue only (e.g. balance queries, bill execution). It does <strong>NOT</strong> rank, filter, or generate financial recommendations, which are handled strictly by the mathematical Personalization Engine.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Spoken Utterance Simulator</div>
+      <input type="text" id="query-input" class="query-input" placeholder="Enter spoken query or select a preset below..." value="Mera khata balance kitna hai?" />
+
+      <div class="presets">
+        <button class="preset-btn" onclick="setQuery('Mera khata balance kitna hai?', 'hi')">Hindi: Balance Check</button>
+        <button class="preset-btn" onclick="setQuery('Mara EMI nu payment kyare che?', 'gu')">Gujarati: EMI Due Date</button>
+        <button class="preset-btn" onclick="setQuery('Bijli ka bill bhar do', 'hi')">Hindi: Pay Bill</button>
+        <button class="preset-btn" onclick="setQuery('Subah ki metro ka kitna lagega?', 'hi')">Hindi: Metro Fare</button>
+        <button class="preset-btn" onclick="setQuery('Lock my card immediately', 'en')">English: Fraud Lock</button>
+        <button class="preset-btn" onclick="setQuery('KCC loan ma ketlu mali shake?', 'gu')">Gujarati: Kisan Credit</button>
+      </div>
+
+      <button onclick="processVoice()" style="background: var(--purple); color:#fff; border:none; padding:10px 18px; border-radius:8px; font-weight:600; cursor:pointer;">
+        Simulate MiniCPM-5 Verbalization
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Mitra SLM Output</span>
+        <span id="intent-badge" class="intent-tag">CHECK_BALANCE</span>
+      </div>
+
+      <div class="voice-output-box">
+        <div style="font-size: 11px; color: var(--text-muted);">Verbalized Audio Text:</div>
+        <div class="voice-text" id="voice-response">"आपके बचत खाते में उपलब्ध बैलेंस ₹42,680 है।"</div>
+      </div>
+
+      <div style="margin-top: 14px; font-size: 12px; font-weight: 600; color: var(--text-muted);">
+        Parsed VoiceIntent JSON Payload (Conforms to contracts/voice-intent.schema.json):
+      </div>
+      <pre id="json-output"></pre>
+    </div>
+  </div>
+
+  <script>
+    const DEMO_RESPONSES = {
+      "Mera khata balance kitna hai?": {
+        intent: "CHECK_BALANCE",
+        language: "hi",
+        response: "आपके बचत खाते में उपलब्ध बैलेंस ₹42,680 है।",
+        entities: { account_type: "savings" },
+        actions: ["VIEW_PASSBOOK"]
+      },
+      "Mara EMI nu payment kyare che?": {
+        intent: "CHECK_EMI",
+        language: "gu",
+        response: "તમારું હોમ લોન EMI ₹18,500 છે અને તે 16 તારીખે જમા કરવાનું છે.",
+        entities: { loan_type: "home_loan", due_date: "16 September" },
+        actions: ["PAY_NOW", "SET_AUTOPAY"]
+      },
+      "Bijli ka bill bhar do": {
+        intent: "PAY_BILL",
+        language: "hi",
+        response: "आपका टाटा पावर बिजली बिल ₹1,450 देय है। क्या मैं 1-टैप यूपीआई से भुगतान करूँ?",
+        entities: { biller: "Tata Power", amount: 1450.0 },
+        actions: ["1_TAP_PAY"]
+      },
+      "Subah ki metro ka kitna lagega?": {
+        intent: "PAY_METRO",
+        language: "hi",
+        response: "आपकी सुबह की मेट्रो यात्रा का किराया ₹40 है। क्या आप 1-टैप यूपीआई से भुगतान करना चाहते हैं?",
+        entities: { transit_agency: "DMRC", amount: 40.0 },
+        actions: ["1_TAP_PAY"]
+      },
+      "Lock my card immediately": {
+        intent: "LOCK_CARD",
+        language: "en",
+        response: "Your Visa Platinum debit card ending in 8912 has been instantly frozen to protect your account.",
+        entities: { card_last_four: "8912", action: "freeze" },
+        actions: ["REQUEST_REPLACEMENT"]
+      },
+      "KCC loan ma ketlu mali shake?": {
+        intent: "CHECK_BALANCE",
+        language: "gu",
+        response: "તમારા કિસાન ક્રેડિટ કાર્ડ પર 4% વ્યાજે ₹50,000 ની લિમિટ તૈયાર છે.",
+        entities: { credit_type: "KCC", limit: 50000 },
+        actions: ["APPLY_TOPUP"]
+      }
+    };
+
+    function setQuery(q) {
+      document.getElementById("query-input").value = q;
+      processVoice();
+    }
+
+    function processVoice() {
+      const q = document.getElementById("query-input").value.trim();
+      const res = DEMO_RESPONSES[q] || {
+        intent: "GENERAL_QUERY",
+        language: "hi",
+        response: "नमस्ते! मैं एबीसी बैंक मित्र हूँ। आप अपना बैलेंस, बिल या यात्रा सहायता के बारे में पूछ सकते हैं।",
+        entities: {},
+        actions: []
+      };
+
+      document.getElementById("intent-badge").innerText = res.intent;
+      document.getElementById("voice-response").innerText = '"' + res.response + '"';
+      document.getElementById("json-output").innerText = JSON.stringify({
+        intent: res.intent,
+        language: res.language,
+        confidence: 0.96,
+        response_text: res.response,
+        entities: res.entities,
+        suggested_actions: res.actions
+      }, null, 2);
+    }
+
+    // Initial run
+    processVoice();
+  </script>
+</body>
+</html>

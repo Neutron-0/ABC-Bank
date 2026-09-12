@@ -1,4 +1,4 @@
-﻿# Hackathon Presentation & Demo Flow
+# Hackathon Presentation & Demo Flow
 
 ## 1. The Core Demonstration
 
@@ -25,7 +25,7 @@ Adaptive UI (apps/frontend/)
 ### Demo 1: Normal Workday (`normal.json`)
 - **Signals**: Regular salary, 8:40 AM Metro habit, positive savings.
 - **UI Focus**:
-  - Hero Card: *"🚇 Your 8:40 AM Metro Commute — Pay ₹40 Again"*.
+  - Hero Card: *"Your 8:40 AM Metro Commute — Pay ₹40 Again"*.
   - Attention Stack: Morning Metro, Monthly Spending on Track, EMI due in 4 days.
   - Ethical Check: Normal product offers (Smart FD @ 7.85%).
 

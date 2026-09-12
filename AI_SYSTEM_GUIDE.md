@@ -1,4 +1,4 @@
-# 🧠 AI System Guide: ABC Bank (Adaptive Banking for Bharat)
+# AI System Guide: ABC Bank (Adaptive Banking for Bharat)
 
 > **FOR AI AGENTS & COLLABORATORS**: This document is the definitive single source of truth for the **ABC Bank** architecture. Read this file to understand the system mechanics, data contracts, AI pipelines, and mobile runtime without needing to reverse-engineer source code.
 
@@ -147,22 +147,29 @@ Scan the displayed QR code using the **Expo Go app** on any Android or iOS devic
 All AI agents must verify that tests pass before pushing any modifications:
 
 ```bash
-# 1. Verify all frozen JSON schemas & seed data
+# 1. Comprehensive AI Intelligence & Voice Test Suite (45 tests, 0.39s)
+pytest ai/tests/ -v
+
+# 2. Verify all frozen JSON schemas & seed data
 python scripts/seed-data.py
 
-# 2. Verify AI state generation for normal and stress states
+# 3. Verify AI state generation for normal and stress states
 python ai/intelligence/run.py --scenario normal
 python ai/intelligence/run.py --scenario financial-stress
 
-# 3. Verify multilingual voice intent classifier
+# 4. Verify multilingual voice intent classifier
 python ai/voice/run_voice.py --query "Mera metro recharge karo" --lang hi
 
-# 4. Verify backend experience composer & ethical suppression unit tests
+# 5. Verify backend experience composer & ethical suppression unit tests
 python apps/backend/tests/test_experience.py
 
-# 5. Verify TypeScript compiler (0 errors strictly required)
+# 6. Verify TypeScript compiler (0 errors strictly required)
 cd apps/frontend && npx tsc --noEmit
 ```
+
+For complete architecture, mathematical scoring, cryptographic audits, and taxonomy, see:
+- [PERSONALIZATION_SYSTEM_GUIDE.md](file:///d:/Projects/ABC-Bank/PERSONALIZATION_SYSTEM_GUIDE.md)
+- [BHARAT_BANKING_SERVICES_MASTER_TAXONOMY.md](file:///d:/Projects/ABC-Bank/BHARAT_BANKING_SERVICES_MASTER_TAXONOMY.md)
 
 ---
 

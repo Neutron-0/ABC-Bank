@@ -1,4 +1,4 @@
-# 🏛️ ABC Bank — Adaptive Banking for Bharat
+# ABC Bank — Adaptive Banking for Bharat
 
 AI-Powered Hyper-Personalized Mobile Banking Prototype for Bharat. Designed with **hard ownership boundaries**, **contracts-first architecture**, and **100% Expo Go compatibility**.
 
@@ -6,7 +6,7 @@ AI-Powered Hyper-Personalized Mobile Banking Prototype for Bharat. Designed with
 
 ---
 
-## 👥 Team Ownership Structure
+## Team Ownership Structure
 
 ```text
 LAKSHYA
@@ -27,7 +27,7 @@ scripts/**      ← Automation & Demo runners
 
 ---
 
-## 📁 Repository Layout
+## Repository Layout
 
 ```text
 .
@@ -107,7 +107,7 @@ scripts/**      ← Automation & Demo runners
 
 ---
 
-## 📜 The Core Contracts
+## The Core Contracts
 
 1. **`contracts/customer-state.schema.json`**:
    - **Producer**: Ubaid (`ai/`)
@@ -126,7 +126,7 @@ scripts/**      ← Automation & Demo runners
 
 ---
 
-## 🚦 How to Run
+## How to Run
 
 ### 1. Run Data & Contract Validation
 ```bash
