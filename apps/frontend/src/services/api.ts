@@ -13,6 +13,7 @@ import {
   LanguageCode,
   ConsentSettings,
 } from '../types';
+import { OnDeviceIntentService, VoiceIntentContract } from './onDeviceIntentService';
 
 declare const process: any;
 
@@ -111,22 +112,33 @@ export class BankingApi {
     return this.request(`/assistant/init?lang=${lang}`);
   }
 
+  public static classifyOnDevice(query: string, language?: LanguageCode): VoiceIntentContract {
+    return OnDeviceIntentService.classifyIntent(query, language);
+  }
+
   public static async sendAssistantMessage(
     query: string,
     language: LanguageCode = 'en',
     pendingClarification?: string | null
   ): Promise<any | null> {
+    // 1. Run genuine on-device neural intent inference
+    const localIntent = this.classifyOnDevice(query, language);
+
+    // 2. Transmit structured intent & entities to authoritative backend
     const remote = await this.request<any>('/assistant/chat', {
       method: 'POST',
       body: JSON.stringify({
         query,
         language,
+        intent: localIntent.intent,
+        entities: localIntent.entities,
         pending_clarification: pendingClarification || null,
+        on_device_latency_ms: localIntent.latency_ms,
       }),
     });
     if (remote && remote.reply) return remote;
 
-    // On-device MiniCPM-5 edge execution fallback (0ms latency, zero server required)
+    // On-device edge execution fallback (0ms latency, zero server required)
     const edge = MiniCPM5EdgeEngine.processQuery(query, language);
     return {
       success: true,

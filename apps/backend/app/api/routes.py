@@ -545,12 +545,18 @@ def assistant_chat(req: AssistantChatMessageRequest):
     lang = req.language or "en"
     pending = req.pending_clarification or (req.conversation_context or {}).get("pending_clarification")
 
-    classified = VoiceIntentClassifier.classify(
-        query,
-        lang=lang,
-        pending_clarification=pending
-    )
-    intent = classified.get("intent", "GENERAL_QUERY")
+    if req.intent and req.intent != "GENERAL_QUERY":
+        intent = req.intent
+        entities = req.entities or {}
+        classified = {"intent": intent, "entities": entities}
+    else:
+        classified = VoiceIntentClassifier.classify(
+            query,
+            lang=lang,
+            pending_clarification=pending
+        )
+        intent = classified.get("intent", "GENERAL_QUERY")
+        entities = classified.get("entities", {})
 
     # Delegate to secure intent execution
     intent_resp = execute_assistant_intent(
@@ -558,7 +564,7 @@ def assistant_chat(req: AssistantChatMessageRequest):
             customer_id=req.customer_id or "cust_bharat_001",
             intent=intent,
             language=lang,
-            entities=classified.get("entities", {})
+            entities=entities
         )
     )
 

@@ -21,4 +21,7 @@ class AssistantChatMessageRequest(BaseModel):
     customer_id: Optional[str] = "cust_bharat_001"
     pending_clarification: Optional[str] = None
     conversation_context: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    intent: Optional[str] = None
+    entities: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    on_device_latency_ms: Optional[float] = None
 

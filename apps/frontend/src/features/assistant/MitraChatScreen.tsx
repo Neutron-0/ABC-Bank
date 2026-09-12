@@ -288,17 +288,58 @@ export const MitraChatScreen: React.FC = () => {
         toggleSpeech(res.reply.id, res.reply.text);
       }
     } else {
-      // Offline fallback reply
-      const fallbackText = `I understood your inquiry: "${text}". Your account data and contextual signals are active and up-to-date.`;
-      const fallbackMsg: AssistantMessage = {
-        id: `asst_${Date.now()}`,
+      // Offline on-device SLM execution: Language understanding, intent classification & entity parsing
+      const localIntent = BankingApi.classifyOnDevice(text, language);
+      let offlineText = '';
+
+      if (localIntent.intent === 'CHECK_BALANCE') {
+        offlineText = language === 'hi'
+          ? 'बैंक सर्वर से कनेक्शन उपलब्ध नहीं है। अपना वास्तविक बैलेंस देखने के लिए कृपया इंटरनेट से पुनः कनेक्ट करें।'
+          : language === 'gu'
+          ? 'બેંક સર્વર કનેક્શન ઉપલબ્ધ નથી. તમારું વાસ્તવિક બેલેન્સ જોવા માટે કૃપા કરીને ઇન્ટરનેટ ફરીથી કનેક્ટ કરો.'
+          : 'Bank connection unavailable. Please reconnect to retrieve your authoritative account balance.';
+      } else if (localIntent.intent === 'CHECK_EMI') {
+        offlineText = language === 'hi'
+          ? 'बैंक सर्वर से कनेक्शन उपलब्ध नहीं है। अपने आगामी ईएमआई की सही तारीख और राशि देखने के लिए कृपया पुनः कनेक्ट करें।'
+          : language === 'gu'
+          ? 'બેંક સર્વર કનેક્શન ઉપલબ્ધ નથી. તમારી આગામી EMI ની વિગતો મેળવવા કૃપા કરીને ફરી કનેક્ટ કરો.'
+          : 'Bank connection unavailable. Please reconnect to inspect your active mandate and EMI schedule.';
+      } else if (localIntent.intent === 'LOCK_CARD') {
+        offlineText = language === 'hi'
+          ? 'ऑफलाइन सुरक्षा निर्देश दर्ज किया गया। डेबिट कार्ड ब्लॉक अनुरोध को बैंक के केंद्रीय स्विच पर तुरंत भेजने के लिए नेटवर्क की आवश्यकता है।'
+          : language === 'gu'
+          ? 'ઑફલાઇન સુરક્ષા સૂચના નોંધાઈ. ડેબિટ કાર્ડ બ્લોક વિનંતી પૂર્ણ કરવા માટે નેટવર્ક કનેક્શન જરૂરી છે.'
+          : 'Offline security command registered. Live network connectivity is required to complete debit card freeze on the institutional core.';
+      } else if (localIntent.intent === 'PAY_METRO' || localIntent.intent === 'PAY_BILL') {
+        offlineText = language === 'hi'
+          ? 'भुगतान आदेश समझ लिया गया। यूपीआई ट्रांजैक्शन पूरा करने के लिए बैंक नेटवर्क से पुनः कनेक्ट करें।'
+          : language === 'gu'
+          ? 'ચુકવણી વિનંતી સમજી લેવામાં આવી. UPI વ્યવહાર પૂર્ણ કરવા માટે કૃપા કરીને ફરી કનેક્ટ કરો.'
+          : 'Payment intent parsed locally. Live banking connectivity is required to clear UPI settlement.';
+      } else {
+        offlineText = language === 'hi'
+          ? `मैंने आपका अनुरोध समझ लिया: "${text}" [इरादा: ${localIntent.intent}]। प्रामाणिक बैंकिंग विवरण लोड करने के लिए नेटवर्क कनेक्टिविटी आवश्यक है।`
+          : language === 'gu'
+          ? `મેં તમારી વિનંતી સમજી: "${text}" [ઇરાદો: ${localIntent.intent}]. ચોક્કસ બેંકિંગ વિગતો માટે નેટવર્ક જોડાણ આવશ્યક છે.`
+          : `Understood: "${text}" [Intent: ${localIntent.intent}]. Authoritative bank data requires live network connectivity.`;
+      }
+
+      const offlineMsg: AssistantMessage = {
+        id: `asst_offline_${Date.now()}`,
         sender: 'assistant',
-        text: fallbackText,
+        text: offlineText,
         timestamp: new Date().toISOString(),
+        actionChips: [
+          {
+            label: 'Retry Connection',
+            action: 'RETRY',
+            payload: { query: text }
+          }
+        ]
       };
-      setMessages((prev) => [...prev, fallbackMsg]);
+      setMessages((prev) => [...prev, offlineMsg]);
       if (wasSpoken) {
-        toggleSpeech(fallbackMsg.id, fallbackText);
+        toggleSpeech(offlineMsg.id, offlineText);
       }
     }
 

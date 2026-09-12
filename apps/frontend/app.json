@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-
     "ios": {
       "supportsTablet": true
     },
@@ -14,7 +13,8 @@
       "adaptiveIcon": {
         "backgroundColor": "#1E3A8A"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.abcbank"
     },
     "web": {
       "favicon": "./assets/favicon.png"
