@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import logging
 from pathlib import Path
@@ -17,6 +18,15 @@ class DataLoader:
     If PostgreSQL is offline or unconfigured, raises an operational error with actionable instructions.
     Legacy JSON scenarios are loaded from disk with clean normalization.
     """
+    _db_offline_until: float = 0.0
+
+    @classmethod
+    def _is_db_offline(cls) -> bool:
+        return time.time() < cls._db_offline_until
+
+    @classmethod
+    def _mark_db_offline(cls, duration: float = 15.0) -> None:
+        cls._db_offline_until = time.time() + duration
 
     @classmethod
     def get_data_dir(cls) -> Path:
@@ -24,59 +34,83 @@ class DataLoader:
 
     @classmethod
     def load_customers(cls) -> List[Dict[str, Any]]:
-        """Loads all customer summaries from PostgreSQL."""
-        try:
-            with SessionLocal() as db:
-                customers = CustomerRepository.get_all(db, limit=2000)
-                result = []
-                for c in customers:
-                    summary = CustomerRepository.get_customer_summary(db, c.id)
-                    if summary:
-                        result.append(summary)
-                if result:
-                    return result
-        except Exception as e:
-            logger.error(
-                f"[DataLoader] Failed to query customers from PostgreSQL: {e}. "
-                "Ensure PostgreSQL is running and DATABASE_URL is properly configured."
-            )
-            raise RuntimeError(
-                f"PostgreSQL database connection failed: {e}. "
-                "Please ensure your PostgreSQL database is running (e.g. `docker compose up -d db` or local service) "
-                "and DATABASE_URL is set in .env."
-            ) from e
+        """Loads all customer summaries from PostgreSQL with fallback to seed data."""
+        if not cls._is_db_offline():
+            try:
+                with SessionLocal() as db:
+                    customers = CustomerRepository.get_all(db, limit=2000)
+                    result = []
+                    for c in customers:
+                        summary = CustomerRepository.get_customer_summary(db, c.id)
+                        if summary:
+                            result.append(summary)
+                    if result:
+                        return result
+            except Exception as e:
+                cls._mark_db_offline()
+                logger.warning(
+                    f"[DataLoader] PostgreSQL unavailable ({e}). Falling back to seed JSON fixtures."
+                )
+
+        # Resilient fallback to local seed data
+        seed_path = cls.get_data_dir() / "seed" / "customers.json"
+        if seed_path.exists():
+            with open(seed_path, "r", encoding="utf-8-sig") as f:
+                return json.load(f)
         return []
 
     @classmethod
     def load_customer(cls, customer_id: str) -> Optional[Dict[str, Any]]:
-        """Loads single customer summary from PostgreSQL."""
-        try:
-            with SessionLocal() as db:
-                return CustomerRepository.get_customer_summary(db, customer_id)
-        except Exception as e:
-            logger.error(f"[DataLoader] Failed to query customer '{customer_id}' from PostgreSQL: {e}")
-            raise RuntimeError(
-                f"PostgreSQL connection failed while fetching customer '{customer_id}': {e}"
-            ) from e
+        """Loads single customer summary from PostgreSQL with fallback to seed data."""
+        if not cls._is_db_offline():
+            try:
+                with SessionLocal() as db:
+                    summary = CustomerRepository.get_customer_summary(db, customer_id)
+                    if summary:
+                        return summary
+            except Exception as e:
+                cls._mark_db_offline()
+                logger.warning(
+                    f"[DataLoader] PostgreSQL unavailable ({e}) for customer '{customer_id}'. Falling back to seed JSON fixtures."
+                )
+
+        customers = cls.load_customers()
+        for c in customers:
+            if c.get("id") == customer_id:
+                return c
+        return None
 
     @classmethod
     def load_transactions(cls, customer_id: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Loads transactions for customer or all recent transactions from PostgreSQL."""
-        try:
-            with SessionLocal() as db:
+        """Loads transactions for customer or all recent transactions from PostgreSQL with fallback to seed data."""
+        if not cls._is_db_offline():
+            try:
+                with SessionLocal() as db:
+                    if customer_id:
+                        txs = TransactionRepository.get_by_customer(db, customer_id, limit=500)
+                    else:
+                        from sqlalchemy import select, desc
+                        from apps.backend.app.db.models import Transaction
+                        stmt = select(Transaction).order_by(desc(Transaction.timestamp)).limit(1000)
+                        txs = list(db.scalars(stmt).all())
+                    result = TransactionRepository.to_dict_list(txs)
+                    if result:
+                        return result
+            except Exception as e:
+                cls._mark_db_offline()
+                logger.warning(
+                    f"[DataLoader] PostgreSQL unavailable ({e}). Falling back to seed JSON fixtures."
+                )
+
+        # Resilient fallback to local seed data
+        seed_path = cls.get_data_dir() / "seed" / "transactions.json"
+        if seed_path.exists():
+            with open(seed_path, "r", encoding="utf-8-sig") as f:
+                tx_data = json.load(f)
                 if customer_id:
-                    txs = TransactionRepository.get_by_customer(db, customer_id, limit=500)
-                else:
-                    from sqlalchemy import select, desc
-                    from apps.backend.app.db.models import Transaction
-                    stmt = select(Transaction).order_by(desc(Transaction.timestamp)).limit(1000)
-                    txs = list(db.scalars(stmt).all())
-                return TransactionRepository.to_dict_list(txs)
-        except Exception as e:
-            logger.error(f"[DataLoader] Failed to query transactions from PostgreSQL: {e}")
-            raise RuntimeError(
-                f"PostgreSQL connection failed while fetching transactions: {e}"
-            ) from e
+                    return [t for t in tx_data if t.get("customer_id") == customer_id or t.get("user_id") == customer_id]
+                return tx_data
+        return []
 
     @classmethod
     def load_scenario(cls, scenario_name: str) -> Dict[str, Any]:
