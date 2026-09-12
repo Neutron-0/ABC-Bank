@@ -17,6 +17,7 @@ import { BalanceHeader } from '../../components/common/BalanceHeader';
 import { ContextCardStack } from '../../components/context/ContextCardStack';
 import { useCustomerStore } from '../../state/customerStore';
 import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
+import { serifFont } from '../../theme/typography';
 import { getTranslation } from '../../i18n';
 import { motion } from '../../motion';
 import {
@@ -39,6 +40,10 @@ import {
   CreditCard,
   Smartphone,
   Tv,
+  Award,
+  Layers,
+  Sparkles,
+  ArrowUpRight,
 } from 'lucide-react-native';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -762,74 +767,192 @@ export const AdaptiveHomeScreen: React.FC = () => {
   };
 
   // =========================================================================
-  // 1. EDITORIAL ACTIVITY LEDGER (Paper & Ink Financial Record)
+  // 1. HINGE VITALS & ATTRIBUTES BLOCK (Exact Match to Block 2 from Image)
+  // =========================================================================
+  const renderAccountGroup = () => {
+    return (
+      <View style={styles.vitalsCard}>
+        {/* Top 3-Column Vitals Strip with Vertical Hairlines */}
+        <View style={styles.vitalsTopRow}>
+          <View style={styles.vitalsTopCol}>
+            <ShieldCheck size={18} color="#141414" />
+            <Text style={styles.vitalsTopText}>KYC Verified</Text>
+          </View>
+          <View style={styles.vitalsVerticalLine} />
+          <View style={styles.vitalsTopCol}>
+            <Award size={18} color="#141414" />
+            <Text style={styles.vitalsTopText}>CIBIL 782</Text>
+          </View>
+          <View style={styles.vitalsVerticalLine} />
+          <View style={styles.vitalsTopCol}>
+            <TrendingUp size={18} color="#B45309" />
+            <Text style={[styles.vitalsTopText, { color: '#B45309' }]}>7.2% Yield</Text>
+          </View>
+        </View>
+
+        {/* Row 1: Primary Savings Account */}
+        <View style={styles.vitalsRowDivider} />
+        <TouchableOpacity
+          style={styles.vitalsRow}
+          onPress={() => openJourney('kyc')}
+          activeOpacity={0.7}
+        >
+          <View style={styles.vitalsIconWrap}>
+            <CreditCard size={18} color="#141414" />
+          </View>
+          <View style={styles.vitalsRowBody}>
+            <Text style={styles.vitalsRowTitle}>Savings Account · •••• 4092</Text>
+            <Text style={styles.vitalsRowDesc}>ABC Bank · Primary liquidity account</Text>
+          </View>
+          <Text style={styles.vitalsRowRightAmount}>₹{balance.available.toLocaleString('en-IN')}</Text>
+        </TouchableOpacity>
+
+        {/* Row 2: Auto-Sweep FD */}
+        <View style={styles.vitalsRowDivider} />
+        <TouchableOpacity
+          style={styles.vitalsRow}
+          onPress={() => openJourney('savings_invest')}
+          activeOpacity={0.7}
+        >
+          <View style={styles.vitalsIconWrap}>
+            <Layers size={18} color="#141414" />
+          </View>
+          <View style={styles.vitalsRowBody}>
+            <Text style={styles.vitalsRowTitle}>Auto-Sweep Liquid Deposit</Text>
+            <Text style={styles.vitalsRowDesc}>Earning 7.2% tax-free · Zero penalty breakable</Text>
+          </View>
+          <Text style={[styles.vitalsRowRightAmount, { color: '#B45309' }]}>₹18,000</Text>
+        </TouchableOpacity>
+
+        {/* Row 3: Debit Card Controls */}
+        <View style={styles.vitalsRowDivider} />
+        <TouchableOpacity
+          style={styles.vitalsRow}
+          onPress={() => openJourney('debit_card')}
+          activeOpacity={0.7}
+        >
+          <View style={styles.vitalsIconWrap}>
+            <Smartphone size={18} color="#141414" />
+          </View>
+          <View style={styles.vitalsRowBody}>
+            <Text style={styles.vitalsRowTitle}>Platinum Contactless Debit Card</Text>
+            <Text style={styles.vitalsRowDesc}>Tap & Pay enabled · International transactions active</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* Row 4: Daily UPI & Limits */}
+        <View style={styles.vitalsRowDivider} />
+        <TouchableOpacity
+          style={styles.vitalsRow}
+          onPress={() => setActiveTab('payments')}
+          activeOpacity={0.7}
+        >
+          <View style={styles.vitalsIconWrap}>
+            <Zap size={18} color="#141414" />
+          </View>
+          <View style={styles.vitalsRowBody}>
+            <Text style={styles.vitalsRowTitle}>Daily UPI Allowance & Autopay</Text>
+            <Text style={styles.vitalsRowDesc}>₹1,00,000 daily limit (₹18,420 used today) · 2 active mandates</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  // =========================================================================
+  // 2. HINGE PROMPT CARD: MONTHLY FINANCIAL HABIT (Exact Match to Image Block 1)
+  // =========================================================================
+  const renderFinancialObservation = () => {
+    return (
+      <View style={styles.hingePromptCard}>
+        <Text style={styles.hingePromptHeader}>
+          {language === 'hi' ? 'वित्तीय आदत एवं विश्लेषण' : language === 'gu' ? 'નાણાકીય આદત અને વિશ્લેષણ' : 'My monthly financial habit'}
+        </Text>
+        <Text style={styles.hingePromptSerifAnswer}>
+          Spending is 8% below your typical average. You have ₹24,100 ready to sweep into 7.2% tax-free yield.
+        </Text>
+
+        <View style={styles.hingePromptMetaRow}>
+          <Text style={styles.hingePromptMetaText}>
+            Pacing: ₹18,420 spent of ₹42,000 budget
+          </Text>
+        </View>
+
+        {/* Hinge Bottom-Right Round Black Action Circle */}
+        <TouchableOpacity
+          style={styles.hingePromptCircleBtn}
+          onPress={() => openJourney('savings_invest')}
+          activeOpacity={0.85}
+        >
+          <TrendingUp size={18} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  // =========================================================================
+  // 3. EDITORIAL ACTIVITY LEDGER IN CRISP HINGE SHEET
   // =========================================================================
   const renderActivityLedger = () => {
     const displayTx = transactions.slice(0, 4);
 
     return (
-      <View style={styles.activityLedgerSection}>
-        <View style={styles.sectionHeaderRow}>
-          <View>
-            <Text style={[styles.sectionTitleText, { color: themeColors.textSecondary }]}>
-              {language === 'hi' ? 'हालिया गतिविधि' : language === 'gu' ? 'તાજેતરની પ્રવૃત્તિ' : 'RECENT ACTIVITY'}
-            </Text>
-            <Text style={[styles.ledgerSubLabel, { color: themeColors.textMuted }]}>
-              {language === 'hi' ? 'आज' : language === 'gu' ? 'આજે' : 'TODAY'}
-            </Text>
-          </View>
+      <View style={styles.ledgerSheet}>
+        <View style={styles.ledgerHeaderRow}>
+          <Text style={styles.ledgerPromptHeader}>
+            {language === 'hi' ? 'हालिया लेनदेन' : language === 'gu' ? 'તાજેતરના વ્યવહારો' : 'Recent activity'}
+          </Text>
           <TouchableOpacity
             onPress={() => setActiveTab('activity')}
             delayPressIn={0}
             activeOpacity={0.7}
           >
-            <Text style={[styles.viewAllText, { color: themeColors.primary }]}>
+            <Text style={styles.viewAllText}>
               {language === 'hi' ? 'पासबुक →' : language === 'gu' ? 'પાસબુક →' : 'Passbook →'}
             </Text>
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.ledgerFeed, { borderTopColor: themeColors.borderLight }]}>
-          {displayTx.map((tx) => {
+        <View style={styles.ledgerFeed}>
+          {displayTx.map((tx, idx) => {
             const isCredit = tx.type === 'credit';
             const timeStr = new Date(tx.timestamp).toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit',
             });
             return (
-              <TouchableOpacity
-                key={tx.id}
-                style={[styles.ledgerRow, { borderBottomColor: themeColors.borderLight }]}
-                onPress={() => {
-                  setSelectedTransaction(tx);
-                }}
-                activeOpacity={0.65}
-              >
-                <View style={styles.ledgerLeft}>
-                  <Text style={[styles.ledgerMerchant, { color: themeColors.textPrimary }]} numberOfLines={1}>
-                    {tx.merchant}
-                  </Text>
-                  <Text style={[styles.ledgerMeta, { color: themeColors.textSecondary }]}>
-                    {tx.category === 'transport' ? 'UPI · Commute' :
-                     tx.category === 'food' ? 'UPI · Food' :
-                     tx.category === 'bills' ? 'BBPS · Utility' :
-                     tx.category === 'salary' ? 'NEFT · Salary' :
-                     tx.category === 'emi' ? 'NACH · Auto-Debit' : 'UPI Transfer'}
-                  </Text>
-                </View>
-                <View style={styles.ledgerRight}>
-                  <Text
-                    style={[
-                      styles.ledgerAmount,
-                      { color: themeColors.textPrimary },
-                      tx.status === 'flagged' && { color: themeColors.danger },
-                    ]}
-                  >
-                    {isCredit ? '+' : '−'}₹{tx.amount.toLocaleString('en-IN')}
-                  </Text>
-                  <Text style={[styles.ledgerTime, { color: themeColors.textMuted }]}>{timeStr}</Text>
-                </View>
-              </TouchableOpacity>
+              <View key={tx.id}>
+                {idx > 0 && <View style={styles.ledgerRowDivider} />}
+                <TouchableOpacity
+                  style={styles.ledgerRow}
+                  onPress={() => setSelectedTransaction(tx)}
+                  activeOpacity={0.65}
+                >
+                  <View style={styles.ledgerLeft}>
+                    <Text style={styles.ledgerMerchant} numberOfLines={1}>
+                      {tx.merchant}
+                    </Text>
+                    <Text style={styles.ledgerMeta}>
+                      {tx.category === 'transport' ? 'UPI · Commute' :
+                       tx.category === 'food' ? 'UPI · Dining' :
+                       tx.category === 'bills' ? 'BBPS · Utility' :
+                       tx.category === 'salary' ? 'NEFT · Salary' :
+                       tx.category === 'emi' ? 'NACH · Auto-Debit' : 'UPI Transfer'}
+                    </Text>
+                  </View>
+                  <View style={styles.ledgerRight}>
+                    <Text
+                      style={[
+                        styles.ledgerAmount,
+                        tx.status === 'flagged' && { color: '#DC2626' },
+                      ]}
+                    >
+                      {isCredit ? '+' : '−'}₹{tx.amount.toLocaleString('en-IN')}
+                    </Text>
+                    <Text style={styles.ledgerTime}>{timeStr}</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
             );
           })}
         </View>
@@ -838,65 +961,32 @@ export const AdaptiveHomeScreen: React.FC = () => {
   };
 
   // =========================================================================
-  // 2. FINANCIAL OBSERVATION (Concise Editorial Intelligence, No AI Card)
+  // 4. HINGE PROMPT CARD: PEACE OF MIND
   // =========================================================================
-  const renderFinancialObservation = () => {
+  const renderPeaceOfMindPrompt = () => {
     return (
-      <View style={[styles.observationSection, { borderTopColor: themeColors.borderLight, borderBottomColor: themeColors.borderLight }]}>
-        <Text style={[styles.observationLabel, { color: themeColors.textMuted }]}>
-          {language === 'hi' ? 'इस महीने का अवलोकन' : language === 'gu' ? 'આ મહિનાનું અવલોકન' : 'THIS MONTH'}
+      <View style={styles.hingePromptCard}>
+        <Text style={styles.hingePromptHeader}>
+          {language === 'hi' ? 'आपातकालीन सुरक्षा' : language === 'gu' ? 'કટોકટી સુરક્ષા' : 'Financial peace of mind'}
         </Text>
-        <Text style={[styles.observationAmount, { color: themeColors.textPrimary }]}>
-          ₹18,420 spent
+        <Text style={styles.hingePromptSerifAnswer}>
+          Your emergency reserves cover 4.2 months of essential living expenses without touching any investments.
         </Text>
-        <Text style={[styles.observationDesc, { color: themeColors.textSecondary }]}>
-          8% below your typical spending pace. Liquid buffer preserved.
-        </Text>
-      </View>
-    );
-  };
 
-  // =========================================================================
-  // 3. STRUCTURED ACCOUNT GROUP (Typography & Hairline Dividers)
-  // =========================================================================
-  const renderAccountGroup = () => {
-    return (
-      <View style={styles.accountsSection}>
-        <View style={styles.sectionHeaderRow}>
-          <Text style={[styles.sectionTitleText, { color: themeColors.textSecondary }]}>
-            {language === 'hi' ? 'आपके खाते' : language === 'gu' ? 'તમારા ખાતાઓ' : 'YOUR ACCOUNTS'}
+        <View style={styles.hingePromptMetaRow}>
+          <Text style={styles.hingePromptMetaText}>
+            Liquid Safety: ₹94,680 available · High liquidity rating
           </Text>
         </View>
 
-        <View style={[styles.accountsList, { borderTopColor: themeColors.borderLight }]}>
-          <TouchableOpacity
-            style={[styles.accountItemRow, { borderBottomColor: themeColors.borderLight }]}
-            onPress={() => openJourney('kyc')}
-            activeOpacity={0.7}
-          >
-            <View>
-              <Text style={[styles.accountNameText, { color: themeColors.textPrimary }]}>Savings A/C · •••• 4092</Text>
-              <Text style={[styles.accountSubText, { color: themeColors.textMuted }]}>ABC Payments Bank · Primary</Text>
-            </View>
-            <Text style={[styles.accountBalanceText, { color: themeColors.textPrimary }]}>
-              ₹{balance.available.toLocaleString('en-IN')}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.accountItemRow, { borderBottomColor: themeColors.borderLight }]}
-            onPress={() => openJourney('savings_invest')}
-            activeOpacity={0.7}
-          >
-            <View>
-              <Text style={[styles.accountNameText, { color: themeColors.textPrimary }]}>Auto-Sweep FD · 7.2% p.a.</Text>
-              <Text style={[styles.accountSubText, { color: themeColors.textMuted }]}>Linked Liquid Growth Account</Text>
-            </View>
-            <Text style={[styles.accountBalanceText, { color: themeColors.brandSecondary }]}>
-              ₹18,000
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {/* Hinge Bottom-Right Round Black Action Circle */}
+        <TouchableOpacity
+          style={styles.hingePromptCircleBtn}
+          onPress={() => openJourney('financial_stress')}
+          activeOpacity={0.85}
+        >
+          <ShieldCheck size={18} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
     );
   };
@@ -957,14 +1047,17 @@ export const AdaptiveHomeScreen: React.FC = () => {
         {/* Calm Editorial Balance Header & Action Band */}
         <BalanceHeader />
 
-        {/* 1. Dense Activity Ledger (Financial Record) */}
-        {renderActivityLedger()}
+        {/* 1. Hinge Vitals & Attributes Sheet (Block 2 from image) */}
+        {renderAccountGroup()}
 
-        {/* 2. Quiet Financial Observation */}
+        {/* 2. Hinge Prompt Card: Monthly Financial Habit */}
         {renderFinancialObservation()}
 
-        {/* 3. Structured Accounts Group */}
-        {renderAccountGroup()}
+        {/* 3. Recent Activity Ledger Sheet */}
+        {renderActivityLedger()}
+
+        {/* 4. Hinge Prompt Card: Financial Peace of Mind */}
+        {renderPeaceOfMindPrompt()}
 
         {/* Contextual Experience (if active state: medical, financial stress, surplus) */}
         {currentState !== 'normal' && (
@@ -1857,32 +1950,192 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // 1. Editorial Activity Ledger Styles
-  activityLedgerSection: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+  // 1. Hinge Vitals & Attributes Block Styles (Block 2 from image)
+  vitalsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E8E8E6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
-  ledgerSubLabel: {
-    fontSize: 10,
+  vitalsTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+  },
+  vitalsTopCol: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  vitalsTopText: {
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
+    color: '#141414',
+    letterSpacing: -0.2,
+  },
+  vitalsVerticalLine: {
+    width: StyleSheet.hairlineWidth,
+    height: 24,
+    backgroundColor: '#E8E8E6',
+  },
+  vitalsRowDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#E8E8E6',
+    marginLeft: 48,
+  },
+  vitalsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  vitalsIconWrap: {
+    width: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  vitalsRowBody: {
+    flex: 1,
+  },
+  vitalsRowTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#141414',
+    letterSpacing: -0.2,
+  },
+  vitalsRowDesc: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#737373',
     marginTop: 2,
+    lineHeight: 16,
+  },
+  vitalsRowRightAmount: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#141414',
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.2,
+  },
+
+  // 2. Hinge Prompt Card Styles (Blocks 1 & 3 from image)
+  hingePromptCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E8E8E6',
+    position: 'relative',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  hingePromptHeader: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#141414',
+    letterSpacing: -0.2,
+    marginBottom: 12,
+  },
+  hingePromptSerifAnswer: {
+    fontFamily: serifFont,
+    fontSize: 22,
+    fontWeight: '700',
+    lineHeight: 30,
+    color: '#141414',
+    letterSpacing: -0.3,
+    marginBottom: 16,
+    paddingRight: 44, // Leave breathing room for bottom-right circular button
+  },
+  hingePromptMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingRight: 48,
+  },
+  hingePromptMetaText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#737373',
+  },
+  hingePromptCircleBtn: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#141414',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  // 3. Activity Ledger Sheet Styles
+  ledgerSheet: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 18,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E8E8E6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  ledgerHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  ledgerPromptHeader: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#141414',
+    letterSpacing: -0.2,
   },
   viewAllText: {
     fontSize: 12,
     fontWeight: '600',
+    color: '#141414',
   },
   ledgerFeed: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    marginTop: spacing.xs,
+    marginTop: 2,
+  },
+  ledgerRowDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#E8E8E6',
+    marginVertical: 4,
   },
   ledgerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    paddingVertical: 10,
   },
   ledgerLeft: {
     flex: 1,
@@ -1891,86 +2144,30 @@ const styles = StyleSheet.create({
   ledgerMerchant: {
     fontSize: 14,
     fontWeight: '600',
+    color: '#141414',
     letterSpacing: -0.2,
     marginBottom: 2,
   },
   ledgerMeta: {
     fontSize: 12,
     fontWeight: '400',
+    color: '#737373',
   },
   ledgerRight: {
     alignItems: 'flex-end',
   },
   ledgerAmount: {
-    fontSize: 14,
+    fontFamily: serifFont,
+    fontSize: 15,
     fontWeight: '700',
-    fontVariant: ['tabular-nums'],
+    color: '#141414',
     letterSpacing: -0.2,
     marginBottom: 2,
   },
   ledgerTime: {
     fontSize: 11,
     fontWeight: '400',
-  },
-
-  // 2. Financial Observation Styles
-  observationSection: {
-    marginHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    marginBottom: spacing.lg,
-  },
-  observationLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    marginBottom: 4,
-  },
-  observationAmount: {
-    fontSize: 20,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-    marginBottom: 4,
-  },
-  observationDesc: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: '400',
-  },
-
-  // 3. Structured Accounts Styles
-  accountsSection: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
-  },
-  accountsList: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    marginTop: spacing.xs,
-  },
-  accountItemRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  accountNameText: {
-    fontSize: 14,
-    fontWeight: '600',
-    letterSpacing: -0.2,
-    marginBottom: 2,
-  },
-  accountSubText: {
-    fontSize: 12,
-    fontWeight: '400',
-  },
-  accountBalanceText: {
-    fontSize: 14,
-    fontWeight: '700',
-    fontVariant: ['tabular-nums'],
-    letterSpacing: -0.2,
+    color: '#A3A3A3',
   },
 
   // Quiet Institutional Banking Footer

@@ -1,23 +1,59 @@
-import { TextStyle } from 'react-native';
+import { TextStyle, Platform } from 'react-native';
+
+export const serifFont = Platform.select({
+  ios: 'Georgia',
+  android: 'serif',
+  default: 'Georgia, serif',
+});
 
 export const typography = {
-  displayBalance: {
-    fontSize: 38,
-    fontWeight: '700' as const,
-    lineHeight: 46,
-    letterSpacing: -1.2,
-  },
-  balanceLarge: {
+  serifHero: {
+    fontFamily: serifFont,
     fontSize: 34,
     fontWeight: '700' as const,
     lineHeight: 40,
-    letterSpacing: -1,
+    letterSpacing: -0.6,
   },
-  balanceMedium: {
-    fontSize: 26,
+  serifPrompt: {
+    fontFamily: serifFont,
+    fontSize: 24,
     fontWeight: '700' as const,
     lineHeight: 32,
-    letterSpacing: -0.6,
+    letterSpacing: -0.4,
+  },
+  serifStatement: {
+    fontFamily: serifFont,
+    fontSize: 19,
+    fontWeight: '700' as const,
+    lineHeight: 26,
+    letterSpacing: -0.2,
+  },
+  promptHeader: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+    lineHeight: 18,
+    letterSpacing: -0.2,
+  },
+  displayBalance: {
+    fontFamily: serifFont,
+    fontSize: 36,
+    fontWeight: '700' as const,
+    lineHeight: 44,
+    letterSpacing: -1.0,
+  },
+  balanceLarge: {
+    fontFamily: serifFont,
+    fontSize: 32,
+    fontWeight: '700' as const,
+    lineHeight: 38,
+    letterSpacing: -0.8,
+  },
+  balanceMedium: {
+    fontFamily: serifFont,
+    fontSize: 24,
+    fontWeight: '700' as const,
+    lineHeight: 30,
+    letterSpacing: -0.5,
   },
   h1: {
     fontSize: 28,

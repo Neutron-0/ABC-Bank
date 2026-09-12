@@ -88,14 +88,14 @@ export const lightColors: ThemeColors = {
   warningLight: '#FDF6ED',
 
   // Warm Paper Foundation
-  bg: '#FAF8F5', // Hinge Warm Paper / Ivory Canvas
+  bg: '#EDEDEC', // Hinge soft stone backdrop
   cardBg: '#FFFFFF', // Crisp White Sheet
   cardBgSecondary: '#F3EFEA', // Soft Warm Stone Neutral Well
   surfaceElevated: '#FFFFFF',
 
-  border: '#EAE6DF', // Hairline paper divider
-  borderLight: '#F3EFEA',
-  divider: '#EAE6DF',
+  border: '#E8E8E6', // Hairline paper divider
+  borderLight: '#F2F2F0',
+  divider: '#E8E8E6',
 
   iconNeutral: '#68645E', // Warm Muted Charcoal
   iconNeutralSubtle: '#9C968E', // Soft Stone

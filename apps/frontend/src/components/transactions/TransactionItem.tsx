@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Transaction } from '../../types';
 import { spacing, useAppTheme } from '../../theme';
+import { serifFont } from '../../theme/typography';
 import { useCustomerStore } from '../../state/customerStore';
 
 interface Props {
@@ -119,9 +120,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   amount: {
-    fontSize: 14,
+    fontFamily: serifFont,
+    fontSize: 15,
     fontWeight: '700',
-    fontVariant: ['tabular-nums'],
     letterSpacing: -0.2,
     marginBottom: 2,
   },

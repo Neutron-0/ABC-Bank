@@ -8,6 +8,7 @@ import {
   TextInput,
 } from 'react-native';
 import { colors, typography, spacing, radii } from '../../theme';
+import { serifFont } from '../../theme/typography';
 import { useAppTheme } from '../../theme/ThemeContext';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
@@ -191,8 +192,11 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   title: {
-    ...typography.h2,
+    fontFamily: serifFont,
+    fontSize: 26,
+    fontWeight: '700',
     color: colors.textPrimary,
+    letterSpacing: -0.4,
   },
   subtitle: {
     ...typography.caption,
@@ -273,25 +277,39 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   dateGroup: {
-    marginBottom: spacing.xs,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    marginHorizontal: spacing.md,
+    marginVertical: 6,
+    overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E8E8E6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
   dateGroupHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: 6,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E8E8E6',
   },
   dateGroupTitle: {
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 1,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#141414',
+    letterSpacing: -0.1,
   },
   dateGroupCount: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '500',
+    color: '#737373',
   },
 });
 

@@ -237,8 +237,8 @@ export const AppNavigator: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {/* Anchored Institutional Banking Navigation Bar */}
-        <View style={[styles.dockContainer, { backgroundColor: themeColors.cardBg, borderTopColor: themeColors.border }]}>
+        {/* Anchored Institutional Banking Navigation Bar (Hinge Obsidian Dock) */}
+        <View style={styles.dockContainer}>
           <View style={styles.tabBar}>
             {tabs.map((tab) => {
               const active = activeTab === tab.id;
@@ -256,9 +256,7 @@ export const AppNavigator: React.FC = () => {
                   <View
                     style={[
                       styles.activePip,
-                      active
-                        ? [styles.activePipVisible, { backgroundColor: themeColors.primary }]
-                        : styles.activePipHidden,
+                      active ? styles.activePipVisible : styles.activePipHidden,
                     ]}
                   />
                   <Animated.View
@@ -269,16 +267,19 @@ export const AppNavigator: React.FC = () => {
                   >
                     <IconComp
                       size={20}
-                      color={active ? themeColors.primary : themeColors.iconNeutral}
+                      color={active ? '#FFFFFF' : '#737373'}
                       strokeWidth={active ? 2.3 : 1.7}
                     />
+                    {tab.id === 'assistant' && (
+                      <View style={styles.badgePip}>
+                        <Text style={styles.badgePipText}>1</Text>
+                      </View>
+                    )}
                   </Animated.View>
                   <Text
                     style={[
                       styles.tabLabel,
-                      active
-                        ? [styles.activeTabLabel, { color: themeColors.primary }]
-                        : [styles.inactiveTabLabel, { color: themeColors.textSecondary }],
+                      active ? styles.activeTabLabel : styles.inactiveTabLabel,
                     ]}
                     numberOfLines={1}
                   >
@@ -371,15 +372,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dockContainer: {
-    backgroundColor: '#FAF8F5',
+    backgroundColor: '#121212',
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#EAE6DF',
+    borderTopColor: '#262626',
   },
   tabBar: {
     flexDirection: 'row',
-    height: Platform.OS === 'ios' ? 72 : 58,
-    paddingBottom: Platform.OS === 'ios' ? 14 : 4,
-    paddingTop: 2,
+    height: Platform.OS === 'ios' ? 74 : 60,
+    paddingBottom: Platform.OS === 'ios' ? 16 : 6,
+    paddingTop: 4,
     alignItems: 'center',
     justifyContent: 'space-around',
     width: '100%',
@@ -397,7 +398,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   activePipVisible: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#FFFFFF',
   },
   activePipHidden: {
     backgroundColor: 'transparent',
@@ -408,18 +409,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 22,
   },
+  badgePip: {
+    position: 'absolute',
+    top: -4,
+    right: -10,
+    backgroundColor: '#8B5CF6',
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    minWidth: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgePipText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '700',
+  },
   tabLabel: {
     fontSize: 10,
     fontWeight: '500',
-    marginTop: 2,
+    marginTop: 3,
     letterSpacing: 0.1,
   },
   activeTabLabel: {
-    color: colors.primary,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   inactiveTabLabel: {
-    color: colors.textSecondary,
+    color: '#737373',
   },
   floatingChatButton: {
     position: 'absolute',

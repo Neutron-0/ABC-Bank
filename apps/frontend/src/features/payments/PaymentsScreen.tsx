@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { typography, spacing, radii, shadows } from '../../theme';
+import { serifFont } from '../../theme/typography';
 import { useAppTheme } from '../../theme/ThemeContext';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
@@ -494,7 +495,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   title: {
-    ...typography.h2,
+    fontFamily: serifFont,
+    fontSize: 26,
+    fontWeight: '700',
+    letterSpacing: -0.4,
   },
   subtitle: {
     ...typography.caption,
@@ -548,13 +552,25 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   section: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.sm,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 18,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E8E8E6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
   sectionTitle: {
-    ...typography.h4,
-    marginBottom: 2,
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#141414',
+    letterSpacing: -0.2,
+    marginBottom: 4,
   },
   sectionSubtitle: {
     ...typography.caption,
@@ -634,11 +650,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   amountPrefix: {
+    fontFamily: serifFont,
     fontSize: 30,
     fontWeight: '700',
     marginRight: spacing.xs,
   },
   amountInput: {
+    fontFamily: serifFont,
     fontSize: 32,
     fontWeight: '700',
     minWidth: 120,

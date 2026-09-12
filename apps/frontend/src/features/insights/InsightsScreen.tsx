@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useAppTheme, typography, spacing, radii, shadows } from '../../theme';
+import { serifFont } from '../../theme/typography';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import { BespokeFinancialGraph } from '../../components/common/BespokeFinancialGraph';
@@ -230,7 +231,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   title: {
-    ...typography.h2,
+    fontFamily: serifFont,
+    fontSize: 26,
+    fontWeight: '700',
+    letterSpacing: -0.4,
   },
   subtitle: {
     ...typography.caption,
@@ -240,12 +244,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   graphContainer: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
   },
   statusSection: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 18,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E8E8E6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
   statusTop: {
     flexDirection: 'row',
@@ -287,14 +301,25 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   metricVal: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontFamily: serifFont,
+    fontSize: 18,
+    fontWeight: '700',
     letterSpacing: -0.3,
     marginTop: 2,
   },
   section: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 18,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E8E8E6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
   sectionHeading: {
     fontSize: 10,

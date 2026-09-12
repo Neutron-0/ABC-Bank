@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Text, StyleSheet, Animated, TextStyle } from 'react-native';
 import { useAppTheme } from '../../theme/ThemeContext';
+import { typography, serifFont } from '../../theme/typography';
 
 interface Props {
   value: number;
@@ -72,30 +73,30 @@ export const AnimatedBalance: React.FC<Props> = ({
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }], flexDirection: 'row', alignItems: 'baseline' }}>
-      {currencyPrefix ? <Text style={[styles.currency, { color: themeColors.textSecondary }, style]}>{currencyPrefix}</Text> : null}
+      {currencyPrefix ? <Text style={[styles.currency, { color: themeColors.textPrimary }, style]}>{currencyPrefix}</Text> : null}
       <Text style={[styles.text, { color: themeColors.textPrimary }, style]}>{displayValue.toLocaleString('en-IN')}</Text>
-      {fractionSuffix ? <Text style={[styles.fraction, { color: themeColors.textMuted }, style]}>{fractionSuffix}</Text> : null}
+      {fractionSuffix ? <Text style={[styles.fraction, { color: themeColors.textSecondary }, style]}>{fractionSuffix}</Text> : null}
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   currency: {
-    fontSize: 24,
-    fontWeight: '500',
-    color: '#64748B',
+    fontFamily: serifFont,
+    fontSize: 26,
+    fontWeight: '700',
     marginRight: 4,
   },
   text: {
-    fontSize: 38,
+    fontFamily: serifFont,
+    fontSize: 36,
     fontWeight: '700',
-    color: '#0F172A',
-    letterSpacing: -1.2,
+    letterSpacing: -0.8,
   },
   fraction: {
+    fontFamily: serifFont,
     fontSize: 20,
-    fontWeight: '400',
-    color: '#94A3B8',
+    fontWeight: '500',
     marginLeft: 1,
   },
 });
