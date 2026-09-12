@@ -8,7 +8,7 @@ import {
   Switch,
   Image,
 } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { useAppTheme, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
 import {
@@ -22,9 +22,13 @@ import {
   Sparkles,
   Lock,
   Check,
+  Sun,
+  Moon,
+  Smartphone,
 } from 'lucide-react-native';
 
 export const ProfileScreen: React.FC = () => {
+  const { colors, isDark, themeMode, setThemeMode } = useAppTheme();
   const {
     profile,
     language,
@@ -38,10 +42,10 @@ export const ProfileScreen: React.FC = () => {
   const t = getTranslation(language);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>{t.profile.title}</Text>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{t.profile.title}</Text>
       </View>
 
       <ScrollView
@@ -50,66 +54,174 @@ export const ProfileScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* User Card */}
-        <View style={styles.userCard}>
+        <View style={[styles.userCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
           <Image source={{ uri: profile.avatarUrl }} style={styles.avatar} />
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>{profile.name}</Text>
-            <Text style={styles.userSub}>{profile.phone}</Text>
-            <Text style={styles.userSub}>{profile.email}</Text>
-            <View style={styles.kycBadge}>
+            <Text style={[styles.userName, { color: colors.textPrimary }]}>{profile.name}</Text>
+            <Text style={[styles.userSub, { color: colors.textSecondary }]}>{profile.phone}</Text>
+            <Text style={[styles.userSub, { color: colors.textSecondary }]}>{profile.email}</Text>
+            <View style={[styles.kycBadge, { backgroundColor: isDark ? '#064E3B' : colors.successLight }]}>
               <Check size={12} color={colors.success} />
-              <Text style={styles.kycBadgeText}>KYC Verified • Tier 2 Account</Text>
+              <Text style={[styles.kycBadgeText, { color: isDark ? '#34D399' : '#065F46' }]}>
+                KYC Verified • Tier 2 Account
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* APPEARANCE & THEME SWITCHER */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+            {language === 'hi' ? 'थीम व डिस्प्ले' : language === 'gu' ? 'થીમ અને ડિસ્પ્લે' : 'Appearance & Theme'}
+          </Text>
+
+          <View style={[styles.themeCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+            <View style={styles.themeInfoRow}>
+              <View style={[styles.themeIconWrap, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
+                {themeMode === 'system' ? (
+                  <Smartphone size={20} color={isDark ? colors.accent : colors.primaryRoyal} />
+                ) : themeMode === 'dark' ? (
+                  <Moon size={20} color={colors.accent} />
+                ) : (
+                  <Sun size={20} color="#D97706" />
+                )}
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.themeTitle, { color: colors.textPrimary }]}>
+                  {themeMode === 'system'
+                    ? (isDark ? 'System (Dark Mode Active)' : 'System (Light Mode Active)')
+                    : themeMode === 'dark'
+                    ? 'Dark Mode Active'
+                    : 'Light Mode Active'}
+                </Text>
+                <Text style={[styles.themeDesc, { color: colors.textSecondary }]}>
+                  {themeMode === 'system'
+                    ? 'Automatically follows your phone system settings'
+                    : 'Custom override applied'}
+                </Text>
+              </View>
+            </View>
+
+            {/* 3-Pill Toggle Bar */}
+            <View style={[styles.themePillsRow, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
+              {[
+                { id: 'system' as const, label: 'System', icon: Smartphone },
+                { id: 'light' as const, label: 'Light', icon: Sun },
+                { id: 'dark' as const, label: 'Dark', icon: Moon },
+              ].map((item) => {
+                const active = themeMode === item.id;
+                const IconComp = item.icon;
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={[
+                      styles.themePill,
+                      active && [
+                        styles.themePillActive,
+                        { backgroundColor: isDark ? colors.surfaceElevated : '#FFFFFF' },
+                      ],
+                    ]}
+                    onPress={() => setThemeMode(item.id)}
+                    activeOpacity={0.75}
+                  >
+                    <IconComp
+                      size={14}
+                      color={
+                        active
+                          ? isDark
+                            ? colors.accent
+                            : colors.primaryRoyal
+                          : colors.textSecondary
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.themePillText,
+                        { color: colors.textSecondary },
+                        active && {
+                          color: isDark ? colors.accent : colors.primaryRoyal,
+                          fontWeight: '700',
+                        },
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         </View>
 
         {/* PROTOTYPE LAB & DEMO CONTROLS (JUDGE SPOTLIGHT) */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>Judge & Developer Controls</Text>
+          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+            Judge & Developer Controls
+          </Text>
 
           <TouchableOpacity
-            style={styles.labCard}
+            style={[
+              styles.labCard,
+              {
+                backgroundColor: isDark ? '#451A03' : '#FFFBEB',
+                borderColor: isDark ? '#78350F' : '#FCD34D',
+              },
+            ]}
             onPress={() => openJourney('prototype_lab')}
             activeOpacity={0.85}
           >
             <View style={styles.labLeft}>
-              <View style={styles.labIconWrap}>
+              <View style={[styles.labIconWrap, { backgroundColor: isDark ? '#78350F' : '#FEF3C7' }]}>
                 <Sparkles size={22} color="#D97706" />
               </View>
               <View style={styles.labInfo}>
-                <Text style={styles.labTitle}>Prototype Lab (State Switcher)</Text>
-                <Text style={styles.labSubtitle}>
-                  Current Active State: <Text style={{ fontWeight: '700', color: colors.primary }}>{currentState.toUpperCase()}</Text>
+                <Text style={[styles.labTitle, { color: isDark ? '#FDE68A' : '#92400E' }]}>
+                  Prototype Lab (State Switcher)
                 </Text>
-                <Text style={styles.labHint}>Tap to switch between 5 customer states & see live UI adaptation.</Text>
+                <Text style={[styles.labSubtitle, { color: isDark ? '#FCD34D' : '#B45309' }]}>
+                  Current Active State:{' '}
+                  <Text style={{ fontWeight: '700', color: isDark ? '#38BDF8' : colors.primaryRoyal }}>
+                    {currentState.toUpperCase()}
+                  </Text>
+                </Text>
+                <Text style={[styles.labHint, { color: isDark ? '#FCD34D' : '#B45309' }]}>
+                  Tap to switch between 5 customer states & see live UI adaptation.
+                </Text>
               </View>
             </View>
             <ArrowRight size={18} color="#D97706" />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.archCard}
+            style={[
+              styles.archCard,
+              { backgroundColor: colors.cardBg, borderColor: colors.border },
+            ]}
             onPress={() => openJourney('architecture_flow')}
             activeOpacity={0.85}
           >
             <View style={styles.labLeft}>
-              <View style={[styles.labIconWrap, { backgroundColor: '#EFF6FF' }]}>
-                <Cpu size={22} color={colors.primary} />
+              <View style={[styles.labIconWrap, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
+                <Cpu size={22} color={isDark ? colors.accent : colors.primaryRoyal} />
               </View>
               <View style={styles.labInfo}>
-                <Text style={styles.archTitle}>System Architecture Visualizer</Text>
-                <Text style={styles.labSubtitle}>
+                <Text style={[styles.archTitle, { color: colors.textPrimary }]}>
+                  System Architecture Visualizer
+                </Text>
+                <Text style={[styles.labSubtitle, { color: colors.textSecondary }]}>
                   Data Sources → Signal Detectors → Priority Scoring → Attention Stack
                 </Text>
               </View>
             </View>
-            <ArrowRight size={18} color={colors.primary} />
+            <ArrowRight size={18} color={isDark ? colors.accent : colors.primaryRoyal} />
           </TouchableOpacity>
         </View>
 
         {/* Vernacular Language Selector */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>{t.profile.language}</Text>
+          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+            {t.profile.language}
+          </Text>
           <View style={styles.langGrid}>
             {[
               { code: 'en' as const, label: 'English' },
@@ -120,13 +232,34 @@ export const ProfileScreen: React.FC = () => {
               return (
                 <TouchableOpacity
                   key={langItem.code}
-                  style={[styles.langOption, active && styles.activeLangOption]}
+                  style={[
+                    styles.langOption,
+                    { backgroundColor: colors.cardBg, borderColor: colors.border },
+                    active && [
+                      styles.activeLangOption,
+                      {
+                        borderColor: isDark ? colors.accent : colors.primaryRoyal,
+                        backgroundColor: isDark ? '#1E293B' : colors.pastelBlue,
+                      },
+                    ],
+                  ]}
                   onPress={() => setLanguage(langItem.code)}
                 >
-                  <Text style={[styles.langOptionText, active && styles.activeLangOptionText]}>
+                  <Text
+                    style={[
+                      styles.langOptionText,
+                      { color: colors.textPrimary },
+                      active && {
+                        color: isDark ? colors.accent : colors.primaryRoyal,
+                        fontWeight: '700',
+                      },
+                    ]}
+                  >
                     {langItem.label}
                   </Text>
-                  {active && <Check size={16} color={colors.primary} />}
+                  {active && (
+                    <Check size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
+                  )}
                 </TouchableOpacity>
               );
             })}
@@ -135,102 +268,122 @@ export const ProfileScreen: React.FC = () => {
 
         {/* Personalization & Privacy Consent Toggles */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>{t.profile.personalizationSettings}</Text>
+          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+            {t.profile.personalizationSettings}
+          </Text>
 
-          <View style={styles.toggleRow}>
+          <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.toggleTextWrap}>
-              <Text style={styles.toggleTitle}>{t.profile.useTransactionData}</Text>
-              <Text style={styles.toggleDesc}>
+              <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>
+                {t.profile.useTransactionData}
+              </Text>
+              <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
                 Enables attention stack to prioritize repeated actions (e.g. morning Metro).
               </Text>
             </View>
             <Switch
               value={consent.useTransactionData}
               onValueChange={(val) => updateConsent({ useTransactionData: val })}
-              trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={colors.cardBg}
+              trackColor={{ false: colors.border, true: isDark ? '#1E3A8A' : colors.primaryLight }}
+              thumbColor={isDark ? colors.accent : colors.cardBg}
             />
           </View>
 
-          <View style={styles.toggleRow}>
+          <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.toggleTextWrap}>
-              <Text style={styles.toggleTitle}>{t.profile.personalizedProducts}</Text>
-              <Text style={styles.toggleDesc}>
+              <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>
+                {t.profile.personalizedProducts}
+              </Text>
+              <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
                 Allows surfacing ethical suggestions (strictly suppressed during stress).
               </Text>
             </View>
             <Switch
               value={consent.personalizedProducts}
               onValueChange={(val) => updateConsent({ personalizedProducts: val })}
-              trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={colors.cardBg}
+              trackColor={{ false: colors.border, true: isDark ? '#1E3A8A' : colors.primaryLight }}
+              thumbColor={isDark ? colors.accent : colors.cardBg}
             />
           </View>
 
-          <View style={styles.toggleRow}>
+          <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.toggleTextWrap}>
-              <Text style={styles.toggleTitle}>{t.profile.financialInsights}</Text>
-              <Text style={styles.toggleDesc}>
+              <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>
+                {t.profile.financialInsights}
+              </Text>
+              <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
                 Computes non-gamified cash flow digests and resilience checkpoints.
               </Text>
             </View>
             <Switch
               value={consent.financialInsights}
               onValueChange={(val) => updateConsent({ financialInsights: val })}
-              trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={colors.cardBg}
+              trackColor={{ false: colors.border, true: isDark ? '#1E3A8A' : colors.primaryLight }}
+              thumbColor={isDark ? colors.accent : colors.cardBg}
             />
           </View>
 
-          <View style={styles.toggleRow}>
+          <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.toggleTextWrap}>
-              <Text style={styles.toggleTitle}>{t.profile.assistantContext}</Text>
-              <Text style={styles.toggleDesc}>
+              <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>
+                {t.profile.assistantContext}
+              </Text>
+              <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
                 Allows Mitra to understand active medical, savings, or bill events.
               </Text>
             </View>
             <Switch
               value={consent.assistantContextAccess}
               onValueChange={(val) => updateConsent({ assistantContextAccess: val })}
-              trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={colors.cardBg}
+              trackColor={{ false: colors.border, true: isDark ? '#1E3A8A' : colors.primaryLight }}
+              thumbColor={isDark ? colors.accent : colors.cardBg}
             />
           </View>
         </View>
 
         {/* Banking Demo Journeys */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>Demo Journeys (Challenge #2)</Text>
+          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+            Demo Journeys (Challenge #2)
+          </Text>
           <TouchableOpacity
-            style={styles.journeyBtn}
+            style={[styles.journeyBtn, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
             onPress={() => openJourney('onboarding')}
           >
-            <Text style={styles.journeyBtnText}>App Onboarding & Language Selection</Text>
-            <ArrowRight size={16} color={colors.primary} />
+            <Text style={[styles.journeyBtnText, { color: colors.textPrimary }]}>
+              App Onboarding & Language Selection
+            </Text>
+            <ArrowRight size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.journeyBtn}
+            style={[styles.journeyBtn, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
             onPress={() => openJourney('kyc')}
           >
-            <Text style={styles.journeyBtnText}>Digital KYC Journey</Text>
-            <ArrowRight size={16} color={colors.primary} />
+            <Text style={[styles.journeyBtnText, { color: colors.textPrimary }]}>
+              Digital KYC Journey
+            </Text>
+            <ArrowRight size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.journeyBtn}
+            style={[styles.journeyBtn, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
             onPress={() => openJourney('loan')}
           >
-            <Text style={styles.journeyBtnText}>Responsible Affordability Loan</Text>
-            <ArrowRight size={16} color={colors.primary} />
+            <Text style={[styles.journeyBtnText, { color: colors.textPrimary }]}>
+              Responsible Affordability Loan
+            </Text>
+            <ArrowRight size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.journeyBtn}
+            style={[styles.journeyBtn, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
             onPress={() => openJourney('savings_invest')}
           >
-            <Text style={styles.journeyBtnText}>Surplus Savings & Investments</Text>
-            <ArrowRight size={16} color={colors.primary} />
+            <Text style={[styles.journeyBtnText, { color: colors.textPrimary }]}>
+              Surplus Savings & Investments
+            </Text>
+            <ArrowRight size={16} color={isDark ? colors.accent : colors.primaryRoyal} />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -241,19 +394,15 @@ export const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.bg,
   },
   header: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
     paddingBottom: spacing.sm,
-    backgroundColor: colors.cardBg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   title: {
     ...typography.h2,
-    color: colors.textPrimary,
   },
   scroll: {
     flex: 1,
@@ -261,14 +410,12 @@ const styles = StyleSheet.create({
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.cardBg,
-    marginHorizontal: spacing.lg,
+    marginHorizontal: spacing.md,
     marginTop: spacing.md,
     marginBottom: spacing.md,
     padding: spacing.md,
     borderRadius: radii.xl,
     borderWidth: 1,
-    borderColor: colors.border,
     gap: spacing.md,
     ...shadows.sm,
   },
@@ -282,18 +429,15 @@ const styles = StyleSheet.create({
   },
   userName: {
     ...typography.h3,
-    color: colors.textPrimary,
   },
   userSub: {
     ...typography.caption,
-    color: colors.textSecondary,
     marginTop: 1,
   },
   kycBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.successLight,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: radii.full,
@@ -302,27 +446,75 @@ const styles = StyleSheet.create({
   },
   kycBadgeText: {
     ...typography.tiny,
-    color: '#065F46',
     fontWeight: '700',
   },
   section: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
   },
   sectionHeader: {
     ...typography.captionMedium,
-    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.xs,
+  },
+  themeCard: {
+    borderRadius: radii.xl,
+    padding: spacing.md,
+    borderWidth: 1,
+    ...shadows.sm,
+  },
+  themeInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  themeIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: radii.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  themeTitle: {
+    ...typography.bodyBold,
+  },
+  themeDesc: {
+    ...typography.caption,
+    marginTop: 1,
+  },
+  themePillsRow: {
+    flexDirection: 'row',
+    borderRadius: radii.lg,
+    padding: 3,
+    borderWidth: 1,
+    gap: 4,
+  },
+  themePill: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    borderRadius: radii.md,
+  },
+  themePillActive: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  themePillText: {
+    ...typography.captionMedium,
   },
   labCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFBEB',
     borderWidth: 1.5,
-    borderColor: '#FCD34D',
     borderRadius: radii.lg,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -331,9 +523,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.cardBg,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radii.lg,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -348,7 +538,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: radii.md,
-    backgroundColor: '#FEF3C7',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -357,58 +546,45 @@ const styles = StyleSheet.create({
   },
   labTitle: {
     ...typography.bodyBold,
-    color: '#92400E',
   },
   archTitle: {
     ...typography.bodyBold,
-    color: colors.textPrimary,
   },
   labSubtitle: {
     ...typography.caption,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   labHint: {
     ...typography.tiny,
-    color: '#B45309',
     marginTop: 2,
-    fontStyle: 'italic',
   },
   langGrid: {
-    backgroundColor: colors.cardBg,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
+    gap: spacing.xs,
   },
   langOption: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    borderRadius: radii.md,
+    borderWidth: 1,
   },
   activeLangOption: {
-    backgroundColor: colors.primarySubtle,
+    borderWidth: 1.5,
   },
   langOptionText: {
     ...typography.body,
-    color: colors.textPrimary,
   },
   activeLangOptionText: {
     ...typography.bodyBold,
-    color: colors.primary,
   },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.cardBg,
     padding: spacing.md,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: spacing.xs,
     gap: spacing.md,
   },
@@ -417,26 +593,21 @@ const styles = StyleSheet.create({
   },
   toggleTitle: {
     ...typography.bodyBold,
-    color: colors.textPrimary,
   },
   toggleDesc: {
     ...typography.caption,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   journeyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.cardBg,
     padding: spacing.md,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: spacing.xs,
   },
   journeyBtnText: {
-    ...typography.bodyMedium,
-    color: colors.textPrimary,
+    ...typography.body,
   },
 });

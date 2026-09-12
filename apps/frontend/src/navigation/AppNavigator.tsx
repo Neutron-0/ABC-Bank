@@ -10,7 +10,7 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../theme';
 import { useCustomerStore } from '../state/customerStore';
 import { getTranslation } from '../i18n';
 import { MainTabType } from '../types';
@@ -51,6 +51,7 @@ import {
 } from 'lucide-react-native';
 
 export const AppNavigator: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const { activeTab, setActiveTab, language, toastMessage, currentState, activeJourney, closeJourney } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -163,22 +164,22 @@ export const AppNavigator: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FBFBFB" />
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: themeColors.bg }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={themeColors.bg} />
 
       {/* Discreet Institutional Sandbox Strip if state is simulated */}
       {currentState !== 'normal' && (
-        <View style={styles.stateNoticeStrip}>
-          <ShieldAlert size={12} color="#475569" />
-          <Text style={styles.stateNoticeText}>
-            AUDIT SANDBOX: <Text style={{ fontWeight: '700', color: '#0F172A' }}>{currentState.toUpperCase().replace('_', ' ')}</Text>
+        <View style={[styles.stateNoticeStrip, { backgroundColor: themeColors.cardBgSecondary, borderBottomColor: themeColors.border }]}>
+          <ShieldAlert size={12} color={themeColors.textSecondary} />
+          <Text style={[styles.stateNoticeText, { color: themeColors.textSecondary }]}>
+            AUDIT SANDBOX: <Text style={{ fontWeight: '700', color: themeColors.textPrimary }}>{currentState.toUpperCase().replace('_', ' ')}</Text>
           </Text>
         </View>
       )}
 
       {/* Toast Banner */}
       {toastMessage && (
-        <View style={styles.toastBanner} pointerEvents="none">
+        <View style={[styles.toastBanner, { backgroundColor: isDark ? '#1E293B' : '#0F172A' }]} pointerEvents="none">
           <CheckCircle2 size={16} color="#10B981" />
           <Text style={styles.toastText}>{toastMessage}</Text>
         </View>
@@ -201,7 +202,7 @@ export const AppNavigator: React.FC = () => {
       </Animated.View>
 
       {/* Anchored Institutional Banking Navigation Bar */}
-      <View style={styles.dockContainer}>
+      <View style={[styles.dockContainer, { backgroundColor: themeColors.cardBg, borderTopColor: themeColors.border }]}>
         <View style={styles.tabBar}>
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
@@ -219,7 +220,9 @@ export const AppNavigator: React.FC = () => {
                 <View
                   style={[
                     styles.activePip,
-                    active ? styles.activePipVisible : styles.activePipHidden,
+                    active
+                      ? [styles.activePipVisible, { backgroundColor: isDark ? themeColors.accent : '#002970' }]
+                      : styles.activePipHidden,
                   ]}
                 />
                 <Animated.View
@@ -230,14 +233,16 @@ export const AppNavigator: React.FC = () => {
                 >
                   <IconComp
                     size={20}
-                    color={active ? '#0F294A' : '#64748B'}
+                    color={active ? (isDark ? themeColors.accent : '#002970') : (isDark ? '#64748B' : '#94A3B8')}
                     strokeWidth={active ? 2.3 : 1.7}
                   />
                 </Animated.View>
                 <Text
                   style={[
                     styles.tabLabel,
-                    active ? styles.activeTabLabel : styles.inactiveTabLabel,
+                    active
+                      ? [styles.activeTabLabel, { color: isDark ? themeColors.accent : '#002970' }]
+                      : [styles.inactiveTabLabel, { color: isDark ? '#64748B' : '#94A3B8' }],
                   ]}
                   numberOfLines={1}
                 >

@@ -16,7 +16,7 @@ import { AdaptiveHeader } from '../../components/common/AdaptiveHeader';
 import { BalanceHeader } from '../../components/common/BalanceHeader';
 import { ContextCardStack } from '../../components/context/ContextCardStack';
 import { useCustomerStore } from '../../state/customerStore';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { getTranslation } from '../../i18n';
 import { motion } from '../../motion';
 import {
@@ -63,6 +63,7 @@ interface RepeatedIntentItem {
 }
 
 export const AdaptiveHomeScreen: React.FC = () => {
+  const { colors: themeColors, isDark } = useAppTheme();
   const {
     cards,
     fetchStateAndContext,
@@ -808,14 +809,14 @@ export const AdaptiveHomeScreen: React.FC = () => {
   const remainingCards = cards.filter((c) => c.id !== topWarningCard?.id);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
       <AdaptiveHeader />
 
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#111318" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={isDark ? themeColors.accent : '#111318'} />
         }
         showsVerticalScrollIndicator={false}
       >

@@ -658,6 +658,8 @@ interface CustomerStateStore {
   isBalanceHidden: boolean;
   toastMessage: string | null;
   isLoading: boolean;
+  themeMode: 'system' | 'light' | 'dark';
+  setThemeMode: (mode: 'system' | 'light' | 'dark') => void;
 
   userPin: string;
   biometricsEnabled: boolean;
@@ -824,6 +826,10 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     isBalanceHidden: false,
     toastMessage: null,
     isLoading: false,
+    themeMode: 'system',
+    setThemeMode: (mode: 'system' | 'light' | 'dark') => {
+      set({ themeMode: mode });
+    },
 
     userPin: '1234',
     biometricsEnabled: true,

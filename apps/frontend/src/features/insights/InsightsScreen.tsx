@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { colors, typography, spacing, radii, shadows } from '../../theme';
+import { useAppTheme, typography, spacing, radii, shadows } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { getTranslation } from '../../i18n';
+import { BespokeFinancialGraph } from '../../components/common/BespokeFinancialGraph';
 import {
   Activity,
   TrendingUp,
@@ -16,41 +17,65 @@ import {
 } from 'lucide-react-native';
 
 export const InsightsScreen: React.FC = () => {
+  const { colors, isDark } = useAppTheme();
   const { financialHealth, signals, language, openJourney } = useCustomerStore();
   const t = getTranslation(language);
 
   const getHealthBadge = () => {
     switch (financialHealth.status) {
       case 'thriving':
-        return { label: t.insights.statusThriving, color: colors.success, bg: colors.successLight };
+        return {
+          label: t.insights.statusThriving,
+          color: colors.success,
+          bg: isDark ? '#064E3B' : colors.successLight,
+        };
       case 'stress':
-        return { label: t.insights.statusStress, color: colors.accentWarm, bg: colors.warningLight };
+        return {
+          label: t.insights.statusStress,
+          color: colors.accentWarm,
+          bg: isDark ? '#451A03' : colors.warningLight,
+        };
       case 'tighter_than_usual':
-        return { label: t.insights.statusTight, color: '#D97706', bg: '#FEF3C7' };
+        return {
+          label: t.insights.statusTight,
+          color: '#D97706',
+          bg: isDark ? '#451A03' : '#FEF3C7',
+        };
       default:
-        return { label: t.insights.statusStable, color: colors.primary, bg: colors.primarySubtle };
+        return {
+          label: t.insights.statusStable,
+          color: isDark ? '#38BDF8' : colors.primaryRoyal,
+          bg: isDark ? '#0C4A6E' : colors.pastelBlue,
+        };
     }
   };
 
   const badge = getHealthBadge();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>{t.insights.title}</Text>
-        <Text style={styles.subtitle}>{t.insights.subtitle}</Text>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{t.insights.title}</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t.insights.subtitle}</Text>
       </View>
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={{ paddingBottom: 110 }}
+        contentContainerStyle={{ paddingBottom: 110, paddingTop: spacing.md }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Overall Status Card */}
-        <View style={styles.statusCard}>
+        {/* Premier Bespoke Financial Cash Flow Graph */}
+        <View style={styles.graphContainer}>
+          <BespokeFinancialGraph />
+        </View>
+
+        {/* Overall Health Status Card */}
+        <View style={[styles.statusCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
           <View style={styles.statusTop}>
-            <Text style={styles.statusCardLabel}>{t.insights.overallPicture}</Text>
+            <Text style={[styles.statusCardLabel, { color: colors.textSecondary }]}>
+              {t.insights.overallPicture}
+            </Text>
             <View style={[styles.statusBadge, { backgroundColor: badge.bg }]}>
               <Text style={[styles.statusBadgeText, { color: badge.color }]}>{badge.label}</Text>
             </View>
@@ -58,53 +83,99 @@ export const InsightsScreen: React.FC = () => {
 
           {/* Key Metrics Grid */}
           <View style={styles.metricsGrid}>
-            <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>{t.insights.cashFlowStability}</Text>
-              <Text style={styles.metricVal}>{financialHealth.cashFlowStabilityScore} / 100</Text>
+            <View style={[styles.metricItem, { backgroundColor: colors.cardBgSecondary }]}>
+              <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
+                {t.insights.cashFlowStability}
+              </Text>
+              <Text style={[styles.metricVal, { color: colors.textPrimary }]}>
+                {financialHealth.cashFlowStabilityScore} / 100
+              </Text>
             </View>
-            <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>{t.insights.savingsRate}</Text>
+
+            <View style={[styles.metricItem, { backgroundColor: colors.cardBgSecondary }]}>
+              <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
+                {t.insights.savingsRate}
+              </Text>
               <Text style={[styles.metricVal, { color: colors.success }]}>
                 {financialHealth.savingsRatePercent}%
               </Text>
             </View>
-            <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>{t.insights.debtToIncome}</Text>
+
+            <View style={[styles.metricItem, { backgroundColor: colors.cardBgSecondary }]}>
+              <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
+                {t.insights.debtToIncome}
+              </Text>
               <Text
                 style={[
                   styles.metricVal,
-                  financialHealth.debtToIncomeRatio > 0.4 ? { color: colors.danger } : {},
+                  financialHealth.debtToIncomeRatio > 0.4
+                    ? { color: colors.danger }
+                    : { color: colors.textPrimary },
                 ]}
               >
                 {Math.round(financialHealth.debtToIncomeRatio * 100)}%
               </Text>
             </View>
-            <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>{t.insights.emergencyFund}</Text>
-              <Text style={styles.metricVal}>{financialHealth.emergencyFundMonths} Months</Text>
+
+            <View style={[styles.metricItem, { backgroundColor: colors.cardBgSecondary }]}>
+              <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
+                {t.insights.emergencyFund}
+              </Text>
+              <Text style={[styles.metricVal, { color: colors.textPrimary }]}>
+                {financialHealth.emergencyFundMonths} Months
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Positive & Caution Statements */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeading}>{t.insights.positiveFactors}</Text>
+          <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+            {t.insights.positiveFactors}
+          </Text>
           {financialHealth.statements.positive.map((stmt, idx) => (
-            <View key={idx} style={styles.statementRow}>
+            <View
+              key={idx}
+              style={[
+                styles.statementRow,
+                { backgroundColor: colors.cardBg, borderColor: colors.border },
+              ]}
+            >
               <CheckCircle2 size={16} color={colors.success} style={styles.iconOffset} />
-              <Text style={styles.statementText}>{stmt}</Text>
+              <Text style={[styles.statementText, { color: colors.textPrimary }]}>{stmt}</Text>
             </View>
           ))}
 
           {financialHealth.statements.caution.length > 0 && (
             <>
-              <Text style={[styles.sectionHeading, { marginTop: spacing.md }]}>
+              <Text
+                style={[
+                  styles.sectionHeading,
+                  { color: colors.textSecondary, marginTop: spacing.md },
+                ]}
+              >
                 {t.insights.cautionFactors}
               </Text>
               {financialHealth.statements.caution.map((stmt, idx) => (
-                <View key={idx} style={styles.statementRowCaution}>
+                <View
+                  key={idx}
+                  style={[
+                    styles.statementRowCaution,
+                    {
+                      backgroundColor: isDark ? '#451A03' : '#FFFBEB',
+                      borderColor: isDark ? '#78350F' : '#FDE68A',
+                    },
+                  ]}
+                >
                   <AlertTriangle size={16} color={colors.accentWarm} style={styles.iconOffset} />
-                  <Text style={styles.statementTextCaution}>{stmt}</Text>
+                  <Text
+                    style={[
+                      styles.statementTextCaution,
+                      { color: isDark ? '#FDE68A' : '#92400E' },
+                    ]}
+                  >
+                    {stmt}
+                  </Text>
                 </View>
               ))}
             </>
@@ -113,15 +184,44 @@ export const InsightsScreen: React.FC = () => {
 
         {/* What Changed Section */}
         <View style={styles.section}>
-          <View style={styles.whatChangedCard}>
+          <View
+            style={[
+              styles.whatChangedCard,
+              {
+                backgroundColor: isDark ? '#172554' : '#EFF6FF',
+                borderColor: isDark ? '#1E3A8A' : '#BFDBFE',
+              },
+            ]}
+          >
             <View style={styles.whatChangedHeader}>
-              <Sparkles size={18} color={colors.primary} />
-              <Text style={styles.whatChangedTitle}>{t.insights.whatChanged}</Text>
+              <Sparkles size={18} color={isDark ? '#38BDF8' : colors.primaryRoyal} />
+              <Text
+                style={[
+                  styles.whatChangedTitle,
+                  { color: isDark ? '#38BDF8' : colors.primaryRoyal },
+                ]}
+              >
+                {t.insights.whatChanged}
+              </Text>
             </View>
             {financialHealth.statements.whatChanged.map((change, idx) => (
               <View key={idx} style={styles.changeItem}>
-                <Text style={styles.changeBullet}>•</Text>
-                <Text style={styles.changeText}>{change}</Text>
+                <Text
+                  style={[
+                    styles.changeBullet,
+                    { color: isDark ? '#38BDF8' : colors.primaryRoyal },
+                  ]}
+                >
+                  •
+                </Text>
+                <Text
+                  style={[
+                    styles.changeText,
+                    { color: isDark ? '#93C5FD' : '#1E3A8A' },
+                  ]}
+                >
+                  {change}
+                </Text>
               </View>
             ))}
           </View>
@@ -129,24 +229,40 @@ export const InsightsScreen: React.FC = () => {
 
         {/* Natural Language Digest Cards */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeading}>Natural-Language Digest</Text>
+          <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>
+            Natural-Language Digest
+          </Text>
 
-          <View style={styles.digestCard}>
-            <Text style={styles.digestTag}>COMMUTE & HABITS</Text>
-            <Text style={styles.digestTitle}>
+          <View
+            style={[
+              styles.digestCard,
+              { backgroundColor: colors.cardBg, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.digestTag, { color: isDark ? '#38BDF8' : colors.primaryRoyal }]}>
+              COMMUTE & HABITS
+            </Text>
+            <Text style={[styles.digestTitle, { color: colors.textPrimary }]}>
               Delhi Metro is your most frequent weekday routine (22 trips/mo).
             </Text>
-            <Text style={styles.digestDesc}>
+            <Text style={[styles.digestDesc, { color: colors.textSecondary }]}>
               Repeated spending averages ₹80/day with high temporal consistency around 8:40 AM.
             </Text>
           </View>
 
-          <View style={styles.digestCard}>
-            <Text style={styles.digestTag}>UTILITIES & BILLS</Text>
-            <Text style={styles.digestTitle}>
+          <View
+            style={[
+              styles.digestCard,
+              { backgroundColor: colors.cardBg, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.digestTag, { color: isDark ? '#38BDF8' : colors.primaryRoyal }]}>
+              UTILITIES & BILLS
+            </Text>
+            <Text style={[styles.digestTitle, { color: colors.textPrimary }]}>
               Electricity bill remained stable for 4 consecutive months.
             </Text>
-            <Text style={styles.digestDesc}>
+            <Text style={[styles.digestDesc, { color: colors.textSecondary }]}>
               Average billing is ₹1,450 without sudden consumption spikes.
             </Text>
           </View>
@@ -159,37 +275,33 @@ export const InsightsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.bg,
   },
   header: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
     paddingBottom: spacing.sm,
-    backgroundColor: colors.cardBg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   title: {
     ...typography.h2,
-    color: colors.textPrimary,
   },
   subtitle: {
     ...typography.caption,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   scroll: {
     flex: 1,
   },
+  graphContainer: {
+    paddingHorizontal: spacing.md,
+  },
   statusCard: {
-    backgroundColor: colors.cardBg,
     borderRadius: radii.xl,
     padding: spacing.lg,
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.md,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.xs,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
     ...shadows.md,
   },
   statusTop: {
@@ -200,7 +312,6 @@ const styles = StyleSheet.create({
   },
   statusCardLabel: {
     ...typography.captionMedium,
-    color: colors.textSecondary,
     textTransform: 'uppercase',
   },
   statusBadge: {
@@ -219,26 +330,22 @@ const styles = StyleSheet.create({
   },
   metricItem: {
     width: '46%',
-    backgroundColor: colors.cardBgSecondary,
     padding: spacing.md,
     borderRadius: radii.md,
   },
   metricLabel: {
     ...typography.caption,
-    color: colors.textSecondary,
   },
   metricVal: {
     ...typography.h3,
-    color: colors.textPrimary,
     marginTop: 4,
   },
   section: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     marginBottom: spacing.md,
   },
   sectionHeading: {
     ...typography.captionMedium,
-    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.xs,
@@ -246,22 +353,18 @@ const styles = StyleSheet.create({
   statementRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: colors.cardBg,
     padding: spacing.md,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: spacing.xs,
     gap: spacing.sm,
   },
   statementRowCaution: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#FFFBEB',
     padding: spacing.md,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#FDE68A',
     marginBottom: spacing.xs,
     gap: spacing.sm,
   },
@@ -270,20 +373,16 @@ const styles = StyleSheet.create({
   },
   statementText: {
     ...typography.body,
-    color: colors.textPrimary,
     flex: 1,
   },
   statementTextCaution: {
     ...typography.body,
-    color: '#92400E',
     flex: 1,
   },
   whatChangedCard: {
-    backgroundColor: '#EFF6FF',
     borderRadius: radii.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
   },
   whatChangedHeader: {
     flexDirection: 'row',
@@ -293,7 +392,6 @@ const styles = StyleSheet.create({
   },
   whatChangedTitle: {
     ...typography.bodyBold,
-    color: colors.primary,
   },
   changeItem: {
     flexDirection: 'row',
@@ -303,35 +401,28 @@ const styles = StyleSheet.create({
   },
   changeBullet: {
     fontSize: 16,
-    color: colors.primary,
   },
   changeText: {
     ...typography.caption,
-    color: '#1E3A8A',
     flex: 1,
   },
   digestCard: {
-    backgroundColor: colors.cardBg,
     borderRadius: radii.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: spacing.sm,
   },
   digestTag: {
     ...typography.tiny,
-    color: colors.primary,
     fontWeight: '800',
     letterSpacing: 0.5,
     marginBottom: 2,
   },
   digestTitle: {
     ...typography.bodyBold,
-    color: colors.textPrimary,
   },
   digestDesc: {
     ...typography.caption,
-    color: colors.textSecondary,
     marginTop: 2,
   },
 });
