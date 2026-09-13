@@ -56,4 +56,9 @@ class RiskSignalDetector:
         if is_stressed:
             signals["suppress_promotions"] = True
 
+        # 3. Explainable anomaly indicators & Pre-debit stress link
+        signals["odd_hours_flag"] = bool(odd_cnt > 0)
+        signals["amount_deviation_multiplier"] = round(largest_amt / median_debit, 1) if median_debit > 0 else 1.0
+        signals["has_pre_debit_shortfall"] = bool(financial_signals.get("has_early_shortfall", False))
+
         return signals

@@ -117,4 +117,11 @@ class FinancialSignalDetector:
         health_score = int(round(runway_pts + dti_pts + savings_pts + vol_pts))
         signals["financial_health_score"] = max(5, min(100, health_score))
 
+        # 7. 7-Day Pre-Debit Shortfall & Deficit Modeling
+        upcoming_emi = float(scenario_signals.get("upcoming_emi_amount") or features.get("spending_metrics", {}).get("emi_spend", 0.0) or 16500.0)
+        signals["upcoming_emi_amount"] = upcoming_emi
+        shortfall = max(0.0, upcoming_emi - avail)
+        signals["upcoming_emi_deficit"] = round(shortfall, 2)
+        signals["has_early_shortfall"] = bool(shortfall > 0)
+
         return signals

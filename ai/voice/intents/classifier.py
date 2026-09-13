@@ -7,6 +7,7 @@ from ai.voice.prompts.vernacular import VERNACULAR_PROMPTS
 
 
 from ai.voice.dialogue.manager import DialogueManager
+from ai.voice.intents.autocorrect import autocorrect_stt_text
 
 
 class VoiceIntentClassifier:
@@ -32,7 +33,8 @@ class VoiceIntentClassifier:
         stress_level: str = "normal",
         pending_clarification: Optional[str] = None
     ) -> Dict[str, Any]:
-        clean_q = str(query or "").strip()
+        raw_q = str(query or "").strip()
+        clean_q = autocorrect_stt_text(raw_q)
         if lang is None:
             normalized_lang = MiniCPM5Runner.detect_language(clean_q)
         else:
@@ -78,6 +80,20 @@ class VoiceIntentClassifier:
             intent = "CHECK_BALANCE"
             entities["view"] = "activity"
             entities["query_type"] = "spending"
+            entities["is_relevant"] = True
+            response_text = dialogue_turn.response_text
+            confidence = 0.96
+            resolved_lang = cls.normalize_language_code(dialogue_turn.language)
+        elif dialogue_turn.intent == "NAVIGATE_MEDICAL":
+            intent = "MEDICAL_CLAIM_HELP"
+            entities["journey_id"] = "medical_assistance"
+            entities["is_relevant"] = True
+            response_text = dialogue_turn.response_text
+            confidence = 0.96
+            resolved_lang = cls.normalize_language_code(dialogue_turn.language)
+        elif dialogue_turn.intent == "NAVIGATE_SAVINGS":
+            intent = "SAVE_SURPLUS"
+            entities["journey_id"] = "savings_invest"
             entities["is_relevant"] = True
             response_text = dialogue_turn.response_text
             confidence = 0.96

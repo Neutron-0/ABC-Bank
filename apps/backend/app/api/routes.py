@@ -412,6 +412,33 @@ def execute_assistant_intent(req: AssistantIntentRequest):
             suggested_actions=["EXPLORE_AUTO_SWEEP", "DISMISS"]
         )
 
+    elif intent_name == "INSURANCE_PROTECTION":
+        resp_msg = (
+            "एबीसी बैंक बीमा और स्वास्थ्य सुरक्षा: आरोग्य संजीवनी फैमिली हेल्थ कवर (₹3L-₹10L) मात्र ₹310/माह से और सोवरेन टर्म लाइफ कवर मात्र ₹490/माह से उपलब्ध है। धारा 80D और 10(10D) के तहत कर छूट प्राप्त करें।"
+            if lang == "hi"
+            else (
+                "એબીસી બેંક વીમો અને આરોગ્ય સુરક્ષા: આરોગ્ય સંજીવની ફેમિલી હેલ્થ કવર ₹310/મહિને અને ટર્મ લાઇફ કવર ₹490/મહિને ઉપલબ્ધ છે. કલમ 80D હેઠળ કર લાભો મેળવો."
+                if lang == "gu"
+                else "ABC Bank Insurance & Protection: Arogya Sanjeevani Family Health Cover (₹3L–₹10L) starting from ₹310/mo with 10,000+ cashless hospitals, and Sovereign Term Life from ₹490/mo. Tax deductible under Sec 80D & 10(10D)."
+            )
+        )
+        return AssistantIntentResponse(
+            intent="INSURANCE_PROTECTION",
+            success=True,
+            data={
+                "health_cover": "Arogya Sanjeevani (₹3L–₹10L Cashless)",
+                "starting_health_premium": 310.0,
+                "term_life": "Sovereign Term Life (₹50L–₹1Cr)",
+                "starting_life_premium": 490.0,
+                "tax_benefits": ["Section 80D", "Section 10(10D)"],
+                "hospital_network_count": 10500,
+                "journey_id": "insurance_protection"
+            },
+            response_text=resp_msg,
+            language=lang,
+            suggested_actions=["ENROLL_HEALTH_COVER", "VIEW_TERM_LIFE", "TAX_BENEFITS"]
+        )
+
     else:
         # Check if query is irrelevant or out-of-domain
         if req.entities.get("is_relevant") is False or req.entities.get("query_type") == "irrelevant":
@@ -874,5 +901,222 @@ def pause_mandate(req: MandatePauseRequest):
     except Exception as e:
         logger.error(f"Failed to pause mandate for {cid}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Mandate update failed.")
+
+
+# ---------------------------------------------------------------------------
+# 14. Empathetic Loan Relief: 10-Day Grace Buffer
+# ---------------------------------------------------------------------------
+class EmiGraceRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    loan_id: Optional[str] = None
+    days: Optional[int] = 10
+
+@router.post("/loans/grace")
+def request_emi_grace(req: EmiGraceRequest):
+    """
+    Grants a 10-day penalty-free grace buffer under RBI Resolution guidelines.
+    Guarantees zero bounce fees and zero CIBIL default penalties.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        return StateService.request_emi_grace(
+            customer_id=cid,
+            loan_id=req.loan_id,
+            days=req.days or 10
+        )
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to grant EMI grace for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Grace request failed.")
+
+
+# ---------------------------------------------------------------------------
+# 15. Empathetic Loan Relief: Split EMI (50% Due Date, 50% Post-Salary)
+# ---------------------------------------------------------------------------
+class EmiSplitRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    loan_id: Optional[str] = None
+
+@router.post("/loans/split")
+def split_emi(req: EmiSplitRequest):
+    """
+    Splits upcoming monthly EMI into two equal 50% installments to match cash flow.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        return StateService.split_emi(
+            customer_id=cid,
+            loan_id=req.loan_id
+        )
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to split EMI for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="EMI split failed.")
+
+
+# ---------------------------------------------------------------------------
+# 16. Empathetic Loan Relief: Emergency Deficit Auto-Sweep
+# ---------------------------------------------------------------------------
+class DeficitSweepRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    loan_id: Optional[str] = None
+    amount: Optional[float] = None
+
+@router.post("/loans/sweep-deficit")
+def sweep_deficit_for_emi(req: DeficitSweepRequest):
+    """
+    Partial auto-sweep: sweeps ONLY the shortfall amount from fixed deposits/emergency buffer
+    to prevent auto-debit bounce without liquidating the full deposit.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        return StateService.sweep_deficit_for_emi(
+            customer_id=cid,
+            loan_id=req.loan_id,
+            amount=req.amount
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to sweep deficit for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Deficit sweep failed.")
+
+
+# ---------------------------------------------------------------------------
+# 17. RBI Digital Lending Guidelines: Statutory 3-Day Cooling-Off Cancellation
+# ---------------------------------------------------------------------------
+class LoanCoolingOffRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    contract_id: str
+
+@router.post("/loans/cooling-off-cancel")
+def cancel_loan_cooling_off(req: LoanCoolingOffRequest):
+    """
+    Statutory 3-day cooling-off lookup cancellation without penalty or prepayment fee.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        return StateService.cancel_loan_cooling_off(
+            customer_id=cid,
+            contract_id=req.contract_id
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to execute cooling-off cancellation for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Cooling-off cancellation failed.")
+
+
+# ---------------------------------------------------------------------------
+# 18. SEBI ASBA (Application Supported by Blocked Amount) IPO Bidding
+# ---------------------------------------------------------------------------
+class AsbaBidRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    ipo_name: str
+    shares: int
+    amount: float
+    upi_id: str
+
+@router.post("/investments/asba/bid")
+def place_asba_lien(req: AsbaBidRequest):
+    """
+    Places SEBI UPI ASBA lien blocking for primary market IPO applications.
+    Funds remain blocked in account earning interest until allotment.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        return StateService.place_asba_lien(
+            customer_id=cid,
+            ipo_name=req.ipo_name,
+            shares=req.shares,
+            amount=req.amount,
+            upi_id=req.upi_id
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to place ASBA bid for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="ASBA bid failed.")
+
+
+# ---------------------------------------------------------------------------
+# 19. Card Security: Dynamic Single-Use 5-Minute Virtual CVV Generator
+# ---------------------------------------------------------------------------
+class DynamicCvvRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    card_id: Optional[str] = "card_01"
+
+@router.post("/cards/dynamic-cvv")
+def generate_dynamic_cvv(req: DynamicCvvRequest):
+    """
+    Generates a single-use 5-minute time-bound virtual dynamic CVV for secure card usage.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        return StateService.generate_dynamic_cvv(
+            customer_id=cid,
+            card_id=req.card_id or "card_01"
+        )
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to generate dynamic CVV for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="CVV generation failed.")
+
+
+# ---------------------------------------------------------------------------
+# 20. Statutory IRDAI Insurance & Protection Enrollment APIs
+# ---------------------------------------------------------------------------
+class InsuranceEnrollRequest(BaseModel):
+    customer_id: Optional[str] = "cust_bharat_001"
+    plan_id: str
+    sum_insured: float
+    nominee_name: str
+    nominee_relation: str
+
+@router.get("/insurance/plans/{customer_id}")
+def get_insurance_plans(customer_id: str):
+    """
+    Fetches pre-approved IRDAI standard health and term life insurance plans.
+    """
+    try:
+        return StateService.get_insurance_plans(customer_id)
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to fetch insurance plans for {customer_id}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch insurance plans.")
+
+@router.post("/insurance/enroll")
+def enroll_insurance_policy(req: InsuranceEnrollRequest):
+    """
+    1-Click Digital Insurance Enrollment under IRDAI guidelines.
+    Issues policy certificate, debits initial monthly premium, and updates customer state.
+    """
+    cid = req.customer_id or "cust_bharat_001"
+    try:
+        return StateService.enroll_insurance_policy(
+            customer_id=cid,
+            plan_id=req.plan_id,
+            sum_insured=req.sum_insured,
+            nominee_name=req.nominee_name,
+            nominee_relation=req.nominee_relation
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except Exception as e:
+        logger.error(f"Failed to enroll insurance policy for {cid}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Insurance enrollment failed.")
+
 
 

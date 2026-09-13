@@ -656,4 +656,389 @@ class StateService:
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
+    # -----------------------------------------------------------------------
+    # 14. Empathetic Non-Punitive EMI Grace & Resolution Actions
+    # -----------------------------------------------------------------------
+    @classmethod
+    def request_emi_grace(
+        cls,
+        customer_id: str,
+        loan_id: Optional[str] = None,
+        days: int = 10
+    ) -> Dict[str, Any]:
+        """
+        Grants a 10-day penalty-free grace buffer under RBI Resolution guidelines.
+        Guarantees zero bounce fees, zero CIBIL default penalties, and defers next auto-debit.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+
+        current_state = cls.get_state(customer_id)
+        from datetime import timedelta
+        new_due_date = (datetime.now(timezone.utc) + timedelta(days=days)).strftime("%Y-%m-%d")
+
+        current_state.signals["emi_grace_active"] = True
+        current_state.signals["emi_grace_days"] = days
+        current_state.signals["emi_next_due_date"] = new_due_date
+        current_state.signals["has_early_shortfall"] = False
+        current_state.signals["upcoming_emi_deficit"] = 0.0
+
+        return {
+            "success": True,
+            "loan_id": loan_id or "loan_hdfc_home_01",
+            "grace_days": days,
+            "new_due_date": new_due_date,
+            "zero_penalty_guaranteed": True,
+            "cibil_impact": "None (Protected under RBI Fair Practices Code)",
+            "message": f"EMI auto-debit deferred by {days} days until {new_due_date} with zero penalty fee."
+        }
+
+    @classmethod
+    def split_emi(
+        cls,
+        customer_id: str,
+        loan_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Splits upcoming monthly EMI into two equal 50% installments:
+        50% on scheduled due date, 50% on 20th of the month after receivables.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+
+        current_state = cls.get_state(customer_id)
+        current_emi = float(current_state.signals.get("upcoming_emi_amount") or 16500.0)
+        half_emi = round(current_emi / 2, 2)
+
+        current_state.signals["emi_split_active"] = True
+        current_state.signals["split_emi_installment_1"] = half_emi
+        current_state.signals["split_emi_installment_2"] = half_emi
+        current_state.signals["upcoming_emi_amount"] = half_emi
+
+        avail = current_state.balance.available if current_state.balance else 0.0
+        current_state.signals["upcoming_emi_deficit"] = max(0.0, half_emi - avail)
+        current_state.signals["has_early_shortfall"] = (half_emi > avail)
+
+        return {
+            "success": True,
+            "loan_id": loan_id or "loan_hdfc_home_01",
+            "original_emi": current_emi,
+            "half_emi": half_emi,
+            "installment_1_date": "Scheduled Due Date (5th)",
+            "installment_2_date": "Salary/Receivables Buffer (20th)",
+            "message": f"EMI split into two installments of ₹{half_emi:,.0f} each."
+        }
+
+    @classmethod
+    def sweep_deficit_for_emi(
+        cls,
+        customer_id: str,
+        loan_id: Optional[str] = None,
+        amount: Optional[float] = None
+    ) -> Dict[str, Any]:
+        """
+        Sweeps ONLY the exact shortfall amount from Fixed Deposit/Emergency Buffer
+        into available balance to prevent auto-debit bounce without liquidating the full FD.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+
+        current_state = cls.get_state(customer_id)
+        avail = current_state.balance.available if current_state.balance else 0.0
+        savings = current_state.balance.savings if current_state.balance else 0.0
+        scheduled_emi = float(current_state.signals.get("upcoming_emi_amount") or 16500.0)
+
+        sweep_amount = amount if (amount and amount > 0) else max(0.0, scheduled_emi - avail)
+        if sweep_amount <= 0:
+            return {
+                "success": True,
+                "swept_amount": 0.0,
+                "message": "Available balance already covers scheduled EMI. No sweep required."
+            }
+
+        if savings < sweep_amount:
+            raise ValueError(f"Insufficient deposit buffer: Required ₹{sweep_amount:,.2f}, available in savings ₹{savings:,.2f}.")
+
+        # Deduct from savings, credit to available
+        current_state.balance.savings -= sweep_amount
+        current_state.balance.available += sweep_amount
+        current_state.signals["upcoming_emi_deficit"] = 0.0
+        current_state.signals["has_early_shortfall"] = False
+        current_state.signals["deficit_sweep_active"] = True
+
+        tx_ref = f"SWEEP_FD_{int(time.time()*1000)}_{secrets.token_hex(2).upper()}"
+        iso_now = datetime.now(timezone.utc).isoformat()
+        new_tx = {
+            "id": tx_ref,
+            "customer_id": customer_id,
+            "amount": float(sweep_amount),
+            "type": "credit",
+            "category": "auto_sweep",
+            "merchant": "Emergency Deposit Buffer",
+            "description": f"Partial deficit sweep of ₹{sweep_amount:,.0f} to protect EMI auto-debit",
+            "timestamp": iso_now,
+            "status": "completed",
+            "payment_channel": "internal_sweep"
+        }
+        if customer_id not in cls._in_memory_transactions:
+            cls._in_memory_transactions[customer_id] = []
+        cls._in_memory_transactions[customer_id].insert(0, new_tx)
+
+        return {
+            "success": True,
+            "swept_amount": sweep_amount,
+            "tx_ref": tx_ref,
+            "new_available_balance": current_state.balance.available,
+            "remaining_savings_reserve": current_state.balance.savings,
+            "message": f"Successfully swept ₹{sweep_amount:,.0f} from emergency deposit buffer to guarantee on-time EMI settlement."
+        }
+
+    @classmethod
+    def cancel_loan_cooling_off(
+        cls,
+        customer_id: str,
+        contract_id: str
+    ) -> Dict[str, Any]:
+        """
+        Under RBI Digital Lending Guidelines:
+        Borrowers enjoy a statutory 3-day cooling-off lookup period where principal can be returned
+        without foreclosure penalty or prepayment charges.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+
+        current_state = cls.get_state(customer_id)
+        # Find matching disbursal
+        txs = cls._in_memory_transactions.get(customer_id, [])
+        loan_tx = next((t for t in txs if contract_id in t.get("description", "") or contract_id == t.get("id")), None)
+        principal = float(loan_tx["amount"]) if loan_tx else 150000.0
+
+        avail = current_state.balance.available if current_state.balance else 0.0
+        if avail < principal:
+            raise ValueError(f"Insufficient funds to exercise cooling-off cancellation. Required ₹{principal:,.2f}, available ₹{avail:,.2f}.")
+
+        current_state.balance.available -= principal
+        if current_state.balance.savings >= principal:
+            current_state.balance.savings -= principal
+
+        cancel_ref = f"TXN_COOLING_OFF_{int(time.time()*1000)}_{secrets.token_hex(2).upper()}"
+        iso_now = datetime.now(timezone.utc).isoformat()
+        new_tx = {
+            "id": cancel_ref,
+            "customer_id": customer_id,
+            "amount": float(principal),
+            "type": "debit",
+            "category": "loan_cancellation",
+            "merchant": "ABC Bank Lending Desk",
+            "description": f"Cooling-Off Principal Return for {contract_id} (Zero Penalty)",
+            "timestamp": iso_now,
+            "status": "completed",
+            "payment_channel": "neft"
+        }
+        cls._in_memory_transactions[customer_id].insert(0, new_tx)
+
+        current_state.signals["cooling_off_cancelled"] = True
+        current_state.signals["cooling_off_contract_id"] = contract_id
+
+        return {
+            "success": True,
+            "contract_id": contract_id,
+            "cancellation_ref": cancel_ref,
+            "principal_returned": principal,
+            "penalty_charged": 0.0,
+            "rbi_dlg_compliance": True,
+            "message": f"Loan {contract_id} successfully cancelled under 3-day cooling-off lookup rights. Zero prepayment penalty applied."
+        }
+
+    @classmethod
+    def place_asba_lien(
+        cls,
+        customer_id: str,
+        ipo_name: str,
+        shares: int,
+        amount: float,
+        upi_id: str
+    ) -> Dict[str, Any]:
+        """
+        SEBI UPI ASBA (Application Supported by Blocked Amount):
+        Marks bank account lien for primary market IPO application without debiting funds.
+        Funds remain in customer account earning interest until allotment.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+        if amount <= 0:
+            raise ValueError("ASBA bidding amount must be greater than zero.")
+
+        current_state = cls.get_state(customer_id)
+        avail = current_state.balance.available if current_state.balance else 0.0
+        if avail < amount:
+            raise ValueError(f"Insufficient balance to place ASBA lien: Required ₹{amount:,.2f}, available ₹{avail:,.2f}.")
+
+        current_lien = float(current_state.signals.get("asba_lien_amount", 0.0)) + amount
+        current_state.signals["asba_lien_amount"] = current_lien
+        current_state.signals["asba_active_bids_count"] = int(current_state.signals.get("asba_active_bids_count", 0)) + 1
+
+        ref_id = f"ASBA/{datetime.now(timezone.utc).strftime('%Y%m')}/{secrets.token_hex(4).upper()}"
+
+        return {
+            "success": True,
+            "ref_id": ref_id,
+            "ipo_name": ipo_name,
+            "shares": shares,
+            "blocked_amount": amount,
+            "upi_id": upi_id,
+            "lien_status": "BLOCKED_ASBA",
+            "interest_accruing": True,
+            "message": f"ASBA Bid confirmed. ₹{amount:,.0f} blocked in your primary account (earning savings interest) under application #{ref_id}."
+        }
+
+    @classmethod
+    def generate_dynamic_cvv(
+        cls,
+        customer_id: str,
+        card_id: Optional[str] = "card_01"
+    ) -> Dict[str, Any]:
+        """
+        Generates a single-use, 5-minute time-bound virtual dynamic CVV
+        for fraud-proof online transactions.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+
+        dynamic_cvv = f"{secrets.randbelow(900) + 100}"
+        expires_at = datetime.now(timezone.utc).timestamp() + 300  # 5 minutes
+
+        card_ctrl = cls.get_card_controls(customer_id)
+        card_ctrl["dynamic_cvv"] = dynamic_cvv
+        card_ctrl["dynamic_cvv_expires_at"] = expires_at
+
+        return {
+            "success": True,
+            "card_id": card_id or "card_01",
+            "dynamic_cvv": dynamic_cvv,
+            "validity_seconds": 300,
+            "expires_at": datetime.fromtimestamp(expires_at, timezone.utc).isoformat(),
+            "message": "Single-use dynamic CVV generated. Valid for 5 minutes."
+        }
+
+    # -----------------------------------------------------------------------
+    # 20. Statutory IRDAI Insurance & Protection Enrollment
+    # -----------------------------------------------------------------------
+    @classmethod
+    def get_insurance_plans(cls, customer_id: str) -> Dict[str, Any]:
+        """
+        Fetches statutory IRDAI standard insurance & health protection plans.
+        Pre-approved rates tailored for the customer profile.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+
+        return {
+            "customer_id": customer_id,
+            "currency": "INR",
+            "plans": [
+                {
+                    "plan_id": "arogya_sanjeevani_01",
+                    "name": "Arogya Sanjeevani Standard Family Health Cover",
+                    "type": "HEALTH",
+                    "sum_insured_options": [300000, 500000, 1000000],
+                    "starting_premium_monthly": 310.0,
+                    "hospital_network_count": 10500,
+                    "features": [
+                        "Cashless treatment at 10,000+ network hospitals nationwide",
+                        "Zero pre-policy medical checkup requirement",
+                        "Tax exemption benefits under Section 80D up to ₹25,000/yr",
+                        "Pre and post hospitalization coverage (30 & 60 days)"
+                    ]
+                },
+                {
+                    "plan_id": "sovereign_term_life_01",
+                    "name": "ABC Sovereign Term Life Protection",
+                    "type": "LIFE",
+                    "sum_insured_options": [5000000, 10000000],
+                    "starting_premium_monthly": 490.0,
+                    "claim_settlement_ratio": 99.2,
+                    "features": [
+                        "Pure term life cover backed by sovereign reinsurance",
+                        "99.2% verified fast-track claim settlement ratio",
+                        "Tax-free payout under Section 10(10D)",
+                        "Terminal illness accelerated payout benefit"
+                    ]
+                },
+                {
+                    "plan_id": "cyber_fraud_shield_01",
+                    "name": "Digital RuPay Cyber Fraud Shield",
+                    "type": "CYBER_SECURITY",
+                    "sum_insured_options": [100000, 250000],
+                    "starting_premium_monthly": 49.0,
+                    "features": [
+                        "Full coverage for unauthorized UPI, card, and phishing debits",
+                        "Zero deductible on verified fraud complaints",
+                        "24x7 instant claim registration via Mitra voice assistant"
+                    ]
+                }
+            ]
+        }
+
+    @classmethod
+    def enroll_insurance_policy(
+        cls,
+        customer_id: str,
+        plan_id: str,
+        sum_insured: float,
+        nominee_name: str,
+        nominee_relation: str
+    ) -> Dict[str, Any]:
+        """
+        1-Click Digital Insurance Enrollment under IRDAI guidelines.
+        Deducts initial monthly premium, generates policy number, updates state.
+        """
+        if not cls.is_valid_customer(customer_id):
+            raise KeyError(f"Customer '{customer_id}' not found.")
+
+        current_state = cls.get_state(customer_id)
+        premium = 310.0 if ("health" in plan_id.lower() or "arogya" in plan_id.lower()) else (490.0 if "life" in plan_id.lower() else 49.0)
+
+        avail = current_state.balance.available if current_state.balance else 0.0
+        if avail < premium:
+            raise ValueError(f"Insufficient balance to pay initial premium: ₹{premium:,.2f} required, available ₹{avail:,.2f}.")
+
+        # Deduct premium
+        if current_state.balance:
+            current_state.balance.available -= premium
+        policy_no = f"POL/{datetime.now(timezone.utc).strftime('%Y%m')}/{secrets.token_hex(4).upper()}"
+
+        # Record transaction
+        new_tx = {
+            "id": f"tx_pol_{secrets.token_hex(4)}",
+            "amount": premium,
+            "type": "debit",
+            "category": "bills",
+            "merchant": "ABC Bank General Insurance",
+            "description": f"Initial Monthly Premium - {plan_id} (Policy #{policy_no})",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "status": "completed",
+            "is_recurring": True,
+            "confidence_score": 0.99
+        }
+        if customer_id not in cls._in_memory_transactions:
+            cls._in_memory_transactions[customer_id] = []
+        cls._in_memory_transactions[customer_id].insert(0, new_tx)
+
+        current_state.signals["has_active_health_cover"] = True
+        current_state.signals["active_policy_no"] = policy_no
+
+        return {
+            "success": True,
+            "policy_number": policy_no,
+            "plan_id": plan_id,
+            "sum_insured": sum_insured,
+            "monthly_premium": premium,
+            "nominee_name": nominee_name,
+            "nominee_relation": nominee_relation,
+            "status": "ACTIVE_IN_FORCE",
+            "available_balance": current_state.balance.available if current_state.balance else 0.0,
+            "message": f"Policy {policy_no} issued successfully. Initial premium of ₹{premium:,.2f} debited."
+        }
+
 
