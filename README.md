@@ -2512,7 +2512,7 @@ node scripts/test_ondevice_intent.js
 | Variable | Required | Description | Example | Used By | Sensitive |
 |----------|----------|-------------|---------|---------|-----------|
 | `DATABASE_URL` | Yes | PostgreSQL connection string | `postgresql://postgres:postgres@localhost:5432/abc_bank` | Backend | Yes |
-| `EXPO_PUBLIC_API_URL` | Yes | Backend API URL for mobile app | `http://localhost:8000` | Frontend | No |
+| `EXPO_PUBLIC_API_URL` | Yes | Backend API URL for mobile app | `http://152.67.9.53/api/v1` (Cloud) / `http://localhost:8000/api/v1` (Local) | Frontend | No |
 | `AI_VERBOSITY` | No | AI logging verbosity level | `1` | AI Engine | No |
 | `DEFAULT_LANGUAGE` | No | Default language (en/hi/gu) | `en` | Backend | No |
 | `MINICPM5_MODEL_PATH` | No | Path to MiniCPM-5 ONNX model | `./assets/minicpm5_slm_v1.onnx` | Voice AI | No |
@@ -2574,8 +2574,10 @@ flowchart TD
     ExpoLocal["Expo Dev Server\n• Metro Bundler\n• QR Code → Expo Go"]
   end
 
-  subgraph ProductionRef["Production (Referenced)"]
-    RDSTunnel["AWS RDS PostgreSQL\n(Tunnel: localhost:5433)"]
+  subgraph CloudInfra["Live Cloud Deployment (152.67.9.53)"]
+    NginxCloud["Nginx Reverse Proxy\n• Port 80 (Public)\n• SSL Ready / Header Pass"]
+    FastAPICloud["FastAPI + Uvicorn (abc-bank.service)\n• Port 8000 (Internal)\n• PBKDF2 & JWT Auth"]
+    PostgresCloud[("PostgreSQL 14\n• Port 5432\n• Database: abc_bank")]
   end
 
   Dev2 --> Code
@@ -2583,7 +2585,9 @@ flowchart TD
   Code --> FastAPILocal
   Code --> ExpoLocal
   FastAPILocal --> DockerDB
-  DockerDB -.->|"Production Tunnel"| RDSTunnel
+  ExpoLocal -->|"API Requests (EXPO_PUBLIC_API_URL)"| NginxCloud
+  NginxCloud -->|"proxy_pass 127.0.0.1:8000"| FastAPICloud
+  FastAPICloud --> PostgresCloud
 ```
 
 ### Database Migration Flow
