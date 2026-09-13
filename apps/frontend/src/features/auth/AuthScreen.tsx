@@ -12,7 +12,7 @@ import {
   Animated,
   Switch,
 } from 'react-native';
-import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
+import { typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
 import { CustomerStateType, DpdpConsentState, SignupPayload } from '../../types';
 import {
@@ -29,6 +29,9 @@ import {
   FileText,
   Shield,
   Info,
+  ChevronRight,
+  User,
+  Globe,
 } from 'lucide-react-native';
 
 type AuthScreenStep = 'PHONE' | 'SIGNUP' | 'OTP' | 'DPDP_CONSENT' | 'MPIN';
@@ -39,6 +42,7 @@ interface PersonaPreset {
   phone: string;
   tag: string;
   badgeColor: string;
+  badgeBg: string;
   summary: string;
 }
 
@@ -48,7 +52,8 @@ const PERSONA_PRESETS: PersonaPreset[] = [
     name: 'Rahul Sharma',
     phone: '9999999901',
     tag: 'Salaried • Steady Cashflow',
-    badgeColor: '#10B981',
+    badgeColor: '#1B7A43',
+    badgeBg: '#EDF7F1',
     summary: '₹84,500 salary credited, healthy emergency buffer, low credit risk.',
   },
   {
@@ -56,7 +61,8 @@ const PERSONA_PRESETS: PersonaPreset[] = [
     name: 'Priya Patel',
     phone: '9999999902',
     tag: 'Business • Surplus Liquidity',
-    badgeColor: '#06B6D4',
+    badgeColor: '#0369A1',
+    badgeBg: '#E0F2FE',
     summary: '₹2.85L surplus idle in savings, auto-sweep & mutual fund ready.',
   },
   {
@@ -64,7 +70,8 @@ const PERSONA_PRESETS: PersonaPreset[] = [
     name: 'Amit Kumar',
     phone: '9999999903',
     tag: 'Pre-Salary • Tight Buffer',
-    badgeColor: '#F59E0B',
+    badgeColor: '#B45309',
+    badgeBg: '#FDF6ED',
     summary: 'Upcoming EMI of ₹14,200 due in 4 days with ₹3,840 account deficit.',
   },
   {
@@ -72,7 +79,8 @@ const PERSONA_PRESETS: PersonaPreset[] = [
     name: 'Vikram Singh',
     phone: '9999999904',
     tag: 'Hospitalization • Inpatient',
-    badgeColor: '#8B5CF6',
+    badgeColor: '#6D28D9',
+    badgeBg: '#F5F3FF',
     summary: '₹48,200 payment at Max Hospital, digital insurance claim assistance.',
   },
   {
@@ -80,7 +88,8 @@ const PERSONA_PRESETS: PersonaPreset[] = [
     name: 'Sunita Verma',
     phone: '9999999905',
     tag: 'High Anomaly • Midnight Charge',
-    badgeColor: '#EF4444',
+    badgeColor: '#C92A2A',
+    badgeBg: '#FDF2F2',
     summary: '₹31,800 charged at 02:14 AM from unfamiliar overseas merchant.',
   },
 ];
@@ -143,25 +152,25 @@ export const AuthScreen: React.FC = () => {
 
   const triggerShake = () => {
     Animated.sequence([
-      Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 8, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: -8, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 8, duration: 40, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: -8, duration: 40, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 6, duration: 40, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: -6, duration: 40, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 0, duration: 40, useNativeDriver: true }),
     ]).start();
   };
 
   const transitionTo = (newStep: AuthScreenStep) => {
     Animated.timing(fadeAnim, {
       toValue: 0,
-      duration: 120,
+      duration: 100,
       useNativeDriver: true,
     }).start(() => {
       setStep(newStep);
       setErrorMessage('');
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 160,
+        duration: 140,
         useNativeDriver: true,
       }).start();
     });
@@ -209,7 +218,7 @@ export const AuthScreen: React.FC = () => {
       }
       // Advance to DPDP Consent screen
       transitionTo('DPDP_CONSENT');
-    }, 350);
+    }, 300);
   };
 
   // Step 3: Accept DPDP Consent
@@ -234,7 +243,6 @@ export const AuthScreen: React.FC = () => {
       setErrorMessage('');
 
       if (next.length === 6) {
-        // Auto-verify upon 6th digit
         setIsVerifying(true);
         setTimeout(() => {
           setIsVerifying(false);
@@ -244,7 +252,7 @@ export const AuthScreen: React.FC = () => {
             triggerShake();
             setMpinInput('');
           }
-        }, 300);
+        }, 250);
       }
     }
   };
@@ -259,7 +267,7 @@ export const AuthScreen: React.FC = () => {
     setTimeout(() => {
       setIsVerifying(false);
       verifyMpin('123456');
-    }, 400);
+    }, 350);
   };
 
   // Signup Submit
@@ -289,44 +297,45 @@ export const AuthScreen: React.FC = () => {
     };
 
     signupCustomer(payload);
-    // After signup, take user to DPDP consent confirmation
     transitionTo('DPDP_CONSENT');
   };
 
   return (
-    <SafeAreaView style={[styles.safeContainer, { backgroundColor: '#0B1120' }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B1120" />
-
-      {/* Header Bar: Bank Branding & Multilingual Selector */}
-      <View style={styles.topHeader}>
-        <View style={styles.brandGroup}>
-          <View style={styles.brandIconContainer}>
-            <ShieldCheck size={22} color="#10B981" />
+    <View style={[styles.screenContainer, { backgroundColor: themeColors.bg }]}>
+      {/* Top Header: Brand Crest + Vernacular Language Toggle */}
+      <View style={[styles.topHeader, { backgroundColor: themeColors.cardBg, borderBottomColor: themeColors.border }]}>
+        <View style={styles.brandRow}>
+          <View style={[styles.brandIconBox, { backgroundColor: '#141414' }]}>
+            <ShieldCheck size={18} color="#FFFFFF" strokeWidth={2.4} />
           </View>
           <View>
-            <Text style={styles.brandTitle}>ABC DIGITAL BANK</Text>
-            <Text style={styles.brandSubtitle}>BHARAT HYPER-PERSONALIZED • RBI REGULATED</Text>
+            <Text style={[styles.brandTitle, { color: themeColors.textPrimary }]}>ABC DIGITAL BANK</Text>
+            <Text style={[styles.brandSubtitle, { color: themeColors.textSecondary }]}>
+              BHARAT HYPER-PERSONALIZED • RBI REGULATED
+            </Text>
           </View>
         </View>
 
-        {/* 1-Tap Language Toggle */}
-        <View style={styles.langPillContainer}>
+        {/* Vernacular Language Selector */}
+        <View style={[styles.langPillContainer, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
           {(['en', 'hi', 'gu'] as const).map((l) => (
             <TouchableOpacity
               key={l}
               onPress={() => setLanguage(l)}
               style={[
                 styles.langButton,
-                language === l && styles.langButtonActive,
+                language === l && [styles.langButtonActive, { backgroundColor: '#FFFFFF' }],
               ]}
+              activeOpacity={0.7}
             >
               <Text
                 style={[
                   styles.langButtonText,
-                  language === l && styles.langButtonTextActive,
+                  { color: themeColors.textSecondary },
+                  language === l && { color: '#141414', fontWeight: '800' },
                 ]}
               >
-                {l === 'en' ? 'EN' : l === 'hi' ? 'हिं' : 'ગુજ'}
+                {l === 'en' ? 'EN' : l === 'hi' ? 'हि' : 'ગુ'}
               </Text>
             </TouchableOpacity>
           ))}
@@ -340,8 +349,10 @@ export const AuthScreen: React.FC = () => {
       >
         <Animated.View
           style={[
-            styles.cardContainer,
+            styles.mainCard,
             {
+              backgroundColor: themeColors.cardBg,
+              borderColor: themeColors.border,
               opacity: fadeAnim,
               transform: [{ translateX: shakeAnim }],
             },
@@ -352,30 +363,29 @@ export const AuthScreen: React.FC = () => {
             <View>
               <View style={styles.stepHeader}>
                 <View style={styles.badgeRow}>
-                  <View style={[styles.statusBadge, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                    <Shield size={12} color="#10B981" />
-                    <Text style={[styles.statusBadgeText, { color: '#10B981' }]}>256-Bit Encrypted</Text>
+                  <View style={[styles.statusBadge, { backgroundColor: '#EDF7F1' }]}>
+                    <Shield size={11} color="#1B7A43" />
+                    <Text style={[styles.statusBadgeText, { color: '#1B7A43' }]}>256-Bit Encrypted</Text>
                   </View>
-                  <View style={[styles.statusBadge, { backgroundColor: 'rgba(56, 189, 248, 0.15)' }]}>
-                    <Smartphone size={12} color="#38BDF8" />
-                    <Text style={[styles.statusBadgeText, { color: '#38BDF8' }]}>SIM-Bound Security</Text>
+                  <View style={[styles.statusBadge, { backgroundColor: '#F3EFEA' }]}>
+                    <Smartphone size={11} color="#68645E" />
+                    <Text style={[styles.statusBadgeText, { color: '#68645E' }]}>SIM-Bound Hardware</Text>
                   </View>
                 </View>
-                <Text style={styles.heading}>Welcome to ABC Digital Bank</Text>
-                <Text style={styles.subheading}>
+                <Text style={[styles.heading, { color: themeColors.textPrimary }]}>Welcome to ABC Digital Bank</Text>
+                <Text style={[styles.subheading, { color: themeColors.textSecondary }]}>
                   Enter your registered mobile number or tap a demo persona to experience adaptive banking.
                 </Text>
               </View>
 
               {/* Mobile Input */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Registered Mobile Number</Text>
-                <View style={styles.phoneInputRow}>
-                  <View style={styles.countryCodeBox}>
-                    <Text style={styles.countryCodeText}>🇮🇳 +91</Text>
-                  </View>
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Registered Mobile Number</Text>
+                <View style={[styles.phoneInputCard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+                  <Text style={[styles.inputPrefix, { color: themeColors.textPrimary }]}>🇮🇳 +91</Text>
+                  <View style={[styles.inputDivider, { backgroundColor: '#E2E8F0' }]} />
                   <TextInput
-                    style={styles.textInput}
+                    style={[styles.phoneTextInput, { color: themeColors.textPrimary }]}
                     keyboardType="number-pad"
                     maxLength={10}
                     value={phone}
@@ -384,35 +394,37 @@ export const AuthScreen: React.FC = () => {
                       setErrorMessage('');
                     }}
                     placeholder="99999 99901"
-                    placeholderTextColor="#64748B"
+                    placeholderTextColor="#94A3B8"
                   />
                 </View>
               </View>
 
               {errorMessage ? (
-                <View style={styles.errorBanner}>
-                  <AlertCircle size={15} color="#EF4444" />
-                  <Text style={styles.errorBannerText}>{errorMessage}</Text>
+                <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#FCA5A5' }]}>
+                  <AlertCircle size={14} color="#C92A2A" />
+                  <Text style={[styles.errorBannerText, { color: '#C92A2A' }]}>{errorMessage}</Text>
                 </View>
               ) : null}
 
               {/* Proceed Button */}
               <TouchableOpacity
-                style={styles.primaryButton}
+                style={[styles.primaryButton, { backgroundColor: '#141414' }]}
                 onPress={handleRequestOtp}
                 activeOpacity={0.85}
               >
-                <Text style={styles.primaryButtonText}>Get Secure OTP</Text>
-                <ArrowRight size={18} color="#0F172A" />
+                <Text style={[styles.primaryButtonText, { color: '#FFFFFF' }]}>Get Secure OTP</Text>
+                <ArrowRight size={16} color="#FFFFFF" />
               </TouchableOpacity>
 
               {/* Quick Persona Demo Selector for Evaluators */}
-              <View style={styles.personaSection}>
+              <View style={[styles.personaSection, { borderTopColor: themeColors.border }]}>
                 <View style={styles.personaSectionHeader}>
-                  <Sparkles size={14} color="#38BDF8" />
-                  <Text style={styles.personaSectionTitle}>EVALUATOR QUICK PERSONA PRESETS</Text>
+                  <Sparkles size={14} color="#B45309" />
+                  <Text style={[styles.personaSectionTitle, { color: '#B45309' }]}>
+                    EVALUATOR QUICK PERSONA PRESETS
+                  </Text>
                 </View>
-                <Text style={styles.personaSectionDescription}>
+                <Text style={[styles.personaSectionDescription, { color: themeColors.textSecondary }]}>
                   1-tap instant login as an official evaluation persona to review adaptive life-stage features:
                 </Text>
 
@@ -422,41 +434,45 @@ export const AuthScreen: React.FC = () => {
                       key={p.id}
                       style={[
                         styles.personaCard,
-                        activePreset === p.id && styles.personaCardActive,
+                        { backgroundColor: '#FFFFFF', borderColor: themeColors.border },
+                        activePreset === p.id && { borderColor: '#141414', backgroundColor: '#FAF8F5' },
                       ]}
                       onPress={() => {
                         setActivePreset(p.id);
                         setPhone(p.phone);
                         setErrorMessage('');
                       }}
+                      activeOpacity={0.85}
                     >
                       <View style={styles.personaCardTop}>
-                        <View style={styles.personaNameGroup}>
-                          <Text style={styles.personaName}>{p.name}</Text>
-                          <Text style={styles.personaPhone}>{p.phone}</Text>
+                        <View>
+                          <Text style={[styles.personaName, { color: themeColors.textPrimary }]}>{p.name}</Text>
+                          <Text style={[styles.personaPhone, { color: themeColors.textSecondary }]}>{p.phone}</Text>
                         </View>
-                        <View style={[styles.personaTag, { backgroundColor: `${p.badgeColor}22` }]}>
+                        <View style={[styles.personaTag, { backgroundColor: p.badgeBg }]}>
                           <Text style={[styles.personaTagText, { color: p.badgeColor }]}>{p.tag}</Text>
                         </View>
                       </View>
-                      <Text style={styles.personaSummary}>{p.summary}</Text>
+                      <Text style={[styles.personaSummary, { color: themeColors.textSecondary }]}>{p.summary}</Text>
 
                       <View style={styles.personaActionRow}>
                         <TouchableOpacity
-                          style={styles.personaSelectBtn}
+                          style={[styles.personaSelectBtn, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}
                           onPress={() => {
                             setPhone(p.phone);
                             handleRequestOtp();
                           }}
+                          activeOpacity={0.7}
                         >
-                          <Text style={styles.personaSelectBtnText}>Test OTP Flow</Text>
+                          <Text style={[styles.personaSelectBtnText, { color: themeColors.textPrimary }]}>Test OTP Flow</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          style={styles.personaBypassBtn}
+                          style={[styles.personaBypassBtn, { backgroundColor: '#141414' }]}
                           onPress={() => loginWithPreset(p.id)}
+                          activeOpacity={0.85}
                         >
-                          <Sparkles size={12} color="#38BDF8" />
+                          <Sparkles size={12} color="#F59E0B" />
                           <Text style={styles.personaBypassBtnText}>1-Tap Login</Text>
                         </TouchableOpacity>
                       </View>
@@ -467,9 +483,9 @@ export const AuthScreen: React.FC = () => {
 
               {/* Switch to Signup */}
               <View style={styles.switchAuthRow}>
-                <Text style={styles.switchAuthText}>New to ABC Bank?</Text>
-                <TouchableOpacity onPress={() => transitionTo('SIGNUP')}>
-                  <Text style={styles.switchAuthLink}>Open Digital Account</Text>
+                <Text style={[styles.switchAuthText, { color: themeColors.textSecondary }]}>New to ABC Bank?</Text>
+                <TouchableOpacity onPress={() => transitionTo('SIGNUP')} activeOpacity={0.7}>
+                  <Text style={[styles.switchAuthLink, { color: '#141414' }]}>Open Digital Account</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -479,45 +495,45 @@ export const AuthScreen: React.FC = () => {
           {step === 'SIGNUP' && (
             <View>
               <View style={styles.stepHeader}>
-                <View style={[styles.statusBadge, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                  <Building2 size={12} color="#10B981" />
-                  <Text style={[styles.statusBadgeText, { color: '#10B981' }]}>DigiLocker KYC Ready</Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#EDF7F1' }]}>
+                  <Building2 size={11} color="#1B7A43" />
+                  <Text style={[styles.statusBadgeText, { color: '#1B7A43' }]}>DigiLocker KYC Ready</Text>
                 </View>
-                <Text style={styles.heading}>Open Your Digital Account</Text>
-                <Text style={styles.subheading}>
+                <Text style={[styles.heading, { color: themeColors.textPrimary }]}>Open Your Digital Account</Text>
+                <Text style={[styles.subheading, { color: themeColors.textSecondary }]}>
                   Paperless zero-friction onboarding with statutory DPDP 2023 consent architecture.
                 </Text>
               </View>
 
               {/* Full Name */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Full Legal Name (as on Aadhaar/PAN)</Text>
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Full Legal Name (as on Aadhaar/PAN)</Text>
                 <TextInput
-                  style={styles.textInputFull}
+                  style={[styles.textInputStandard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', color: themeColors.textPrimary }]}
                   value={signupName}
                   onChangeText={setSignupName}
                   placeholder="e.g. Ramesh Chandra Verma"
-                  placeholderTextColor="#64748B"
+                  placeholderTextColor="#94A3B8"
                 />
               </View>
 
               {/* Mobile Number */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Primary Mobile Number</Text>
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Primary Mobile Number</Text>
                 <TextInput
-                  style={styles.textInputFull}
+                  style={[styles.textInputStandard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', color: themeColors.textPrimary }]}
                   keyboardType="number-pad"
                   maxLength={10}
                   value={signupPhone}
                   onChangeText={setSignupPhone}
                   placeholder="9876543210"
-                  placeholderTextColor="#64748B"
+                  placeholderTextColor="#94A3B8"
                 />
               </View>
 
               {/* Account Type Selector */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Select Account Variant</Text>
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Select Account Variant</Text>
                 <View style={styles.accountTypeRow}>
                   {[
                     { id: 'SAVINGS', label: 'Savings 7%', sub: 'Instant RuPay Card' },
@@ -528,76 +544,80 @@ export const AuthScreen: React.FC = () => {
                       key={acc.id}
                       style={[
                         styles.accountTypeButton,
-                        signupAccountType === acc.id && styles.accountTypeButtonActive,
+                        { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' },
+                        signupAccountType === acc.id && { borderColor: '#141414', backgroundColor: '#FFFFFF' },
                       ]}
                       onPress={() => setSignupAccountType(acc.id as any)}
+                      activeOpacity={0.75}
                     >
                       <Text
                         style={[
                           styles.accountTypeTitle,
-                          signupAccountType === acc.id && styles.accountTypeTitleActive,
+                          { color: themeColors.textPrimary },
+                          signupAccountType === acc.id && { fontWeight: '800' },
                         ]}
                       >
                         {acc.label}
                       </Text>
-                      <Text style={styles.accountTypeSub}>{acc.sub}</Text>
+                      <Text style={[styles.accountTypeSub, { color: themeColors.textSecondary }]}>{acc.sub}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
               </View>
 
               {/* Setup 6-digit MPIN */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Set 6-Digit MPIN</Text>
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Set 6-Digit MPIN</Text>
                 <TextInput
-                  style={styles.textInputFull}
+                  style={[styles.textInputStandard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', color: themeColors.textPrimary }]}
                   keyboardType="number-pad"
                   maxLength={6}
                   secureTextEntry
                   value={signupMpin}
                   onChangeText={setSignupMpin}
                   placeholder="Enter 6 numbers"
-                  placeholderTextColor="#64748B"
+                  placeholderTextColor="#94A3B8"
                 />
               </View>
 
               {/* Confirm MPIN */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Confirm 6-Digit MPIN</Text>
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Confirm 6-Digit MPIN</Text>
                 <TextInput
-                  style={styles.textInputFull}
+                  style={[styles.textInputStandard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', color: themeColors.textPrimary }]}
                   keyboardType="number-pad"
                   maxLength={6}
                   secureTextEntry
                   value={confirmMpin}
                   onChangeText={setConfirmMpin}
                   placeholder="Re-enter 6 numbers"
-                  placeholderTextColor="#64748B"
+                  placeholderTextColor="#94A3B8"
                 />
               </View>
 
               {errorMessage ? (
-                <View style={styles.errorBanner}>
-                  <AlertCircle size={15} color="#EF4444" />
-                  <Text style={styles.errorBannerText}>{errorMessage}</Text>
+                <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#FCA5A5' }]}>
+                  <AlertCircle size={14} color="#C92A2A" />
+                  <Text style={[styles.errorBannerText, { color: '#C92A2A' }]}>{errorMessage}</Text>
                 </View>
               ) : null}
 
               {/* Continue to DPDP Consent */}
               <TouchableOpacity
-                style={styles.primaryButton}
+                style={[styles.primaryButton, { backgroundColor: '#141414' }]}
                 onPress={handleSignupSubmit}
                 activeOpacity={0.85}
               >
-                <Text style={styles.primaryButtonText}>Continue to DPDP Consent</Text>
-                <ArrowRight size={18} color="#0F172A" />
+                <Text style={[styles.primaryButtonText, { color: '#FFFFFF' }]}>Continue to DPDP Consent</Text>
+                <ArrowRight size={16} color="#FFFFFF" />
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.secondaryLinkButton}
                 onPress={() => transitionTo('PHONE')}
+                activeOpacity={0.7}
               >
-                <Text style={styles.secondaryLinkButtonText}>Back to Existing Login</Text>
+                <Text style={[styles.secondaryLinkButtonText, { color: themeColors.textSecondary }]}>Back to Existing Login</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -606,28 +626,25 @@ export const AuthScreen: React.FC = () => {
           {step === 'OTP' && (
             <View>
               <View style={styles.stepHeader}>
-                <View style={[styles.statusBadge, { backgroundColor: 'rgba(56, 189, 248, 0.15)' }]}>
-                  <Smartphone size={12} color="#38BDF8" />
-                  <Text style={[styles.statusBadgeText, { color: '#38BDF8' }]}>OTP Dispatched</Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#EFF6FF' }]}>
+                  <Smartphone size={11} color="#2563EB" />
+                  <Text style={[styles.statusBadgeText, { color: '#2563EB' }]}>OTP Dispatched</Text>
                 </View>
-                <Text style={styles.heading}>Verify Mobile Number</Text>
-                <Text style={styles.subheading}>
-                  Sent 6-digit authentication token to <Text style={{ color: '#38BDF8', fontWeight: 'bold' }}>+91 {phone}</Text>
+                <Text style={[styles.heading, { color: themeColors.textPrimary }]}>Verify Mobile Number</Text>
+                <Text style={[styles.subheading, { color: themeColors.textSecondary }]}>
+                  Sent 6-digit authentication token to <Text style={{ color: '#141414', fontWeight: 'bold' }}>+91 {phone}</Text>
                 </Text>
               </View>
 
-              {/* Realistic SMS Banner */}
+              {/* Realistic SMS Banner matching OnboardingModal */}
               {showMockSmsBanner && (
-                <View style={styles.smsSimBanner}>
+                <View style={styles.smsBanner}>
                   <View style={styles.smsHeader}>
-                    <View style={styles.smsHeaderLeft}>
-                      <Smartphone size={14} color="#10B981" />
-                      <Text style={styles.smsSender}>VK-ABCBNK (SMS Notice)</Text>
-                    </View>
-                    <Text style={styles.smsTime}>Just now</Text>
+                    <Smartphone size={13} color="#2563EB" />
+                    <Text style={styles.smsSender}>VK-ABCBNK (SMS Notice)</Text>
                   </View>
                   <Text style={styles.smsBody}>
-                    <Text style={styles.smsCodeHighlight}>482910</Text> is your secret OTP for ABC Digital Banking login. Valid for 10 mins. Do not share OTP with anyone including bank staff.
+                    <Text style={styles.smsCodeHighlight}>482910</Text> is your secret OTP for ABC Digital Banking login. Valid for 10 mins. Do not share OTP with anyone.
                   </Text>
                 </View>
               )}
@@ -654,45 +671,45 @@ export const AuthScreen: React.FC = () => {
                 onPress={handleAutoFillOtp}
                 activeOpacity={0.8}
               >
-                <Sparkles size={16} color="#10B981" />
+                <Sparkles size={15} color="#1B7A43" />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.autofillTitle}>1-Tap Auto-Fill Demo OTP</Text>
                   <Text style={styles.autofillSubtitle}>Inserts verified code: 482910</Text>
                 </View>
-                <ArrowRight size={16} color="#10B981" />
+                <ArrowRight size={15} color="#1B7A43" />
               </TouchableOpacity>
 
               {errorMessage ? (
-                <View style={styles.errorBanner}>
-                  <AlertCircle size={15} color="#EF4444" />
-                  <Text style={styles.errorBannerText}>{errorMessage}</Text>
+                <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#FCA5A5' }]}>
+                  <AlertCircle size={14} color="#C92A2A" />
+                  <Text style={[styles.errorBannerText, { color: '#C92A2A' }]}>{errorMessage}</Text>
                 </View>
               ) : null}
 
               {/* Verify Button */}
               <TouchableOpacity
-                style={[styles.primaryButton, isVerifying && { opacity: 0.7 }]}
+                style={[styles.primaryButton, { backgroundColor: '#141414' }, isVerifying && { opacity: 0.7 }]}
                 onPress={handleVerifyOtp}
                 disabled={isVerifying}
                 activeOpacity={0.85}
               >
-                <Text style={styles.primaryButtonText}>
+                <Text style={[styles.primaryButtonText, { color: '#FFFFFF' }]}>
                   {isVerifying ? 'Verifying Security Token...' : 'Verify & Proceed'}
                 </Text>
-                <CheckCircle2 size={18} color="#0F172A" />
+                <CheckCircle2 size={16} color="#FFFFFF" />
               </TouchableOpacity>
 
               {/* Resend Timer */}
               <View style={styles.resendRow}>
                 {resendTimer > 0 ? (
-                  <Text style={styles.resendTimerText}>Resend code in {resendTimer}s</Text>
+                  <Text style={[styles.resendTimerText, { color: themeColors.textMuted }]}>Resend code in {resendTimer}s</Text>
                 ) : (
                   <TouchableOpacity onPress={() => handleRequestOtp()}>
-                    <Text style={styles.resendActiveText}>Resend OTP (VK-ABCBNK)</Text>
+                    <Text style={[styles.resendActiveText, { color: '#141414' }]}>Resend OTP (VK-ABCBNK)</Text>
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity onPress={() => transitionTo('PHONE')}>
-                  <Text style={styles.changePhoneText}>Change Number</Text>
+                  <Text style={[styles.changePhoneText, { color: themeColors.textSecondary }]}>Change Number</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -702,12 +719,12 @@ export const AuthScreen: React.FC = () => {
           {step === 'DPDP_CONSENT' && (
             <View>
               <View style={styles.stepHeader}>
-                <View style={[styles.statusBadge, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                  <ShieldCheck size={12} color="#10B981" />
-                  <Text style={[styles.statusBadgeText, { color: '#10B981' }]}>DPDP Act 2023 Section 6</Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#EDF7F1' }]}>
+                  <ShieldCheck size={11} color="#1B7A43" />
+                  <Text style={[styles.statusBadgeText, { color: '#1B7A43' }]}>DPDP Act 2023 Section 6</Text>
                 </View>
-                <Text style={styles.heading}>Statutory Privacy & Consent</Text>
-                <Text style={styles.subheading}>
+                <Text style={[styles.heading, { color: themeColors.textPrimary }]}>Statutory Privacy & Consent</Text>
+                <Text style={[styles.subheading, { color: themeColors.textSecondary }]}>
                   As a regulated banking data fiduciary, ABC Digital Bank adheres strictly to the Digital Personal Data Protection Act, 2023 & RBI Master Directions.
                 </Text>
               </View>
@@ -715,101 +732,101 @@ export const AuthScreen: React.FC = () => {
               {/* Consent Card Container */}
               <View style={styles.consentListContainer}>
                 {/* 1. Core Banking (Mandatory) */}
-                <View style={styles.consentItem}>
+                <View style={[styles.consentItem, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
                   <View style={styles.consentItemHeader}>
                     <View style={styles.consentItemTitleGroup}>
-                      <Building2 size={16} color="#10B981" />
-                      <Text style={styles.consentItemTitle}>Core Banking & Transaction Ledger</Text>
+                      <Building2 size={15} color="#141414" />
+                      <Text style={[styles.consentItemTitle, { color: themeColors.textPrimary }]}>Core Banking & Transaction Ledger</Text>
                     </View>
-                    <View style={styles.mandatoryBadge}>
-                      <Text style={styles.mandatoryBadgeText}>Mandatory (RBI)</Text>
+                    <View style={[styles.mandatoryBadge, { backgroundColor: '#EDF7F1' }]}>
+                      <Text style={[styles.mandatoryBadgeText, { color: '#1B7A43' }]}>Mandatory (RBI)</Text>
                     </View>
                   </View>
-                  <Text style={styles.consentItemDesc}>
+                  <Text style={[styles.consentItemDesc, { color: themeColors.textSecondary }]}>
                     Essential transaction logging, core balances, AML reporting, and regulatory audit compliance under RBI Banking Regulation Act 1949.
                   </Text>
                 </View>
 
                 {/* 2. Device Security & Binding (Mandatory) */}
-                <View style={styles.consentItem}>
+                <View style={[styles.consentItem, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
                   <View style={styles.consentItemHeader}>
                     <View style={styles.consentItemTitleGroup}>
-                      <Shield size={16} color="#10B981" />
-                      <Text style={styles.consentItemTitle}>Device Binding & Cyber Defense</Text>
+                      <Shield size={15} color="#141414" />
+                      <Text style={[styles.consentItemTitle, { color: themeColors.textPrimary }]}>Device Binding & Cyber Defense</Text>
                     </View>
-                    <View style={styles.mandatoryBadge}>
-                      <Text style={styles.mandatoryBadgeText}>Mandatory (RBI)</Text>
+                    <View style={[styles.mandatoryBadge, { backgroundColor: '#EDF7F1' }]}>
+                      <Text style={[styles.mandatoryBadgeText, { color: '#1B7A43' }]}>Mandatory (RBI)</Text>
                     </View>
                   </View>
-                  <Text style={styles.consentItemDesc}>
+                  <Text style={[styles.consentItemDesc, { color: themeColors.textSecondary }]}>
                     Verifies SIM binding, jailbreak/root tamper inspection, and anomaly detection per RBI Cyber Security Framework guidelines.
                   </Text>
                 </View>
 
                 {/* 3. Financial SMS Sync (Optional) */}
-                <View style={styles.consentItem}>
+                <View style={[styles.consentItem, { backgroundColor: '#FFFFFF', borderColor: themeColors.border }]}>
                   <View style={styles.consentItemHeader}>
                     <View style={styles.consentItemTitleGroup}>
-                      <Smartphone size={16} color="#38BDF8" />
-                      <Text style={styles.consentItemTitle}>Financial SMS Passbook Sync</Text>
+                      <Smartphone size={15} color="#68645E" />
+                      <Text style={[styles.consentItemTitle, { color: themeColors.textPrimary }]}>Financial SMS Passbook Sync</Text>
                     </View>
                     <Switch
                       value={consentDraft.smsFraudDetection}
                       onValueChange={(val) => setConsentDraft((prev) => ({ ...prev, smsFraudDetection: val }))}
-                      trackColor={{ false: '#334155', true: '#10B981' }}
-                      thumbColor="#F8FAFC"
+                      trackColor={{ false: '#E2E8F0', true: '#141414' }}
+                      thumbColor="#FFFFFF"
                     />
                   </View>
-                  <Text style={styles.consentItemDesc}>
+                  <Text style={[styles.consentItemDesc, { color: themeColors.textSecondary }]}>
                     On-device scanning of bank & utility SMS to track recurring charges, bill reminders, and prevent unauthorized card debits.
                   </Text>
                 </View>
 
                 {/* 4. Account Aggregator (AA) Ecosystem (Optional) */}
-                <View style={styles.consentItem}>
+                <View style={[styles.consentItem, { backgroundColor: '#FFFFFF', borderColor: themeColors.border }]}>
                   <View style={styles.consentItemHeader}>
                     <View style={styles.consentItemTitleGroup}>
-                      <FileText size={16} color="#38BDF8" />
-                      <Text style={styles.consentItemTitle}>RBI Account Aggregator (AA) Sync</Text>
+                      <FileText size={15} color="#68645E" />
+                      <Text style={[styles.consentItemTitle, { color: themeColors.textPrimary }]}>RBI Account Aggregator (AA) Sync</Text>
                     </View>
                     <Switch
                       value={consentDraft.accountAggregator}
                       onValueChange={(val) => setConsentDraft((prev) => ({ ...prev, accountAggregator: val }))}
-                      trackColor={{ false: '#334155', true: '#10B981' }}
-                      thumbColor="#F8FAFC"
+                      trackColor={{ false: '#E2E8F0', true: '#141414' }}
+                      thumbColor="#FFFFFF"
                     />
                   </View>
-                  <Text style={styles.consentItemDesc}>
+                  <Text style={[styles.consentItemDesc, { color: themeColors.textSecondary }]}>
                     Seamless multi-bank statement analysis and net-worth consolidation through RBI-licensed NBFC Account Aggregators.
                   </Text>
                 </View>
 
                 {/* 5. Mitra AI Insights (Optional) */}
-                <View style={styles.consentItem}>
+                <View style={[styles.consentItem, { backgroundColor: '#FFFFFF', borderColor: themeColors.border }]}>
                   <View style={styles.consentItemHeader}>
                     <View style={styles.consentItemTitleGroup}>
-                      <Sparkles size={16} color="#A855F7" />
-                      <Text style={styles.consentItemTitle}>Mitra AI Hyper-Personalization</Text>
+                      <Sparkles size={15} color="#B45309" />
+                      <Text style={[styles.consentItemTitle, { color: themeColors.textPrimary }]}>Mitra AI Hyper-Personalization</Text>
                     </View>
                     <Switch
                       value={consentDraft.personalizedOffers}
                       onValueChange={(val) => setConsentDraft((prev) => ({ ...prev, personalizedOffers: val }))}
-                      trackColor={{ false: '#334155', true: '#10B981' }}
-                      thumbColor="#F8FAFC"
+                      trackColor={{ false: '#E2E8F0', true: '#141414' }}
+                      thumbColor="#FFFFFF"
                     />
                   </View>
-                  <Text style={styles.consentItemDesc}>
+                  <Text style={[styles.consentItemDesc, { color: themeColors.textSecondary }]}>
                     Proactive empathetic alerts, pre-salary cashflow projections, and tailored financial health suggestions.
                   </Text>
                 </View>
               </View>
 
               {/* Data Fiduciary Disclosures */}
-              <View style={styles.fiduciaryNotice}>
-                <Info size={14} color="#94A3B8" />
+              <View style={[styles.fiduciaryNotice, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                <Info size={14} color={themeColors.textSecondary} />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.fiduciaryTitle}>Data Fiduciary Transparency Notice</Text>
-                  <Text style={styles.fiduciaryText}>
+                  <Text style={[styles.fiduciaryTitle, { color: themeColors.textPrimary }]}>Data Fiduciary Transparency Notice</Text>
+                  <Text style={[styles.fiduciaryText, { color: themeColors.textSecondary }]}>
                     Data Fiduciary: ABC Digital Bank Ltd. • Data Protection Officer (DPO): dpo@abcbank.in • Grievance Helpline: 1800 209 8492.
                     You retain the statutory Right to Access, Correction, and Right to Withdraw Consent at any time in Profile & Privacy Settings.
                   </Text>
@@ -818,19 +835,20 @@ export const AuthScreen: React.FC = () => {
 
               {/* Authorize & Accept */}
               <TouchableOpacity
-                style={styles.primaryButton}
+                style={[styles.primaryButton, { backgroundColor: '#141414' }]}
                 onPress={() => handleAcceptDpdp(true)}
                 activeOpacity={0.85}
               >
-                <Text style={styles.primaryButtonText}>I Agree & Authorize All</Text>
-                <CheckCircle2 size={18} color="#0F172A" />
+                <Text style={[styles.primaryButtonText, { color: '#FFFFFF' }]}>I Agree & Authorize All</Text>
+                <CheckCircle2 size={16} color="#FFFFFF" />
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.secondaryLinkButton}
                 onPress={() => handleAcceptDpdp(false)}
+                activeOpacity={0.7}
               >
-                <Text style={styles.secondaryLinkButtonText}>Save Selected Preferences</Text>
+                <Text style={[styles.secondaryLinkButtonText, { color: themeColors.textSecondary }]}>Save Selected Preferences</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -839,12 +857,12 @@ export const AuthScreen: React.FC = () => {
           {step === 'MPIN' && (
             <View>
               <View style={styles.stepHeader}>
-                <View style={[styles.statusBadge, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                  <Lock size={12} color="#10B981" />
-                  <Text style={[styles.statusBadgeText, { color: '#10B981' }]}>Hardware Keystore Locked</Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#EDF7F1' }]}>
+                  <Lock size={11} color="#1B7A43" />
+                  <Text style={[styles.statusBadgeText, { color: '#1B7A43' }]}>Hardware Keystore Locked</Text>
                 </View>
-                <Text style={styles.heading}>Enter 6-Digit MPIN</Text>
-                <Text style={styles.subheading}>
+                <Text style={[styles.heading, { color: themeColors.textPrimary }]}>Enter 6-Digit MPIN</Text>
+                <Text style={[styles.subheading, { color: themeColors.textSecondary }]}>
                   Authorize secure session with your 6-digit MPIN or use Biometric FaceID / Fingerprint.
                 </Text>
               </View>
@@ -863,21 +881,21 @@ export const AuthScreen: React.FC = () => {
               </View>
 
               {/* Demo Hint Banner */}
-              <View style={styles.mpinHintBanner}>
-                <Info size={14} color="#38BDF8" />
-                <Text style={styles.mpinHintText}>
-                  Default Demo MPIN: <Text style={{ fontWeight: 'bold', color: '#38BDF8' }}>123456</Text> (or 8492)
+              <View style={[styles.mpinHintBanner, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                <Info size={14} color="#68645E" />
+                <Text style={[styles.mpinHintText, { color: themeColors.textPrimary }]}>
+                  Default Demo MPIN: <Text style={{ fontWeight: '800', color: '#141414' }}>123456</Text> (or 8492)
                 </Text>
               </View>
 
               {errorMessage ? (
-                <View style={styles.errorBanner}>
-                  <AlertCircle size={15} color="#EF4444" />
-                  <Text style={styles.errorBannerText}>{errorMessage}</Text>
+                <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#FCA5A5' }]}>
+                  <AlertCircle size={14} color="#C92A2A" />
+                  <Text style={[styles.errorBannerText, { color: '#C92A2A' }]}>{errorMessage}</Text>
                 </View>
               ) : null}
 
-              {/* Numpad Keypad */}
+              {/* Numpad Keypad matching PaymentAuthModal */}
               <View style={styles.keypadContainer}>
                 {[
                   ['1', '2', '3'],
@@ -891,10 +909,11 @@ export const AuthScreen: React.FC = () => {
                         return (
                           <TouchableOpacity
                             key={btn}
-                            style={styles.keypadSpecialButton}
+                            style={[styles.keypadSpecialButton, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}
                             onPress={handleBiometricUnlock}
+                            activeOpacity={0.7}
                           >
-                            <Fingerprint size={24} color="#10B981" />
+                            <Fingerprint size={22} color="#141414" />
                           </TouchableOpacity>
                         );
                       }
@@ -902,21 +921,22 @@ export const AuthScreen: React.FC = () => {
                         return (
                           <TouchableOpacity
                             key={btn}
-                            style={styles.keypadSpecialButton}
+                            style={[styles.keypadSpecialButton, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}
                             onPress={handleMpinDelete}
+                            activeOpacity={0.7}
                           >
-                            <Delete size={22} color="#94A3B8" />
+                            <Delete size={20} color="#68645E" />
                           </TouchableOpacity>
                         );
                       }
                       return (
                         <TouchableOpacity
                           key={btn}
-                          style={styles.keypadButton}
+                          style={[styles.keypadButton, { backgroundColor: '#FFFFFF', borderColor: '#E2E8F0' }]}
                           onPress={() => handleMpinPress(btn)}
                           activeOpacity={0.7}
                         >
-                          <Text style={styles.keypadButtonText}>{btn}</Text>
+                          <Text style={[styles.keypadButtonText, { color: '#141414' }]}>{btn}</Text>
                         </TouchableOpacity>
                       );
                     })}
@@ -928,107 +948,93 @@ export const AuthScreen: React.FC = () => {
               <TouchableOpacity
                 style={styles.switchUserButton}
                 onPress={() => transitionTo('PHONE')}
+                activeOpacity={0.7}
               >
-                <Text style={styles.switchUserButtonText}>Log in with a different account</Text>
+                <Text style={[styles.switchUserButtonText, { color: themeColors.textSecondary }]}>Log in with a different account</Text>
               </TouchableOpacity>
             </View>
           )}
         </Animated.View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeContainer: {
+  screenContainer: {
     flex: 1,
   },
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1E293B',
-    backgroundColor: '#0F172A',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  brandGroup: {
+  brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  brandIconContainer: {
-    width: 38,
-    height: 38,
+  brandIconBox: {
+    width: 36,
+    height: 36,
     borderRadius: 10,
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   brandTitle: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#F8FAFC',
-    letterSpacing: 0.8,
+    letterSpacing: 0.5,
   },
   brandSubtitle: {
     fontSize: 8.5,
     fontWeight: '700',
-    color: '#38BDF8',
-    letterSpacing: 0.6,
+    letterSpacing: 0.4,
+    marginTop: 1,
   },
   langPillContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1E293B',
     borderRadius: 8,
     padding: 2,
     borderWidth: 1,
-    borderColor: '#334155',
   },
   langButton: {
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderRadius: 6,
   },
   langButtonActive: {
-    backgroundColor: '#38BDF8',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
   },
   langButtonText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#94A3B8',
-  },
-  langButtonTextActive: {
-    color: '#0F172A',
-    fontWeight: '800',
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 20,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.lg,
     paddingBottom: 40,
   },
-  cardContainer: {
-    backgroundColor: '#0F172A',
-    borderRadius: 24,
+  mainCard: {
+    borderRadius: radii.xl,
     borderWidth: 1,
-    borderColor: '#1E293B',
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 8,
+    padding: spacing.lg,
+    ...shadows.sm,
   },
   stepHeader: {
-    marginBottom: 20,
+    marginBottom: spacing.md,
   },
   badgeRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   statusBadge: {
     flexDirection: 'row',
@@ -1036,74 +1042,62 @@ const styles = StyleSheet.create({
     gap: 5,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 6,
+    borderRadius: radii.sm,
   },
   statusBadgeText: {
-    fontSize: 10.5,
+    fontSize: 10,
     fontWeight: '700',
-    letterSpacing: 0.4,
+    letterSpacing: 0.2,
   },
   heading: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: '800',
-    color: '#F8FAFC',
-    marginBottom: 6,
+    letterSpacing: -0.3,
+    marginBottom: 4,
   },
   subheading: {
-    fontSize: 13,
-    color: '#94A3B8',
-    lineHeight: 19,
+    fontSize: 12.5,
+    lineHeight: 18,
   },
-  inputContainer: {
-    marginBottom: 16,
+  inputGroup: {
+    marginBottom: spacing.md,
   },
   inputLabel: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
-    color: '#CBD5E1',
-    marginBottom: 8,
+    marginBottom: 6,
   },
-  phoneInputRow: {
+  phoneInputCard: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    borderWidth: 1.5,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    height: 52,
   },
-  countryCodeBox: {
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-  },
-  countryCodeText: {
-    fontSize: 14,
+  inputPrefix: {
+    fontSize: 15,
     fontWeight: '700',
-    color: '#F8FAFC',
   },
-  textInput: {
+  inputDivider: {
+    width: 1,
+    height: 22,
+    marginHorizontal: spacing.sm,
+  },
+  phoneTextInput: {
     flex: 1,
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
     fontSize: 16,
     fontWeight: '700',
-    color: '#F8FAFC',
-    letterSpacing: 1.2,
+    letterSpacing: 1,
   },
-  textInputFull: {
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+  textInputStandard: {
+    borderWidth: 1.5,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    height: 48,
     fontSize: 14,
     fontWeight: '600',
-    color: '#F8FAFC',
   },
   accountTypeRow: {
     flexDirection: 'row',
@@ -1111,82 +1105,59 @@ const styles = StyleSheet.create({
   },
   accountTypeButton: {
     flex: 1,
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 10,
+    borderWidth: 1.5,
+    borderRadius: radii.md,
     padding: 10,
   },
-  accountTypeButtonActive: {
-    borderColor: '#38BDF8',
-    backgroundColor: 'rgba(56, 189, 248, 0.1)',
-  },
   accountTypeTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#E2E8F0',
+    fontSize: 11.5,
+    fontWeight: '600',
     marginBottom: 2,
-  },
-  accountTypeTitleActive: {
-    color: '#38BDF8',
   },
   accountTypeSub: {
     fontSize: 9.5,
-    color: '#94A3B8',
   },
   primaryButton: {
-    backgroundColor: '#38BDF8',
-    borderRadius: 14,
-    paddingVertical: 14,
+    borderRadius: radii.md,
+    height: 50,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    marginTop: 8,
-    shadowColor: '#38BDF8',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 4,
+    marginTop: 6,
   },
   primaryButtonText: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: '800',
-    color: '#0F172A',
-    letterSpacing: 0.4,
+    letterSpacing: 0.3,
   },
   secondaryLinkButton: {
     alignItems: 'center',
     paddingVertical: 12,
-    marginTop: 6,
+    marginTop: 4,
   },
   secondaryLinkButtonText: {
-    fontSize: 12.5,
-    fontWeight: '700',
-    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '600',
   },
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(239, 68, 68, 0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.3)',
-    borderRadius: 10,
+    borderRadius: radii.md,
     padding: 10,
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   errorBannerText: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
-    color: '#EF4444',
     flex: 1,
   },
   personaSection: {
-    marginTop: 24,
-    paddingTop: 18,
+    marginTop: spacing.xl,
+    paddingTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: '#1E293B',
   },
   personaSectionHeader: {
     flexDirection: 'row',
@@ -1195,62 +1166,49 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   personaSectionTitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '800',
-    color: '#38BDF8',
-    letterSpacing: 0.8,
+    letterSpacing: 0.6,
   },
   personaSectionDescription: {
     fontSize: 11.5,
-    color: '#94A3B8',
-    marginBottom: 12,
+    marginBottom: spacing.md,
     lineHeight: 16,
   },
   personaList: {
     gap: 10,
   },
   personaCard: {
-    backgroundColor: '#1E293B',
-    borderRadius: 12,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: '#334155',
-    padding: 12,
-  },
-  personaCardActive: {
-    borderColor: '#38BDF8',
-    backgroundColor: 'rgba(56, 189, 248, 0.05)',
+    padding: spacing.md,
   },
   personaCardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 6,
-  },
-  personaNameGroup: {
-    gap: 1,
+    marginBottom: 4,
   },
   personaName: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#F8FAFC',
   },
   personaPhone: {
     fontSize: 11,
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-    color: '#94A3B8',
+    marginTop: 1,
   },
   personaTag: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 7,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: radii.sm,
   },
   personaTagText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '700',
   },
   personaSummary: {
     fontSize: 11,
-    color: '#CBD5E1',
     lineHeight: 15,
     marginBottom: 10,
   },
@@ -1261,24 +1219,18 @@ const styles = StyleSheet.create({
   personaSelectBtn: {
     flex: 1,
     paddingVertical: 7,
-    borderRadius: 8,
-    backgroundColor: '#0F172A',
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#334155',
     alignItems: 'center',
   },
   personaSelectBtnText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#E2E8F0',
   },
   personaBypassBtn: {
     flex: 1,
     paddingVertical: 7,
-    borderRadius: 8,
-    backgroundColor: 'rgba(56, 189, 248, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(56, 189, 248, 0.3)',
+    borderRadius: radii.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1287,146 +1239,134 @@ const styles = StyleSheet.create({
   personaBypassBtnText: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#38BDF8',
+    color: '#FFFFFF',
   },
   switchAuthRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    marginTop: 20,
+    marginTop: spacing.lg,
   },
   switchAuthText: {
     fontSize: 12,
-    color: '#94A3B8',
   },
   switchAuthLink: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#38BDF8',
   },
-  smsSimBanner: {
-    backgroundColor: '#1E293B',
-    borderRadius: 14,
+  smsBanner: {
+    width: '100%',
+    backgroundColor: '#EFF6FF',
+    borderRadius: radii.md,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#334155',
-    padding: 12,
-    marginBottom: 16,
+    borderColor: '#BFDBFE',
+    marginBottom: spacing.md,
   },
   smsHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  smsHeaderLeft: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginBottom: 4,
   },
   smsSender: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#10B981',
-  },
-  smsTime: {
     fontSize: 10,
-    color: '#64748B',
+    fontWeight: '800',
+    color: '#2563EB',
+    letterSpacing: 0.5,
   },
   smsBody: {
-    fontSize: 11.5,
-    color: '#CBD5E1',
-    lineHeight: 16,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1E40AF',
+    lineHeight: 17,
   },
   smsCodeHighlight: {
     fontWeight: '800',
-    color: '#38BDF8',
+    color: '#1E40AF',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   otpRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   otpBox: {
     width: 44,
     height: 52,
-    backgroundColor: '#1E293B',
+    borderRadius: radii.md,
     borderWidth: 1.5,
-    borderColor: '#334155',
-    borderRadius: 12,
+    borderColor: '#CBD5E1',
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
   },
   otpBoxActive: {
-    borderColor: '#38BDF8',
-    backgroundColor: 'rgba(56, 189, 248, 0.05)',
+    borderColor: '#141414',
+    backgroundColor: '#FFFFFF',
   },
   otpBoxFilled: {
-    borderColor: '#10B981',
+    borderColor: '#141414',
+    backgroundColor: '#FFFFFF',
   },
   otpDigitText: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#F8FAFC',
+    color: '#141414',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   autofillBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    backgroundColor: '#EDF7F1',
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 16,
+    borderColor: '#A7F3D0',
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
     gap: 10,
   },
   autofillTitle: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#10B981',
+    color: '#1B7A43',
   },
   autofillSubtitle: {
     fontSize: 10.5,
-    color: '#94A3B8',
+    color: '#065F46',
   },
   resendRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: spacing.md,
   },
   resendTimerText: {
     fontSize: 12,
-    color: '#64748B',
   },
   resendActiveText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#38BDF8',
   },
   changePhoneText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#94A3B8',
   },
   consentListContainer: {
     gap: 10,
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   consentItem: {
-    backgroundColor: '#1E293B',
-    borderRadius: 12,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#334155',
-    padding: 12,
+    padding: spacing.md,
   },
   consentItemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   consentItemTitleGroup: {
     flexDirection: 'row',
@@ -1435,83 +1375,72 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   consentItemTitle: {
-    fontSize: 12.5,
+    fontSize: 12,
     fontWeight: '700',
-    color: '#F8FAFC',
     flex: 1,
   },
   mandatoryBadge: {
-    backgroundColor: 'rgba(16, 185, 129, 0.2)',
-    paddingHorizontal: 8,
+    paddingHorizontal: 7,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: radii.sm,
   },
   mandatoryBadgeText: {
     fontSize: 9.5,
     fontWeight: '700',
-    color: '#10B981',
   },
   consentItemDesc: {
     fontSize: 11,
-    color: '#94A3B8',
     lineHeight: 15,
   },
   fiduciaryNotice: {
     flexDirection: 'row',
     gap: 8,
-    backgroundColor: '#0B1120',
-    borderRadius: 10,
-    padding: 10,
+    borderRadius: radii.md,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#1E293B',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   fiduciaryTitle: {
     fontSize: 10.5,
     fontWeight: '700',
-    color: '#CBD5E1',
     marginBottom: 2,
   },
   fiduciaryText: {
     fontSize: 9.5,
-    color: '#64748B',
     lineHeight: 13.5,
   },
   mpinIndicatorRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 14,
-    marginVertical: 18,
+    gap: 16,
+    marginVertical: spacing.lg,
   },
   mpinDot: {
     width: 14,
     height: 14,
     borderRadius: 7,
-    borderWidth: 1.5,
-    borderColor: '#64748B',
+    borderWidth: 2,
+    borderColor: '#94A3B8',
     backgroundColor: 'transparent',
   },
   mpinDotFilled: {
-    borderColor: '#38BDF8',
-    backgroundColor: '#38BDF8',
-    transform: [{ scale: 1.15 }],
+    borderColor: '#141414',
+    backgroundColor: '#141414',
+    transform: [{ scale: 1.1 }],
   },
   mpinHintBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    backgroundColor: 'rgba(56, 189, 248, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(56, 189, 248, 0.25)',
-    borderRadius: 8,
+    borderRadius: radii.md,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   mpinHintText: {
     fontSize: 12,
-    color: '#CBD5E1',
   },
   keypadContainer: {
     gap: 10,
@@ -1525,37 +1454,32 @@ const styles = StyleSheet.create({
   keypadButton: {
     flex: 1,
     height: 52,
-    backgroundColor: '#1E293B',
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#334155',
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.sm,
   },
   keypadButtonText: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#F8FAFC',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   keypadSpecialButton: {
     flex: 1,
     height: 52,
-    backgroundColor: '#0F172A',
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#1E293B',
     alignItems: 'center',
     justifyContent: 'center',
   },
   switchUserButton: {
     alignItems: 'center',
-    marginTop: 18,
+    marginTop: spacing.md,
     paddingVertical: 8,
   },
   switchUserButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#94A3B8',
   },
 });

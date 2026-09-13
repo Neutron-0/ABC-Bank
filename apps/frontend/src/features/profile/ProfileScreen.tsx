@@ -269,8 +269,8 @@ export const ProfileScreen: React.FC = () => {
             <Text style={[styles.sectionHeader, { color: colors.textSecondary, marginBottom: 0 }]}>
               DPDP Act 2023 & RBI Privacy Center
             </Text>
-            <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-              <Text style={{ fontSize: 9.5, fontWeight: '700', color: '#10B981' }}>DPDP SEC 6 COMPLIANT</Text>
+            <View style={{ backgroundColor: colors.successLight, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+              <Text style={{ fontSize: 9.5, fontWeight: '700', color: colors.success }}>DPDP SEC 6 COMPLIANT</Text>
             </View>
           </View>
 
@@ -278,15 +278,15 @@ export const ProfileScreen: React.FC = () => {
           <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.toggleTextWrap}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <ShieldCheck size={14} color="#10B981" />
+                <ShieldCheck size={14} color={colors.success} />
                 <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>Core Banking & Ledger Audit</Text>
               </View>
               <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
                 Statutory transaction ledger under RBI Banking Regulation Act 1949 (Mandatory).
               </Text>
             </View>
-            <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
-              <Text style={{ fontSize: 10, fontWeight: '700', color: '#10B981' }}>Active</Text>
+            <View style={{ backgroundColor: colors.successLight, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: colors.success }}>Active</Text>
             </View>
           </View>
 
@@ -294,15 +294,15 @@ export const ProfileScreen: React.FC = () => {
           <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.toggleTextWrap}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Shield size={14} color="#10B981" />
+                <Shield size={14} color={colors.success} />
                 <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>Device SIM & Keystore Binding</Text>
               </View>
               <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
                 Hardware security enclave inspection per RBI Cyber Security Framework (Mandatory).
               </Text>
             </View>
-            <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
-              <Text style={{ fontSize: 10, fontWeight: '700', color: '#10B981' }}>Active</Text>
+            <View style={{ backgroundColor: colors.successLight, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: colors.success }}>Active</Text>
             </View>
           </View>
 
@@ -310,7 +310,7 @@ export const ProfileScreen: React.FC = () => {
           <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.toggleTextWrap}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Smartphone size={14} color="#38BDF8" />
+                <Smartphone size={14} color={colors.iconNeutral} />
                 <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>Financial SMS Passbook Sync</Text>
               </View>
               <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
@@ -329,7 +329,7 @@ export const ProfileScreen: React.FC = () => {
           <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.toggleTextWrap}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <FileText size={14} color="#38BDF8" />
+                <FileText size={14} color={colors.iconNeutral} />
                 <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>RBI Account Aggregator (AA)</Text>
               </View>
               <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
@@ -348,7 +348,7 @@ export const ProfileScreen: React.FC = () => {
           <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.toggleTextWrap}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Sparkles size={14} color="#A855F7" />
+                <Sparkles size={14} color={colors.brandSecondary} />
                 <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>Mitra AI Personalization</Text>
               </View>
               <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
@@ -427,18 +427,18 @@ export const ProfileScreen: React.FC = () => {
             Session Security & Device Lock
           </Text>
           <TouchableOpacity
-            style={styles.logoutButton}
+            style={[styles.logoutButton, { backgroundColor: colors.dangerLight, borderColor: '#FCA5A5' }]}
             onPress={logout}
             activeOpacity={0.8}
           >
-            <Lock size={18} color="#EF4444" />
+            <Lock size={18} color={colors.danger} />
             <View style={{ flex: 1 }}>
-              <Text style={styles.logoutTitle}>Lock App & Secure Sign Out</Text>
-              <Text style={styles.logoutDesc}>
+              <Text style={[styles.logoutTitle, { color: colors.danger }]}>Lock App & Secure Sign Out</Text>
+              <Text style={[styles.logoutDesc, { color: colors.textSecondary }]}>
                 Clears session encryption tokens per RBI digital banking security guidelines
               </Text>
             </View>
-            <ArrowRight size={16} color="#EF4444" />
+            <ArrowRight size={16} color={colors.danger} />
           </TouchableOpacity>
         </View>
       </ScrollView>

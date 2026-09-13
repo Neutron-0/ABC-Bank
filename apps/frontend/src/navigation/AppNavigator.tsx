@@ -201,9 +201,9 @@ export const AppNavigator: React.FC = () => {
   // Auth Gate: Render AuthScreen if user is not authenticated
   if (!isAuthenticated) {
     return (
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: '#0B1120' }]}>
-        <StatusBar barStyle="light-content" backgroundColor="#0B1120" />
-        <View style={[styles.responsiveShell, { backgroundColor: '#0B1120', borderColor: '#1E293B' }]}>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: themeColors.bg }]}>
+        <StatusBar barStyle="dark-content" backgroundColor={themeColors.bg} />
+        <View style={[styles.responsiveShell, { backgroundColor: themeColors.bg, borderColor: themeColors.border }]}>
           <AuthScreen />
         </View>
         <BankingSmsToast />
