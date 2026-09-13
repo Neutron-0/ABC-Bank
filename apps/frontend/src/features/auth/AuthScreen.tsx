@@ -11,6 +11,7 @@ import {
   Platform,
   Animated,
   Switch,
+  Easing,
 } from 'react-native';
 import { typography, spacing, radii, shadows, useAppTheme } from '../../theme';
 import { useCustomerStore } from '../../state/customerStore';
@@ -142,6 +143,8 @@ export const AuthScreen: React.FC = () => {
 
   // Animation values
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
   // Countdown timer for OTP resend
@@ -166,18 +169,45 @@ export const AuthScreen: React.FC = () => {
   };
 
   const transitionTo = (newStep: AuthScreenStep) => {
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 100,
-      useNativeDriver: true,
-    }).start(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 130,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 18,
+        duration: 130,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
       setStep(newStep);
       setErrorMessage('');
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 140,
-        useNativeDriver: true,
-      }).start();
+      slideAnim.setValue(-18);
+      scaleAnim.setValue(0.975);
+
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.bezier(0.16, 1, 0.3, 1),
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          easing: Easing.bezier(0.16, 1, 0.3, 1),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.bezier(0.16, 1, 0.3, 1),
+          useNativeDriver: true,
+        }),
+      ]).start();
     });
   };
 
@@ -382,7 +412,10 @@ export const AuthScreen: React.FC = () => {
               backgroundColor: themeColors.cardBg,
               borderColor: themeColors.border,
               opacity: fadeAnim,
-              transform: [{ translateX: shakeAnim }],
+              transform: [
+                { translateX: Animated.add(shakeAnim, slideAnim) },
+                { scale: scaleAnim },
+              ],
             },
           ]}
         >

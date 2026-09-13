@@ -146,33 +146,33 @@ export const AppNavigator: React.FC = () => {
       ]).start();
     }
 
-    // 2. Directional screen cross-fade transition with natural spring
+    // 2. Directional screen cross-fade transition with natural fluid physics
     if (prevTabRef.current !== activeTab) {
       const prevIdx = TAB_ORDER[prevTabRef.current] ?? 0;
       const nextIdx = TAB_ORDER[activeTab] ?? 0;
       const direction = nextIdx >= prevIdx ? 1 : -1;
 
-      screenOpacity.setValue(0.6);
-      screenTranslateX.setValue(direction * 12);
-      screenScale.setValue(0.985);
+      screenOpacity.setValue(0.1);
+      screenTranslateX.setValue(direction * 26);
+      screenScale.setValue(0.975);
 
       Animated.parallel([
         Animated.timing(screenOpacity, {
           toValue: 1,
-          duration: 150,
-          easing: Easing.out(Easing.cubic),
+          duration: 320,
+          easing: Easing.bezier(0.16, 1, 0.3, 1),
           useNativeDriver: true,
         }),
-        Animated.spring(screenTranslateX, {
+        Animated.timing(screenTranslateX, {
           toValue: 0,
-          friction: 8,
-          tension: 110,
+          duration: 320,
+          easing: Easing.bezier(0.16, 1, 0.3, 1),
           useNativeDriver: true,
         }),
-        Animated.spring(screenScale, {
+        Animated.timing(screenScale, {
           toValue: 1,
-          friction: 8,
-          tension: 110,
+          duration: 320,
+          easing: Easing.bezier(0.16, 1, 0.3, 1),
           useNativeDriver: true,
         }),
       ]).start();
