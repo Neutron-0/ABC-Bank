@@ -789,14 +789,16 @@ interface CustomerStateStore {
 
   // Authentication & DPDP Compliance
   isAuthenticated: boolean;
+  authToken: string | null;
   savedMpin: string;
   dpdpConsent: DpdpConsentState;
   sendMockOtp: (phone: string) => { otp: string; isRegistered: boolean };
   verifyMockOtp: (enteredOtp: string, expectedOtp: string) => boolean;
   verifyMpin: (mpin: string) => boolean;
-  signupCustomer: (payload: SignupPayload) => boolean;
+  signupCustomer: (payload: SignupPayload) => Promise<boolean>;
+  loginWithPassword: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>;
   updateDpdpConsent: (consent: Partial<DpdpConsentState>) => void;
-  loginWithPreset: (presetId: CustomerStateType) => void;
+  loginWithPreset: (presetId: CustomerStateType) => Promise<void>;
   logout: () => void;
 
   setLanguage: (lang: LanguageCode) => void;
@@ -952,6 +954,7 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     userPin: '8492',
     savedMpin: '123456',
     isAuthenticated: false,
+    authToken: null,
     dpdpConsent: { ...defaultDpdpConsent },
     biometricsEnabled: true,
     phoneNumber: '+91 98765 43210',
@@ -963,26 +966,7 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     digitalRupeeBalance: 500.0,
     asbaLiens: [],
     dynamicCvv: null,
-    bankingAlerts: [
-      {
-        id: 'sms_reg_01',
-        sender: 'VK-ABCBNK',
-        body: 'Acct XX8492 debited for INR 40.00 on 12-Sep-2026 08:38:00 via UPI (DMRC Transit). Avail Bal: INR 42,680.00.',
-        timestamp: '2026-09-12T08:38:00+05:30',
-        type: 'debit',
-        amount: 40,
-        referenceId: 'UPI/625519849201',
-      },
-      {
-        id: 'sms_reg_02',
-        sender: 'VK-ABCBNK',
-        body: 'Alert: Auto-debit scheduled for Home Loan EMI INR 16,500 on 16-Sep-2026. Keep sufficient balance to avoid bounce fee.',
-        timestamp: '2026-09-11T10:00:00+05:30',
-        type: 'mandate',
-        amount: 16500,
-        referenceId: 'NACH/HDFC/99214',
-      },
-    ],
+    bankingAlerts: [],
 
     // FASTag Toll Services
     fastag: {
@@ -1728,7 +1712,7 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       return isValid;
     },
 
-    signupCustomer: (payload: SignupPayload) => {
+    signupCustomer: async (payload: SignupPayload) => {
       set((state) => ({
         isAuthenticated: true,
         savedMpin: payload.mpin || '123456',
@@ -1739,6 +1723,24 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
           phone: payload.phone || state.profile.phone,
         },
       }));
+
+      // Authoritative backend registration & JWT token issuance
+      try {
+        const cleanPhone = payload.phone.replace(/\D/g, '').slice(-10);
+        const res = await BankingApi.register({
+          name: payload.fullName,
+          phone: cleanPhone || '9876543210',
+          email: `${cleanPhone || 'customer'}@bharatmail.in`,
+          password: payload.mpin || 'password123',
+        });
+        if (res?.access_token) {
+          BankingApi.setAuthToken(res.access_token);
+          set({ authToken: res.access_token });
+        }
+      } catch (err) {
+        console.warn('[Signup] Backend registration fallback:', err);
+      }
+
       get().pushBankingSms({
         sender: 'VK-ABCBNK',
         type: 'regulatory',
@@ -1747,6 +1749,37 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       });
       get().showToast(`Account successfully created for ${payload.fullName}!`);
       return true;
+    },
+
+    loginWithPassword: async (identifier: string, password: string) => {
+      try {
+        const res = await BankingApi.login({ identifier: identifier.trim(), password });
+        if (res && res.success && res.access_token) {
+          BankingApi.setAuthToken(res.access_token);
+          set((state) => ({
+            isAuthenticated: true,
+            authToken: res.access_token,
+            phoneNumber: res.phone || state.phoneNumber,
+            profile: {
+              ...state.profile,
+              id: res.customer_id,
+              name: res.customer_name || state.profile.name,
+              phone: res.phone || state.profile.phone,
+              email: res.email || state.profile.email,
+            },
+            balance: {
+              ...state.balance,
+              available: res.balance?.available ?? state.balance.available,
+              savings: res.balance?.savings ?? state.balance.savings,
+            },
+          }));
+          get().showToast(`Welcome back, ${res.customer_name}! Session authenticated.`);
+          return { success: true };
+        }
+        return { success: false, error: res?.message || 'Invalid credentials or user not found.' };
+      } catch (err: any) {
+        return { success: false, error: err?.message || 'Unable to connect to authentication server.' };
+      }
     },
 
     updateDpdpConsent: (consent: Partial<DpdpConsentState>) => {
@@ -1760,14 +1793,35 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       get().showToast('DPDP 2023 consent preferences updated.');
     },
 
-    loginWithPreset: (presetId: CustomerStateType) => {
+    loginWithPreset: async (presetId: CustomerStateType) => {
       get().switchCustomerState(presetId);
       set({ isAuthenticated: true });
+
+      // Synchronize with backend to acquire authoritative JWT token
+      try {
+        const presetIdentifierMap: Record<CustomerStateType, string> = {
+          normal: 'rahul.sharma@bharatmail.in',
+          surplus: 'pooja.patel@bharatmail.in',
+          financial_stress: 'rahul.sharma@bharatmail.in',
+          medical_event: 'rahul.sharma@bharatmail.in',
+          fraud_alert: 'rahul.sharma@bharatmail.in',
+        };
+        const identifier = presetIdentifierMap[presetId] || 'cust_bharat_001';
+        const res = await BankingApi.login({ identifier, password: 'password123' });
+        if (res?.access_token) {
+          BankingApi.setAuthToken(res.access_token);
+          set({ authToken: res.access_token });
+        }
+      } catch (err) {
+        console.warn('[Auth] Preset JWT token generation fallback:', err);
+      }
+
       get().showToast(`Logged in as demo persona: ${presetId.toUpperCase()}`);
     },
 
     logout: () => {
-      set({ isAuthenticated: false });
+      BankingApi.setAuthToken(null);
+      set({ isAuthenticated: false, authToken: null });
       get().showToast('You have been securely logged out per RBI digital session guidelines.');
     },
   };

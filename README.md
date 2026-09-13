@@ -66,13 +66,15 @@ ABC Bank (VZEYA) is an intelligence and experience layer that dynamically adapts
  - [Migration & Introspection Flow](#migration--introspection-flow)
  - [Seed Data Pipeline](#seed-data-pipeline)
 - [Authentication & Security — Deep Dive](#authentication--security--deep-dive)
- - [PIN Authentication — Complete Lifecycle](#pin-authentication--complete-lifecycle)
- - [PIN Verification with Rate Limiting Sequence](#pin-verification-with-rate-limiting--complete-sequence)
- - [Biometric Payment Flow](#biometric-payment-flow--complete-sequence)
- - [Card Security State Machine](#card-security-state-machine)
- - [Multi-Layer Authorization Architecture](#multi-layer-authorization-architecture)
- - [Ethical AI Security Architecture](#ethical-ai-security-architecture)
- - [Known Security Limitations](#known-security-limitations)
+  - [End-to-End Authentication & MPIN Flow](#end-to-end-authentication--mpin-flow)
+  - [DPDP Act 2023 & RBI Statutory Consent Architecture](#dpdp-act-2023--rbi-statutory-consent-architecture)
+  - [PIN Authentication — Complete Lifecycle](#pin-authentication--complete-lifecycle)
+  - [PIN Verification with Rate Limiting Sequence](#pin-verification-with-rate-limiting--complete-sequence)
+  - [Biometric Payment Flow](#biometric-payment-flow--complete-sequence)
+  - [Card Security State Machine](#card-security-state-machine)
+  - [Multi-Layer Authorization Architecture](#multi-layer-authorization-architecture)
+  - [Ethical AI Security Architecture](#ethical-ai-security-architecture)
+  - [Known Security Limitations](#known-security-limitations)
 - [Data Flow Architecture — Deep Dive](#data-flow-architecture--deep-dive)
  - [End-to-End Personalization Sequence](#end-to-end-personalization--complete-sequence)
  - [Transaction Processing Sequence](#transaction-processing--complete-sequence)
@@ -2033,6 +2035,99 @@ flowchart TD
 ---
 
 ## Authentication & Security — Deep Dive
+
+### End-to-End Authentication & MPIN Flow
+
+VZEYA implements a banking-grade customer authentication flow combining mobile OTP verification, 4-digit MPIN credentials (or device biometrics), and statutory DPDP Act 2023 compliance agreements.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as Customer / User
+  participant UI as AuthScreen (React Native)
+  participant Store as customerStore (Zustand)
+  participant AuthAPI as Auth Service / Backend
+  participant SMS as SMS OTP Gateway (Mock/Live)
+
+  Note over User, UI: Stage 1: Phone Entry & KYC Identifier
+  User->>UI: Inputs 10-digit mobile number (+91)
+  UI->>SMS: Request SMS OTP challenge
+  SMS-->>UI: OTP dispatched (e.g. 123456 / Dev auto-hint)
+
+  Note over User, UI: Stage 2: OTP Verification
+  User->>UI: Enters 6-digit numeric OTP
+  UI->>UI: Validate OTP against challenge token
+
+  Note over User, UI: Stage 3: MPIN Setup / Quick Login
+  alt First-time Customer
+    UI->>UI: Prompt 4-digit MPIN creation + confirmation
+    UI->>AuthAPI: POST /auth/pin/setup (PBKDF2-HMAC-SHA256)
+    AuthAPI-->>UI: PIN Hash & Salt persistent registration
+  else Returning Customer
+    UI->>UI: Prompt 4-digit MPIN or Biometric (Fingerprint/Face)
+    UI->>AuthAPI: POST /auth/pin/verify (hmac.compare_digest)
+    AuthAPI-->>UI: 200 OK (fail_count reset)
+  end
+
+  Note over User, UI: Stage 4: DPDP Act 2023 & RBI Statutory Consent
+  alt New Account / Updated Compliance Scope
+    UI->>User: Display DPDP Statutory Disclosures Modal
+    Note over UI: Disclose Data Fiduciary, Purpose, Account Aggregator AA,<br/>Right to Revoke & Grievance DPO Contact
+    User->>UI: Accepts statutory terms & grants consent
+    UI->>Store: recordDPDPConsent(timestamp, version="2023.1")
+  end
+
+  Note over User, UI: Stage 5: Session Initialization
+  UI->>Store: setAuthenticated(true, customerProfile)
+  Store-->>UI: Hydrate active scenario & banking dashboard
+  UI-->>User: Transition to Main Application Shell
+```
+
+#### Dual Authentication Architecture (Mobile OTP / MPIN & NetBanking JWT)
+
+VZEYA supports two complementary authentication paths designed to accommodate both modern Bharat mobile banking and standard internet banking / developer evaluation:
+
+1. **Bharat Mobile Banking (OTP + MPIN + Biometric)**:
+   - Evaluator-friendly 1-tap OTP simulation (auto-hints verified code `482910` or `000000`).
+   - Hardware-bound 6-digit MPIN validation with cryptographic PIN verify (`/auth/pin/verify`).
+   - 1-tap evaluator persona presets (Salaried, Surplus, Tight Buffer, Medical Emergency, Fraud Alert).
+
+2. **NetBanking / Session Token Architecture (JWT HS256)**:
+   - Directly authenticates via `POST /api/v1/auth/login` accepting Email, Phone number, or Customer ID.
+   - Authoritative HS256 JWT tokens generated with standard RFC 7519 claims (`sub`, `iat`, `exp`).
+   - Client API SDK automatically attaches `Authorization: Bearer <token>` to all downstream banking requests.
+   - New user registration via `POST /api/v1/auth/register` dynamically provisions customer records into the relational database and seed store.
+
+### DPDP Act 2023 & RBI Statutory Consent Architecture
+
+In compliance with the **Digital Personal Data Protection (DPDP) Act, 2023** and **RBI Master Direction on IT Governance, Risk and Controls**, VZEYA enforces strict transparency, consent gating, and revocation capabilities before any financial or behavioral data is processed.
+
+#### Statutory Principles Enforced
+
+| Dimension | DPDP 2023 Requirement | VZEYA Implementation |
+|---|---|---|
+| **Data Fiduciary Identity** | Clear disclosure of processing entity | Displayed as *VZEYA Intelligence Platform / ABC Bank Ltd.* |
+| **Notice & Purpose Specification** | Purpose must be clearly stated in plain language | Explicitly itemizes Account Aggregator retrieval, contextual SDUI personalization, and fraud mitigation. |
+| **Vernacular Accessibility** | Consent notices must be accessible in Schedule 8 languages | UI supports English, Hindi, and Gujarati consent summaries. |
+| **Right to Withdraw Consent** | Data principal can withdraw consent as easily as giving it | Toggle available under `ProfileScreen -> Statutory Compliance & DPDP 2023` to immediately revoke processing rights. |
+| **Data Minimization & Retention** | Retain data only as long as necessary for specified purpose | Session caches and AI telemetry strictly expire; no raw transaction payloads stored in AI agent logs. |
+| **Grievance Redressal** | Mandatory designation of Data Protection Officer (DPO) | Statutory DPO contact (`dpo@vzeyabank.in`, Grievance Officer, Mumbai) accessible directly from the consent sheet. |
+
+```mermaid
+flowchart TD
+  AppLaunch([App Launch]) --> CheckAuth{Authenticated?}
+  CheckAuth -->|No| AuthGate[AuthScreen: Mobile + OTP + MPIN]
+  AuthGate --> ConsentCheck{DPDP Consent Recorded?}
+  ConsentCheck -->|No| ConsentModal[DPDP Statutory Consent Modal]
+  ConsentModal --> UserAction{User Decision}
+  UserAction -->|Reject / Exit| TerminateSession[Session Blocked / Guest Only]
+  UserAction -->|Accept| RecordConsent[Store SHA-256 Consent Proof & Timestamp]
+  RecordConsent --> UnlockVault[Unlock Full Banking SDUI & Accounts]
+  ConsentCheck -->|Yes| UnlockVault
+  UnlockVault --> InAppProfile[ProfileScreen: DPDP Management]
+  InAppProfile --> RevokeAction{Revoke Consent?}
+  RevokeAction -->|Yes| StripTelemetry[Anonymize Local Cache & Block Personalization]
+```
 
 ### PIN Authentication — Complete Lifecycle
 

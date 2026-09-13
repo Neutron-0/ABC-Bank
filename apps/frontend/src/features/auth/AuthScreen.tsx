@@ -23,7 +23,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Building2,
-  Sparkles,
+  Key,
   Delete,
   Fingerprint,
   FileText,
@@ -61,8 +61,8 @@ const PERSONA_PRESETS: PersonaPreset[] = [
     name: 'Priya Patel',
     phone: '9999999902',
     tag: 'Business • Surplus Liquidity',
-    badgeColor: '#0369A1',
-    badgeBg: '#E0F2FE',
+    badgeColor: '#B45309',
+    badgeBg: '#FDF6ED',
     summary: '₹2.85L surplus idle in savings, auto-sweep & mutual fund ready.',
   },
   {
@@ -79,8 +79,8 @@ const PERSONA_PRESETS: PersonaPreset[] = [
     name: 'Vikram Singh',
     phone: '9999999904',
     tag: 'Hospitalization • Inpatient',
-    badgeColor: '#6D28D9',
-    badgeBg: '#F5F3FF',
+    badgeColor: '#68645E',
+    badgeBg: '#F3EFEA',
     summary: '₹48,200 payment at Max Hospital, digital insurance claim assistance.',
   },
   {
@@ -103,13 +103,18 @@ export const AuthScreen: React.FC = () => {
     verifyMockOtp,
     verifyMpin,
     signupCustomer,
+    loginWithPassword,
     updateDpdpConsent,
     loginWithPreset,
     dpdpConsent,
   } = useCustomerStore();
 
   const [step, setStep] = useState<AuthScreenStep>('PHONE');
+  const [authMode, setAuthMode] = useState<'OTP' | 'PASSWORD'>('OTP');
   const [phone, setPhone] = useState('9999999901');
+  const [loginIdentifier, setLoginIdentifier] = useState('rahul.sharma@bharatmail.in');
+  const [loginPassword, setLoginPassword] = useState('password123');
+  const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [mpinInput, setMpinInput] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -190,6 +195,29 @@ export const AuthScreen: React.FC = () => {
     setResendTimer(30);
     setOtpDigits(['', '', '', '', '', '']);
     transitionTo('OTP');
+  };
+
+  // Step 1b: Direct Password / JWT Login
+  const handlePasswordLogin = async () => {
+    if (!loginIdentifier.trim()) {
+      setErrorMessage('Please enter your email, mobile number, or customer ID.');
+      triggerShake();
+      return;
+    }
+    if (!loginPassword) {
+      setErrorMessage('Please enter your account password.');
+      triggerShake();
+      return;
+    }
+
+    setIsSubmittingPassword(true);
+    setErrorMessage('');
+    const res = await loginWithPassword(loginIdentifier, loginPassword);
+    setIsSubmittingPassword(false);
+    if (!res.success) {
+      setErrorMessage(res.error || 'Authentication failed. Please check credentials.');
+      triggerShake();
+    }
   };
 
   // Step 2: Fill OTP automatically for evaluator ease
@@ -378,48 +406,209 @@ export const AuthScreen: React.FC = () => {
                 </Text>
               </View>
 
-              {/* Mobile Input */}
-              <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Registered Mobile Number</Text>
-                <View style={[styles.phoneInputCard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
-                  <Text style={[styles.inputPrefix, { color: themeColors.textPrimary }]}>🇮🇳 +91</Text>
-                  <View style={[styles.inputDivider, { backgroundColor: '#E2E8F0' }]} />
-                  <TextInput
-                    style={[styles.phoneTextInput, { color: themeColors.textPrimary }]}
-                    keyboardType="number-pad"
-                    maxLength={10}
-                    value={phone}
-                    onChangeText={(val) => {
-                      setPhone(val);
-                      setErrorMessage('');
-                    }}
-                    placeholder="99999 99901"
-                    placeholderTextColor="#94A3B8"
-                  />
-                </View>
+              {/* Mode Switcher: Mobile OTP vs NetBanking Password (JWT) */}
+              <View style={[styles.authModeTabContainer, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}>
+                <TouchableOpacity
+                  style={[
+                    styles.authModeTab,
+                    authMode === 'OTP' && [styles.authModeTabActive, { backgroundColor: '#FFFFFF' }],
+                  ]}
+                  onPress={() => {
+                    setAuthMode('OTP');
+                    setErrorMessage('');
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Smartphone size={13} color={authMode === 'OTP' ? '#141414' : '#68645E'} />
+                  <Text
+                    style={[
+                      styles.authModeTabText,
+                      { color: authMode === 'OTP' ? '#141414' : '#68645E' },
+                      authMode === 'OTP' && { fontWeight: '700' },
+                    ]}
+                  >
+                    Mobile OTP & MPIN
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.authModeTab,
+                    authMode === 'PASSWORD' && [styles.authModeTabActive, { backgroundColor: '#FFFFFF' }],
+                  ]}
+                  onPress={() => {
+                    setAuthMode('PASSWORD');
+                    setErrorMessage('');
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Lock size={13} color={authMode === 'PASSWORD' ? '#141414' : '#68645E'} />
+                  <Text
+                    style={[
+                      styles.authModeTabText,
+                      { color: authMode === 'PASSWORD' ? '#141414' : '#68645E' },
+                      authMode === 'PASSWORD' && { fontWeight: '700' },
+                    ]}
+                  >
+                    NetBanking Password (JWT)
+                  </Text>
+                </TouchableOpacity>
               </View>
 
-              {errorMessage ? (
-                <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#FCA5A5' }]}>
-                  <AlertCircle size={14} color="#C92A2A" />
-                  <Text style={[styles.errorBannerText, { color: '#C92A2A' }]}>{errorMessage}</Text>
-                </View>
-              ) : null}
+              {authMode === 'OTP' ? (
+                <>
+                  {/* Mobile Input */}
+                  <View style={styles.inputGroup}>
+                    <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Registered Mobile Number</Text>
+                    <View style={[styles.phoneInputCard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+                      <Text style={[styles.inputPrefix, { color: themeColors.textPrimary }]}>+91</Text>
+                      <View style={[styles.inputDivider, { backgroundColor: '#E2E8F0' }]} />
+                      <TextInput
+                        style={[styles.phoneTextInput, { color: themeColors.textPrimary }]}
+                        keyboardType="number-pad"
+                        maxLength={10}
+                        value={phone}
+                        onChangeText={(val) => {
+                          setPhone(val);
+                          setErrorMessage('');
+                        }}
+                        placeholder="99999 99901"
+                        placeholderTextColor="#94A3B8"
+                      />
+                    </View>
+                  </View>
 
-              {/* Proceed Button */}
-              <TouchableOpacity
-                style={[styles.primaryButton, { backgroundColor: '#141414' }]}
-                onPress={handleRequestOtp}
-                activeOpacity={0.85}
-              >
-                <Text style={[styles.primaryButtonText, { color: '#FFFFFF' }]}>Get Secure OTP</Text>
-                <ArrowRight size={16} color="#FFFFFF" />
-              </TouchableOpacity>
+                  {errorMessage ? (
+                    <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#FCA5A5' }]}>
+                      <AlertCircle size={14} color="#C92A2A" />
+                      <Text style={[styles.errorBannerText, { color: '#C92A2A' }]}>{errorMessage}</Text>
+                    </View>
+                  ) : null}
+
+                  {/* Proceed Button */}
+                  <TouchableOpacity
+                    style={[styles.primaryButton, { backgroundColor: '#141414' }]}
+                    onPress={handleRequestOtp}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={[styles.primaryButtonText, { color: '#FFFFFF' }]}>Get Secure OTP</Text>
+                    <ArrowRight size={16} color="#FFFFFF" />
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  {/* User Identifier (Email, Mobile, or Customer ID) */}
+                  <View style={styles.inputGroup}>
+                    <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>
+                      User ID, Email, or Mobile Number
+                    </Text>
+                    <View style={[styles.phoneInputCard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+                      <User size={15} color="#68645E" style={{ marginLeft: 12 }} />
+                      <View style={[styles.inputDivider, { backgroundColor: '#E2E8F0', marginHorizontal: 8 }]} />
+                      <TextInput
+                        style={[styles.phoneTextInput, { color: themeColors.textPrimary }]}
+                        value={loginIdentifier}
+                        onChangeText={(val) => {
+                          setLoginIdentifier(val);
+                          setErrorMessage('');
+                        }}
+                        placeholder="rahul.sharma@bharatmail.in"
+                        placeholderTextColor="#94A3B8"
+                        autoCapitalize="none"
+                      />
+                    </View>
+                  </View>
+
+                  {/* Password */}
+                  <View style={styles.inputGroup}>
+                    <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Account Password</Text>
+                    <View style={[styles.phoneInputCard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+                      <Lock size={15} color="#68645E" style={{ marginLeft: 12 }} />
+                      <View style={[styles.inputDivider, { backgroundColor: '#E2E8F0', marginHorizontal: 8 }]} />
+                      <TextInput
+                        style={[styles.phoneTextInput, { color: themeColors.textPrimary }]}
+                        secureTextEntry
+                        value={loginPassword}
+                        onChangeText={(val) => {
+                          setLoginPassword(val);
+                          setErrorMessage('');
+                        }}
+                        placeholder="••••••••"
+                        placeholderTextColor="#94A3B8"
+                      />
+                    </View>
+                  </View>
+
+                  {/* Quick Fill Credentials Pills */}
+                  <View style={{ flexDirection: 'row', gap: 6, marginBottom: spacing.md, flexWrap: 'wrap' }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setLoginIdentifier('rahul.sharma@bharatmail.in');
+                        setLoginPassword('password123');
+                        setErrorMessage('');
+                      }}
+                      style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 4,
+                        backgroundColor: '#F3EFEA',
+                        borderWidth: 1,
+                        borderColor: '#EAE6DF',
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: '600', color: '#141414' }}>
+                        Fill Rahul (Salaried)
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setLoginIdentifier('pooja.patel@bharatmail.in');
+                        setLoginPassword('password123');
+                        setErrorMessage('');
+                      }}
+                      style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 4,
+                        backgroundColor: '#F3EFEA',
+                        borderWidth: 1,
+                        borderColor: '#EAE6DF',
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: '600', color: '#141414' }}>
+                        Fill Pooja (Surplus)
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {errorMessage ? (
+                    <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#FCA5A5' }]}>
+                      <AlertCircle size={14} color="#C92A2A" />
+                      <Text style={[styles.errorBannerText, { color: '#C92A2A' }]}>{errorMessage}</Text>
+                    </View>
+                  ) : null}
+
+                  {/* Password Login Button */}
+                  <TouchableOpacity
+                    style={[styles.primaryButton, { backgroundColor: '#141414' }]}
+                    onPress={handlePasswordLogin}
+                    disabled={isSubmittingPassword}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={[styles.primaryButtonText, { color: '#FFFFFF' }]}>
+                      {isSubmittingPassword ? 'Verifying Credentials...' : 'Sign In & Issue JWT Session'}
+                    </Text>
+                    <ArrowRight size={16} color="#FFFFFF" />
+                  </TouchableOpacity>
+                </>
+              )}
 
               {/* Quick Persona Demo Selector for Evaluators */}
               <View style={[styles.personaSection, { borderTopColor: themeColors.border }]}>
                 <View style={styles.personaSectionHeader}>
-                  <Sparkles size={14} color="#B45309" />
+                  <Key size={14} color="#B45309" />
                   <Text style={[styles.personaSectionTitle, { color: '#B45309' }]}>
                     EVALUATOR QUICK PERSONA PRESETS
                   </Text>
@@ -472,7 +661,7 @@ export const AuthScreen: React.FC = () => {
                           onPress={() => loginWithPreset(p.id)}
                           activeOpacity={0.85}
                         >
-                          <Sparkles size={12} color="#F59E0B" />
+                          <Key size={12} color="#F59E0B" />
                           <Text style={styles.personaBypassBtnText}>1-Tap Login</Text>
                         </TouchableOpacity>
                       </View>
@@ -626,9 +815,9 @@ export const AuthScreen: React.FC = () => {
           {step === 'OTP' && (
             <View>
               <View style={styles.stepHeader}>
-                <View style={[styles.statusBadge, { backgroundColor: '#EFF6FF' }]}>
-                  <Smartphone size={11} color="#2563EB" />
-                  <Text style={[styles.statusBadgeText, { color: '#2563EB' }]}>OTP Dispatched</Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#F3EFEA' }]}>
+                  <Smartphone size={11} color="#141414" />
+                  <Text style={[styles.statusBadgeText, { color: '#141414' }]}>OTP Dispatched</Text>
                 </View>
                 <Text style={[styles.heading, { color: themeColors.textPrimary }]}>Verify Mobile Number</Text>
                 <Text style={[styles.subheading, { color: themeColors.textSecondary }]}>
@@ -636,11 +825,11 @@ export const AuthScreen: React.FC = () => {
                 </Text>
               </View>
 
-              {/* Realistic SMS Banner matching OnboardingModal */}
+              {/* Realistic SMS Banner */}
               {showMockSmsBanner && (
                 <View style={styles.smsBanner}>
                   <View style={styles.smsHeader}>
-                    <Smartphone size={13} color="#2563EB" />
+                    <Smartphone size={13} color="#141414" />
                     <Text style={styles.smsSender}>VK-ABCBNK (SMS Notice)</Text>
                   </View>
                   <Text style={styles.smsBody}>
@@ -671,9 +860,9 @@ export const AuthScreen: React.FC = () => {
                 onPress={handleAutoFillOtp}
                 activeOpacity={0.8}
               >
-                <Sparkles size={15} color="#1B7A43" />
+                <ShieldCheck size={15} color="#1B7A43" />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.autofillTitle}>1-Tap Auto-Fill Demo OTP</Text>
+                  <Text style={styles.autofillTitle}>Auto-Fill Demo OTP (482910)</Text>
                   <Text style={styles.autofillSubtitle}>Inserts verified code: 482910</Text>
                 </View>
                 <ArrowRight size={15} color="#1B7A43" />
@@ -805,7 +994,7 @@ export const AuthScreen: React.FC = () => {
                 <View style={[styles.consentItem, { backgroundColor: '#FFFFFF', borderColor: themeColors.border }]}>
                   <View style={styles.consentItemHeader}>
                     <View style={styles.consentItemTitleGroup}>
-                      <Sparkles size={15} color="#B45309" />
+                      <Info size={15} color="#B45309" />
                       <Text style={[styles.consentItemTitle, { color: themeColors.textPrimary }]}>Mitra AI Hyper-Personalization</Text>
                     </View>
                     <Switch
@@ -1059,6 +1248,29 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     lineHeight: 18,
   },
+  authModeTabContainer: {
+    flexDirection: 'row',
+    borderRadius: radii.md,
+    borderWidth: 1,
+    padding: 3,
+    marginBottom: spacing.md,
+    gap: 4,
+  },
+  authModeTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 7,
+    borderRadius: radii.sm,
+    gap: 6,
+  },
+  authModeTabActive: {
+    ...shadows.sm,
+  },
+  authModeTabText: {
+    fontSize: 11.5,
+  },
   inputGroup: {
     marginBottom: spacing.md,
   },
@@ -1257,11 +1469,11 @@ const styles = StyleSheet.create({
   },
   smsBanner: {
     width: '100%',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#F8FAFC',
     borderRadius: radii.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: '#E2E8F0',
     marginBottom: spacing.md,
   },
   smsHeader: {
@@ -1271,20 +1483,20 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   smsSender: {
-    fontSize: 10,
+    fontSize: 10.5,
     fontWeight: '800',
-    color: '#2563EB',
+    color: '#141414',
     letterSpacing: 0.5,
   },
   smsBody: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#1E40AF',
+    fontWeight: '500',
+    color: '#141414',
     lineHeight: 17,
   },
   smsCodeHighlight: {
     fontWeight: '800',
-    color: '#1E40AF',
+    color: '#141414',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   otpRow: {

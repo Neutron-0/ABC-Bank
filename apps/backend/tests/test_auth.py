@@ -1,5 +1,12 @@
-﻿import pytest
+import sys
+from pathlib import Path
+import pytest
 from fastapi.testclient import TestClient
+
+root_dir = Path(__file__).resolve().parents[3]
+if str(root_dir) not in sys.path:
+    sys.path.insert(0, str(root_dir))
+
 from apps.backend.app.main import app
 from apps.backend.app.core.auth import verify_access_token
 

@@ -14,56 +14,59 @@ import {
   X,
   ArrowDownLeft,
   ArrowUpRight,
-  ShieldAlert,
+  ShieldCheck,
   Clock,
 } from 'lucide-react-native';
 
 export const BankingSmsToast: React.FC = () => {
-  const { bankingAlerts, dismissBankingSms } = useCustomerStore();
+  const { bankingAlerts, dismissBankingSms, isAuthenticated } = useCustomerStore();
   const slideAnim = useRef(new Animated.Value(-100)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
   const currentAlert = bankingAlerts[0] || null;
 
+  // Prevent any pre-login notifications except requested OTP security tokens
+  const shouldShow = currentAlert && (isAuthenticated || currentAlert.type === 'security');
+
   useEffect(() => {
-    if (currentAlert) {
+    if (shouldShow && currentAlert) {
       Animated.parallel([
         Animated.spring(slideAnim, {
           toValue: 0,
           useNativeDriver: true,
-          tension: 80,
-          friction: 8,
+          tension: 90,
+          friction: 9,
         }),
         Animated.timing(opacityAnim, {
           toValue: 1,
-          duration: 200,
+          duration: 180,
           useNativeDriver: true,
         }),
       ]).start();
 
-      // Auto dismiss after 8 seconds
+      // Auto dismiss after 7 seconds
       const timer = setTimeout(() => {
         handleDismiss();
-      }, 8000);
+      }, 7000);
 
       return () => clearTimeout(timer);
     } else {
       slideAnim.setValue(-100);
       opacityAnim.setValue(0);
     }
-  }, [currentAlert?.id]);
+  }, [currentAlert?.id, shouldShow]);
 
   const handleDismiss = () => {
     if (!currentAlert) return;
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: -80,
-        duration: 200,
+        duration: 180,
         useNativeDriver: true,
       }),
       Animated.timing(opacityAnim, {
         toValue: 0,
-        duration: 180,
+        duration: 160,
         useNativeDriver: true,
       }),
     ]).start(() => {
@@ -71,35 +74,35 @@ export const BankingSmsToast: React.FC = () => {
     });
   };
 
-  if (!currentAlert) return null;
+  if (!shouldShow || !currentAlert) return null;
 
   const getAlertIcon = () => {
     switch (currentAlert.type) {
       case 'debit':
-        return <ArrowUpRight size={14} color="#E11D48" />;
+        return <ArrowUpRight size={13} color="#C92A2A" strokeWidth={2.4} />;
       case 'credit':
-        return <ArrowDownLeft size={14} color="#059669" />;
+        return <ArrowDownLeft size={13} color="#1B7A43" strokeWidth={2.4} />;
       case 'mandate':
-        return <Clock size={14} color="#D97706" />;
+        return <Clock size={13} color="#B45309" strokeWidth={2.4} />;
       case 'security':
-        return <ShieldAlert size={14} color="#7C3AED" />;
+        return <ShieldCheck size={13} color="#141414" strokeWidth={2.4} />;
       default:
-        return <MessageSquare size={14} color="#0284C7" />;
+        return <MessageSquare size={13} color="#141414" strokeWidth={2.4} />;
     }
   };
 
   const getBadgeStyle = () => {
     switch (currentAlert.type) {
       case 'debit':
-        return { bg: '#FFE4E6', text: '#E11D48', label: 'DEBIT' };
+        return { bg: '#FDF2F2', text: '#C92A2A', label: 'DEBIT' };
       case 'credit':
-        return { bg: '#D1FAE5', text: '#059669', label: 'CREDIT' };
+        return { bg: '#EDF7F1', text: '#1B7A43', label: 'CREDIT' };
       case 'mandate':
-        return { bg: '#FEF3C7', text: '#D97706', label: 'MANDATE' };
+        return { bg: '#FDF6ED', text: '#B45309', label: 'MANDATE' };
       case 'security':
-        return { bg: '#EDE9FE', text: '#7C3AED', label: 'SECURITY' };
+        return { bg: '#F3EFEA', text: '#141414', label: 'SECURITY' };
       default:
-        return { bg: '#E0F2FE', text: '#0284C7', label: 'INFO' };
+        return { bg: '#F3EFEA', text: '#141414', label: 'NOTICE' };
     }
   };
 
@@ -131,8 +134,8 @@ export const BankingSmsToast: React.FC = () => {
 
           <View style={styles.headerRight}>
             <Text style={styles.timeText}>Just now</Text>
-            <TouchableOpacity onPress={handleDismiss} style={styles.closeBtn}>
-              <X size={14} color="#94A3B8" />
+            <TouchableOpacity onPress={handleDismiss} style={styles.closeBtn} activeOpacity={0.7}>
+              <X size={14} color="#68645E" />
             </TouchableOpacity>
           </View>
         </View>
@@ -165,12 +168,12 @@ const styles = StyleSheet.create({
   smsCard: {
     width: '100%',
     maxWidth: 480,
-    backgroundColor: '#0F172A',
-    borderRadius: radii.lg,
+    backgroundColor: '#FFFFFF',
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#334155',
-    padding: spacing.sm + 2,
-    ...shadows.lg,
+    borderColor: '#EAE6DF',
+    padding: spacing.sm + 4,
+    ...shadows.sm,
     gap: 6,
   },
   header: {
@@ -192,18 +195,18 @@ const styles = StyleSheet.create({
   },
   senderText: {
     fontSize: 12,
-    fontFamily: typography.fontFamilies.bold,
-    color: '#F8FAFC',
+    fontWeight: '800',
+    color: '#141414',
     letterSpacing: 0.5,
   },
   badgePill: {
-    paddingHorizontal: 5,
+    paddingHorizontal: 6,
     paddingVertical: 1.5,
     borderRadius: 4,
   },
   badgeText: {
     fontSize: 9,
-    fontFamily: typography.fontFamilies.bold,
+    fontWeight: '700',
   },
   headerRight: {
     flexDirection: 'row',
@@ -212,29 +215,27 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 10,
-    color: '#94A3B8',
-    fontFamily: typography.fontFamilies.regular,
+    color: '#9C968E',
   },
   closeBtn: {
-    padding: 2,
+    padding: 3,
   },
   bodyText: {
     fontSize: 12,
-    fontFamily: 'Courier',
-    color: '#E2E8F0',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    color: '#141414',
     lineHeight: 17,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 2,
+    paddingTop: 3,
     borderTopWidth: 1,
-    borderTopColor: '#1E293B',
+    borderTopColor: '#F3EFEA',
   },
   footerText: {
     fontSize: 9,
-    color: '#64748B',
-    fontFamily: typography.fontFamilies.regular,
+    color: '#9C968E',
   },
 });
