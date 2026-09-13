@@ -405,7 +405,15 @@ export const AuthScreen: React.FC = () => {
       mpin: signupMpin,
     };
 
-    await signupCustomer(payload);
+    setIsVerifying(true);
+    setErrorMessage('');
+    const res = await signupCustomer(payload);
+    setIsVerifying(false);
+    if (!res.success) {
+      setErrorMessage(res.error || 'Account creation failed. Please check your network connection.');
+      triggerShake();
+      return;
+    }
     transitionTo('DPDP_CONSENT');
   };
 

@@ -22,22 +22,8 @@ export const getApiBaseUrl = (): string => {
     return process.env.EXPO_PUBLIC_API_URL;
   }
 
-  const hostUri =
-    Constants.expoConfig?.hostUri ||
-    (Constants as any).manifest2?.extra?.expoGo?.debuggerHost;
-
-  if (hostUri) {
-    const hostIp = hostUri.split(':')[0];
-    if (hostIp && hostIp !== 'localhost' && hostIp !== '127.0.0.1') {
-      return `http://${hostIp}:8000/api/v1`;
-    }
-  }
-
-  if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:8000/api/v1';
-  }
-
-  return 'http://localhost:8000/api/v1';
+  // Authoritative cloud backend server running FastAPI & PostgreSQL
+  return 'http://152.67.9.53/api/v1';
 };
 
 import { MiniCPM5EdgeEngine } from './MiniCPM5EdgeEngine';
@@ -60,7 +46,7 @@ export class BankingApi {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s timeout for fast on-device fallback
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout for cloud backend requests
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',

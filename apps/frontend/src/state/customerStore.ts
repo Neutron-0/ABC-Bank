@@ -795,7 +795,7 @@ interface CustomerStateStore {
   sendMockOtp: (phone: string) => { otp: string; isRegistered: boolean };
   verifyMockOtp: (enteredOtp: string, expectedOtp: string) => boolean;
   verifyMpin: (mpin: string) => Promise<boolean>;
-  signupCustomer: (payload: SignupPayload) => Promise<boolean>;
+  signupCustomer: (payload: SignupPayload) => Promise<{ success: boolean; error?: string }>;
   loginWithPassword: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>;
   updateDpdpConsent: (consent: Partial<DpdpConsentState>) => void;
   loginWithPreset: (presetId: CustomerStateType) => Promise<void>;
@@ -1725,18 +1725,6 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     },
 
     signupCustomer: async (payload: SignupPayload) => {
-      set((state) => ({
-        isAuthenticated: true,
-        savedMpin: payload.mpin || '123456',
-        phoneNumber: payload.phone || state.phoneNumber,
-        profile: {
-          ...state.profile,
-          name: payload.fullName || state.profile.name,
-          phone: payload.phone || state.profile.phone,
-          email: payload.email || state.profile.email,
-        },
-      }));
-
       // Authoritative backend registration & JWT token issuance
       try {
         const cleanPhone = payload.phone.replace(/\D/g, '').slice(-10);
@@ -1750,16 +1738,19 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
           city: 'Mumbai',
           state: 'Maharashtra',
         });
-        if (res && res.access_token) {
+        if (res && res.success && res.access_token) {
           BankingApi.setAuthToken(res.access_token);
           set((state) => ({
+            isAuthenticated: true,
             authToken: res.access_token,
+            savedMpin: payload.mpin || '123456',
+            phoneNumber: res.phone || payload.phone || state.phoneNumber,
             profile: {
               ...state.profile,
               id: res.customer_id,
-              name: res.customer_name || state.profile.name,
-              email: res.email || state.profile.email,
-              phone: res.phone || state.profile.phone,
+              name: res.customer_name || payload.fullName,
+              email: res.email || payload.email,
+              phone: res.phone || payload.phone,
             },
             balance: {
               ...state.balance,
@@ -1769,13 +1760,14 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
           }));
           // Establish PBKDF2 PIN on backend
           await BankingApi.setupPin(payload.mpin, res.customer_id);
+          get().showToast(`Account successfully created for ${payload.fullName}!`);
+          return { success: true };
         }
-      } catch (err) {
+        return { success: false, error: res?.message || 'Registration failed on banking server.' };
+      } catch (err: any) {
         console.warn('[Signup] Backend registration notice:', err);
+        return { success: false, error: err?.message || 'Unable to connect to banking server.' };
       }
-
-      get().showToast(`Account successfully created for ${payload.fullName}!`);
-      return true;
     },
 
     loginWithPassword: async (identifier: string, password: string) => {
