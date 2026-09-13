@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { AdaptiveHeader } from '../../components/common/AdaptiveHeader';
 import { BalanceHeader } from '../../components/common/BalanceHeader';
+import { EarlyEmiShortfallBanner } from './EarlyEmiShortfallBanner';
 import { ContextCardStack } from '../../components/context/ContextCardStack';
 import { useCustomerStore } from '../../state/customerStore';
 import { colors, typography, spacing, radii, shadows, useAppTheme } from '../../theme';
@@ -1077,6 +1078,9 @@ export const AdaptiveHomeScreen: React.FC = () => {
 
         {/* Calm Editorial Balance Header & Action Band */}
         <BalanceHeader />
+
+        {/* Empathetic Pre-Debit EMI Shortfall Relief Banner */}
+        <EarlyEmiShortfallBanner />
 
         {/* 1. Hinge Vitals & Attributes Sheet (Block 2 from image) */}
         {renderAccountGroup()}

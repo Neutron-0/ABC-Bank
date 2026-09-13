@@ -22,6 +22,7 @@ import { TransactionsScreen } from '../features/transactions/TransactionsScreen'
 import { InsightsScreen } from '../features/insights/InsightsScreen';
 import { MitraChatScreen } from '../features/assistant/MitraChatScreen';
 import { ProfileScreen } from '../features/profile/ProfileScreen';
+import { MoreViewScreen } from '../features/more/MoreViewScreen';
 
 // Modals
 import { WhyThisCard } from '../components/common/WhyThisCard';
@@ -37,6 +38,14 @@ import { CreditScoreModal } from '../features/journeys/CreditScoreModal';
 import { DebitCardModal } from '../features/journeys/DebitCardModal';
 import { OnboardingModal } from '../features/onboarding/OnboardingModal';
 import { PaymentAuthModal } from '../components/common/PaymentAuthModal';
+import { InsuranceModal } from '../features/journeys/InsuranceModal';
+import { DigitalRupeeModal } from '../features/journeys/DigitalRupeeModal';
+import { IpoBiddingModal } from '../features/journeys/IpoBiddingModal';
+import { RelationshipManagerModal } from '../features/journeys/RelationshipManagerModal';
+import { ChequeServicesModal } from '../features/journeys/ChequeServicesModal';
+import { FastagRechargeModal } from '../features/journeys/FastagRechargeModal';
+import { ForexTravelCardModal } from '../features/journeys/ForexTravelCardModal';
+import { BankingSmsToast } from '../components/common/BankingSmsToast';
 
 // Icons
 import {
@@ -48,11 +57,12 @@ import {
   ShieldAlert,
   CheckCircle2,
   Bot,
+  Grid,
 } from 'lucide-react-native';
 
 export const AppNavigator: React.FC = () => {
   const { colors: themeColors } = useAppTheme();
-  const { activeTab, setActiveTab, language, toastMessage, currentState, activeJourney, closeJourney } = useCustomerStore();
+  const { activeTab, setActiveTab, language, toastMessage, currentState, activeJourney, closeJourney, openJourney } = useCustomerStore();
   const t = getTranslation(language);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -63,6 +73,7 @@ export const AppNavigator: React.FC = () => {
     payments: new Animated.Value(1),
     assistant: new Animated.Value(1),
     activity: new Animated.Value(1),
+    more: new Animated.Value(1),
     insights: new Animated.Value(1),
     profile: new Animated.Value(1),
   }).current;
@@ -73,13 +84,12 @@ export const AppNavigator: React.FC = () => {
   const screenScale = useRef(new Animated.Value(1)).current;
   const prevTabRef = useRef<MainTabType>(activeTab);
 
-  const tabs: { id: MainTabType; label: string; icon: any }[] = [
+  const tabs: { id: MainTabType; label: string; icon: any; isCenter?: boolean }[] = [
     { id: 'home', label: t.tabs.home || 'Home', icon: Home },
     { id: 'payments', label: language === 'hi' ? 'भुगतान' : language === 'gu' ? 'ચુકવણી' : 'Pay & Transfer', icon: Send },
-    { id: 'assistant', label: language === 'hi' ? 'मित्तर AI' : language === 'gu' ? 'મિત્તર AI' : 'Mittar AI', icon: Bot },
+    { id: 'assistant', label: language === 'hi' ? 'मित्तर AI' : language === 'gu' ? 'મિત્તર AI' : 'Mittar AI', icon: Bot, isCenter: true },
     { id: 'activity', label: language === 'hi' ? 'पासबुक' : language === 'gu' ? 'પાસબુક' : 'Passbook', icon: Clock },
-    { id: 'insights', label: language === 'hi' ? 'संपत्ति' : language === 'gu' ? 'સંપત્તિ' : 'Wealth', icon: TrendingUp },
-    { id: 'profile', label: language === 'hi' ? 'सेवाएं' : language === 'gu' ? 'સેવાઓ' : 'Services', icon: ShieldCheck },
+    { id: 'more', label: language === 'hi' ? 'अन्य' : language === 'gu' ? 'વધુ' : 'More', icon: Grid },
   ];
 
   const TAB_ORDER: Record<string, number> = {
@@ -87,8 +97,9 @@ export const AppNavigator: React.FC = () => {
     payments: 1,
     assistant: 2,
     activity: 3,
-    insights: 4,
-    profile: 5,
+    more: 4,
+    insights: 5,
+    profile: 6,
   };
 
   // Animate tab icon bounce & screen transition when activeTab changes
@@ -174,6 +185,13 @@ export const AppNavigator: React.FC = () => {
         return <ProfileScreen />;
       case 'assistant':
         return <MitraChatScreen />;
+      case 'more':
+        return (
+          <MoreViewScreen
+            onNavigate={(route) => setActiveTab(route as any)}
+            onOpenModal={(modalId) => openJourney(modalId)}
+          />
+        );
       default:
         return <AdaptiveHomeScreen />;
     }
@@ -219,24 +237,6 @@ export const AppNavigator: React.FC = () => {
         </Animated.View>
 
         {/* Floating Mitra AI Pill Button */}
-        {activeTab !== 'assistant' && (
-          <TouchableOpacity
-            style={[styles.floatingChatButton, { backgroundColor: themeColors.primary }]}
-            onPress={() => setActiveTab('assistant')}
-            activeOpacity={0.88}
-          >
-            <View style={styles.floatingChatInner}>
-              <View style={[styles.floatingChatIconCircle, { backgroundColor: '#2C2B29' }]}>
-                <Bot size={14} color="#FFFFFF" />
-              </View>
-              <View style={styles.floatingChatTextWrap}>
-                <Text style={styles.floatingChatTitle}>Ask Mitra</Text>
-                <Text style={[styles.floatingChatSub, { color: '#D6D2CC' }]}>Edge AI</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
-
         {/* Anchored Institutional Banking Navigation Bar (Hinge Obsidian Dock) */}
         <View style={styles.dockContainer}>
           <View style={styles.tabBar}>
@@ -244,6 +244,43 @@ export const AppNavigator: React.FC = () => {
               const active = activeTab === tab.id;
               const IconComp = tab.icon;
               const scaleValue = iconScales[tab.id] || new Animated.Value(1);
+
+              if (tab.isCenter) {
+                return (
+                  <TouchableOpacity
+                    key={tab.id}
+                    style={styles.centerTabItem}
+                    onPress={() => setActiveTab(tab.id)}
+                    delayPressIn={0}
+                    activeOpacity={0.85}
+                  >
+                    <Animated.View
+                      style={[
+                        styles.centerIconCircle,
+                        active && styles.centerIconCircleActive,
+                        { transform: [{ scale: scaleValue }] },
+                      ]}
+                    >
+                      <IconComp
+                        size={22}
+                        color="#FFFFFF"
+                        strokeWidth={2.4}
+                      />
+                      <View style={styles.centerAiPulse} />
+                    </Animated.View>
+                    <Text
+                      style={[
+                        styles.tabLabel,
+                        styles.centerTabLabel,
+                        active ? styles.activeTabLabel : styles.inactiveTabLabel,
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {tab.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }
 
               return (
                 <TouchableOpacity
@@ -270,11 +307,6 @@ export const AppNavigator: React.FC = () => {
                       color={active ? '#FFFFFF' : '#737373'}
                       strokeWidth={active ? 2.3 : 1.7}
                     />
-                    {tab.id === 'assistant' && (
-                      <View style={styles.badgePip}>
-                        <Text style={styles.badgePipText}>1</Text>
-                      </View>
-                    )}
                   </Animated.View>
                   <Text
                     style={[
@@ -292,6 +324,8 @@ export const AppNavigator: React.FC = () => {
         </View>
       </View>
 
+      {/* Authentic Regulatory SMS Alert Toast */}
+      <BankingSmsToast />
 
       {/* Global Modals & Journeys */}
       <WhyThisCard />
@@ -306,6 +340,34 @@ export const AppNavigator: React.FC = () => {
       <CreditScoreModal />
       <DebitCardModal />
       <PaymentAuthModal />
+      <InsuranceModal
+        visible={activeJourney === 'insurance' || activeJourney === 'insurance_modal'}
+        onClose={closeJourney}
+      />
+      <DigitalRupeeModal
+        visible={activeJourney === 'digital_rupee' || activeJourney === 'digital_rupee_modal' || activeJourney === 'cbdc'}
+        onClose={closeJourney}
+      />
+      <IpoBiddingModal
+        visible={activeJourney === 'ipo' || activeJourney === 'ipo_modal' || activeJourney === 'asba'}
+        onClose={closeJourney}
+      />
+      <RelationshipManagerModal
+        visible={activeJourney === 'rm' || activeJourney === 'rm_modal' || activeJourney === 'manager'}
+        onClose={closeJourney}
+      />
+      <ChequeServicesModal
+        visible={activeJourney === 'cheque' || activeJourney === 'cheque_modal' || activeJourney === 'cheques'}
+        onClose={closeJourney}
+      />
+      <FastagRechargeModal
+        visible={activeJourney === 'fastag' || activeJourney === 'fastag_modal'}
+        onClose={closeJourney}
+      />
+      <ForexTravelCardModal
+        visible={activeJourney === 'forex' || activeJourney === 'forex_modal'}
+        onClose={closeJourney}
+      />
       <OnboardingModal
         visible={showOnboarding || activeJourney === 'onboarding'}
         onFinish={() => {
@@ -439,43 +501,45 @@ const styles = StyleSheet.create({
   inactiveTabLabel: {
     color: '#737373',
   },
-  floatingChatButton: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 82 : 68,
-    right: 16,
-    borderRadius: 99,
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    zIndex: 999,
-    borderWidth: 1,
-    borderColor: '#262626',
-  },
-  floatingChatInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  floatingChatIconCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: '#262626',
+  centerTabItem: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: -16,
   },
-  floatingChatTextWrap: {
-    flexDirection: 'column',
+  centerIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#800020',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2.5,
+    borderColor: '#262626',
+    shadowColor: '#800020',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  floatingChatTitle: {
-    fontSize: 12,
+  centerIconCircleActive: {
+    backgroundColor: '#9B1130',
+    borderColor: '#FFFFFF',
+    shadowOpacity: 0.7,
+  },
+  centerAiPulse: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#10B981',
+    borderWidth: 1.5,
+    borderColor: '#0A0A0A',
+  },
+  centerTabLabel: {
+    marginTop: 3,
     fontWeight: '700',
-    color: '#FAF8F5',
-    letterSpacing: 0.2,
-  },
-  floatingChatSub: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: '#A3A3A3',
-    letterSpacing: 0.2,
   },
 });
