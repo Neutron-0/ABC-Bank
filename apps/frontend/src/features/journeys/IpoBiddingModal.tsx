@@ -103,7 +103,7 @@ export const IpoBiddingModal: React.FC<IpoBiddingModalProps> = ({ visible, onClo
           <View style={styles.header}>
             <View style={styles.headerLeft}>
               <View style={styles.headerIcon}>
-                <Megaphone size={22} color="#4338CA" />
+                <Megaphone size={22} color="#141414" />
               </View>
               <View>
                 <Text style={styles.headerTitle}>SEBI UPI ASBA IPO Bidding</Text>
@@ -111,7 +111,7 @@ export const IpoBiddingModal: React.FC<IpoBiddingModalProps> = ({ visible, onClo
               </View>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-              <X size={20} color="#64748B" />
+              <X size={20} color="#68645E" />
             </TouchableOpacity>
           </View>
 
@@ -174,7 +174,7 @@ export const IpoBiddingModal: React.FC<IpoBiddingModalProps> = ({ visible, onClo
                   style={[styles.checkbox, useCutOff && styles.checkboxActive]}
                   onPress={() => setUseCutOff(!useCutOff)}
                 >
-                  {useCutOff && <CheckCircle2 size={16} color="#4338CA" />}
+                  {useCutOff && <CheckCircle2 size={16} color="#141414" />}
                 </TouchableOpacity>
               </View>
 
@@ -195,7 +195,7 @@ export const IpoBiddingModal: React.FC<IpoBiddingModalProps> = ({ visible, onClo
                 value={upiId}
                 onChangeText={setUpiId}
                 placeholder="yourname@bankupi"
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor="#9C968E"
               />
 
               {/* Submit Bid Button */}
@@ -218,7 +218,7 @@ export const IpoBiddingModal: React.FC<IpoBiddingModalProps> = ({ visible, onClo
 
             {/* SEBI Interest Notice */}
             <View style={styles.asbaNotice}>
-              <ShieldCheck size={16} color="#059669" />
+              <ShieldCheck size={16} color="#1B7A43" />
               <Text style={styles.noticeText}>
                 Funds remain in your primary account earning regular savings interest. No debit occurs until final allotment.
               </Text>
@@ -254,11 +254,11 @@ export const IpoBiddingModal: React.FC<IpoBiddingModalProps> = ({ visible, onClo
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(20, 20, 20, 0.60)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: '#FAF8F8',
+    backgroundColor: '#FAF8F5',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '90%',
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: '#EAE6DF',
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -286,18 +286,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#EEF2FF',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   headerSub: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 2,
   },
   closeBtn: {
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#334155',
+    color: '#141414',
     marginBottom: 8,
   },
   ipoList: {
@@ -321,11 +321,11 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 14,
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   ipoCardActive: {
-    borderColor: '#4338CA',
-    backgroundColor: '#F5F3FF',
+    borderColor: '#141414',
+    backgroundColor: '#F3EFEA',
   },
   ipoCardTop: {
     flexDirection: 'row',
@@ -336,11 +336,11 @@ const styles = StyleSheet.create({
   ipoName: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     flex: 1,
   },
   subBadge: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   subBadgeText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#047857',
+    color: '#1B7A43',
   },
   ipoCardMeta: {
     flexDirection: 'row',
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   },
   ipoMetaText: {
     fontSize: 11.5,
-    color: '#64748B',
+    color: '#68645E',
   },
   bidForm: {
     backgroundColor: '#FFFFFF',
@@ -364,12 +364,12 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   formTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: 12,
   },
   rowBetween: {
@@ -380,21 +380,21 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#334155',
+    color: '#141414',
   },
   fieldSub: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 2,
   },
   lotStepper: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
@@ -405,18 +405,18 @@ const styles = StyleSheet.create({
   stepBtnText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#4338CA',
+    color: '#141414',
   },
   stepCount: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     minWidth: 20,
     textAlign: 'center',
   },
   divider: {
     height: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#EAE6DF',
     marginVertical: 12,
   },
   checkbox: {
@@ -424,55 +424,55 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxActive: {
-    borderColor: '#4338CA',
-    backgroundColor: '#EEF2FF',
+    borderColor: '#141414',
+    backgroundColor: '#F3EFEA',
   },
   totalBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 12,
     padding: 12,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   totalLabel: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
   },
   totalShares: {
     fontSize: 11.5,
     fontWeight: '600',
-    color: '#334155',
+    color: '#68645E',
     marginTop: 2,
   },
   totalAmt: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#4338CA',
+    color: '#141414',
   },
   upiInput: {
     height: 44,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     paddingHorizontal: 12,
     fontSize: 13,
-    color: '#0F172A',
+    color: '#141414',
     marginTop: 6,
     marginBottom: 14,
   },
   bidBtn: {
     height: 48,
-    backgroundColor: '#4338CA',
+    backgroundColor: '#141414',
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -488,16 +488,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     padding: 12,
     borderRadius: 12,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#EDF7F1',
   },
   noticeText: {
     fontSize: 11.5,
-    color: '#065F46',
+    color: '#1B7A43',
     flex: 1,
     lineHeight: 16,
   },
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   lienTop: {
     flexDirection: 'row',
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
   lienSymbol: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   lienStatusBadge: {
     backgroundColor: '#FEF3C7',
@@ -536,12 +536,12 @@ const styles = StyleSheet.create({
   },
   lienAmt: {
     fontSize: 12,
-    color: '#334155',
+    color: '#68645E',
     fontWeight: '600',
   },
   lienMandate: {
     fontSize: 10.5,
-    color: '#64748B',
+    color: '#9C968E',
     marginTop: 2,
   },
 });

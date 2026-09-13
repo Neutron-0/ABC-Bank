@@ -10,6 +10,7 @@ import {
   Platform,
   ActivityIndicator,
   Modal,
+  Animated,
 } from 'react-native';
 import { colors, typography, spacing, radii, shadows } from '../../theme';
 import { useAppTheme } from '../../theme/ThemeContext';
@@ -56,6 +57,72 @@ export const MitraChatScreen: React.FC = () => {
   const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const recognitionRef = useRef<any>(null);
+
+  // Micro-interaction animations
+  const micPulseAnim = useRef(new Animated.Value(1)).current;
+  const waveAnim1 = useRef(new Animated.Value(24)).current;
+  const waveAnim2 = useRef(new Animated.Value(42)).current;
+  const waveAnim3 = useRef(new Animated.Value(58)).current;
+  const waveAnim4 = useRef(new Animated.Value(38)).current;
+  const waveAnim5 = useRef(new Animated.Value(48)).current;
+  const waveAnim6 = useRef(new Animated.Value(24)).current;
+
+  // Active listening mic pulse
+  useEffect(() => {
+    if (isListening) {
+      const loop = Animated.loop(
+        Animated.sequence([
+          Animated.timing(micPulseAnim, {
+            toValue: 1.14,
+            duration: 550,
+            useNativeDriver: true,
+          }),
+          Animated.timing(micPulseAnim, {
+            toValue: 1.0,
+            duration: 550,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      loop.start();
+      return () => loop.stop();
+    } else {
+      micPulseAnim.setValue(1);
+    }
+  }, [isListening, micPulseAnim]);
+
+  // Voice studio soundwave bars dynamic rhythm
+  useEffect(() => {
+    if (!showVoiceStudio) return;
+    const createWaveLoop = (anim: Animated.Value, minH: number, maxH: number, duration: number) => {
+      return Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, {
+            toValue: maxH,
+            duration,
+            useNativeDriver: false,
+          }),
+          Animated.timing(anim, {
+            toValue: minH,
+            duration,
+            useNativeDriver: false,
+          }),
+        ])
+      );
+    };
+
+    const anims = [
+      createWaveLoop(waveAnim1, 14, 38, 420),
+      createWaveLoop(waveAnim2, 20, 52, 540),
+      createWaveLoop(waveAnim3, 26, 62, 380),
+      createWaveLoop(waveAnim4, 16, 44, 590),
+      createWaveLoop(waveAnim5, 22, 54, 460),
+      createWaveLoop(waveAnim6, 12, 34, 510),
+    ];
+
+    anims.forEach((a) => a.start());
+    return () => anims.forEach((a) => a.stop());
+  }, [showVoiceStudio, waveAnim1, waveAnim2, waveAnim3, waveAnim4, waveAnim5, waveAnim6]);
 
   // Clean up speech synthesis & recognition on unmount
   useEffect(() => {
@@ -632,22 +699,24 @@ export const MitraChatScreen: React.FC = () => {
         />
 
         {/* Voice Option Mic Button */}
-        <TouchableOpacity
-          style={[
-            styles.voiceButton,
-            { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
-            isListening && styles.voiceButtonActive,
-          ]}
-          onPress={toggleVoiceInput}
-          activeOpacity={0.8}
-          accessibilityLabel="Voice input"
-        >
-          {isListening ? (
-            <MicOff size={18} color="#FFFFFF" />
-          ) : (
-            <Mic size={18} color={themeColors.primary} />
-          )}
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: micPulseAnim }] }}>
+          <TouchableOpacity
+            style={[
+              styles.voiceButton,
+              { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border },
+              isListening && styles.voiceButtonActive,
+            ]}
+            onPress={toggleVoiceInput}
+            activeOpacity={0.8}
+            accessibilityLabel="Voice input"
+          >
+            {isListening ? (
+              <MicOff size={18} color="#FFFFFF" />
+            ) : (
+              <Mic size={18} color={themeColors.primary} />
+            )}
+          </TouchableOpacity>
+        </Animated.View>
 
         {/* Send Button */}
         <TouchableOpacity
@@ -693,12 +762,12 @@ export const MitraChatScreen: React.FC = () => {
             {/* Visualizer & Mic Pulse */}
             <View style={[styles.soundwaveBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.soundwaveBarsRow}>
-                <View style={[styles.soundwaveBar, { height: 26, backgroundColor: themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 42, backgroundColor: themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 58, backgroundColor: themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 38, backgroundColor: themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 48, backgroundColor: themeColors.primary }]} />
-                <View style={[styles.soundwaveBar, { height: 24, backgroundColor: themeColors.primary }]} />
+                <Animated.View style={[styles.soundwaveBar, { height: waveAnim1, backgroundColor: themeColors.primary }]} />
+                <Animated.View style={[styles.soundwaveBar, { height: waveAnim2, backgroundColor: themeColors.primary }]} />
+                <Animated.View style={[styles.soundwaveBar, { height: waveAnim3, backgroundColor: themeColors.primary }]} />
+                <Animated.View style={[styles.soundwaveBar, { height: waveAnim4, backgroundColor: themeColors.primary }]} />
+                <Animated.View style={[styles.soundwaveBar, { height: waveAnim5, backgroundColor: themeColors.primary }]} />
+                <Animated.View style={[styles.soundwaveBar, { height: waveAnim6, backgroundColor: themeColors.primary }]} />
               </View>
               <Text style={[styles.voiceStudioHeading, { color: themeColors.textPrimary }]}>
                 {language === 'hi'
@@ -1023,17 +1092,17 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   miniCpmPill: {
-    backgroundColor: 'rgba(99, 102, 241, 0.12)',
+    backgroundColor: '#FDF6ED',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.25)',
+    borderColor: '#EAE6DF',
   },
   miniCpmPillText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#4F46E5',
+    color: '#B45309',
   },
   quickChipsBar: {
     backgroundColor: colors.cardBg,
@@ -1065,23 +1134,23 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.primarySubtle,
+    backgroundColor: colors.cardBgSecondary,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.25)',
+    borderColor: colors.border,
   },
   voiceButtonActive: {
-    backgroundColor: '#EF4444',
-    borderColor: '#DC2626',
+    backgroundColor: '#C92A2A',
+    borderColor: '#B91C1C',
   },
   listeningBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+    backgroundColor: '#FDF2F2',
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.2)',
+    borderColor: '#F8D7DA',
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
     gap: 8,
@@ -1090,24 +1159,24 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#C92A2A',
   },
   listeningBannerText: {
     flex: 1,
     fontSize: 12,
     fontWeight: '600',
-    color: '#DC2626',
+    color: '#C92A2A',
   },
   stopListeningBtn: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    backgroundColor: '#F8D7DA',
   },
   stopListeningText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#DC2626',
+    color: '#C92A2A',
   },
   bubbleVoiceBar: {
     flexDirection: 'row',
@@ -1127,8 +1196,8 @@ const styles = StyleSheet.create({
     borderColor: colors.borderLight,
   },
   voiceListenBtnActive: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    borderColor: 'rgba(239, 68, 68, 0.3)',
+    backgroundColor: '#FDF2F2',
+    borderColor: '#F8D7DA',
   },
   voiceListenText: {
     fontSize: 11,
@@ -1136,11 +1205,11 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   voiceListenTextActive: {
-    color: '#EF4444',
+    color: '#C92A2A',
   },
   voiceModalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.7)',
+    backgroundColor: 'rgba(20, 20, 20, 0.65)',
     justifyContent: 'flex-end',
   },
   voiceStudioSheet: {
@@ -1162,7 +1231,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radii.sm,
@@ -1170,25 +1239,25 @@ const styles = StyleSheet.create({
   voiceStudioTagText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#059669',
+    color: '#1B7A43',
     letterSpacing: 0.5,
   },
   voiceStudioClose: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   soundwaveBox: {
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF8F5',
     borderRadius: radii.lg,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.sm,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
     marginBottom: spacing.md,
   },
   soundwaveBarsRow: {
@@ -1201,19 +1270,19 @@ const styles = StyleSheet.create({
   },
   soundwaveBar: {
     width: 5,
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#141414',
     borderRadius: 3,
   },
   voiceStudioHeading: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: 4,
   },
   voiceStudioSub: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#64748B',
+    color: '#68645E',
     textAlign: 'center',
     paddingHorizontal: spacing.sm,
   },
@@ -1223,7 +1292,7 @@ const styles = StyleSheet.create({
   voicePromptsLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#94A3B8',
+    color: '#9C968E',
     letterSpacing: 0.8,
     marginBottom: 8,
   },
@@ -1234,12 +1303,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   voicePromptCardText: {
     flex: 1,
@@ -1251,12 +1320,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: radii.md,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
   },
   voiceDictationInput: {
     flex: 1,

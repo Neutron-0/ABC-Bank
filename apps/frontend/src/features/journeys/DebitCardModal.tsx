@@ -213,7 +213,7 @@ export const DebitCardModal: React.FC = () => {
             <View style={[styles.dynamicCvvCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
               <View style={styles.dynamicCvvHeader}>
                 <View style={styles.dynamicCvvTitleWrap}>
-                  <ShieldCheck size={16} color="#059669" />
+                  <ShieldCheck size={16} color="#1B7A43" />
                   <Text style={[styles.dynamicCvvTitle, { color: themeColors.textPrimary }]}>
                     Dynamic Virtual CVV
                   </Text>
@@ -223,7 +223,7 @@ export const DebitCardModal: React.FC = () => {
                 </View>
                 {dynamicCvv && secondsLeft > 0 ? (
                   <View style={styles.timerBadge}>
-                    <Clock size={12} color="#D97706" />
+                    <Clock size={12} color="#B45309" />
                     <Text style={styles.timerBadgeText}>{formatTimer(secondsLeft)}</Text>
                   </View>
                 ) : null}
@@ -234,7 +234,7 @@ export const DebitCardModal: React.FC = () => {
               </Text>
 
               {dynamicCvv && secondsLeft > 0 ? (
-                <View style={[styles.cvvActiveBox, { backgroundColor: themeColors.cardBg, borderColor: '#10B981' }]}>
+                <View style={[styles.cvvActiveBox, { backgroundColor: themeColors.cardBg, borderColor: '#1B7A43' }]}>
                   <View style={styles.cvvValueCol}>
                     <Text style={[styles.cvvActiveLabel, { color: themeColors.textSecondary }]}>Active One-Time CVV</Text>
                     <Text style={[styles.cvvActiveDigits, { color: themeColors.textPrimary }]}>
@@ -247,7 +247,7 @@ export const DebitCardModal: React.FC = () => {
                     }}
                     style={styles.copyCvvBtn}
                   >
-                    <Copy size={14} color="#059669" />
+                    <Copy size={14} color="#1B7A43" />
                     <Text style={styles.copyCvvText}>Copy</Text>
                   </TouchableOpacity>
                 </View>
@@ -256,7 +256,7 @@ export const DebitCardModal: React.FC = () => {
               <TouchableOpacity
                 onPress={handleGenerateCvv}
                 disabled={isGeneratingCvv}
-                style={[styles.genCvvBtn, { backgroundColor: '#800020' }]}
+                style={[styles.genCvvBtn, { backgroundColor: '#141414' }]}
               >
                 <RefreshCw size={14} color="#FFFFFF" />
                 <Text style={styles.genCvvBtnText}>
@@ -428,7 +428,7 @@ export const DebitCardModal: React.FC = () => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(20, 20, 20, 0.60)',
     justifyContent: 'flex-end',
   },
   sheet: {
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: '#EAE6DF',
   },
   headerLeft: {
     flexDirection: 'row',
@@ -457,24 +457,24 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radii.md,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   subtitle: {
     fontSize: 12,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 1,
   },
   closeBtn: {
     padding: 6,
     borderRadius: radii.full,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
   },
   scrollArea: {
     paddingHorizontal: spacing.lg,
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     ...shadows.md,
   },
   visualCardLocked: {
-    backgroundColor: '#334155',
+    backgroundColor: '#2C2B29',
   },
   cardTopRow: {
     flexDirection: 'row',
@@ -510,10 +510,10 @@ const styles = StyleSheet.create({
     borderRadius: radii.full,
   },
   cardBadgeActive: {
-    backgroundColor: '#DCFCE7',
+    backgroundColor: '#EDF7F1',
   },
   cardBadgeLocked: {
-    backgroundColor: '#FEE2E2',
+    backgroundColor: '#FDF2F2',
   },
   cardStatusText: {
     fontSize: 10,
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
   cardLabel: {
     fontSize: 8,
     fontWeight: '700',
-    color: '#94A3B8',
+    color: '#9C968E',
     letterSpacing: 0.5,
   },
   cardHolderName: {
@@ -574,23 +574,23 @@ const styles = StyleSheet.create({
   rupayLogo: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#38BDF8',
+    color: '#B45309',
     fontStyle: 'italic',
   },
   freezeCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: radii.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
     marginBottom: spacing.md,
   },
   freezeCardActive: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FECACA',
+    backgroundColor: '#FDF2F2',
+    borderColor: '#F8D7DA',
   },
   freezeLeft: {
     flexDirection: 'row',
@@ -609,17 +609,17 @@ const styles = StyleSheet.create({
   freezeTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   freezeDesc: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 1,
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: spacing.xs,
     marginTop: spacing.xs,
   },
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   toggleLeft: {
     flexDirection: 'row',
@@ -654,11 +654,11 @@ const styles = StyleSheet.create({
   toggleTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#141414',
   },
   toggleDesc: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 1,
   },
   limitSelector: {
@@ -670,19 +670,19 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     borderRadius: radii.md,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     alignItems: 'center',
   },
   limitChipSelected: {
-    backgroundColor: '#002970',
-    borderColor: '#002970',
+    backgroundColor: '#141414',
+    borderColor: '#141414',
   },
   limitChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#475569',
+    color: '#68645E',
   },
   limitChipTextSelected: {
     color: '#FFFFFF',
@@ -703,15 +703,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
   },
   actionCardBtnText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   doneBtn: {
-    backgroundColor: '#002970',
+    backgroundColor: '#141414',
     borderRadius: radii.md,
     paddingVertical: 14,
     alignItems: 'center',
@@ -745,7 +745,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   rbiPill: {
-    backgroundColor: '#D1FAE5',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: 5,
     paddingVertical: 1,
     borderRadius: 4,
@@ -753,13 +753,13 @@ const styles = StyleSheet.create({
   rbiPillText: {
     fontSize: 8,
     fontWeight: '700',
-    color: '#047857',
+    color: '#1B7A43',
   },
   timerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#FDF6ED',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
@@ -801,7 +801,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#D1FAE5',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: radii.sm,
@@ -809,7 +809,7 @@ const styles = StyleSheet.create({
   copyCvvText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#065F46',
+    color: '#1B7A43',
   },
   genCvvBtn: {
     flexDirection: 'row',

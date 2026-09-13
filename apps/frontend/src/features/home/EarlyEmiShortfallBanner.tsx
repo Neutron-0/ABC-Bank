@@ -120,7 +120,7 @@ export const EarlyEmiShortfallBanner: React.FC = () => {
           {loadingAction === 'grace' ? (
             <ActivityIndicator size="small" color="#B45309" />
           ) : (
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#9C968E" />
           )}
         </TouchableOpacity>
 
@@ -132,8 +132,8 @@ export const EarlyEmiShortfallBanner: React.FC = () => {
           activeOpacity={0.8}
         >
           <View style={styles.actionLeft}>
-            <View style={[styles.actionIconBadge, { backgroundColor: '#EDE9FE' }]}>
-              <Split size={16} color="#6D28D9" />
+            <View style={[styles.actionIconBadge, { backgroundColor: '#FDF6ED' }]}>
+              <Split size={16} color="#B45309" />
             </View>
             <View>
               <Text style={styles.actionTitle}>Split into 2 Payments</Text>
@@ -141,9 +141,9 @@ export const EarlyEmiShortfallBanner: React.FC = () => {
             </View>
           </View>
           {loadingAction === 'split' ? (
-            <ActivityIndicator size="small" color="#6D28D9" />
+            <ActivityIndicator size="small" color="#B45309" />
           ) : (
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#9C968E" />
           )}
         </TouchableOpacity>
 
@@ -155,8 +155,8 @@ export const EarlyEmiShortfallBanner: React.FC = () => {
           activeOpacity={0.8}
         >
           <View style={styles.actionLeft}>
-            <View style={[styles.actionIconBadge, { backgroundColor: '#ECFDF5' }]}>
-              <ShieldCheck size={16} color="#059669" />
+            <View style={[styles.actionIconBadge, { backgroundColor: '#EDF7F1' }]}>
+              <ShieldCheck size={16} color="#1B7A43" />
             </View>
             <View>
               <Text style={styles.actionTitle}>Emergency Auto-Sweep</Text>
@@ -166,9 +166,9 @@ export const EarlyEmiShortfallBanner: React.FC = () => {
             </View>
           </View>
           {loadingAction === 'sweep' ? (
-            <ActivityIndicator size="small" color="#059669" />
+            <ActivityIndicator size="small" color="#1B7A43" />
           ) : (
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#9C968E" />
           )}
         </TouchableOpacity>
       </View>
@@ -253,22 +253,22 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1E293B',
+    color: '#141414',
   },
   actionDesc: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 1,
     maxWidth: 240,
   },
   resolvedContainer: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     borderRadius: 16,
     padding: 14,
     marginHorizontal: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#EDF7F1',
   },
   resolvedHeader: {
     flexDirection: 'row',

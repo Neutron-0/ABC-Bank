@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
   },
   inputPrefix: {
     fontSize: 14,
-    color: '#64748B',
+    color: '#68645E',
     marginRight: 4,
     fontFamily: typography.fontFamilies.bold,
   },

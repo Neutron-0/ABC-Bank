@@ -103,72 +103,81 @@ export const AppNavigator: React.FC = () => {
     profile: 6,
   };
 
+  // Continuous gentle harmonic breathing pulse on the center AI button
+  const aiPulseAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(aiPulseAnim, {
+          toValue: 1.25,
+          duration: 1600,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(aiPulseAnim, {
+          toValue: 1.0,
+          duration: 1600,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    pulseLoop.start();
+    return () => pulseLoop.stop();
+  }, []);
+
   // Animate tab icon bounce & screen transition when activeTab changes
   useEffect(() => {
     // 1. Icon spring bounce for newly active tab
     if (iconScales[activeTab]) {
       Animated.sequence([
         Animated.timing(iconScales[activeTab], {
-          toValue: 1.2,
-          duration: 100,
+          toValue: 1.25,
+          duration: 90,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.spring(iconScales[activeTab], {
           toValue: 1.0,
-          friction: 6,
-          tension: 110,
+          friction: 5,
+          tension: 130,
           useNativeDriver: true,
         }),
       ]).start();
     }
 
-    // 2. Directional screen cross-fade transition
+    // 2. Directional screen cross-fade transition with natural spring
     if (prevTabRef.current !== activeTab) {
       const prevIdx = TAB_ORDER[prevTabRef.current] ?? 0;
       const nextIdx = TAB_ORDER[activeTab] ?? 0;
       const direction = nextIdx >= prevIdx ? 1 : -1;
 
-      screenOpacity.setValue(0.7);
-      screenTranslateX.setValue(direction * 10);
-      screenScale.setValue(0.99);
+      screenOpacity.setValue(0.6);
+      screenTranslateX.setValue(direction * 12);
+      screenScale.setValue(0.985);
 
       Animated.parallel([
         Animated.timing(screenOpacity, {
           toValue: 1,
-          duration: 120,
+          duration: 150,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
-        Animated.timing(screenTranslateX, {
+        Animated.spring(screenTranslateX, {
           toValue: 0,
-          duration: 220,
+          friction: 8,
+          tension: 110,
           useNativeDriver: true,
         }),
-        Animated.timing(screenScale, {
+        Animated.spring(screenScale, {
           toValue: 1,
-          duration: 220,
+          friction: 8,
+          tension: 110,
           useNativeDriver: true,
         }),
       ]).start();
 
       prevTabRef.current = activeTab;
-    }
-
-    // Micro pulse on active tab icon
-    if (iconScales[activeTab]) {
-      Animated.sequence([
-        Animated.timing(iconScales[activeTab], {
-          toValue: 1.15,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(iconScales[activeTab], {
-          toValue: 1.0,
-          duration: 140,
-          useNativeDriver: true,
-        }),
-      ]).start();
     }
   }, [activeTab]);
 
@@ -280,7 +289,18 @@ export const AppNavigator: React.FC = () => {
                         color="#FFFFFF"
                         strokeWidth={2.4}
                       />
-                      <View style={styles.centerAiPulse} />
+                      <Animated.View
+                        style={[
+                          styles.centerAiPulse,
+                          {
+                            transform: [{ scale: aiPulseAnim }],
+                            opacity: aiPulseAnim.interpolate({
+                              inputRange: [1, 1.25],
+                              outputRange: [0.65, 0.1],
+                            }),
+                          },
+                        ]}
+                      />
                     </Animated.View>
                     <Text
                       style={[
@@ -489,7 +509,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: -10,
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#B45309',
     borderRadius: 8,
     paddingHorizontal: 4,
     paddingVertical: 1,

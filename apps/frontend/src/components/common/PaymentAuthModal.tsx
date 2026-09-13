@@ -52,6 +52,12 @@ export const PaymentAuthModal: React.FC = () => {
   const [pulseAnim] = useState(new Animated.Value(1));
   const [receiptAnim] = useState(new Animated.Value(0));
   const [shakeAnim] = useState(new Animated.Value(0));
+  const dotScales = useRef([
+    new Animated.Value(1),
+    new Animated.Value(1),
+    new Animated.Value(1),
+    new Animated.Value(1),
+  ]).current;
   const autoDismissTimerRef = useRef<any>(null);
 
   useEffect(() => {
@@ -65,6 +71,7 @@ export const PaymentAuthModal: React.FC = () => {
       setTxRefId(`UPI/2026/09/ABC${Math.floor(10000000 + Math.random() * 90000000)}`);
       receiptAnim.setValue(0);
       shakeAnim.setValue(0);
+      dotScales.forEach((s) => s.setValue(1));
     } else {
       if (autoDismissTimerRef.current) {
         clearTimeout(autoDismissTimerRef.current);
@@ -92,6 +99,12 @@ export const PaymentAuthModal: React.FC = () => {
     if (isProcessingTx || bioSuccess || stage !== 'auth') return;
     setErrorMsg(null);
     if (pin.length < 4) {
+      const idx = pin.length;
+      Animated.sequence([
+        Animated.timing(dotScales[idx], { toValue: 1.4, duration: 60, useNativeDriver: true }),
+        Animated.spring(dotScales[idx], { toValue: 1.0, friction: 4, tension: 150, useNativeDriver: true }),
+      ]).start();
+
       const nextPin = pin + digit;
       setPin(nextPin);
       if (nextPin.length === 4) {
@@ -362,11 +375,11 @@ export const PaymentAuthModal: React.FC = () => {
                 {[0, 1, 2, 3].map((idx) => {
                   const filled = pin.length > idx;
                   return (
-                    <View
+                    <Animated.View
                       key={idx}
                       style={[
                         styles.pinDot,
-                        { borderColor: themeColors.border },
+                        { borderColor: themeColors.border, transform: [{ scale: dotScales[idx] }] },
                         filled && [styles.pinDotFilled, { backgroundColor: themeColors.textPrimary, borderColor: themeColors.textPrimary }],
                         errorMsg && styles.pinDotError,
                       ]}
@@ -584,11 +597,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   paymentSummaryCard: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF8F5',
     borderRadius: radii.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
     marginBottom: spacing.sm,
   },
   merchantHeaderRow: {
@@ -600,34 +613,34 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   payingToLabel: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#68645E',
     letterSpacing: 0.8,
   },
   merchantTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     marginTop: 1,
   },
   categoryBadge: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#FDF6ED',
     paddingHorizontal: 7,
     paddingVertical: 3,
     borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: '#FDE68A',
   },
   categoryBadgeText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#2563EB',
+    color: '#B45309',
   },
   amountWrap: {
     flexDirection: 'row',
@@ -654,16 +667,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
+    borderTopColor: '#EAE6DF',
     marginTop: 4,
   },
   accountSourceText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#475569',
+    color: '#68645E',
   },
   balanceBadge: {
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: radii.sm,
@@ -671,27 +684,27 @@ const styles = StyleSheet.create({
   balanceBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#059669',
+    color: '#1B7A43',
   },
   biometricButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF8F5',
     borderRadius: radii.md,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderWidth: 1.5,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     marginBottom: spacing.xs,
   },
   biometricButtonScanning: {
-    borderColor: '#2563EB',
-    backgroundColor: '#EFF6FF',
+    borderColor: '#141414',
+    backgroundColor: '#F3EFEA',
   },
   biometricButtonSuccess: {
-    borderColor: '#059669',
-    backgroundColor: '#ECFDF5',
+    borderColor: '#1B7A43',
+    backgroundColor: '#EDF7F1',
   },
   biometricTextWrap: {
     flex: 1,
@@ -704,7 +717,7 @@ const styles = StyleSheet.create({
   biometricButtonSubtitle: {
     fontSize: 10,
     fontWeight: '500',
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 1,
   },
   separatorRow: {
@@ -721,7 +734,7 @@ const styles = StyleSheet.create({
   sepText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#94A3B8',
+    color: '#9C968E',
     letterSpacing: 0.5,
   },
   pinSection: {
@@ -738,7 +751,7 @@ const styles = StyleSheet.create({
     height: 14,
     borderRadius: 7,
     borderWidth: 2,
-    borderColor: '#94A3B8',
+    borderColor: '#9C968E',
     backgroundColor: 'transparent',
   },
   pinDotFilled: {
@@ -814,9 +827,9 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#ECFDF5',
-    borderWidth: 3,
-    borderColor: '#A7F3D0',
+    backgroundColor: '#EDF7F1',
+    borderWidth: 2,
+    borderColor: '#1B7A43',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
@@ -830,7 +843,7 @@ const styles = StyleSheet.create({
   receiptMerchantSubtitle: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#64748B',
+    color: '#68645E',
     marginBottom: spacing.md,
   },
   receiptAmountBox: {
@@ -840,14 +853,14 @@ const styles = StyleSheet.create({
   receiptAmountText: {
     fontSize: 34,
     fontWeight: '800',
-    color: '#059669',
+    color: '#1B7A43',
     letterSpacing: -0.5,
   },
   receiptStatusPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: radii.sm,
@@ -856,7 +869,7 @@ const styles = StyleSheet.create({
   receiptStatusPillText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#059669',
+    color: '#1B7A43',
   },
   receiptLedgerCard: {
     width: '100%',
@@ -875,7 +888,7 @@ const styles = StyleSheet.create({
   ledgerLabel: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#64748B',
+    color: '#68645E',
   },
   ledgerValue: {
     fontSize: 12,
@@ -904,6 +917,6 @@ const styles = StyleSheet.create({
   receiptDismissHint: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#94A3B8',
+    color: '#9C968E',
   },
 });

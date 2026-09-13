@@ -183,7 +183,7 @@ export const FastagRechargeModal: React.FC<FastagRechargeModalProps> = ({
                 <View style={styles.customRow}>
                   <TextInput
                     placeholder="Enter custom amount (₹)"
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor="#9C968E"
                     keyboardType="numeric"
                     value={customAmount}
                     onChangeText={(val) => {
@@ -196,7 +196,7 @@ export const FastagRechargeModal: React.FC<FastagRechargeModalProps> = ({
                       styles.customInput,
                       {
                         backgroundColor: themeColors.cardBgSecondary,
-                        borderColor: isCustom ? '#800020' : themeColors.border,
+                        borderColor: isCustom ? '#141414' : themeColors.border,
                         color: themeColors.textPrimary,
                       },
                     ]}
@@ -205,8 +205,8 @@ export const FastagRechargeModal: React.FC<FastagRechargeModalProps> = ({
               </View>
 
               {/* Debit Source Warning / Info */}
-              <View style={[styles.debitSourceBox, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
-                <ShieldCheck size={16} color="#059669" />
+              <View style={[styles.debitSourceBox, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}>
+                <ShieldCheck size={16} color="#1B7A43" />
                 <Text style={styles.debitSourceText}>
                   Debit From: <Text style={{ fontWeight: '700' }}>DigiSavings A/c ••8492</Text> (Avail: ₹{balance.available.toLocaleString('en-IN')})
                 </Text>
@@ -214,7 +214,7 @@ export const FastagRechargeModal: React.FC<FastagRechargeModalProps> = ({
 
               {isInsufficient && (
                 <View style={styles.errorBox}>
-                  <AlertCircle size={14} color="#DC2626" />
+                  <AlertCircle size={14} color="#C92A2A" />
                   <Text style={styles.errorText}>Insufficient balance in savings account.</Text>
                 </View>
               )}
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   },
   debitSourceText: {
     fontSize: 11,
-    color: '#334155',
+    color: '#2C2B29',
   },
   errorBox: {
     flexDirection: 'row',
@@ -440,11 +440,11 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 11,
-    color: '#DC2626',
+    color: '#C92A2A',
     fontFamily: typography.fontFamilies.medium,
   },
   submitBtn: {
-    backgroundColor: '#800020',
+    backgroundColor: '#141414',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

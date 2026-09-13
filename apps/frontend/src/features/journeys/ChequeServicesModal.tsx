@@ -82,7 +82,7 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
               </View>
             </View>
             <TouchableOpacity onPress={handleReset} style={styles.closeBtn}>
-              <X size={20} color="#64748B" />
+              <X size={20} color="#68645E" />
             </TouchableOpacity>
           </View>
 
@@ -93,7 +93,7 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
                 style={[styles.tabBtn, activeTab === 'ORDER' && styles.tabBtnActive]}
                 onPress={() => setActiveTab('ORDER')}
               >
-                <Package size={13} color={activeTab === 'ORDER' ? '#0F766E' : '#64748B'} />
+                <Package size={13} color={activeTab === 'ORDER' ? '#141414' : '#68645E'} />
                 <Text style={[styles.tabBtnText, activeTab === 'ORDER' && styles.tabBtnTextActive]}>
                   Order Book
                 </Text>
@@ -103,7 +103,7 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
                 style={[styles.tabBtn, activeTab === 'POSITIVE_PAY' && styles.tabBtnActive]}
                 onPress={() => setActiveTab('POSITIVE_PAY')}
               >
-                <ShieldCheck size={13} color={activeTab === 'POSITIVE_PAY' ? '#0F766E' : '#64748B'} />
+                <ShieldCheck size={13} color={activeTab === 'POSITIVE_PAY' ? '#141414' : '#68645E'} />
                 <Text style={[styles.tabBtnText, activeTab === 'POSITIVE_PAY' && styles.tabBtnTextActive]}>
                   Positive Pay
                 </Text>
@@ -113,7 +113,7 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
                 style={[styles.tabBtn, activeTab === 'STOP' && styles.tabBtnActive]}
                 onPress={() => setActiveTab('STOP')}
               >
-                <Ban size={13} color={activeTab === 'STOP' ? '#0F766E' : '#64748B'} />
+                <Ban size={13} color={activeTab === 'STOP' ? '#141414' : '#68645E'} />
                 <Text style={[styles.tabBtnText, activeTab === 'STOP' && styles.tabBtnTextActive]}>
                   Stop Cheque
                 </Text>
@@ -125,7 +125,7 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
               <View style={styles.card}>
                 {isOrdered ? (
                   <View style={styles.successBox}>
-                    <CheckCircle2 size={32} color="#059669" />
+                    <CheckCircle2 size={32} color="#1B7A43" />
                     <Text style={styles.successTitle}>Chequebook Request Dispatched</Text>
                     <Text style={styles.successSub}>
                       Your personalized {leafCount}-leaf chequebook will be delivered to your registered address via SpeedPost within 3 business days.
@@ -179,7 +179,7 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
                 <TextInput
                   style={styles.input}
                   placeholder="e.g. 004128"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#9C968E"
                   keyboardType="numeric"
                   value={chequeNo}
                   onChangeText={setChequeNo}
@@ -189,7 +189,7 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
                 <TextInput
                   style={styles.input}
                   placeholder="Name of recipient"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#9C968E"
                   value={payeeName}
                   onChangeText={setPayeeName}
                 />
@@ -198,7 +198,7 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
                 <TextInput
                   style={styles.input}
                   placeholder="₹ 50,000"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#9C968E"
                   keyboardType="numeric"
                   value={chequeAmt}
                   onChangeText={setChequeAmt}
@@ -222,14 +222,14 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
                 <TextInput
                   style={styles.input}
                   placeholder="6 digit cheque number"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#9C968E"
                   keyboardType="numeric"
                   value={chequeNo}
                   onChangeText={setChequeNo}
                 />
 
                 <TouchableOpacity
-                  style={[styles.primaryBtn, { backgroundColor: '#DC2626' }]}
+                  style={[styles.primaryBtn, { backgroundColor: '#C92A2A' }]}
                   onPress={handleStop}
                   activeOpacity={0.8}
                 >
@@ -247,11 +247,11 @@ export const ChequeServicesModal: React.FC<ChequeServicesModalProps> = ({ visibl
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(20, 20, 20, 0.60)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: '#FAF8F8',
+    backgroundColor: '#FAF8F5',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '85%',
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: '#EAE6DF',
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -279,18 +279,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#CCFBF1',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   headerSub: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 2,
   },
   closeBtn: {
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   },
   tabSwitch: {
     flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
     borderRadius: 12,
     padding: 4,
     marginBottom: 14,
@@ -325,10 +325,10 @@ const styles = StyleSheet.create({
   tabBtnText: {
     fontSize: 11.5,
     fontWeight: '600',
-    color: '#64748B',
+    color: '#68645E',
   },
   tabBtnTextActive: {
-    color: '#0F766E',
+    color: '#141414',
     fontWeight: '700',
   },
   card: {
@@ -337,24 +337,24 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   cardTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: 6,
   },
   cardSub: {
     fontSize: 12,
-    color: '#64748B',
+    color: '#68645E',
     lineHeight: 17,
     marginBottom: 14,
   },
   fieldLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#475569',
+    color: '#141414',
     marginBottom: 6,
   },
   chipRow: {
@@ -367,36 +367,37 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
   },
   chipActive: {
-    borderColor: '#0F766E',
-    backgroundColor: '#F0FDFA',
+    borderColor: '#141414',
+    backgroundColor: '#141414',
   },
   chipText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#475569',
+    color: '#68645E',
   },
   chipTextActive: {
-    color: '#0F766E',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   input: {
     height: 44,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     paddingHorizontal: 12,
     fontSize: 13,
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: 14,
   },
   primaryBtn: {
     height: 48,
-    backgroundColor: '#0F766E',
+    backgroundColor: '#141414',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -413,19 +414,19 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#065F46',
+    color: '#1B7A43',
     marginTop: 10,
     marginBottom: 4,
   },
   successSub: {
     fontSize: 12,
-    color: '#475569',
+    color: '#68645E',
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: 16,
   },
   doneBtn: {
-    backgroundColor: '#059669',
+    backgroundColor: '#141414',
     paddingHorizontal: 32,
     paddingVertical: 10,
     borderRadius: 10,

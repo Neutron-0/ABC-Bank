@@ -145,7 +145,7 @@ export const InsuranceModal: React.FC<InsuranceModalProps> = ({ visible, onClose
               </View>
             </View>
             <TouchableOpacity onPress={handleReset} style={styles.closeBtn}>
-              <X size={20} color="#64748B" />
+              <X size={20} color="#68645E" />
             </TouchableOpacity>
           </View>
 
@@ -154,7 +154,7 @@ export const InsuranceModal: React.FC<InsuranceModalProps> = ({ visible, onClose
               // Success Certificate Card
               <View style={styles.successCard}>
                 <View style={styles.successBadge}>
-                  <CheckCircle2 size={32} color="#059669" />
+                  <CheckCircle2 size={32} color="#1B7A43" />
                 </View>
                 <Text style={styles.successTitle}>Policy Certificate Issued</Text>
                 <Text style={styles.successSub}>
@@ -172,7 +172,7 @@ export const InsuranceModal: React.FC<InsuranceModalProps> = ({ visible, onClose
                   </View>
                   <View style={styles.certRow}>
                     <Text style={styles.certLabel}>Sum Insured</Text>
-                    <Text style={[styles.certVal, { color: '#059669', fontWeight: '700' }]}>
+                    <Text style={[styles.certVal, { color: '#1B7A43', fontWeight: '700' }]}>
                       ₹{enrolledPolicy.sumInsured.toLocaleString('en-IN')}
                     </Text>
                   </View>
@@ -203,7 +203,7 @@ export const InsuranceModal: React.FC<InsuranceModalProps> = ({ visible, onClose
                       setSelectedSum(500000);
                     }}
                   >
-                    <Heart size={16} color={selectedCategory === 'HEALTH' ? '#831843' : '#64748B'} />
+                    <Heart size={16} color={selectedCategory === 'HEALTH' ? '#141414' : '#68645E'} />
                     <Text style={[styles.tabBtnText, selectedCategory === 'HEALTH' && styles.tabBtnTextActive]}>
                       Health & Hospital
                     </Text>
@@ -216,7 +216,7 @@ export const InsuranceModal: React.FC<InsuranceModalProps> = ({ visible, onClose
                       setSelectedSum(5000000);
                     }}
                   >
-                    <Award size={16} color={selectedCategory === 'LIFE' ? '#831843' : '#64748B'} />
+                    <Award size={16} color={selectedCategory === 'LIFE' ? '#141414' : '#68645E'} />
                     <Text style={[styles.tabBtnText, selectedCategory === 'LIFE' && styles.tabBtnTextActive]}>
                       Term Life (Pure)
                     </Text>
@@ -278,7 +278,7 @@ export const InsuranceModal: React.FC<InsuranceModalProps> = ({ visible, onClose
                     value={nomineeName}
                     onChangeText={setNomineeName}
                     placeholder="Enter nominee name"
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor="#9C968E"
                   />
 
                   <Text style={styles.inputLabel}>Relationship</Text>
@@ -333,11 +333,11 @@ export const InsuranceModal: React.FC<InsuranceModalProps> = ({ visible, onClose
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(20, 20, 20, 0.60)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: '#FAF8F8',
+    backgroundColor: '#FAF8F5',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '90%',
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: '#EAE6DF',
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -365,18 +365,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#FCE7F3',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   headerSub: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 2,
   },
   closeBtn: {
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
   },
   tabSwitch: {
     flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
     borderRadius: 12,
     padding: 4,
     marginBottom: 16,
@@ -411,10 +411,10 @@ const styles = StyleSheet.create({
   tabBtnText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#64748B',
+    color: '#68645E',
   },
   tabBtnTextActive: {
-    color: '#831843',
+    color: '#141414',
     fontWeight: '700',
   },
   planCard: {
@@ -423,23 +423,23 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   planTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   planSub: {
     fontSize: 12,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 2,
     marginBottom: 14,
   },
   sectionLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#334155',
+    color: '#68645E',
     marginBottom: 8,
   },
   sumSelectorRow: {
@@ -452,55 +452,56 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
   },
   sumChipActive: {
-    borderColor: '#831843',
-    backgroundColor: '#FDF2F8',
+    borderColor: '#141414',
+    backgroundColor: '#141414',
   },
   sumChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#475569',
+    color: '#68645E',
   },
   sumChipTextActive: {
-    color: '#831843',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   pricingBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 12,
     padding: 12,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   pricingLabel: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
   },
   pricingAmt: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#831843',
+    color: '#141414',
     marginTop: 2,
   },
   taxBadge: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#EDF7F1',
   },
   taxBadgeText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#047857',
+    color: '#1B7A43',
   },
   featuresList: {
     gap: 8,
@@ -512,7 +513,7 @@ const styles = StyleSheet.create({
   },
   featText: {
     fontSize: 12,
-    color: '#334155',
+    color: '#2C2B29',
     flex: 1,
   },
   formCard: {
@@ -521,29 +522,29 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   formCardTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: 12,
   },
   inputLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#475569',
+    color: '#68645E',
     marginBottom: 6,
   },
   textInput: {
     height: 44,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     paddingHorizontal: 12,
     fontSize: 14,
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: 12,
   },
   relationRow: {
@@ -555,25 +556,26 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
   },
   relationChipActive: {
-    borderColor: '#831843',
-    backgroundColor: '#FDF2F8',
+    borderColor: '#141414',
+    backgroundColor: '#141414',
   },
   relationText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#475569',
+    color: '#68645E',
   },
   relationTextActive: {
-    color: '#831843',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   submitBtn: {
     height: 50,
-    backgroundColor: '#831843',
+    backgroundColor: '#141414',
     borderRadius: 14,
     flexDirection: 'row',
     alignItems: 'center',
@@ -588,7 +590,7 @@ const styles = StyleSheet.create({
   },
   disclaimerText: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     textAlign: 'center',
     marginBottom: 30,
     lineHeight: 16,
@@ -600,13 +602,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 10,
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#EDF7F1',
   },
   successBadge: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -614,25 +616,25 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#065F46',
+    color: '#1B7A43',
     marginBottom: 6,
   },
   successSub: {
     fontSize: 12.5,
-    color: '#475569',
+    color: '#68645E',
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: 20,
   },
   certDetails: {
     width: '100%',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 12,
     padding: 14,
     gap: 10,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   certRow: {
     flexDirection: 'row',
@@ -641,17 +643,17 @@ const styles = StyleSheet.create({
   },
   certLabel: {
     fontSize: 12,
-    color: '#64748B',
+    color: '#68645E',
   },
   certVal: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#141414',
   },
   doneBtn: {
     width: '100%',
     height: 46,
-    backgroundColor: '#059669',
+    backgroundColor: '#141414',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

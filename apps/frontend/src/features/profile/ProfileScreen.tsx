@@ -694,11 +694,11 @@ const styles = StyleSheet.create({
   },
   logoutTitle: {
     ...typography.bodyBold,
-    color: '#EF4444',
+    color: '#C92A2A',
   },
   logoutDesc: {
     ...typography.tiny,
-    color: '#94A3B8',
+    color: '#9C968E',
     marginTop: 2,
   },
 });

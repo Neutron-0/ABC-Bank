@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
   factorImpactLow: {
     ...typography.tiny,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#68645E',
   },
   adviceBox: {
     borderRadius: radii.md,

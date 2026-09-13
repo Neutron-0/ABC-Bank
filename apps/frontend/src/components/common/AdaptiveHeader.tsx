@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     width: 15,
     height: 15,
     borderRadius: 8,
-    backgroundColor: '#059669',
+    backgroundColor: '#1B7A43',
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
     alignItems: 'center',
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   greetingText: {
     fontSize: 15,
     fontWeight: '800',
-    color: '#0F172A',
+    color: '#141414',
     letterSpacing: -0.2,
   },
   subRow: {
@@ -169,12 +169,12 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#059669',
+    backgroundColor: '#1B7A43',
   },
   subHeaderText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#059669',
+    color: '#1B7A43',
     letterSpacing: 0.2,
   },
   rightRow: {

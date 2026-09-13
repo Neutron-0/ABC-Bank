@@ -22,28 +22,28 @@ export const radii = {
 
 export const shadows = {
   sm: {
-    shadowColor: '#0F172A',
+    shadowColor: '#141414',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 2,
     elevation: 1,
   },
   md: {
-    shadowColor: '#0F172A',
+    shadowColor: '#141414',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
     elevation: 2,
   },
   lg: {
-    shadowColor: '#0F172A',
+    shadowColor: '#141414',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.07,
     shadowRadius: 12,
     elevation: 4,
   },
   soft: {
-    shadowColor: '#002970',
+    shadowColor: '#141414',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,

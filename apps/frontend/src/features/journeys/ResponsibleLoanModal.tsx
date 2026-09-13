@@ -716,7 +716,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     paddingBottom: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#EAE6DF',
   },
   kfsTitleLeft: {
     flexDirection: 'row',
@@ -728,7 +728,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   kfsBadge: {
-    backgroundColor: '#D1FAE5',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 4,
@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
   kfsBadgeText: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#047857',
+    color: '#1B7A43',
   },
   kfsDivider: {
     borderTopWidth: 1,
@@ -744,14 +744,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   coolingOffNote: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     padding: 6,
     borderRadius: 6,
     marginTop: 4,
   },
   coolingOffNoteText: {
     fontSize: 10,
-    color: '#475569',
+    color: '#68645E',
     lineHeight: 14,
   },
   coolingOffCard: {
@@ -770,15 +770,15 @@ const styles = StyleSheet.create({
   coolingOffTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#065F46',
+    color: '#1B7A43',
   },
   coolingOffDesc: {
     fontSize: 11,
-    color: '#334155',
+    color: '#68645E',
     lineHeight: 15,
   },
   coolingOffBtn: {
-    backgroundColor: '#DC2626',
+    backgroundColor: '#C92A2A',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: radii.sm,

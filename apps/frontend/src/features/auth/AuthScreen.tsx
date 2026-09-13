@@ -460,9 +460,9 @@ export const AuthScreen: React.FC = () => {
                   {/* Mobile Input */}
                   <View style={styles.inputGroup}>
                     <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Registered Mobile Number</Text>
-                    <View style={[styles.phoneInputCard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+                    <View style={[styles.phoneInputCard, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}>
                       <Text style={[styles.inputPrefix, { color: themeColors.textPrimary }]}>+91</Text>
-                      <View style={[styles.inputDivider, { backgroundColor: '#E2E8F0' }]} />
+                      <View style={[styles.inputDivider, { backgroundColor: '#EAE6DF' }]} />
                       <TextInput
                         style={[styles.phoneTextInput, { color: themeColors.textPrimary }]}
                         keyboardType="number-pad"
@@ -473,13 +473,13 @@ export const AuthScreen: React.FC = () => {
                           setErrorMessage('');
                         }}
                         placeholder="99999 99901"
-                        placeholderTextColor="#94A3B8"
+                        placeholderTextColor="#9C968E"
                       />
                     </View>
                   </View>
 
                   {errorMessage ? (
-                    <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#FCA5A5' }]}>
+                    <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#F8D7DA' }]}>
                       <AlertCircle size={14} color="#C92A2A" />
                       <Text style={[styles.errorBannerText, { color: '#C92A2A' }]}>{errorMessage}</Text>
                     </View>
@@ -502,9 +502,9 @@ export const AuthScreen: React.FC = () => {
                     <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>
                       User ID, Email, or Mobile Number
                     </Text>
-                    <View style={[styles.phoneInputCard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+                    <View style={[styles.phoneInputCard, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}>
                       <User size={15} color="#68645E" style={{ marginLeft: 12 }} />
-                      <View style={[styles.inputDivider, { backgroundColor: '#E2E8F0', marginHorizontal: 8 }]} />
+                      <View style={[styles.inputDivider, { backgroundColor: '#EAE6DF', marginHorizontal: 8 }]} />
                       <TextInput
                         style={[styles.phoneTextInput, { color: themeColors.textPrimary }]}
                         value={loginIdentifier}
@@ -513,7 +513,7 @@ export const AuthScreen: React.FC = () => {
                           setErrorMessage('');
                         }}
                         placeholder="rahul.sharma@bharatmail.in"
-                        placeholderTextColor="#94A3B8"
+                        placeholderTextColor="#9C968E"
                         autoCapitalize="none"
                       />
                     </View>
@@ -522,9 +522,9 @@ export const AuthScreen: React.FC = () => {
                   {/* Password */}
                   <View style={styles.inputGroup}>
                     <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Account Password</Text>
-                    <View style={[styles.phoneInputCard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+                    <View style={[styles.phoneInputCard, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}>
                       <Lock size={15} color="#68645E" style={{ marginLeft: 12 }} />
-                      <View style={[styles.inputDivider, { backgroundColor: '#E2E8F0', marginHorizontal: 8 }]} />
+                      <View style={[styles.inputDivider, { backgroundColor: '#EAE6DF', marginHorizontal: 8 }]} />
                       <TextInput
                         style={[styles.phoneTextInput, { color: themeColors.textPrimary }]}
                         secureTextEntry
@@ -534,7 +534,7 @@ export const AuthScreen: React.FC = () => {
                           setErrorMessage('');
                         }}
                         placeholder="••••••••"
-                        placeholderTextColor="#94A3B8"
+                        placeholderTextColor="#9C968E"
                       />
                     </View>
                   </View>
@@ -698,11 +698,11 @@ export const AuthScreen: React.FC = () => {
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Full Legal Name (as on Aadhaar/PAN)</Text>
                 <TextInput
-                  style={[styles.textInputStandard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', color: themeColors.textPrimary }]}
+                  style={[styles.textInputStandard, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF', color: themeColors.textPrimary }]}
                   value={signupName}
                   onChangeText={setSignupName}
                   placeholder="e.g. Ramesh Chandra Verma"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#9C968E"
                 />
               </View>
 
@@ -710,13 +710,13 @@ export const AuthScreen: React.FC = () => {
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Primary Mobile Number</Text>
                 <TextInput
-                  style={[styles.textInputStandard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', color: themeColors.textPrimary }]}
+                  style={[styles.textInputStandard, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF', color: themeColors.textPrimary }]}
                   keyboardType="number-pad"
                   maxLength={10}
                   value={signupPhone}
                   onChangeText={setSignupPhone}
                   placeholder="9876543210"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#9C968E"
                 />
               </View>
 
@@ -733,7 +733,7 @@ export const AuthScreen: React.FC = () => {
                       key={acc.id}
                       style={[
                         styles.accountTypeButton,
-                        { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' },
+                        { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' },
                         signupAccountType === acc.id && { borderColor: '#141414', backgroundColor: '#FFFFFF' },
                       ]}
                       onPress={() => setSignupAccountType(acc.id as any)}
@@ -758,14 +758,14 @@ export const AuthScreen: React.FC = () => {
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Set 6-Digit MPIN</Text>
                 <TextInput
-                  style={[styles.textInputStandard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', color: themeColors.textPrimary }]}
+                  style={[styles.textInputStandard, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF', color: themeColors.textPrimary }]}
                   keyboardType="number-pad"
                   maxLength={6}
                   secureTextEntry
                   value={signupMpin}
                   onChangeText={setSignupMpin}
                   placeholder="Enter 6 numbers"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#9C968E"
                 />
               </View>
 
@@ -773,14 +773,14 @@ export const AuthScreen: React.FC = () => {
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Confirm 6-Digit MPIN</Text>
                 <TextInput
-                  style={[styles.textInputStandard, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', color: themeColors.textPrimary }]}
+                  style={[styles.textInputStandard, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF', color: themeColors.textPrimary }]}
                   keyboardType="number-pad"
                   maxLength={6}
                   secureTextEntry
                   value={confirmMpin}
                   onChangeText={setConfirmMpin}
                   placeholder="Re-enter 6 numbers"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#9C968E"
                 />
               </View>
 
@@ -921,7 +921,7 @@ export const AuthScreen: React.FC = () => {
               {/* Consent Card Container */}
               <View style={styles.consentListContainer}>
                 {/* 1. Core Banking (Mandatory) */}
-                <View style={[styles.consentItem, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+                <View style={[styles.consentItem, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}>
                   <View style={styles.consentItemHeader}>
                     <View style={styles.consentItemTitleGroup}>
                       <Building2 size={15} color="#141414" />
@@ -932,12 +932,12 @@ export const AuthScreen: React.FC = () => {
                     </View>
                   </View>
                   <Text style={[styles.consentItemDesc, { color: themeColors.textSecondary }]}>
-                    Essential transaction logging, core balances, AML reporting, and regulatory audit compliance under RBI Banking Regulation Act 1949.
+                     Essential transaction logging, core balances, AML reporting, and regulatory audit compliance under RBI Banking Regulation Act 1949.
                   </Text>
                 </View>
 
                 {/* 2. Device Security & Binding (Mandatory) */}
-                <View style={[styles.consentItem, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+                <View style={[styles.consentItem, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}>
                   <View style={styles.consentItemHeader}>
                     <View style={styles.consentItemTitleGroup}>
                       <Shield size={15} color="#141414" />
@@ -962,7 +962,7 @@ export const AuthScreen: React.FC = () => {
                     <Switch
                       value={consentDraft.smsFraudDetection}
                       onValueChange={(val) => setConsentDraft((prev) => ({ ...prev, smsFraudDetection: val }))}
-                      trackColor={{ false: '#E2E8F0', true: '#141414' }}
+                      trackColor={{ false: '#EAE6DF', true: '#141414' }}
                       thumbColor="#FFFFFF"
                     />
                   </View>
@@ -981,7 +981,7 @@ export const AuthScreen: React.FC = () => {
                     <Switch
                       value={consentDraft.accountAggregator}
                       onValueChange={(val) => setConsentDraft((prev) => ({ ...prev, accountAggregator: val }))}
-                      trackColor={{ false: '#E2E8F0', true: '#141414' }}
+                      trackColor={{ false: '#EAE6DF', true: '#141414' }}
                       thumbColor="#FFFFFF"
                     />
                   </View>
@@ -1000,7 +1000,7 @@ export const AuthScreen: React.FC = () => {
                     <Switch
                       value={consentDraft.personalizedOffers}
                       onValueChange={(val) => setConsentDraft((prev) => ({ ...prev, personalizedOffers: val }))}
-                      trackColor={{ false: '#E2E8F0', true: '#141414' }}
+                      trackColor={{ false: '#EAE6DF', true: '#141414' }}
                       thumbColor="#FFFFFF"
                     />
                   </View>
@@ -1098,7 +1098,7 @@ export const AuthScreen: React.FC = () => {
                         return (
                           <TouchableOpacity
                             key={btn}
-                            style={[styles.keypadSpecialButton, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}
+                            style={[styles.keypadSpecialButton, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}
                             onPress={handleBiometricUnlock}
                             activeOpacity={0.7}
                           >
@@ -1110,7 +1110,7 @@ export const AuthScreen: React.FC = () => {
                         return (
                           <TouchableOpacity
                             key={btn}
-                            style={[styles.keypadSpecialButton, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}
+                            style={[styles.keypadSpecialButton, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}
                             onPress={handleMpinDelete}
                             activeOpacity={0.7}
                           >
@@ -1121,7 +1121,7 @@ export const AuthScreen: React.FC = () => {
                       return (
                         <TouchableOpacity
                           key={btn}
-                          style={[styles.keypadButton, { backgroundColor: '#FFFFFF', borderColor: '#E2E8F0' }]}
+                          style={[styles.keypadButton, { backgroundColor: '#FFFFFF', borderColor: '#EAE6DF' }]}
                           onPress={() => handleMpinPress(btn)}
                           activeOpacity={0.7}
                         >
@@ -1469,11 +1469,11 @@ const styles = StyleSheet.create({
   },
   smsBanner: {
     width: '100%',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: radii.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
     marginBottom: spacing.md,
   },
   smsHeader: {
@@ -1509,8 +1509,8 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: radii.md,
     borderWidth: 1.5,
-    borderColor: '#CBD5E1',
-    backgroundColor: '#F8FAFC',
+    borderColor: '#EAE6DF',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1533,7 +1533,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#EDF7F1',
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#EDF7F1',
     borderRadius: radii.md,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -1546,7 +1546,7 @@ const styles = StyleSheet.create({
   },
   autofillSubtitle: {
     fontSize: 10.5,
-    color: '#065F46',
+    color: '#1B7A43',
   },
   resendRow: {
     flexDirection: 'row',
@@ -1632,7 +1632,7 @@ const styles = StyleSheet.create({
     height: 14,
     borderRadius: 7,
     borderWidth: 2,
-    borderColor: '#94A3B8',
+    borderColor: '#9C968E',
     backgroundColor: 'transparent',
   },
   mpinDotFilled: {

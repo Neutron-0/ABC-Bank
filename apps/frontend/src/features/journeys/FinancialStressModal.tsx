@@ -326,11 +326,11 @@ const styles = StyleSheet.create({
   mitraCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#FDF6ED',
     borderRadius: radii.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#DBEAFE',
+    borderColor: '#FDE68A',
     gap: spacing.md,
     marginBottom: spacing.md,
   },

@@ -254,8 +254,8 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
             </View>
 
             {errorMsg && (
-              <View style={[styles.errorBanner, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
-                <AlertCircle size={14} color="#DC2626" />
+              <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#F8D7DA' }]}>
+                <AlertCircle size={14} color="#C92A2A" />
                 <Text style={styles.errorBannerText}>{errorMsg}</Text>
               </View>
             )}
@@ -332,8 +332,8 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
             />
 
             {errorMsg && (
-              <View style={[styles.errorBanner, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
-                <AlertCircle size={14} color="#DC2626" />
+              <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#F8D7DA' }]}>
+                <AlertCircle size={14} color="#C92A2A" />
                 <Text style={styles.errorBannerText}>{errorMsg}</Text>
               </View>
             )}
@@ -400,8 +400,8 @@ export const OnboardingModal: React.FC<Props> = ({ visible, onFinish }) => {
             </View>
 
             {errorMsg && (
-              <View style={[styles.errorBanner, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
-                <AlertCircle size={14} color="#DC2626" />
+              <View style={[styles.errorBanner, { backgroundColor: '#FDF2F2', borderColor: '#F8D7DA' }]}>
+                <AlertCircle size={14} color="#C92A2A" />
                 <Text style={styles.errorBannerText}>{errorMsg}</Text>
               </View>
             )}
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
   progressBarTrack: {
     width: '100%',
     height: 3,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#EAE6DF',
   },
   progressBarFill: {
     height: '100%',
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     width: 68,
     height: 68,
     borderRadius: radii.full,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
@@ -614,25 +614,25 @@ const styles = StyleSheet.create({
   },
   heroSubtitle: {
     ...typography.body,
-    color: '#64748B',
+    color: '#68645E',
     textAlign: 'center',
     marginBottom: spacing.xl,
     lineHeight: 20,
   },
   cardContainer: {
     width: '100%',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: radii.xl,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
     marginBottom: spacing.xl,
     ...shadows.sm,
   },
   cardSectionLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#68645E',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
     marginBottom: spacing.sm,
@@ -646,16 +646,16 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   activeLangRow: {
     borderColor: '#141414',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
   },
   langName: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   activeLangName: {
     color: '#141414',
@@ -663,16 +663,16 @@ const styles = StyleSheet.create({
   langSub: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 2,
   },
   phoneInputCard: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderWidth: 1.5,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     borderRadius: radii.lg,
     paddingHorizontal: spacing.md,
     height: 56,
@@ -686,7 +686,7 @@ const styles = StyleSheet.create({
   inputDivider: {
     width: 1,
     height: 24,
-    backgroundColor: '#CBD5E1',
+    backgroundColor: '#EAE6DF',
     marginHorizontal: spacing.sm,
   },
   phoneTextInput: {
@@ -700,7 +700,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: spacing.md,
     paddingVertical: 8,
     borderRadius: radii.md,
@@ -709,15 +709,15 @@ const styles = StyleSheet.create({
   trustBadgeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#047857',
+    color: '#1B7A43',
   },
   smsBanner: {
     width: '100%',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#FDF6ED',
     borderRadius: radii.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: '#FDE68A',
     marginBottom: spacing.lg,
   },
   smsHeader: {
@@ -729,13 +729,13 @@ const styles = StyleSheet.create({
   smsSender: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#2563EB',
+    color: '#B45309',
     letterSpacing: 0.5,
   },
   smsBody: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#1E40AF',
+    color: '#141414',
   },
   otpBoxesRow: {
     flexDirection: 'row',
@@ -747,8 +747,8 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#CBD5E1',
-    backgroundColor: '#F8FAFC',
+    borderColor: '#EAE6DF',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -768,7 +768,7 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   autoFillButton: {
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
     paddingHorizontal: spacing.md,
     paddingVertical: 7,
     borderRadius: radii.full,
@@ -777,7 +777,7 @@ const styles = StyleSheet.create({
   autoFillButtonText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#2563EB',
+    color: '#141414',
   },
   pinDotsContainer: {
     flexDirection: 'row',
@@ -790,7 +790,7 @@ const styles = StyleSheet.create({
     height: 16,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#94A3B8',
+    borderColor: '#9C968E',
     backgroundColor: 'transparent',
   },
   pinCircleFilled: {
@@ -812,11 +812,11 @@ const styles = StyleSheet.create({
     width: 64,
     height: 50,
     borderRadius: 12,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   keypadEmpty: {
     width: 64,
@@ -829,41 +829,41 @@ const styles = StyleSheet.create({
   },
   bioTestCard: {
     width: '100%',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: radii.xl,
     padding: spacing.xl,
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     marginBottom: spacing.xl,
   },
   bioTestCardScanning: {
-    borderColor: '#2563EB',
-    backgroundColor: '#EFF6FF',
+    borderColor: '#141414',
+    backgroundColor: '#FAF8F5',
   },
   bioTestCardSuccess: {
-    borderColor: '#059669',
-    backgroundColor: '#ECFDF5',
+    borderColor: '#1B7A43',
+    backgroundColor: '#EDF7F1',
   },
   bioTestCardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     marginTop: spacing.md,
     marginBottom: 4,
   },
   bioTestCardSub: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#64748B',
+    color: '#68645E',
   },
   accountLinkedCard: {
     width: '100%',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: radii.xl,
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
     marginBottom: spacing.xl,
   },
   accountHeaderRow: {
@@ -874,7 +874,7 @@ const styles = StyleSheet.create({
   accTypeLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#68645E',
     letterSpacing: 0.5,
   },
   accNumber: {
@@ -887,7 +887,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
@@ -895,11 +895,11 @@ const styles = StyleSheet.create({
   kycBadgeText: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#047857',
+    color: '#1B7A43',
   },
   cardDivider: {
     height: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#EAE6DF',
     marginVertical: spacing.md,
   },
   secRow: {
@@ -910,7 +910,7 @@ const styles = StyleSheet.create({
   secLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#64748B',
+    color: '#68645E',
   },
   secValue: {
     fontSize: 11,
@@ -936,9 +936,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#FDF2F2',
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: '#F8D7DA',
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
     borderRadius: radii.md,
@@ -947,6 +947,6 @@ const styles = StyleSheet.create({
   errorBannerText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#DC2626',
+    color: '#C92A2A',
   },
 });

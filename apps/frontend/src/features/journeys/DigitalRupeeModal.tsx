@@ -84,7 +84,7 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
           <View style={styles.header}>
             <View style={styles.headerLeft}>
               <View style={styles.headerIcon}>
-                <Coins size={22} color="#059669" />
+                <Coins size={22} color="#1B7A43" />
               </View>
               <View>
                 <Text style={styles.headerTitle}>Digital Rupee (e₹) Wallet</Text>
@@ -92,7 +92,7 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
               </View>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-              <X size={20} color="#64748B" />
+              <X size={20} color="#68645E" />
             </TouchableOpacity>
           </View>
 
@@ -102,7 +102,7 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
               <Text style={styles.walletHeroLabel}>Total Sovereign e₹ Balance</Text>
               <Text style={styles.walletHeroAmt}>e₹ {digitalRupeeBalance.toLocaleString('en-IN')}</Text>
               <View style={styles.walletHeroSubRow}>
-                <ShieldCheck size={14} color="#A7F3D0" />
+                <ShieldCheck size={14} color="#9C968E" />
                 <Text style={styles.walletHeroSub}>Direct Legal Tender • Sovereign RBI Liability</Text>
               </View>
             </View>
@@ -113,7 +113,7 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
                 style={[styles.tabBtn, activeTab === 'LOAD' && styles.tabBtnActive]}
                 onPress={() => setActiveTab('LOAD')}
               >
-                <ArrowDownLeft size={14} color={activeTab === 'LOAD' ? '#059669' : '#64748B'} />
+                <ArrowDownLeft size={14} color={activeTab === 'LOAD' ? '#141414' : '#68645E'} />
                 <Text style={[styles.tabBtnText, activeTab === 'LOAD' && styles.tabBtnTextActive]}>
                   Load from Bank
                 </Text>
@@ -123,7 +123,7 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
                 style={[styles.tabBtn, activeTab === 'REDEEM' && styles.tabBtnActive]}
                 onPress={() => setActiveTab('REDEEM')}
               >
-                <ArrowUpRight size={14} color={activeTab === 'REDEEM' ? '#059669' : '#64748B'} />
+                <ArrowUpRight size={14} color={activeTab === 'REDEEM' ? '#141414' : '#68645E'} />
                 <Text style={[styles.tabBtnText, activeTab === 'REDEEM' && styles.tabBtnTextActive]}>
                   Redeem to Bank
                 </Text>
@@ -133,7 +133,7 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
                 style={[styles.tabBtn, activeTab === 'SEND' && styles.tabBtnActive]}
                 onPress={() => setActiveTab('SEND')}
               >
-                <Send size={14} color={activeTab === 'SEND' ? '#059669' : '#64748B'} />
+                <Send size={14} color={activeTab === 'SEND' ? '#141414' : '#68645E'} />
                 <Text style={[styles.tabBtnText, activeTab === 'SEND' && styles.tabBtnTextActive]}>
                   Send e₹ Token
                 </Text>
@@ -156,7 +156,7 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
                 onChangeText={setAmount}
                 keyboardType="numeric"
                 placeholder="0"
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor="#9C968E"
               />
 
               {/* Denomination quick chips */}
@@ -182,7 +182,7 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
                     value={recipient}
                     onChangeText={setRecipient}
                     placeholder="e.g. mobile@rbi.cbdc"
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor="#9C968E"
                   />
                 </View>
               )}
@@ -201,11 +201,11 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
 
             <View style={styles.featuresNote}>
               <View style={styles.noteRow}>
-                <CheckCircle2 size={13} color="#059669" />
+                <CheckCircle2 size={13} color="#1B7A43" />
                 <Text style={styles.noteText}>Instant finality with zero intermediary risk</Text>
               </View>
               <View style={styles.noteRow}>
-                <CheckCircle2 size={13} color="#059669" />
+                <CheckCircle2 size={13} color="#1B7A43" />
                 <Text style={styles.noteText}>Programmable digital vouchers for offline retail</Text>
               </View>
             </View>
@@ -219,11 +219,11 @@ export const DigitalRupeeModal: React.FC<DigitalRupeeModalProps> = ({ visible, o
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(20, 20, 20, 0.60)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: '#FAF8F8',
+    backgroundColor: '#FAF8F5',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '85%',
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: '#EAE6DF',
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -251,18 +251,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EDF7F1',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   headerSub: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 2,
   },
   closeBtn: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   walletHero: {
-    backgroundColor: '#064E3B',
+    backgroundColor: '#141414',
     borderRadius: 18,
     padding: 20,
     marginBottom: 16,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   },
   walletHeroLabel: {
     fontSize: 12,
-    color: '#A7F3D0',
+    color: '#9C968E',
     fontWeight: '500',
   },
   walletHeroAmt: {
@@ -296,11 +296,11 @@ const styles = StyleSheet.create({
   },
   walletHeroSub: {
     fontSize: 11,
-    color: '#A7F3D0',
+    color: '#9C968E',
   },
   tabSwitch: {
     flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
     borderRadius: 12,
     padding: 4,
     marginBottom: 16,
@@ -324,10 +324,10 @@ const styles = StyleSheet.create({
   tabBtnText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#64748B',
+    color: '#68645E',
   },
   tabBtnTextActive: {
-    color: '#059669',
+    color: '#141414',
     fontWeight: '700',
   },
   actionCard: {
@@ -336,23 +336,23 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   inputLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#475569',
+    color: '#68645E',
     marginBottom: 8,
   },
   amtInput: {
     height: 52,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     paddingHorizontal: 16,
     marginBottom: 12,
   },
@@ -367,20 +367,20 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
-    backgroundColor: '#F8FAFC',
+    borderColor: '#EAE6DF',
+    backgroundColor: '#F3EFEA',
   },
   denomChipActive: {
-    borderColor: '#059669',
-    backgroundColor: '#ECFDF5',
+    borderColor: '#141414',
+    backgroundColor: '#141414',
   },
   denomText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#475569',
+    color: '#68645E',
   },
   denomTextActive: {
-    color: '#059669',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   recipientWrap: {
@@ -388,17 +388,17 @@ const styles = StyleSheet.create({
   },
   textInput: {
     height: 44,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     paddingHorizontal: 12,
     fontSize: 13,
-    color: '#0F172A',
+    color: '#141414',
   },
   actionBtn: {
     height: 48,
-    backgroundColor: '#059669',
+    backgroundColor: '#141414',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -420,6 +420,6 @@ const styles = StyleSheet.create({
   },
   noteText: {
     fontSize: 11.5,
-    color: '#64748B',
+    color: '#68645E',
   },
 });

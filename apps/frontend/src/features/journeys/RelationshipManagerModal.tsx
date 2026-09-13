@@ -80,7 +80,7 @@ export const RelationshipManagerModal: React.FC<RelationshipManagerModalProps> =
               </View>
             </View>
             <TouchableOpacity onPress={handleReset} style={styles.closeBtn}>
-              <X size={20} color="#64748B" />
+              <X size={20} color="#68645E" />
             </TouchableOpacity>
           </View>
 
@@ -103,7 +103,7 @@ export const RelationshipManagerModal: React.FC<RelationshipManagerModalProps> =
                 style={[styles.tabBtn, activeTab === 'CONTACT' && styles.tabBtnActive]}
                 onPress={() => setActiveTab('CONTACT')}
               >
-                <Phone size={13} color={activeTab === 'CONTACT' ? '#831843' : '#64748B'} />
+                <Phone size={13} color={activeTab === 'CONTACT' ? '#141414' : '#68645E'} />
                 <Text style={[styles.tabBtnText, activeTab === 'CONTACT' && styles.tabBtnTextActive]}>
                   Direct Contact
                 </Text>
@@ -113,7 +113,7 @@ export const RelationshipManagerModal: React.FC<RelationshipManagerModalProps> =
                 style={[styles.tabBtn, activeTab === 'APPOINTMENT' && styles.tabBtnActive]}
                 onPress={() => setActiveTab('APPOINTMENT')}
               >
-                <Calendar size={13} color={activeTab === 'APPOINTMENT' ? '#831843' : '#64748B'} />
+                <Calendar size={13} color={activeTab === 'APPOINTMENT' ? '#141414' : '#68645E'} />
                 <Text style={[styles.tabBtnText, activeTab === 'APPOINTMENT' && styles.tabBtnTextActive]}>
                   In-Branch Appt
                 </Text>
@@ -123,7 +123,7 @@ export const RelationshipManagerModal: React.FC<RelationshipManagerModalProps> =
                 style={[styles.tabBtn, activeTab === 'DOORSTEP' && styles.tabBtnActive]}
                 onPress={() => setActiveTab('DOORSTEP')}
               >
-                <Truck size={13} color={activeTab === 'DOORSTEP' ? '#831843' : '#64748B'} />
+                <Truck size={13} color={activeTab === 'DOORSTEP' ? '#141414' : '#68645E'} />
                 <Text style={[styles.tabBtnText, activeTab === 'DOORSTEP' && styles.tabBtnTextActive]}>
                   Doorstep Banking
                 </Text>
@@ -138,8 +138,8 @@ export const RelationshipManagerModal: React.FC<RelationshipManagerModalProps> =
                   style={styles.contactItem}
                   onPress={() => showToast('Connecting call to Vikram Malhotra...')}
                 >
-                  <View style={[styles.iconBadge, { backgroundColor: '#ECFDF5' }]}>
-                    <Phone size={16} color="#059669" />
+                  <View style={[styles.iconBadge, { backgroundColor: '#EDF7F1' }]}>
+                    <Phone size={16} color="#1B7A43" />
                   </View>
                   <View style={styles.contactTextWrap}>
                     <Text style={styles.contactLabel}>Direct VIP Hotline</Text>
@@ -151,8 +151,8 @@ export const RelationshipManagerModal: React.FC<RelationshipManagerModalProps> =
                   style={styles.contactItem}
                   onPress={() => showToast('Opening mail composer...')}
                 >
-                  <View style={[styles.iconBadge, { backgroundColor: '#EFF6FF' }]}>
-                    <Mail size={16} color="#2563EB" />
+                  <View style={[styles.iconBadge, { backgroundColor: '#F3EFEA' }]}>
+                    <Mail size={16} color="#141414" />
                   </View>
                   <View style={styles.contactTextWrap}>
                     <Text style={styles.contactLabel}>Encrypted Email</Text>
@@ -161,8 +161,8 @@ export const RelationshipManagerModal: React.FC<RelationshipManagerModalProps> =
                 </TouchableOpacity>
 
                 <View style={styles.contactItem}>
-                  <View style={[styles.iconBadge, { backgroundColor: '#FDF2F8' }]}>
-                    <Clock size={16} color="#831843" />
+                  <View style={[styles.iconBadge, { backgroundColor: '#F3EFEA' }]}>
+                    <Clock size={16} color="#141414" />
                   </View>
                   <View style={styles.contactTextWrap}>
                     <Text style={styles.contactLabel}>Dedicated Operating Hours</Text>
@@ -280,7 +280,7 @@ export const RelationshipManagerModal: React.FC<RelationshipManagerModalProps> =
 
             {/* Security Badge */}
             <View style={styles.secRow}>
-              <Shield size={14} color="#64748B" />
+              <Shield size={14} color="#68645E" />
               <Text style={styles.secText}>
                 All interactions backed by dual-factor OTP authentication and digital audit logs.
               </Text>
@@ -295,11 +295,11 @@ export const RelationshipManagerModal: React.FC<RelationshipManagerModalProps> =
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(20, 20, 20, 0.60)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: '#FAF8F8',
+    backgroundColor: '#FAF8F5',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '90%',
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: '#EAE6DF',
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -327,18 +327,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#FCE7F3',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   headerSub: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 2,
   },
   closeBtn: {
@@ -356,13 +356,13 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     gap: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   avatar: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#831843',
+    backgroundColor: '#141414',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -377,22 +377,22 @@ const styles = StyleSheet.create({
   rmName: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
   },
   rmRole: {
     fontSize: 12,
-    color: '#831843',
+    color: '#B45309',
     fontWeight: '600',
     marginTop: 2,
   },
   rmBranch: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     marginTop: 2,
   },
   tabSwitch: {
     flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
     borderRadius: 12,
     padding: 4,
     marginBottom: 14,
@@ -416,10 +416,10 @@ const styles = StyleSheet.create({
   tabBtnText: {
     fontSize: 11.5,
     fontWeight: '600',
-    color: '#64748B',
+    color: '#68645E',
   },
   tabBtnTextActive: {
-    color: '#831843',
+    color: '#141414',
     fontWeight: '700',
   },
   card: {
@@ -428,12 +428,12 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#EAE6DF',
   },
   cardTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: 14,
   },
   contactItem: {
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     gap: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F8FAFC',
+    borderBottomColor: '#EAE6DF',
   },
   iconBadge: {
     width: 36,
@@ -456,34 +456,34 @@ const styles = StyleSheet.create({
   },
   contactLabel: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
   },
   contactVal: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#141414',
     marginTop: 2,
   },
   fieldLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#475569',
+    color: '#141414',
     marginBottom: 6,
   },
   input: {
     height: 44,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F3EFEA',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
     paddingHorizontal: 12,
     fontSize: 13,
-    color: '#0F172A',
+    color: '#141414',
     marginBottom: 14,
   },
   primaryBtn: {
     height: 48,
-    backgroundColor: '#831843',
+    backgroundColor: '#141414',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -503,20 +503,21 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#EAE6DF',
+    backgroundColor: '#F3EFEA',
     alignItems: 'center',
   },
   servChipActive: {
-    borderColor: '#831843',
-    backgroundColor: '#FDF2F8',
+    borderColor: '#141414',
+    backgroundColor: '#141414',
   },
   servText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#475569',
+    color: '#68645E',
   },
   servTextActive: {
-    color: '#831843',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   bookedCard: {
@@ -526,19 +527,19 @@ const styles = StyleSheet.create({
   bookedTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#065F46',
+    color: '#1B7A43',
     marginTop: 10,
     marginBottom: 4,
   },
   bookedSub: {
     fontSize: 12,
-    color: '#475569',
+    color: '#68645E',
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: 16,
   },
   bookedDoneBtn: {
-    backgroundColor: '#059669',
+    backgroundColor: '#141414',
     paddingHorizontal: 32,
     paddingVertical: 10,
     borderRadius: 10,
@@ -557,7 +558,7 @@ const styles = StyleSheet.create({
   },
   secText: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#68645E',
     flex: 1,
   },
 });

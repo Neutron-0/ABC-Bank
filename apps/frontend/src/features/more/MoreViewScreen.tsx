@@ -281,7 +281,7 @@ export const MoreViewScreen: React.FC<MoreViewScreenProps> = ({
             </View>
             <TouchableOpacity
               onPress={() => onOpenModal ? onOpenModal('deposit_modal') : openJourney('deposit_modal')}
-              style={[styles.promoActionBtn, { backgroundColor: '#1E293B' }]}
+              style={[styles.promoActionBtn, { backgroundColor: '#141414' }]}
             >
               <Text style={styles.promoActionBtnText}>Lock FD</Text>
               <ArrowRight size={14} color="#FFFFFF" />
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   },
   promoIssuer: {
     fontSize: 10,
-    color: '#64748B',
+    color: '#68645E',
     fontFamily: typography.fontFamilies.medium,
   },
   promoTitle: {
@@ -474,10 +474,10 @@ const styles = StyleSheet.create({
   },
   promoDisclaimer: {
     fontSize: 9,
-    color: '#94A3B8',
+    color: '#9C968E',
   },
   promoActionBtn: {
-    backgroundColor: '#800020',
+    backgroundColor: '#141414',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,

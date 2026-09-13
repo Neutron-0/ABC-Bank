@@ -1184,7 +1184,7 @@ const styles = StyleSheet.create({
   topWarningTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#1E293B',
+    color: '#141414',
     marginTop: 1,
   },
   topWarningBtn: {
@@ -1757,23 +1757,23 @@ const styles = StyleSheet.create({
   sectionTitleText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#68645E',
     letterSpacing: 1.1,
     textTransform: 'uppercase',
   },
   sectionSubText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#94A3B8',
+    color: '#9C968E',
     marginTop: 2,
   },
   mandateCountBadge: {
     paddingHorizontal: 8,
     paddingVertical: 3,
-    backgroundColor: '#EEF2FF',
+    backgroundColor: '#F3EFEA',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#E0E7FF',
+    borderColor: '#EAE6DF',
   },
   mandateCountText: {
     fontSize: 10,
@@ -1793,13 +1793,13 @@ const styles = StyleSheet.create({
     borderRadius: radii.card,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#ECEEF2',
+    borderColor: '#EAE6DF',
     ...shadows.sm,
     justifyContent: 'space-between',
   },
   routineCardPaid: {
-    backgroundColor: '#F8FAFC',
-    borderColor: '#E2E8F0',
+    backgroundColor: '#F3EFEA',
+    borderColor: '#EAE6DF',
   },
   routineCardTop: {
     flexDirection: 'row',
@@ -1818,25 +1818,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: radii.xs,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3EFEA',
   },
   routineCategoryText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#68645E',
     letterSpacing: 0.3,
   },
   routineCardTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#141414',
     letterSpacing: -0.2,
     marginBottom: 2,
   },
   routineCardSub: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#94A3B8',
+    color: '#9C968E',
     marginBottom: 10,
   },
   routineCardBottom: {
@@ -1845,16 +1845,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
+    borderTopColor: '#EAE6DF',
   },
   routineCardAmount: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#0F172A',
+    color: '#141414',
     letterSpacing: -0.2,
   },
   routineCardAmountPaid: {
-    color: '#64748B',
+    color: '#68645E',
   },
   routinePaidBadge: {
     flexDirection: 'row',
