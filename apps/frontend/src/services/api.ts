@@ -47,18 +47,31 @@ export class BankingApi {
     return getApiBaseUrl();
   }
 
+  private static _authToken: string | null = null;
+
+  public static setAuthToken(token: string | null) {
+    this._authToken = token;
+  }
+
+  public static getAuthToken(): string | null {
+    return this._authToken;
+  }
+
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s timeout for fast on-device fallback
 
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(this._authToken ? { Authorization: `Bearer ${this._authToken}` } : {}),
+        ...((options?.headers as Record<string, string>) || {}),
+      };
+
       const res = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
         signal: controller.signal,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(options?.headers || {}),
-        },
+        headers,
       });
       clearTimeout(timeoutId);
 
@@ -544,6 +557,84 @@ export class BankingApi {
       }),
     });
   }
+
+  // -------------------------------------------------------------------------
+  // 18. Authentication Endpoints (Login, Registration, JWT)
+  // -------------------------------------------------------------------------
+  public static async register(payload: {
+    name: string;
+    phone: string;
+    email: string;
+    password: string;
+    monthly_income?: number;
+    language?: string;
+    city?: string;
+    state?: string;
+  }): Promise<{
+    success: boolean;
+    access_token: string;
+    token_type: string;
+    customer_id: string;
+    customer_name: string;
+    email: string;
+    phone: string;
+    balance: {
+      available: number;
+      savings: number;
+      currency: string;
+    };
+    message: string;
+  } | null> {
+    const res = await this.request<any>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (res?.access_token) {
+      this.setAuthToken(res.access_token);
+    }
+    return res;
+  }
+
+  public static async login(credentials: {
+    identifier: string;
+    password: string;
+  }): Promise<{
+    success: boolean;
+    access_token: string;
+    token_type: string;
+    customer_id: string;
+    customer_name: string;
+    email: string;
+    phone: string;
+    balance: {
+      available: number;
+      savings: number;
+      currency: string;
+    };
+    message: string;
+  } | null> {
+    const res = await this.request<any>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+    if (res?.access_token) {
+      this.setAuthToken(res.access_token);
+    }
+    return res;
+  }
+
+  public static async getMe(): Promise<{
+    authenticated: boolean;
+    claims: Record<string, any>;
+    customer_id: string;
+    name: string;
+    financial_health: string;
+    balance: any;
+    signals: any;
+  } | null> {
+    return this.request('/auth/me');
+  }
 }
+
 
 

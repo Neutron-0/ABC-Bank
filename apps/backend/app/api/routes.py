@@ -2,10 +2,11 @@ import logging
 import time
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, status, Depends
 from pydantic import BaseModel
 
 from apps.backend.app.services.state_service import StateService
+from apps.backend.app.core.auth import get_current_customer_claims
 from apps.backend.app.db.loader import DataLoader
 from apps.backend.app.experience.composer import ExperienceComposer
 from apps.backend.app.models.experience import ExperienceConfigModel
@@ -1117,6 +1118,104 @@ def enroll_insurance_policy(req: InsuranceEnrollRequest):
     except Exception as e:
         logger.error(f"Failed to enroll insurance policy for {cid}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Insurance enrollment failed.")
+
+
+# ---------------------------------------------------------------------------
+# 21. User Authentication & Session Management (Login, Registration, JWT)
+# ---------------------------------------------------------------------------
+class RegisterRequest(BaseModel):
+    name: str
+    phone: str
+    email: str
+    password: str
+    monthly_income: Optional[float] = 50000.0
+    language: Optional[str] = "en"
+    city: Optional[str] = "Mumbai"
+    state: Optional[str] = "Maharashtra"
+
+class LoginRequest(BaseModel):
+    identifier: str  # email, phone, or customer_id
+    password: str
+
+@router.post("/auth/register", status_code=status.HTTP_201_CREATED)
+def register(req: RegisterRequest):
+    """
+    Registers a new banking customer profile with unhashed password (as specified)
+    and returns a signed JWT access token.
+    """
+    if not req.name.strip():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Name is required.")
+    if not req.phone.strip():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Mobile number is required.")
+    if not req.email.strip():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email is required.")
+    if not req.password:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password is required.")
+
+    try:
+        res = StateService.register_customer(
+            name=req.name.strip(),
+            phone=req.phone.strip(),
+            email=req.email.strip(),
+            password=req.password,
+            monthly_income=float(req.monthly_income or 50000.0),
+            preferred_language=req.language or "en",
+            city=req.city or "Mumbai",
+            state=req.state or "Maharashtra"
+        )
+        return res
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(ve))
+    except Exception as e:
+        logger.error(f"Registration failed: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Registration failed.")
+
+@router.post("/auth/login")
+def login(req: LoginRequest):
+    """
+    Authenticates a user via identifier (email, phone, customer_id) and unhashed password.
+    Returns authoritative JWT access token and active banking session summary.
+    """
+    if not req.identifier.strip() or not req.password:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Identifier and password are required.")
+
+    try:
+        return StateService.authenticate_customer(
+            identifier=req.identifier.strip(),
+            password=req.password
+        )
+    except KeyError as ke:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ke))
+    except PermissionError as pe:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(pe))
+    except Exception as e:
+        logger.error(f"Login failed: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Login service error.")
+
+@router.get("/auth/me")
+def get_current_user_profile(claims: Dict[str, Any] = Depends(get_current_customer_claims)):
+    """
+    Protected route: validates Bearer JWT token and returns authenticated customer profile & state.
+    """
+    customer_id = claims.get("sub")
+    if not customer_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token subject.")
+
+    try:
+        state = StateService.get_state(customer_id)
+        return {
+            "authenticated": True,
+            "claims": claims,
+            "customer_id": customer_id,
+            "name": state.customer_name,
+            "financial_health": state.financial_health,
+            "balance": state.balance,
+            "signals": state.signals
+        }
+    except Exception as e:
+        logger.error(f"Failed to fetch profile for token subject {customer_id}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to load authenticated profile.")
+
 
 
 

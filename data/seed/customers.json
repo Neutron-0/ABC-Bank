@@ -1,9 +1,10 @@
-﻿[
+[
   {
     "id": "cust_bharat_001",
     "name": "Rahul Sharma",
     "phone": "+91 98765 43210",
     "email": "rahul.sharma@bharatmail.in",
+    "password": "password123",
     "monthly_income": 75000,
     "kyc_tier": 2,
     "credit_score": 765,
@@ -19,6 +20,7 @@
     "name": "Pooja Patel",
     "phone": "+91 98234 56789",
     "email": "pooja.patel@bharatmail.in",
+    "password": "password123",
     "monthly_income": 95000,
     "kyc_tier": 2,
     "credit_score": 790,
@@ -27,6 +29,38 @@
       "savings": "SB-83746281",
       "available_balance": 84200,
       "savings_reserve": 210000
+    }
+  },
+  {
+    "id": "cust_bharat_66f81caf",
+    "name": "Aarav Patel a09016",
+    "phone": "+91 99999 a09016",
+    "email": "aarav_a09016@bharatmail.in",
+    "password": "myPlainPassword2026",
+    "monthly_income": 65000.0,
+    "kyc_tier": 2,
+    "credit_score": 750,
+    "language": "hi",
+    "accounts": {
+      "savings": "SB-44590622",
+      "available_balance": 25000.0,
+      "savings_reserve": 50000.0
+    }
+  },
+  {
+    "id": "cust_bharat_e607ee9b",
+    "name": "Aarav Patel 1710e3",
+    "phone": "+91 99999 1710e3",
+    "email": "aarav_1710e3@bharatmail.in",
+    "password": "myPlainPassword2026",
+    "monthly_income": 65000.0,
+    "kyc_tier": 2,
+    "credit_score": 750,
+    "language": "hi",
+    "accounts": {
+      "savings": "SB-63354449",
+      "available_balance": 25000.0,
+      "savings_reserve": 50000.0
     }
   }
 ]

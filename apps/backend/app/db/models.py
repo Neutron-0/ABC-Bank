@@ -21,6 +21,7 @@ class Customer(Base):
     preferred_language: Mapped[str] = mapped_column(String(8), nullable=False, default="en")
     phone: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     email: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    password: Mapped[Optional[str]] = mapped_column(String(128), nullable=True, default="password123")
     monthly_income: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     income_type: Mapped[str] = mapped_column(String(32), nullable=False, default="salaried")
     kyc_tier: Mapped[int] = mapped_column(Integer, nullable=False, default=2)

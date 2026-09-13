@@ -57,6 +57,7 @@ class DataLoader:
                             "name": cust.name,
                             "phone": cust.phone,
                             "email": cust.email,
+                            "password": cust.password or "password123",
                             "monthly_income": cust.monthly_income,
                             "kyc_tier": cust.kyc_tier,
                             "credit_score": cust.credit_score,

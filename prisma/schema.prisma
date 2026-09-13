@@ -79,6 +79,7 @@ model customers {
   preferred_language  String               @db.VarChar(8)
   phone               String?              @db.VarChar(32)
   email               String?              @db.VarChar(128)
+  password            String?              @db.VarChar(128)
   monthly_income      Float
   income_type         String               @db.VarChar(32)
   kyc_tier            Int
