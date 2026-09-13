@@ -108,10 +108,37 @@ export class BankingApi {
     return this.request(`/customer/${customerId}`);
   }
 
-  public static async switchScenario(scenario: string): Promise<any | null> {
+  public static async switchScenario(scenario: string, customerId = 'cust_bharat_001'): Promise<any | null> {
     return this.request('/scenario/switch', {
       method: 'POST',
-      body: JSON.stringify({ scenario }),
+      body: JSON.stringify({ scenario, customer_id: customerId }),
+    });
+  }
+
+  public static async ingestEvent(event: {
+    type: string;
+    customer_id: string;
+    timestamp?: string;
+    payload?: Record<string, any>;
+  }): Promise<any | null> {
+    return this.request('/events', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...event,
+        timestamp: event.timestamp || new Date().toISOString(),
+      }),
+    });
+  }
+
+  public static async executeAssistantIntent(req: {
+    customer_id: string;
+    intent: string;
+    language?: string;
+    entities?: Record<string, any>;
+  }): Promise<any | null> {
+    return this.request('/assistant/intent', {
+      method: 'POST',
+      body: JSON.stringify(req),
     });
   }
 

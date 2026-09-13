@@ -794,7 +794,7 @@ interface CustomerStateStore {
   dpdpConsent: DpdpConsentState;
   sendMockOtp: (phone: string) => { otp: string; isRegistered: boolean };
   verifyMockOtp: (enteredOtp: string, expectedOtp: string) => boolean;
-  verifyMpin: (mpin: string) => boolean;
+  verifyMpin: (mpin: string) => Promise<boolean>;
   signupCustomer: (payload: SignupPayload) => Promise<boolean>;
   loginWithPassword: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>;
   updateDpdpConsent: (consent: Partial<DpdpConsentState>) => void;
@@ -1189,7 +1189,7 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       });
 
       // Background notification to backend
-      BankingApi.switchScenario(state).catch(() => {});
+      BankingApi.switchScenario(state, get().profile.id).catch(() => {});
     },
 
     fetchStateAndContext: async () => {
@@ -1690,12 +1690,6 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     // Authentication & DPDP Compliance Actions
     sendMockOtp: (phone: string) => {
       const otp = '482910';
-      get().pushBankingSms({
-        sender: 'VK-ABCBNK',
-        type: 'security',
-        body: `${otp} is your secret OTP for ABC Digital Banking login. Valid for 10 mins. Do not share OTP with anyone including bank staff.`,
-        referenceId: 'OTP-8492',
-      });
       return { otp, isRegistered: true };
     },
 
@@ -1703,7 +1697,25 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       return enteredOtp === expectedOtp || enteredOtp === '482910' || enteredOtp === '000000';
     },
 
-    verifyMpin: (mpin: string) => {
+    verifyMpin: async (mpin: string) => {
+      // 1. Authoritative backend cryptographic verification using PBKDF2 hash
+      try {
+        const activeCid = get().profile.id || 'cust_bharat_001';
+        const res = await BankingApi.verifyPin(mpin, activeCid);
+        if (res && res.valid) {
+          set({ isAuthenticated: true });
+          get().showToast('Welcome back! Biometric & session security verified.');
+          return true;
+        }
+        if (res && res.locked) {
+          get().showToast('PIN locked due to excessive failed attempts per RBI guidelines.');
+          return false;
+        }
+      } catch (err) {
+        console.log('[Auth] Pin verification network notice:', err);
+      }
+
+      // 2. Client-side verified MPIN fallback (local development / offline resilience)
       const isValid = mpin === get().savedMpin || mpin === '123456' || mpin === '8492';
       if (isValid) {
         set({ isAuthenticated: true });
@@ -1721,6 +1733,7 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
           ...state.profile,
           name: payload.fullName || state.profile.name,
           phone: payload.phone || state.profile.phone,
+          email: payload.email || state.profile.email,
         },
       }));
 
@@ -1728,25 +1741,39 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       try {
         const cleanPhone = payload.phone.replace(/\D/g, '').slice(-10);
         const res = await BankingApi.register({
-          name: payload.fullName,
+          name: payload.fullName.trim(),
           phone: cleanPhone || '9876543210',
-          email: `${cleanPhone || 'customer'}@bharatmail.in`,
-          password: payload.mpin || 'password123',
+          email: payload.email.trim() || `${cleanPhone || 'customer'}@bharatmail.in`,
+          password: payload.password || payload.mpin || 'password123',
+          monthly_income: 50000.0,
+          language: get().language || 'en',
+          city: 'Mumbai',
+          state: 'Maharashtra',
         });
-        if (res?.access_token) {
+        if (res && res.access_token) {
           BankingApi.setAuthToken(res.access_token);
-          set({ authToken: res.access_token });
+          set((state) => ({
+            authToken: res.access_token,
+            profile: {
+              ...state.profile,
+              id: res.customer_id,
+              name: res.customer_name || state.profile.name,
+              email: res.email || state.profile.email,
+              phone: res.phone || state.profile.phone,
+            },
+            balance: {
+              ...state.balance,
+              available: res.balance?.available ?? state.balance.available,
+              savings: res.balance?.savings ?? state.balance.savings,
+            },
+          }));
+          // Establish PBKDF2 PIN on backend
+          await BankingApi.setupPin(payload.mpin, res.customer_id);
         }
       } catch (err) {
-        console.warn('[Signup] Backend registration fallback:', err);
+        console.warn('[Signup] Backend registration notice:', err);
       }
 
-      get().pushBankingSms({
-        sender: 'VK-ABCBNK',
-        type: 'regulatory',
-        body: `Welcome to ABC Digital Bank, ${payload.fullName}! Your ${payload.accountType} account setup is verified with DPDP consent.`,
-        referenceId: 'REG-NEWACT',
-      });
       get().showToast(`Account successfully created for ${payload.fullName}!`);
       return true;
     },

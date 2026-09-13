@@ -238,8 +238,10 @@ export type AuthStep = 'LOGIN' | 'SIGNUP' | 'OTP' | 'DPDP_CONSENT' | 'MPIN' | 'A
 export interface SignupPayload {
   fullName: string;
   phone: string;
+  email: string;
+  password?: string;
   accountType: 'SAVINGS' | 'SALARY' | 'CURRENT';
-  panOrAadhaar: string;
+  panOrAadhaar?: string;
   mpin: string;
 }
 

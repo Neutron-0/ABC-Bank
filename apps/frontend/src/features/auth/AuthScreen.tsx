@@ -111,7 +111,7 @@ export const AuthScreen: React.FC = () => {
   } = useCustomerStore();
 
   const [step, setStep] = useState<AuthScreenStep>('PHONE');
-  const [authMode, setAuthMode] = useState<'OTP' | 'PASSWORD'>('OTP');
+  const [authMode, setAuthMode] = useState<'PASSWORD' | 'OTP'>('PASSWORD');
   const [phone, setPhone] = useState('9999999901');
   const [loginIdentifier, setLoginIdentifier] = useState('rahul.sharma@bharatmail.in');
   const [loginPassword, setLoginPassword] = useState('password123');
@@ -121,12 +121,13 @@ export const AuthScreen: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [resendTimer, setResendTimer] = useState(30);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [showMockSmsBanner, setShowMockSmsBanner] = useState(false);
   const [activePreset, setActivePreset] = useState<CustomerStateType>('normal');
 
   // Sign up fields
   const [signupName, setSignupName] = useState('');
   const [signupPhone, setSignupPhone] = useState('9876543210');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
   const [signupAccountType, setSignupAccountType] = useState<'SAVINGS' | 'SALARY' | 'CURRENT'>('SAVINGS');
   const [signupMpin, setSignupMpin] = useState('');
   const [confirmMpin, setConfirmMpin] = useState('');
@@ -221,7 +222,6 @@ export const AuthScreen: React.FC = () => {
     }
     setErrorMessage('');
     sendMockOtp(cleanPhone);
-    setShowMockSmsBanner(true);
     setResendTimer(30);
     setOtpDigits(['', '', '', '', '', '']);
     transitionTo('OTP');
@@ -250,13 +250,39 @@ export const AuthScreen: React.FC = () => {
     }
   };
 
-  // Step 2: Fill OTP automatically for evaluator ease
+  // Step 2: Auto-fill OTP
   const handleAutoFillOtp = () => {
     setOtpDigits(['4', '8', '2', '9', '1', '0']);
     setErrorMessage('');
+    setTimeout(() => {
+      transitionTo('MPIN');
+    }, 400);
   };
 
-  // Verify OTP
+  const handleOtpChange = (text: string) => {
+    const raw = text.replace(/\D/g, '').slice(0, 6);
+    const updated = ['', '', '', '', '', ''];
+    for (let i = 0; i < raw.length; i++) {
+      updated[i] = raw[i];
+    }
+    setOtpDigits(updated);
+    setErrorMessage('');
+
+    if (raw.length === 6) {
+      setIsVerifying(true);
+      setTimeout(() => {
+        setIsVerifying(false);
+        const valid = verifyMockOtp(raw, '482910');
+        if (valid) {
+          transitionTo('MPIN');
+        } else {
+          setErrorMessage('Invalid verification code. Please enter 482910.');
+          triggerShake();
+        }
+      }, 300);
+    }
+  };
+
   const handleVerifyOtp = () => {
     const entered = otpDigits.join('');
     if (entered.length !== 6) {
@@ -270,24 +296,31 @@ export const AuthScreen: React.FC = () => {
       setIsVerifying(false);
       const ok = verifyMockOtp(entered, '482910');
       if (!ok) {
-        setErrorMessage('Invalid OTP code. Tap "Auto-fill 482910" or use 000000.');
+        setErrorMessage('Invalid verification code. Please enter 482910.');
         triggerShake();
         return;
       }
-      // Advance to DPDP Consent screen
-      transitionTo('DPDP_CONSENT');
+      transitionTo('MPIN');
     }, 300);
   };
 
-  // Step 3: Accept DPDP Consent
+  // Step 3: DPDP Consent
+  const handleConsentToggle = (key: keyof DpdpConsentState) => {
+    setConsentDraft((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   const handleAcceptDpdp = (allAccepted: boolean) => {
-    const updated = {
+    const updated: DpdpConsentState = {
       ...consentDraft,
       essentialBanking: true,
       deviceSecurity: true,
       smsFraudDetection: allAccepted ? true : consentDraft.smsFraudDetection,
       accountAggregator: allAccepted ? true : consentDraft.accountAggregator,
       personalizedOffers: allAccepted ? true : consentDraft.personalizedOffers,
+      acceptedTimestamp: new Date().toISOString(),
     };
     updateDpdpConsent(updated);
     transitionTo('MPIN');
@@ -302,9 +335,9 @@ export const AuthScreen: React.FC = () => {
 
       if (next.length === 6) {
         setIsVerifying(true);
-        setTimeout(() => {
+        setTimeout(async () => {
+          const valid = await verifyMpin(next);
           setIsVerifying(false);
-          const valid = verifyMpin(next);
           if (!valid) {
             setErrorMessage('Incorrect MPIN. Default demo MPIN is 123456.');
             triggerShake();
@@ -322,16 +355,32 @@ export const AuthScreen: React.FC = () => {
 
   const handleBiometricUnlock = () => {
     setIsVerifying(true);
-    setTimeout(() => {
+    setTimeout(async () => {
+      await verifyMpin('123456');
       setIsVerifying(false);
-      verifyMpin('123456');
     }, 350);
   };
 
   // Signup Submit
-  const handleSignupSubmit = () => {
+  const handleSignupSubmit = async () => {
     if (!signupName.trim()) {
       setErrorMessage('Please enter your full legal name as per Aadhaar/PAN.');
+      triggerShake();
+      return;
+    }
+    const cleanPhone = signupPhone.replace(/\D/g, '').slice(-10);
+    if (cleanPhone.length !== 10) {
+      setErrorMessage('Please enter a valid 10-digit mobile number.');
+      triggerShake();
+      return;
+    }
+    if (!signupEmail.trim() || !signupEmail.includes('@')) {
+      setErrorMessage('Please enter a valid email address.');
+      triggerShake();
+      return;
+    }
+    if (!signupPassword || signupPassword.length < 6) {
+      setErrorMessage('Please set an account password (at least 6 characters).');
       triggerShake();
       return;
     }
@@ -348,13 +397,15 @@ export const AuthScreen: React.FC = () => {
 
     const payload: SignupPayload = {
       fullName: signupName.trim(),
-      phone: signupPhone,
+      phone: cleanPhone,
+      email: signupEmail.trim(),
+      password: signupPassword,
       accountType: signupAccountType,
       panOrAadhaar: 'ABCDE1234F',
       mpin: signupMpin,
     };
 
-    signupCustomer(payload);
+    await signupCustomer(payload);
     transitionTo('DPDP_CONSENT');
   };
 
@@ -753,6 +804,33 @@ export const AuthScreen: React.FC = () => {
                 />
               </View>
 
+              {/* Email Address */}
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Email Address</Text>
+                <TextInput
+                  style={[styles.textInputStandard, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF', color: themeColors.textPrimary }]}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={signupEmail}
+                  onChangeText={setSignupEmail}
+                  placeholder="e.g. ramesh.verma@bharatmail.in"
+                  placeholderTextColor="#9C968E"
+                />
+              </View>
+
+              {/* Account Password */}
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Account Password</Text>
+                <TextInput
+                  style={[styles.textInputStandard, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF', color: themeColors.textPrimary }]}
+                  secureTextEntry
+                  value={signupPassword}
+                  onChangeText={setSignupPassword}
+                  placeholder="Set password (min 6 characters)"
+                  placeholderTextColor="#9C968E"
+                />
+              </View>
+
               {/* Account Type Selector */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: themeColors.textSecondary }]}>Select Account Variant</Text>
@@ -858,33 +936,37 @@ export const AuthScreen: React.FC = () => {
                 </Text>
               </View>
 
-              {/* Realistic SMS Banner */}
-              {showMockSmsBanner && (
-                <View style={styles.smsBanner}>
-                  <View style={styles.smsHeader}>
-                    <Smartphone size={13} color="#141414" />
-                    <Text style={styles.smsSender}>VK-ABCBNK (SMS Notice)</Text>
-                  </View>
-                  <Text style={styles.smsBody}>
-                    <Text style={styles.smsCodeHighlight}>482910</Text> is your secret OTP for ABC Digital Banking login. Valid for 10 mins. Do not share OTP with anyone.
-                  </Text>
-                </View>
-              )}
+              {/* Transparent Informative Note */}
+              <View style={[styles.infoBanner, { backgroundColor: '#F3EFEA', borderColor: '#EAE6DF' }]}>
+                <Info size={14} color="#68645E" />
+                <Text style={[styles.infoBannerText, { color: themeColors.textSecondary }]}>
+                  RBI mandates two-factor verification. For testing and demonstration, use code <Text style={{ fontWeight: '700', color: themeColors.textPrimary }}>482910</Text>.
+                </Text>
+              </View>
 
-              {/* 6 Digit Input Boxes */}
-              <View style={styles.otpRow}>
-                {otpDigits.map((digit, idx) => (
-                  <View
-                    key={idx}
-                    style={[
-                      styles.otpBox,
-                      digit ? styles.otpBoxFilled : null,
-                      otpDigits.findIndex((d) => !d) === idx ? styles.otpBoxActive : null,
-                    ]}
-                  >
-                    <Text style={styles.otpDigitText}>{digit || '•'}</Text>
-                  </View>
-                ))}
+              {/* 6 Digit Input Boxes with Hidden Direct Input */}
+              <View style={{ position: 'relative', marginVertical: spacing.sm }}>
+                <View style={styles.otpRow}>
+                  {otpDigits.map((digit, idx) => (
+                    <View
+                      key={idx}
+                      style={[
+                        styles.otpBox,
+                        digit ? styles.otpBoxFilled : null,
+                        otpDigits.findIndex((d) => !d) === idx ? styles.otpBoxActive : null,
+                      ]}
+                    >
+                      <Text style={styles.otpDigitText}>{digit || '•'}</Text>
+                    </View>
+                  ))}
+                </View>
+                <TextInput
+                  style={styles.hiddenOtpInput}
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  value={otpDigits.join('')}
+                  onChangeText={handleOtpChange}
+                />
               </View>
 
               {/* 1-Tap Auto-fill Button for Evaluator Convenience */}
@@ -895,7 +977,7 @@ export const AuthScreen: React.FC = () => {
               >
                 <ShieldCheck size={15} color="#1B7A43" />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.autofillTitle}>Auto-Fill Demo OTP (482910)</Text>
+                  <Text style={styles.autofillTitle}>Test Helper: Tap to Fill Demo OTP (482910)</Text>
                   <Text style={styles.autofillSubtitle}>Inserts verified code: 482910</Text>
                 </View>
                 <ArrowRight size={15} color="#1B7A43" />
@@ -927,7 +1009,7 @@ export const AuthScreen: React.FC = () => {
                   <Text style={[styles.resendTimerText, { color: themeColors.textMuted }]}>Resend code in {resendTimer}s</Text>
                 ) : (
                   <TouchableOpacity onPress={() => handleRequestOtp()}>
-                    <Text style={[styles.resendActiveText, { color: '#141414' }]}>Resend OTP (VK-ABCBNK)</Text>
+                    <Text style={[styles.resendActiveText, { color: '#141414' }]}>Resend OTP</Text>
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity onPress={() => transitionTo('PHONE')}>
@@ -1500,37 +1582,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
   },
-  smsBanner: {
-    width: '100%',
-    backgroundColor: '#F3EFEA',
+  infoBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderRadius: radii.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#EAE6DF',
+    gap: 10,
     marginBottom: spacing.md,
   },
-  smsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
-  },
-  smsSender: {
-    fontSize: 10.5,
-    fontWeight: '800',
-    color: '#141414',
-    letterSpacing: 0.5,
-  },
-  smsBody: {
+  infoBannerText: {
     fontSize: 12,
-    fontWeight: '500',
-    color: '#141414',
     lineHeight: 17,
+    flex: 1,
   },
-  smsCodeHighlight: {
-    fontWeight: '800',
-    color: '#141414',
-    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+  hiddenOtpInput: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0,
   },
   otpRow: {
     flexDirection: 'row',
