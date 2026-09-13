@@ -17,6 +17,10 @@ import {
   EyeOff,
   AlertTriangle,
   CheckCircle2,
+  ShieldCheck,
+  RefreshCw,
+  Clock,
+  Copy,
 } from 'lucide-react-native';
 
 export const DebitCardModal: React.FC = () => {
@@ -29,11 +33,40 @@ export const DebitCardModal: React.FC = () => {
     cardControls,
     updateCardControls,
     fetchCardControls,
+    dynamicCvv,
+    generateDynamicCvv,
   } = useCustomerStore();
 
   useEffect(() => {
     fetchCardControls();
   }, []);
+
+  const [secondsLeft, setSecondsLeft] = useState<number>(0);
+  const [isGeneratingCvv, setIsGeneratingCvv] = useState(false);
+
+  useEffect(() => {
+    if (!dynamicCvv) return;
+    const expiresMs = new Date(dynamicCvv.expiresAt).getTime();
+    const updateCountdown = () => {
+      const remaining = Math.max(0, Math.floor((expiresMs - Date.now()) / 1000));
+      setSecondsLeft(remaining);
+    };
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [dynamicCvv?.expiresAt]);
+
+  const handleGenerateCvv = async () => {
+    setIsGeneratingCvv(true);
+    await generateDynamicCvv();
+    setIsGeneratingCvv(false);
+  };
+
+  const formatTimer = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
   const isLocked = cardControls?.is_locked ?? false;
   const contactlessEnabled = cardControls?.contactlessEnabled ?? true;
@@ -174,6 +207,62 @@ export const DebitCardModal: React.FC = () => {
                 trackColor={{ false: themeColors.border, true: themeColors.danger }}
                 thumbColor="#FFFFFF"
               />
+            </View>
+
+            {/* Dynamic 5-Minute Single-Use Virtual CVV */}
+            <View style={[styles.dynamicCvvCard, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+              <View style={styles.dynamicCvvHeader}>
+                <View style={styles.dynamicCvvTitleWrap}>
+                  <ShieldCheck size={16} color="#059669" />
+                  <Text style={[styles.dynamicCvvTitle, { color: themeColors.textPrimary }]}>
+                    Dynamic Virtual CVV
+                  </Text>
+                  <View style={styles.rbiPill}>
+                    <Text style={styles.rbiPillText}>RBI Safe</Text>
+                  </View>
+                </View>
+                {dynamicCvv && secondsLeft > 0 ? (
+                  <View style={styles.timerBadge}>
+                    <Clock size={12} color="#D97706" />
+                    <Text style={styles.timerBadgeText}>{formatTimer(secondsLeft)}</Text>
+                  </View>
+                ) : null}
+              </View>
+
+              <Text style={[styles.dynamicCvvDesc, { color: themeColors.textSecondary }]}>
+                Generate a single-use 5-minute virtual security code. Protects against online credential leaks and recurring card skimming.
+              </Text>
+
+              {dynamicCvv && secondsLeft > 0 ? (
+                <View style={[styles.cvvActiveBox, { backgroundColor: themeColors.cardBg, borderColor: '#10B981' }]}>
+                  <View style={styles.cvvValueCol}>
+                    <Text style={[styles.cvvActiveLabel, { color: themeColors.textSecondary }]}>Active One-Time CVV</Text>
+                    <Text style={[styles.cvvActiveDigits, { color: themeColors.textPrimary }]}>
+                      {dynamicCvv.cvv}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      showToast('CVV copied! Valid for checkout.');
+                    }}
+                    style={styles.copyCvvBtn}
+                  >
+                    <Copy size={14} color="#059669" />
+                    <Text style={styles.copyCvvText}>Copy</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+
+              <TouchableOpacity
+                onPress={handleGenerateCvv}
+                disabled={isGeneratingCvv}
+                style={[styles.genCvvBtn, { backgroundColor: '#800020' }]}
+              >
+                <RefreshCw size={14} color="#FFFFFF" />
+                <Text style={styles.genCvvBtnText}>
+                  {dynamicCvv && secondsLeft > 0 ? 'Regenerate 5-Min CVV' : 'Generate Single-Use CVV'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             {/* Usage Channels Settings */}
@@ -630,6 +719,109 @@ const styles = StyleSheet.create({
   },
   doneBtnText: {
     fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  dynamicCvvCard: {
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
+    gap: spacing.xs,
+  },
+  dynamicCvvHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dynamicCvvTitleWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dynamicCvvTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  rbiPill: {
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  rbiPillText: {
+    fontSize: 8,
+    fontWeight: '700',
+    color: '#047857',
+  },
+  timerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  timerBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#B45309',
+    fontFamily: 'Courier',
+  },
+  dynamicCvvDesc: {
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  cvvActiveBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: spacing.sm,
+    borderRadius: radii.md,
+    borderWidth: 1.5,
+    marginTop: 4,
+  },
+  cvvValueCol: {
+    gap: 2,
+  },
+  cvvActiveLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  cvvActiveDigits: {
+    fontSize: 22,
+    fontWeight: '800',
+    fontFamily: 'Courier',
+    letterSpacing: 4,
+  },
+  copyCvvBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: radii.sm,
+  },
+  copyCvvText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#065F46',
+  },
+  genCvvBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: radii.md,
+    marginTop: 4,
+  },
+  genCvvBtnText: {
+    fontSize: 12,
     fontWeight: '700',
     color: '#FFFFFF',
   },

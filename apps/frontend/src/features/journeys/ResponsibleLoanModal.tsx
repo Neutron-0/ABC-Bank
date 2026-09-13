@@ -30,6 +30,8 @@ export const ResponsibleLoanModal: React.FC = () => {
     transactions,
     language,
     disburseLoan,
+    calculateKfs,
+    cancelLoanCoolingOff,
   } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -38,8 +40,12 @@ export const ResponsibleLoanModal: React.FC = () => {
   const [isDisbursed, setIsDisbursed] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [disbursedTxId, setDisbursedTxId] = useState<string>('');
+  const [isCancellingCoolingOff, setIsCancellingCoolingOff] = useState<boolean>(false);
+  const [coolingOffExecuted, setCoolingOffExecuted] = useState<boolean>(false);
 
   if (activeJourney !== 'loan' && !activeJourney?.includes('loan')) return null;
+
+  const kfs = calculateKfs(loanAmount, tenureMonths, 11.5);
 
   const isStress = currentState === 'financial_stress' || financialHealth.status === 'stress';
 
@@ -158,8 +164,49 @@ export const ResponsibleLoanModal: React.FC = () => {
                   </View>
                 </View>
 
+                {/* 3-Day Statutory Cooling-Off Period Card */}
+                {coolingOffExecuted ? (
+                  <View style={[styles.coolingOffCard, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
+                    <View style={styles.coolingOffHeader}>
+                      <CheckCircle2 size={16} color="#DC2626" />
+                      <Text style={[styles.coolingOffTitle, { color: '#DC2626' }]}>
+                        Loan Cancelled Under Statutory Cooling-Off
+                      </Text>
+                    </View>
+                    <Text style={[styles.coolingOffDesc, { color: '#991B1B' }]}>
+                      The agreement has been revoked with 0% penalty and principal reversed as per RBI Fair Practices Code.
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={[styles.coolingOffCard, { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' }]}>
+                    <View style={styles.coolingOffHeader}>
+                      <ShieldCheck size={16} color="#059669" />
+                      <Text style={styles.coolingOffTitle}>
+                        RBI 3-Day Statutory Cooling-Off Active
+                      </Text>
+                    </View>
+                    <Text style={styles.coolingOffDesc}>
+                      Under RBI Fair Practices Code, you can cancel this credit contract within 72 hours with 0% exit penalty.
+                    </Text>
+                    <TouchableOpacity
+                      onPress={async () => {
+                        setIsCancellingCoolingOff(true);
+                        await cancelLoanCoolingOff(disbursedTxId || 'loan_agreement_01');
+                        setIsCancellingCoolingOff(false);
+                        setCoolingOffExecuted(true);
+                      }}
+                      disabled={isCancellingCoolingOff}
+                      style={styles.coolingOffBtn}
+                    >
+                      <Text style={styles.coolingOffBtnText}>
+                        {isCancellingCoolingOff ? 'Reversing Loan...' : 'Exercise Cooling-Off & Cancel Loan (0% Fee)'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
                 <TouchableOpacity
-                  style={[styles.primaryBtn, { backgroundColor: themeColors.primary }]}
+                  style={[styles.primaryBtn, { backgroundColor: themeColors.primary, marginTop: spacing.md }]}
                   onPress={handleClose}
                   delayPressIn={0}
                   activeOpacity={0.8}
@@ -307,31 +354,62 @@ export const ResponsibleLoanModal: React.FC = () => {
                   ))}
                 </View>
 
-                {/* Live Transparent EMI Breakdown Box */}
+                {/* RBI Mandated Key Fact Statement (KFS) Box */}
                 <View style={[styles.calcBox, { backgroundColor: themeColors.cardBgSecondary, borderColor: themeColors.border }]}>
+                  <View style={styles.kfsHeaderRow}>
+                    <View style={styles.kfsTitleLeft}>
+                      <ShieldCheck size={14} color="#059669" />
+                      <Text style={[styles.kfsTitleText, { color: themeColors.textPrimary }]}>
+                        RBI Key Fact Statement (KFS)
+                      </Text>
+                    </View>
+                    <View style={styles.kfsBadge}>
+                      <Text style={styles.kfsBadgeText}>APR {kfs.annualPercentageRate}%</Text>
+                    </View>
+                  </View>
+
                   <View style={styles.calcRow}>
                     <Text style={[styles.calcLabel, { color: themeColors.textSecondary }]}>
-                      {language === 'hi' ? 'अनुमानित मासिक ईएमआई:' : language === 'gu' ? 'અંદાજિત માસિક EMI:' : 'Estimated Monthly EMI:'}
+                      {language === 'hi' ? 'मासिक ईएमआई:' : language === 'gu' ? 'માસિક EMI:' : 'Monthly EMI:'}
                     </Text>
-                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>₹{estimatedEmi.toLocaleString('en-IN')} / mo</Text>
+                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>₹{kfs.monthlyEmi.toLocaleString('en-IN')} / mo</Text>
                   </View>
                   <View style={styles.calcRow}>
                     <Text style={[styles.calcLabel, { color: themeColors.textSecondary }]}>
-                      {language === 'hi' ? 'ब्याज दर (पारदर्शी):' : language === 'gu' ? 'વ્યાજ દર (પારદર્શક):' : 'Fixed Interest Rate:'}
+                      {language === 'hi' ? 'सालाना प्रतिशत दर (APR):' : 'Annual Percentage Rate (APR):'}
                     </Text>
-                    <Text style={[styles.calcValue, { color: themeColors.brandSecondary }]}>11.5% p.a. Fixed</Text>
+                    <Text style={[styles.calcValue, { color: '#059669', fontWeight: '800' }]}>{kfs.annualPercentageRate}%</Text>
                   </View>
                   <View style={styles.calcRow}>
                     <Text style={[styles.calcLabel, { color: themeColors.textSecondary }]}>
-                      {language === 'hi' ? 'प्री-पेमेंट चार्ज:' : language === 'gu' ? 'પ્રી-પેમેન્ટ ચાર્જ:' : 'Pre-payment Penalty:'}
+                      {language === 'hi' ? 'मूल ब्याज दर (नाममात्र):' : 'Nominal Interest Rate:'}
                     </Text>
-                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>₹0 (Zero Charges)</Text>
+                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>{kfs.nominalRate}% p.a. Fixed</Text>
                   </View>
                   <View style={styles.calcRow}>
                     <Text style={[styles.calcLabel, { color: themeColors.textSecondary }]}>
-                      {language === 'hi' ? 'दस्तावेजीकरण:' : language === 'gu' ? 'દસ્તાવેજીકરણ:' : 'Documentation:'}
+                      {language === 'hi' ? 'प्रसंस्करण शुल्क (Processing Fee):' : 'One-Time Processing Fee:'}
                     </Text>
-                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>100% Paperless DigiLocker</Text>
+                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>₹{kfs.processingFee.toLocaleString('en-IN')} (incl. GST)</Text>
+                  </View>
+                  <View style={styles.calcRow}>
+                    <Text style={[styles.calcLabel, { color: themeColors.textSecondary }]}>
+                      {language === 'hi' ? 'कुल ब्याज देनदारी:' : 'Total Interest Payable:'}
+                    </Text>
+                    <Text style={[styles.calcValue, { color: themeColors.textPrimary }]}>₹{kfs.totalInterest.toLocaleString('en-IN')}</Text>
+                  </View>
+                  <View style={[styles.calcRow, styles.kfsDivider, { borderTopColor: themeColors.border }]}>
+                    <Text style={[styles.calcLabel, { color: themeColors.textPrimary, fontWeight: '700' }]}>
+                      {language === 'hi' ? 'कुल पुनर्भुगतान राशि:' : 'Total Repayment Amount:'}
+                    </Text>
+                    <Text style={[styles.calcValue, { color: themeColors.textPrimary, fontWeight: '800' }]}>
+                      ₹{kfs.totalRepayment.toLocaleString('en-IN')}
+                    </Text>
+                  </View>
+                  <View style={styles.coolingOffNote}>
+                    <Text style={styles.coolingOffNoteText}>
+                      ✓ 3-Day Statutory Cooling-Off Period applies. Cancel within 72 hrs with zero exit fee.
+                    </Text>
                   </View>
                 </View>
 
@@ -630,5 +708,86 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+  kfsHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  kfsTitleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  kfsTitleText: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  kfsBadge: {
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  kfsBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#047857',
+  },
+  kfsDivider: {
+    borderTopWidth: 1,
+    paddingTop: 6,
+    marginTop: 4,
+  },
+  coolingOffNote: {
+    backgroundColor: '#F8FAFC',
+    padding: 6,
+    borderRadius: 6,
+    marginTop: 4,
+  },
+  coolingOffNoteText: {
+    fontSize: 10,
+    color: '#475569',
+    lineHeight: 14,
+  },
+  coolingOffCard: {
+    width: '100%',
+    padding: spacing.md,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    marginTop: spacing.md,
+    gap: 6,
+  },
+  coolingOffHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  coolingOffTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#065F46',
+  },
+  coolingOffDesc: {
+    fontSize: 11,
+    color: '#334155',
+    lineHeight: 15,
+  },
+  coolingOffBtn: {
+    backgroundColor: '#DC2626',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: radii.sm,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  coolingOffBtnText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
   },
 });

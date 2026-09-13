@@ -15,6 +15,10 @@ import {
   Building,
   RefreshCw,
   Info,
+  Sparkles,
+  Calculator,
+  ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-react-native';
 
 const MODAL_WIDTH = Math.min(360, Dimensions.get('window').width - 40);
@@ -39,9 +43,21 @@ function describeArc(x: number, y: number, radius: number, startAngle: number, e
 
 export const CreditScoreModal: React.FC = () => {
   const { colors } = useAppTheme();
-  const { activeJourney, closeJourney, language, showToast, profile } = useCustomerStore();
+  const {
+    activeJourney,
+    closeJourney,
+    language,
+    showToast,
+    profile,
+    getSimulatedCreditScore,
+  } = useCustomerStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [score, setScore] = useState(profile.creditScore || 765);
+  const [selectedScenario, setSelectedScenario] = useState<
+    'pay_off_loan' | 'miss_emi' | 'lower_utilization' | 'new_credit_inquiry' | null
+  >(null);
+
+  const simulation = selectedScenario ? getSimulatedCreditScore(selectedScenario) : null;
 
   const isVisible = activeJourney === 'credit_score' || activeJourney === 'credit';
 
@@ -332,6 +348,123 @@ export const CreditScoreModal: React.FC = () => {
               </View>
             </View>
 
+            {/* What-If Credit Score Simulator */}
+            <View style={[styles.simulatorBox, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+              <View style={styles.simHeaderRow}>
+                <View style={styles.simTitleLeft}>
+                  <Calculator size={16} color={colors.primary} />
+                  <Text style={[styles.simTitle, { color: colors.textPrimary }]}>
+                    "What-If" Credit Score Simulator
+                  </Text>
+                </View>
+                <View style={styles.simAiTag}>
+                  <Sparkles size={11} color="#D97706" />
+                  <Text style={styles.simAiTagText}>Bureau Model</Text>
+                </View>
+              </View>
+
+              <Text style={[styles.simSubtext, { color: colors.textSecondary }]}>
+                See how specific financial decisions will impact your TransUnion CIBIL score before taking action.
+              </Text>
+
+              {/* Scenario Chips */}
+              <View style={styles.scenarioGrid}>
+                {[
+                  { id: 'pay_off_loan', label: 'Pay Off Loan Early', delta: '+22 pts', isPositive: true },
+                  { id: 'lower_utilization', label: 'Lower Limit Usage <10%', delta: '+15 pts', isPositive: true },
+                  { id: 'new_credit_inquiry', label: 'Apply 2 New Cards', delta: '-12 pts', isPositive: false },
+                  { id: 'miss_emi', label: 'Miss 1 EMI Payment', delta: '-65 pts', isPositive: false },
+                ].map((sc) => {
+                  const isSelected = selectedScenario === sc.id;
+                  return (
+                    <TouchableOpacity
+                      key={sc.id}
+                      onPress={() => setSelectedScenario(isSelected ? null : (sc.id as any))}
+                      style={[
+                        styles.scenarioChip,
+                        {
+                          backgroundColor: isSelected ? colors.primary : colors.cardBgSecondary,
+                          borderColor: isSelected ? colors.primary : colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.scenarioChipLabel,
+                          { color: isSelected ? '#FFFFFF' : colors.textPrimary },
+                        ]}
+                      >
+                        {sc.label}
+                      </Text>
+                      <View style={styles.scenarioDeltaWrap}>
+                        {sc.isPositive ? (
+                          <ArrowUpRight size={12} color={isSelected ? '#A7F3D0' : '#059669'} />
+                        ) : (
+                          <ArrowDownRight size={12} color={isSelected ? '#FECDD3' : '#E11D48'} />
+                        )}
+                        <Text
+                          style={[
+                            styles.scenarioChipDelta,
+                            {
+                              color: isSelected
+                                ? sc.isPositive ? '#A7F3D0' : '#FECDD3'
+                                : sc.isPositive ? '#059669' : '#E11D48',
+                            },
+                          ]}
+                        >
+                          {sc.delta}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {/* Active Simulation Result Box */}
+              {simulation && (
+                <View style={[styles.simResultCard, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
+                  <View style={styles.simResultHeader}>
+                    <View>
+                      <Text style={[styles.simResultTitle, { color: colors.textSecondary }]}>
+                        Projected Score
+                      </Text>
+                      <View style={styles.simScoreRow}>
+                        <Text style={[styles.simCurrentScore, { color: colors.textSecondary }]}>
+                          {simulation.currentScore}
+                        </Text>
+                        <Text style={[styles.simArrow, { color: colors.textSecondary }]}>➔</Text>
+                        <Text style={[styles.simProjectedScore, { color: colors.textPrimary }]}>
+                          {simulation.projectedScore}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View
+                      style={[
+                        styles.deltaBadge,
+                        {
+                          backgroundColor: simulation.delta >= 0 ? '#D1FAE5' : '#FFE4E6',
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.deltaBadgeText,
+                          { color: simulation.delta >= 0 ? '#047857' : '#BE123C' },
+                        ]}
+                      >
+                        {simulation.delta >= 0 ? `+${simulation.delta}` : simulation.delta} pts
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text style={[styles.simExplanation, { color: colors.textSecondary }]}>
+                    {simulation.explanation}
+                  </Text>
+                </View>
+              )}
+            </View>
+
             {/* Strategic Advisory */}
             <View style={[styles.adviceBox, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
               <View style={styles.adviceHeader}>
@@ -577,5 +710,121 @@ const styles = StyleSheet.create({
   doneBtnText: {
     ...typography.bodyBold,
     color: '#FFFFFF',
+  },
+  simulatorBox: {
+    borderRadius: radii.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    marginBottom: spacing.md,
+    gap: spacing.xs,
+  },
+  simHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  simTitleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  simTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  simAiTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  simAiTagText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#B45309',
+  },
+  simSubtext: {
+    fontSize: 11,
+    lineHeight: 16,
+    marginBottom: 4,
+  },
+  scenarioGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+  },
+  scenarioChip: {
+    width: '48%',
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    justifyContent: 'space-between',
+    minHeight: 54,
+  },
+  scenarioChipLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  scenarioDeltaWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    marginTop: 4,
+  },
+  scenarioChipDelta: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  simResultCard: {
+    borderRadius: radii.md,
+    padding: spacing.sm + 2,
+    borderWidth: 1,
+    marginTop: 6,
+    gap: 6,
+  },
+  simResultHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  simResultTitle: {
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  simScoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
+  simCurrentScore: {
+    fontSize: 13,
+    fontWeight: '600',
+    textDecorationLine: 'line-through',
+  },
+  simArrow: {
+    fontSize: 12,
+  },
+  simProjectedScore: {
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  deltaBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: radii.sm,
+  },
+  deltaBadgeText: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  simExplanation: {
+    fontSize: 11,
+    lineHeight: 16,
   },
 });
