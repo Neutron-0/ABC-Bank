@@ -165,4 +165,61 @@ export interface AssistantMessage {
   } | null;
 }
 
-export type MainTabType = 'home' | 'payments' | 'activity' | 'insights' | 'assistant' | 'profile';
+export type MainTabType = 'home' | 'payments' | 'assistant' | 'activity' | 'insights' | 'profile' | 'more';
+
+export interface AsbaLien {
+  lienId: string;
+  symbol: string;
+  applicationNo: string;
+  sharesCount: number;
+  amountBlocked: number;
+  status: 'BLOCKED' | 'ALLOTTED' | 'UNBLOCKED';
+  sebiMandateId: string;
+  timestamp: string;
+}
+
+export interface DynamicCvvState {
+  cardId: string;
+  cvv: string;
+  expiresAt: string;
+  validSeconds: number;
+}
+
+export interface BankingSmsAlert {
+  id: string;
+  sender: string; // e.g. "VK-ABCBNK"
+  body: string;
+  timestamp: string;
+  type: 'debit' | 'credit' | 'mandate' | 'security' | 'regulatory';
+  amount?: number;
+  referenceId?: string;
+}
+
+export interface KfsDetails {
+  loanAmount: number;
+  tenureMonths: number;
+  annualPercentageRate: number; // APR %
+  nominalRate: number;
+  processingFee: number;
+  totalInterest: number;
+  totalRepayment: number;
+  monthlyEmi: number;
+  coolingOffPeriodDays: number;
+}
+
+export interface FastagDetails {
+  vehicleNumber: string;
+  tagId: string;
+  balance: number;
+  minBalance: number;
+}
+
+export interface ForexOrderRecord {
+  id: string;
+  currency: string;
+  foreignAmount: number;
+  rate: number;
+  inrAmount: number;
+  timestamp: string;
+}
+

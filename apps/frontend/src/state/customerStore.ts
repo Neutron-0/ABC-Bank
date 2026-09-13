@@ -14,6 +14,12 @@ import {
   RiskSignals,
   ConsentSettings,
   MainTabType,
+  AsbaLien,
+  DynamicCvvState,
+  BankingSmsAlert,
+  KfsDetails,
+  FastagDetails,
+  ForexOrderRecord,
 } from '../types';
 import { BankingApi } from '../services/api';
 
@@ -707,6 +713,67 @@ interface CustomerStateStore {
   disburseLoan: (payload: { amount: number; tenureMonths?: number; annualRate?: number }) => Promise<{ success: boolean; contract_id?: string; error?: string }>;
   submitKyc: (payload: { pan: string; aadhaar: string; latitude?: number; longitude?: number; selfieVerified?: boolean }) => Promise<{ success: boolean; error?: string }>;
 
+  // Bharat Accessibility Mode Flag
+  isBharatMode: boolean;
+  toggleBharatMode: () => void;
+
+  // Pre-debit Shortfall Detection
+  getUpcomingEmiDeficit: () => {
+    hasDeficit: boolean;
+    deficit: number;
+    upcomingEmi: number;
+    availableBalance: number;
+    dueDate: string;
+  };
+
+  // Empathetic Loan Relief Operations
+  requestEmiGrace: (loanId?: string, days?: number) => Promise<{ success: boolean; newDueDate?: string; message?: string }>;
+  splitEmi: (loanId?: string) => Promise<{ success: boolean; part1?: number; part2?: number; message?: string }>;
+  sweepDeficitForEmi: (loanId?: string, amount?: number) => Promise<{ success: boolean; sweptAmount?: number; message?: string }>;
+  cancelLoanCoolingOff: (contractId: string) => Promise<{ success: boolean; refundedAmount?: number; message?: string }>;
+
+  // Key Fact Statement (KFS) Calculator
+  calculateKfs: (amount: number, tenureMonths: number, annualRate?: number) => KfsDetails;
+
+  // Account Aggregator (AA) Consent
+  aaConsentGiven: boolean;
+  setAaConsent: (consented: boolean) => void;
+
+  // Credit Score "What-If" Simulator
+  getSimulatedCreditScore: (action: 'pay_off_loan' | 'miss_emi' | 'lower_utilization' | 'new_credit_inquiry') => {
+    currentScore: number;
+    projectedScore: number;
+    delta: number;
+    explanation: string;
+  };
+
+  // Digital Rupee (e₹) CBDC Wallet
+  digitalRupeeBalance: number;
+  loadDigitalRupee: (amount: number) => boolean;
+  redeemDigitalRupee: (amount: number) => boolean;
+  sendDigitalRupee: (amount: number, recipient: string) => boolean;
+
+  // SEBI ASBA IPO Bidding
+  asbaLiens: AsbaLien[];
+  placeAsbaBid: (payload: { ipoName: string; shares: number; amount: number; upiId: string }) => Promise<{ success: boolean; lienId?: string; message?: string }>;
+
+  // Card Security: Dynamic Virtual CVV
+  dynamicCvv: DynamicCvvState | null;
+  generateDynamicCvv: (cardId?: string) => Promise<{ success: boolean; cvv?: string; expiresAt?: string; message?: string }>;
+
+  // Regulatory SMS Alert Queue
+  bankingAlerts: BankingSmsAlert[];
+  pushBankingSms: (alert: Omit<BankingSmsAlert, 'id' | 'timestamp'>) => void;
+  dismissBankingSms: (id: string) => void;
+
+  // FASTag Toll Services
+  fastag: FastagDetails;
+  rechargeFastag: (amount: number) => { success: boolean; refId: string; newBalance: number };
+
+  // Forex Multi-Currency Travel Card
+  forexOrders: ForexOrderRecord[];
+  bookForexOrder: (currency: string, foreignAmount: number, rate: number, inrAmount: number) => { success: boolean; orderId: string };
+
   setLanguage: (lang: LanguageCode) => void;
   setActiveTab: (tab: MainTabType) => void;
   switchCustomerState: (state: CustomerStateType) => Promise<void>;
@@ -861,6 +928,44 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     biometricsEnabled: true,
     phoneNumber: '+91 98765 43210',
     authModal: null,
+
+    // Authentic Banking Additions
+    isBharatMode: false,
+    aaConsentGiven: false,
+    digitalRupeeBalance: 500.0,
+    asbaLiens: [],
+    dynamicCvv: null,
+    bankingAlerts: [
+      {
+        id: 'sms_reg_01',
+        sender: 'VK-ABCBNK',
+        body: 'Acct XX8492 debited for INR 40.00 on 12-Sep-2026 08:38:00 via UPI (DMRC Transit). Avail Bal: INR 42,680.00.',
+        timestamp: '2026-09-12T08:38:00+05:30',
+        type: 'debit',
+        amount: 40,
+        referenceId: 'UPI/625519849201',
+      },
+      {
+        id: 'sms_reg_02',
+        sender: 'VK-ABCBNK',
+        body: 'Alert: Auto-debit scheduled for Home Loan EMI INR 16,500 on 16-Sep-2026. Keep sufficient balance to avoid bounce fee.',
+        timestamp: '2026-09-11T10:00:00+05:30',
+        type: 'mandate',
+        amount: 16500,
+        referenceId: 'NACH/HDFC/99214',
+      },
+    ],
+
+    // FASTag Toll Services
+    fastag: {
+      vehicleNumber: 'DL 01 AB 8492',
+      tagId: 'NETC-TAG-84920194',
+      balance: 340,
+      minBalance: 200,
+    },
+
+    // Forex Multi-Currency Travel Card
+    forexOrders: [],
 
     // Persistent Card Controls initial state
     cardControls: {
@@ -1179,6 +1284,388 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       set((state) => ({
         consent: { ...state.consent, ...consentUpdate },
       }));
+    },
+
+    // -----------------------------------------------------------------------
+    // Authentic Banking Implementations
+    // -----------------------------------------------------------------------
+    toggleBharatMode: () => {
+      set((state) => ({ isBharatMode: !state.isBharatMode }));
+    },
+
+    getUpcomingEmiDeficit: () => {
+      const state = get();
+      const upcomingEmi = (state.signals as any)?.upcoming_emi_amount || 16500;
+      const dueDate = (state.signals as any)?.upcoming_emi_date || '2026-09-16';
+      const available = state.balance.available;
+      const deficit = Math.max(0, upcomingEmi - available);
+      return {
+        hasDeficit: deficit > 0,
+        deficit,
+        upcomingEmi,
+        availableBalance: available,
+        dueDate,
+      };
+    },
+
+    requestEmiGrace: async (loanId = 'loan_home_01', days = 10) => {
+      set({ isLoading: true });
+      try {
+        const res = await BankingApi.requestEmiGrace({ loanId, days, customerId: get().profile.id });
+        if (res && res.success) {
+          set({
+            isLoading: false,
+            toastMessage: `10-Day Grace Granted! Due date extended to ${res.new_due_date} under RBI guidelines.`,
+          });
+          return { success: true, newDueDate: res.new_due_date, message: res.message };
+        }
+      } catch (err: any) {
+        console.warn('[LoanGrace] Live API call failed, applying offline relief:', err);
+      }
+      const newDueDate = '2026-09-26';
+      set({
+        isLoading: false,
+        toastMessage: `10-Day Grace Granted! Due date extended to ${newDueDate}. Zero bounce penalty.`,
+      });
+      return {
+        success: true,
+        newDueDate,
+        message: '10-day penalty-free grace buffer granted under RBI Resolution framework.',
+      };
+    },
+
+    splitEmi: async (loanId = 'loan_home_01') => {
+      set({ isLoading: true });
+      try {
+        const res = await BankingApi.splitEmi({ loanId, customerId: get().profile.id });
+        if (res && res.success) {
+          set({
+            isLoading: false,
+            toastMessage: `EMI split into 2: ₹${res.part_1_amount.toLocaleString('en-IN')} on ${res.part_1_due_date} & ₹${res.part_2_amount.toLocaleString('en-IN')} on ${res.part_2_due_date}.`,
+          });
+          return { success: true, part1: res.part_1_amount, part2: res.part_2_amount, message: res.message };
+        }
+      } catch (err: any) {
+        console.warn('[SplitEmi] Live API call failed, applying offline split:', err);
+      }
+      const part1 = 8250;
+      const part2 = 8250;
+      set({
+        isLoading: false,
+        toastMessage: 'EMI split: ₹8,250 due on 16-Sep and ₹8,250 on 01-Oct post-salary.',
+      });
+      return {
+        success: true,
+        part1,
+        part2,
+        message: 'EMI split into two 50% installments successfully.',
+      };
+    },
+
+    sweepDeficitForEmi: async (loanId = 'loan_home_01', amount?: number) => {
+      set({ isLoading: true });
+      const currentAvail = get().balance.available;
+      const deficit = amount !== undefined ? amount : Math.max(0, 16500 - currentAvail);
+      try {
+        const res = await BankingApi.sweepDeficitForEmi({ loanId, amount: deficit, customerId: get().profile.id });
+        if (res && res.success) {
+          set((state) => ({
+            balance: {
+              ...state.balance,
+              available: res.new_available_balance,
+              fixedDeposits: Math.max(0, state.balance.fixedDeposits - res.swept_amount),
+            },
+            isLoading: false,
+            toastMessage: `Auto-sweep complete: ₹${res.swept_amount.toLocaleString('en-IN')} transferred to cover EMI without breaking full FD!`,
+          }));
+          return { success: true, sweptAmount: res.swept_amount, message: res.message };
+        }
+      } catch (err: any) {
+        console.warn('[DeficitSweep] Live API call failed, applying offline sweep:', err);
+      }
+      set((state) => ({
+        balance: {
+          ...state.balance,
+          available: state.balance.available + deficit,
+          fixedDeposits: Math.max(0, state.balance.fixedDeposits - deficit),
+        },
+        isLoading: false,
+        toastMessage: `Auto-sweep complete: ₹${deficit.toLocaleString('en-IN')} covered from emergency buffer.`,
+      }));
+      return {
+        success: true,
+        sweptAmount: deficit,
+        message: 'Deficit auto-sweep successful.',
+      };
+    },
+
+    cancelLoanCoolingOff: async (contractId: string) => {
+      set({ isLoading: true });
+      try {
+        const res = await BankingApi.cancelLoanCoolingOff({ contractId, customerId: get().profile.id });
+        if (res && res.success) {
+          set((state) => ({
+            balance: {
+              ...state.balance,
+              available: Math.max(0, state.balance.available - res.refunded_amount),
+            },
+            isLoading: false,
+            toastMessage: `Loan cancelled within 3-day statutory cooling-off window! Zero penalty. ₹${res.refunded_amount.toLocaleString('en-IN')} reversed.`,
+          }));
+          return { success: true, refundedAmount: res.refunded_amount, message: res.message };
+        }
+      } catch (err: any) {
+        console.warn('[CoolingOff] Live API call failed, applying offline cancellation:', err);
+      }
+      const refund = 50000;
+      set((state) => ({
+        balance: {
+          ...state.balance,
+          available: Math.max(0, state.balance.available - refund),
+        },
+        isLoading: false,
+        toastMessage: `Loan cancelled within statutory 3-day cooling-off window with 0% penalty.`,
+      }));
+      return {
+        success: true,
+        refundedAmount: refund,
+        message: 'Loan cancelled under statutory cooling-off period.',
+      };
+    },
+
+    calculateKfs: (amount: number, tenureMonths: number, annualRate = 10.5): KfsDetails => {
+      const monthlyRate = annualRate / 12 / 100;
+      const emi = Math.round(
+        (amount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) /
+        (Math.pow(1 + monthlyRate, tenureMonths) - 1)
+      );
+      const processingFee = Math.round(amount * 0.01);
+      const totalRepayment = emi * tenureMonths;
+      const totalInterest = totalRepayment - amount;
+      const apr = Math.round(((totalInterest + processingFee) / amount / (tenureMonths / 12)) * 10000) / 100;
+      return {
+        loanAmount: amount,
+        tenureMonths,
+        annualPercentageRate: apr,
+        nominalRate: annualRate,
+        processingFee,
+        totalInterest,
+        totalRepayment,
+        monthlyEmi: emi,
+        coolingOffPeriodDays: 3,
+      };
+    },
+
+    setAaConsent: (consented: boolean) => {
+      set({ aaConsentGiven: consented });
+    },
+
+    getSimulatedCreditScore: (action) => {
+      const currentScore = get().profile.creditScore || 765;
+      let delta = 0;
+      let explanation = '';
+
+      switch (action) {
+        case 'pay_off_loan':
+          delta = 25;
+          explanation = 'Full early loan closure improves debt-to-income ratio and reflects exemplary credit discipline.';
+          break;
+        case 'miss_emi':
+          delta = -45;
+          explanation = 'A 30-day delinquency is reported to CIBIL/Experian and significantly depresses score for 24+ months.';
+          break;
+        case 'lower_utilization':
+          delta = 18;
+          explanation = 'Reducing revolving credit card utilization below 30% indicates responsible liquidity management.';
+          break;
+        case 'new_credit_inquiry':
+          delta = -8;
+          explanation = 'Multiple hard credit bureau inquiries indicate credit hunger and temporarily deduct minor points.';
+          break;
+      }
+
+      const projectedScore = Math.max(300, Math.min(900, currentScore + delta));
+      return {
+        currentScore,
+        projectedScore,
+        delta,
+        explanation,
+      };
+    },
+
+    loadDigitalRupee: (amount: number) => {
+      if (amount <= 0 || get().balance.available < amount) {
+        set({ toastMessage: 'Insufficient bank balance to load Digital Rupee.' });
+        return false;
+      }
+      set((state) => ({
+        balance: {
+          ...state.balance,
+          available: state.balance.available - amount,
+        },
+        digitalRupeeBalance: state.digitalRupeeBalance + amount,
+        toastMessage: `Loaded ₹${amount.toLocaleString('en-IN')} into e₹ CBDC Wallet from bank account!`,
+      }));
+      return true;
+    },
+
+    redeemDigitalRupee: (amount: number) => {
+      if (amount <= 0 || get().digitalRupeeBalance < amount) {
+        set({ toastMessage: 'Insufficient Digital Rupee balance to redeem.' });
+        return false;
+      }
+      set((state) => ({
+        balance: {
+          ...state.balance,
+          available: state.balance.available + amount,
+        },
+        digitalRupeeBalance: state.digitalRupeeBalance - amount,
+        toastMessage: `Redeemed ₹${amount.toLocaleString('en-IN')} e₹ into your primary savings account!`,
+      }));
+      return true;
+    },
+
+    sendDigitalRupee: (amount: number, recipient: string) => {
+      if (amount <= 0 || get().digitalRupeeBalance < amount) {
+        set({ toastMessage: 'Insufficient e₹ balance to complete transfer.' });
+        return false;
+      }
+      set((state) => ({
+        digitalRupeeBalance: state.digitalRupeeBalance - amount,
+        toastMessage: `Transferred ₹${amount.toLocaleString('en-IN')} e₹ token directly to ${recipient}!`,
+      }));
+      return true;
+    },
+
+    placeAsbaBid: async (payload) => {
+      set({ isLoading: true });
+      try {
+        const res = await BankingApi.placeAsbaBid({ ...payload, customerId: get().profile.id });
+        if (res && res.success) {
+          const newLien: AsbaLien = {
+            lienId: res.lien_id,
+            symbol: res.symbol,
+            applicationNo: payload.ipoName + '_APP_' + Math.floor(100000 + Math.random() * 900000),
+            sharesCount: payload.shares,
+            amountBlocked: res.amount_blocked,
+            status: 'BLOCKED',
+            sebiMandateId: res.sebi_mandate_id,
+            timestamp: res.timestamp || new Date().toISOString(),
+          };
+          set((state) => ({
+            balance: {
+              ...state.balance,
+              available: res.available_balance_after_lien,
+            },
+            asbaLiens: [newLien, ...state.asbaLiens],
+            isLoading: false,
+            toastMessage: `ASBA IPO Bid placed! ₹${payload.amount.toLocaleString('en-IN')} lien-blocked earning interest until allotment.`,
+          }));
+          return { success: true, lienId: res.lien_id, message: res.message };
+        }
+      } catch (err: any) {
+        console.warn('[ASBA] Live API call failed, applying offline lien:', err);
+      }
+      const offlineLien: AsbaLien = {
+        lienId: `asba_${Date.now()}`,
+        symbol: payload.ipoName,
+        applicationNo: `APP_${Math.floor(100000 + Math.random() * 900000)}`,
+        sharesCount: payload.shares,
+        amountBlocked: payload.amount,
+        status: 'BLOCKED',
+        sebiMandateId: `SEBI_MAND_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+      };
+      set((state) => ({
+        balance: {
+          ...state.balance,
+          available: Math.max(0, state.balance.available - payload.amount),
+        },
+        asbaLiens: [offlineLien, ...state.asbaLiens],
+        isLoading: false,
+        toastMessage: `ASBA IPO Bid placed! ₹${payload.amount.toLocaleString('en-IN')} lien-blocked.`,
+      }));
+      return { success: true, lienId: offlineLien.lienId, message: 'ASBA lien placed.' };
+    },
+
+    generateDynamicCvv: async (cardId = 'card_01') => {
+      try {
+        const res = await BankingApi.generateDynamicCvv({ cardId, customerId: get().profile.id });
+        if (res && res.success) {
+          const cvvState: DynamicCvvState = {
+            cardId: res.card_id,
+            cvv: res.dynamic_cvv,
+            expiresAt: res.expires_at,
+            validSeconds: res.valid_seconds,
+          };
+          set({ dynamicCvv: cvvState, toastMessage: 'New single-use 5-minute virtual CVV generated!' });
+          return { success: true, cvv: res.dynamic_cvv, expiresAt: res.expires_at, message: res.message };
+        }
+      } catch (err: any) {
+        console.warn('[DynamicCvv] Live API call failed, generating offline dynamic CVV:', err);
+      }
+      const randomCvv = Math.floor(100 + Math.random() * 900).toString();
+      const expires = new Date(Date.now() + 300000).toISOString();
+      const cvvState: DynamicCvvState = {
+        cardId,
+        cvv: randomCvv,
+        expiresAt: expires,
+        validSeconds: 300,
+      };
+      set({ dynamicCvv: cvvState, toastMessage: 'New single-use 5-minute virtual CVV generated!' });
+      return { success: true, cvv: randomCvv, expiresAt: expires, message: 'Dynamic CVV generated.' };
+    },
+
+    pushBankingSms: (alert) => {
+      const newAlert: BankingSmsAlert = {
+        ...alert,
+        id: `sms_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        timestamp: new Date().toISOString(),
+      };
+      set((state) => ({ bankingAlerts: [newAlert, ...state.bankingAlerts] }));
+    },
+
+    dismissBankingSms: (id: string) => {
+      set((state) => ({
+        bankingAlerts: state.bankingAlerts.filter((a) => a.id !== id),
+      }));
+    },
+
+    rechargeFastag: (amount: number) => {
+      const refId = 'NETC' + Math.floor(1000000000 + Math.random() * 9000000000);
+      set((state) => ({
+        fastag: {
+          ...state.fastag,
+          balance: state.fastag.balance + amount,
+        },
+        balance: {
+          ...state.balance,
+          available: Math.max(0, state.balance.available - amount),
+        },
+        toastMessage: `FASTag recharged with ₹${amount.toLocaleString('en-IN')}! Tag Bal: ₹${(state.fastag.balance + amount).toLocaleString('en-IN')}`,
+      }));
+      return { success: true, refId, newBalance: get().fastag.balance };
+    },
+
+    bookForexOrder: (currency: string, foreignAmount: number, rate: number, inrAmount: number) => {
+      const orderId = 'FX-' + Math.floor(100000 + Math.random() * 900000);
+      const newOrder: ForexOrderRecord = {
+        id: orderId,
+        currency,
+        foreignAmount,
+        rate,
+        inrAmount,
+        timestamp: new Date().toISOString(),
+      };
+      set((state) => ({
+        forexOrders: [newOrder, ...state.forexOrders],
+        balance: {
+          ...state.balance,
+          available: Math.max(0, state.balance.available - inrAmount),
+        },
+        toastMessage: `Forex Card reloaded with ${currency} ${foreignAmount} (₹${inrAmount.toLocaleString('en-IN')})!`,
+      }));
+      return { success: true, orderId };
     },
 
     showToast: (msg: string) => {

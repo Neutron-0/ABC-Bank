@@ -349,6 +349,201 @@ export class BankingApi {
       }),
     });
   }
+
+  // -------------------------------------------------------------------------
+  // 11. Empathetic Loan Relief: 10-Day Grace Buffer
+  // -------------------------------------------------------------------------
+  public static async requestEmiGrace(payload: {
+    loanId?: string;
+    days?: number;
+    customerId?: string;
+  }): Promise<{
+    success: boolean;
+    loan_id: string;
+    previous_due_date: string;
+    new_due_date: string;
+    grace_days: number;
+    penalty_waived: boolean;
+    message: string;
+    timestamp: string;
+  } | null> {
+    return this.request('/loans/grace', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer_id: payload.customerId || 'cust_bharat_001',
+        loan_id: payload.loanId,
+        days: payload.days || 10,
+      }),
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // 12. Empathetic Loan Relief: Split EMI (Dual-installment)
+  // -------------------------------------------------------------------------
+  public static async splitEmi(payload: {
+    loanId?: string;
+    customerId?: string;
+  }): Promise<{
+    success: boolean;
+    loan_id: string;
+    original_amount: number;
+    part_1_amount: number;
+    part_1_due_date: string;
+    part_2_amount: number;
+    part_2_due_date: string;
+    message: string;
+    timestamp: string;
+  } | null> {
+    return this.request('/loans/split', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer_id: payload.customerId || 'cust_bharat_001',
+        loan_id: payload.loanId,
+      }),
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // 13. Empathetic Loan Relief: Emergency Deficit Auto-Sweep
+  // -------------------------------------------------------------------------
+  public static async sweepDeficitForEmi(payload: {
+    loanId?: string;
+    amount?: number;
+    customerId?: string;
+  }): Promise<{
+    success: boolean;
+    swept_amount: number;
+    remaining_deficit: number;
+    new_available_balance: number;
+    new_emergency_balance: number;
+    message: string;
+    timestamp: string;
+  } | null> {
+    return this.request('/loans/sweep-deficit', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer_id: payload.customerId || 'cust_bharat_001',
+        loan_id: payload.loanId,
+        amount: payload.amount,
+      }),
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // 14. RBI Digital Lending: Statutory 3-Day Cooling-Off Cancellation
+  // -------------------------------------------------------------------------
+  public static async cancelLoanCoolingOff(payload: {
+    contractId: string;
+    customerId?: string;
+  }): Promise<{
+    success: boolean;
+    loan_id: string;
+    status: string;
+    refunded_amount: number;
+    penalty_applied: number;
+    message: string;
+    timestamp: string;
+  } | null> {
+    return this.request('/loans/cooling-off-cancel', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer_id: payload.customerId || 'cust_bharat_001',
+        contract_id: payload.contractId,
+      }),
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // 15. SEBI ASBA IPO Lien Blocking
+  // -------------------------------------------------------------------------
+  public static async placeAsbaBid(payload: {
+    ipoName: string;
+    shares: number;
+    amount: number;
+    upiId: string;
+    customerId?: string;
+  }): Promise<{
+    success: boolean;
+    lien_id: string;
+    symbol: string;
+    amount_blocked: number;
+    available_balance_after_lien: number;
+    status: string;
+    sebi_mandate_id: string;
+    message: string;
+    timestamp: string;
+  } | null> {
+    return this.request('/investments/asba/bid', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer_id: payload.customerId || 'cust_bharat_001',
+        ipo_name: payload.ipoName,
+        shares: payload.shares,
+        amount: payload.amount,
+        upi_id: payload.upiId,
+      }),
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // 16. Dynamic Single-Use 5-Minute Virtual CVV Generator
+  // -------------------------------------------------------------------------
+  public static async generateDynamicCvv(payload: {
+    cardId?: string;
+    customerId?: string;
+  }): Promise<{
+    success: boolean;
+    card_id: string;
+    dynamic_cvv: string;
+    expires_at: string;
+    valid_seconds: number;
+    message: string;
+  } | null> {
+    return this.request('/cards/dynamic-cvv', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer_id: payload.customerId || 'cust_bharat_001',
+        card_id: payload.cardId || 'card_01',
+      }),
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // 17. Statutory IRDAI Insurance & Protection Enrollment APIs
+  // -------------------------------------------------------------------------
+  public static async getInsurancePlans(customerId = 'cust_bharat_001'): Promise<any | null> {
+    return this.request(`/insurance/plans/${customerId}`);
+  }
+
+  public static async enrollInsurancePolicy(payload: {
+    planId: string;
+    sumInsured: number;
+    nomineeName: string;
+    nomineeRelation: string;
+    customerId?: string;
+  }): Promise<{
+    success: boolean;
+    policy_number: string;
+    plan_id: string;
+    sum_insured: number;
+    monthly_premium: number;
+    nominee_name: string;
+    nominee_relation: string;
+    status: string;
+    available_balance: number;
+    message: string;
+  } | null> {
+    return this.request('/insurance/enroll', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer_id: payload.customerId || 'cust_bharat_001',
+        plan_id: payload.planId,
+        sum_insured: payload.sumInsured,
+        nominee_name: payload.nomineeName,
+        nominee_relation: payload.nomineeRelation,
+      }),
+    });
+  }
 }
 
 

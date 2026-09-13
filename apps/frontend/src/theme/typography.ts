@@ -6,7 +6,15 @@ export const serifFont = Platform.select({
   default: 'Georgia, serif',
 });
 
+export const fontFamilies = {
+  regular: Platform.select({ ios: 'System', android: 'Roboto', default: 'sans-serif' }),
+  medium: Platform.select({ ios: 'System', android: 'Roboto-Medium', default: 'sans-serif' }),
+  bold: Platform.select({ ios: 'System', android: 'Roboto-Bold', default: 'sans-serif' }),
+  serif: serifFont,
+};
+
 export const typography = {
+  fontFamilies,
   serifHero: {
     fontFamily: serifFont,
     fontSize: 34,

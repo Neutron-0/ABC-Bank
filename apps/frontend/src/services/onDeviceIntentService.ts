@@ -32,6 +32,45 @@ export class OnDeviceIntentService {
   private static readonly w2: number[][] = graphMeta.w2;
   private static readonly b2: number[] = graphMeta.b2;
 
+  /**
+   * Ultra-fast zero-latency route matching for unambiguous user intents.
+   * Directly maps high-confidence keywords to application destinations.
+   */
+  public static matchObviousRoute(query: string): {
+    intent: string;
+    tab: 'home' | 'payments' | 'activity' | 'insights' | 'assistant' | 'profile';
+    journeyId?: string;
+  } | null {
+    const q = (query || '').toLowerCase().trim();
+    if (!q) return null;
+
+    if (/\b(balance|check balance|kitna paisa|khata balance|account balance|बैलेंस|બેલેન્સ)\b/i.test(q)) {
+      return { intent: 'CHECK_BALANCE', tab: 'home' };
+    }
+    if (/\b(send money|transfer|upi|paise bhejo|bhejna|pay someone|पैसे भेजो|મોકલો)\b/i.test(q)) {
+      return { intent: 'SEND_MONEY', tab: 'payments' };
+    }
+    if (/\b(passbook|history|statement|transactions|recent payments|लेनदेन|ચુકવણીઓ)\b/i.test(q)) {
+      return { intent: 'VIEW_TRANSACTIONS', tab: 'activity' };
+    }
+    if (/\b(lock card|freeze card|card block|card controls|कार्ड ब्लॉक|કાર્ડ લોક)\b/i.test(q)) {
+      return { intent: 'LOCK_CARD', tab: 'profile', journeyId: 'card_controls' };
+    }
+    if (/\b(emi|kist|loan payment|upcoming emi|ईएमआई|કિસ્ત)\b/i.test(q)) {
+      return { intent: 'CHECK_EMI', tab: 'home', journeyId: 'emi_details' };
+    }
+    if (/\b(metro|dmrc|smart card|मेट्रो|મેટ્રો)\b/i.test(q)) {
+      return { intent: 'PAY_METRO', tab: 'payments', journeyId: 'metro_recharge' };
+    }
+    if (/\b(bill|electricity|bijli|utility|light bill|बिजली बिल|લાઇટ બિલ)\b/i.test(q)) {
+      return { intent: 'PAY_BILL', tab: 'payments', journeyId: 'bill_pay' };
+    }
+    if (/\b(medical|hospital|insurance claim|claim|bima|क्लेम|વીમો)\b/i.test(q)) {
+      return { intent: 'MEDICAL_CLAIM_HELP', tab: 'insights', journeyId: 'medical_claim' };
+    }
+    return null;
+  }
+
   public static detectLanguage(text: string): LanguageCode {
     if (/[\u0900-\u097F]/.test(text)) return 'hi';
     if (/[\u0A80-\u0AFF]/.test(text)) return 'gu';
