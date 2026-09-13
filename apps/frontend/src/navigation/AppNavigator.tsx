@@ -23,6 +23,7 @@ import { InsightsScreen } from '../features/insights/InsightsScreen';
 import { MitraChatScreen } from '../features/assistant/MitraChatScreen';
 import { ProfileScreen } from '../features/profile/ProfileScreen';
 import { MoreViewScreen } from '../features/more/MoreViewScreen';
+import { AuthScreen } from '../features/auth/AuthScreen';
 
 // Modals
 import { WhyThisCard } from '../components/common/WhyThisCard';
@@ -62,7 +63,7 @@ import {
 
 export const AppNavigator: React.FC = () => {
   const { colors: themeColors } = useAppTheme();
-  const { activeTab, setActiveTab, language, toastMessage, currentState, activeJourney, closeJourney, openJourney } = useCustomerStore();
+  const { activeTab, setActiveTab, language, toastMessage, currentState, activeJourney, closeJourney, openJourney, isAuthenticated } = useCustomerStore();
   const t = getTranslation(language);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -196,6 +197,19 @@ export const AppNavigator: React.FC = () => {
         return <AdaptiveHomeScreen />;
     }
   };
+
+  // Auth Gate: Render AuthScreen if user is not authenticated
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: '#0B1120' }]}>
+        <StatusBar barStyle="light-content" backgroundColor="#0B1120" />
+        <View style={[styles.responsiveShell, { backgroundColor: '#0B1120', borderColor: '#1E293B' }]}>
+          <AuthScreen />
+        </View>
+        <BankingSmsToast />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: themeColors.bg }]}>

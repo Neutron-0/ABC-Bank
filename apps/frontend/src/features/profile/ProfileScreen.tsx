@@ -21,6 +21,11 @@ import {
   ArrowRight,
   Lock,
   Check,
+  Smartphone,
+  FileText,
+  Info,
+  Sparkles,
+  Shield,
 } from 'lucide-react-native';
 
 export const ProfileScreen: React.FC = () => {
@@ -34,6 +39,9 @@ export const ProfileScreen: React.FC = () => {
     openJourney,
     switchCustomerState,
     currentState,
+    dpdpConsent,
+    updateDpdpConsent,
+    logout,
   } = useCustomerStore();
   const t = getTranslation(language);
 
@@ -255,6 +263,118 @@ export const ProfileScreen: React.FC = () => {
           </View>
         </View>
 
+        {/* DPDP Act 2023 Statutory Privacy Center */}
+        <View style={styles.section}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xs }}>
+            <Text style={[styles.sectionHeader, { color: colors.textSecondary, marginBottom: 0 }]}>
+              DPDP Act 2023 & RBI Privacy Center
+            </Text>
+            <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+              <Text style={{ fontSize: 9.5, fontWeight: '700', color: '#10B981' }}>DPDP SEC 6 COMPLIANT</Text>
+            </View>
+          </View>
+
+          {/* Mandatory Ledger */}
+          <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+            <View style={styles.toggleTextWrap}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <ShieldCheck size={14} color="#10B981" />
+                <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>Core Banking & Ledger Audit</Text>
+              </View>
+              <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
+                Statutory transaction ledger under RBI Banking Regulation Act 1949 (Mandatory).
+              </Text>
+            </View>
+            <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: '#10B981' }}>Active</Text>
+            </View>
+          </View>
+
+          {/* Mandatory Device Binding */}
+          <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+            <View style={styles.toggleTextWrap}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Shield size={14} color="#10B981" />
+                <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>Device SIM & Keystore Binding</Text>
+              </View>
+              <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
+                Hardware security enclave inspection per RBI Cyber Security Framework (Mandatory).
+              </Text>
+            </View>
+            <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: '#10B981' }}>Active</Text>
+            </View>
+          </View>
+
+          {/* Financial SMS Passbook */}
+          <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+            <View style={styles.toggleTextWrap}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Smartphone size={14} color="#38BDF8" />
+                <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>Financial SMS Passbook Sync</Text>
+              </View>
+              <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
+                Locally inspect SMS for utility dues & auto-passbook. Revocable at any time.
+              </Text>
+            </View>
+            <Switch
+              value={dpdpConsent.smsFraudDetection}
+              onValueChange={(val) => updateDpdpConsent({ smsFraudDetection: val })}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.cardBg}
+            />
+          </View>
+
+          {/* RBI Account Aggregator */}
+          <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+            <View style={styles.toggleTextWrap}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <FileText size={14} color="#38BDF8" />
+                <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>RBI Account Aggregator (AA)</Text>
+              </View>
+              <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
+                Real-time multi-bank asset visibility via RBI licensed Account Aggregators.
+              </Text>
+            </View>
+            <Switch
+              value={dpdpConsent.accountAggregator}
+              onValueChange={(val) => updateDpdpConsent({ accountAggregator: val })}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.cardBg}
+            />
+          </View>
+
+          {/* Mitra AI Hyper-Personalization */}
+          <View style={[styles.toggleRow, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+            <View style={styles.toggleTextWrap}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Sparkles size={14} color="#A855F7" />
+                <Text style={[styles.toggleTitle, { color: colors.textPrimary }]}>Mitra AI Personalization</Text>
+              </View>
+              <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
+                On-device empathetic insights, life-stage assistance & cash flow buffer alerts.
+              </Text>
+            </View>
+            <Switch
+              value={dpdpConsent.personalizedOffers}
+              onValueChange={(val) => updateDpdpConsent({ personalizedOffers: val })}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.cardBg}
+            />
+          </View>
+
+          {/* Data Fiduciary Notice */}
+          <View style={[styles.dpdpNoticeBox, { backgroundColor: colors.cardBgSecondary, borderColor: colors.border }]}>
+            <Info size={14} color={colors.textSecondary} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.dpdpNoticeTitle, { color: colors.textPrimary }]}>Data Fiduciary Transparency</Text>
+              <Text style={[styles.dpdpNoticeText, { color: colors.textSecondary }]}>
+                Data Fiduciary: ABC Digital Bank Ltd. • DPO Contact: {dpdpConsent.dpoContact} • You have the statutory Right to Access, Correction, and Erasure/Withdrawal under DPDP Act 2023.
+              </Text>
+            </View>
+          </View>
+        </View>
+
         {/* Banking Demo Journeys */}
         <View style={styles.section}>
           <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
@@ -298,6 +418,27 @@ export const ProfileScreen: React.FC = () => {
               Surplus Savings & Investments
             </Text>
             <ArrowRight size={16} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Session Security & Sign Out */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+            Session Security & Device Lock
+          </Text>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={logout}
+            activeOpacity={0.8}
+          >
+            <Lock size={18} color="#EF4444" />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.logoutTitle}>Lock App & Secure Sign Out</Text>
+              <Text style={styles.logoutDesc}>
+                Clears session encryption tokens per RBI digital banking security guidelines
+              </Text>
+            </View>
+            <ArrowRight size={16} color="#EF4444" />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -523,5 +664,41 @@ const styles = StyleSheet.create({
   },
   journeyBtnText: {
     ...typography.body,
+  },
+  dpdpNoticeBox: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    marginTop: spacing.xs,
+  },
+  dpdpNoticeTitle: {
+    ...typography.caption,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  dpdpNoticeText: {
+    ...typography.tiny,
+    lineHeight: 14,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+    borderColor: 'rgba(239, 68, 68, 0.25)',
+  },
+  logoutTitle: {
+    ...typography.bodyBold,
+    color: '#EF4444',
+  },
+  logoutDesc: {
+    ...typography.tiny,
+    color: '#94A3B8',
+    marginTop: 2,
   },
 });

@@ -223,3 +223,24 @@ export interface ForexOrderRecord {
   timestamp: string;
 }
 
+export interface DpdpConsentState {
+  essentialBanking: boolean;
+  deviceSecurity: boolean;
+  smsFraudDetection: boolean;
+  accountAggregator: boolean;
+  personalizedOffers: boolean;
+  acceptedTimestamp: string;
+  dpoContact: string;
+}
+
+export type AuthStep = 'LOGIN' | 'SIGNUP' | 'OTP' | 'DPDP_CONSENT' | 'MPIN' | 'AUTHENTICATED';
+
+export interface SignupPayload {
+  fullName: string;
+  phone: string;
+  accountType: 'SAVINGS' | 'SALARY' | 'CURRENT';
+  panOrAadhaar: string;
+  mpin: string;
+}
+
+

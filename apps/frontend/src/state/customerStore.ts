@@ -20,6 +20,9 @@ import {
   KfsDetails,
   FastagDetails,
   ForexOrderRecord,
+  DpdpConsentState,
+  AuthStep,
+  SignupPayload,
 } from '../types';
 import { BankingApi } from '../services/api';
 
@@ -43,6 +46,16 @@ const defaultConsent: ConsentSettings = {
   financialInsights: true,
   assistantContextAccess: true,
   shareWithAffiliates: false,
+};
+
+const defaultDpdpConsent: DpdpConsentState = {
+  essentialBanking: true,
+  deviceSecurity: true,
+  smsFraudDetection: true,
+  accountAggregator: true,
+  personalizedOffers: true,
+  acceptedTimestamp: '2026-09-12T10:00:00+05:30',
+  dpoContact: 'dpo@abcbank.in • +91 1800 209 8492',
 };
 
 // Complete offline fallback state database for 100% reliability on Expo Go
@@ -774,6 +787,18 @@ interface CustomerStateStore {
   forexOrders: ForexOrderRecord[];
   bookForexOrder: (currency: string, foreignAmount: number, rate: number, inrAmount: number) => { success: boolean; orderId: string };
 
+  // Authentication & DPDP Compliance
+  isAuthenticated: boolean;
+  savedMpin: string;
+  dpdpConsent: DpdpConsentState;
+  sendMockOtp: (phone: string) => { otp: string; isRegistered: boolean };
+  verifyMockOtp: (enteredOtp: string, expectedOtp: string) => boolean;
+  verifyMpin: (mpin: string) => boolean;
+  signupCustomer: (payload: SignupPayload) => boolean;
+  updateDpdpConsent: (consent: Partial<DpdpConsentState>) => void;
+  loginWithPreset: (presetId: CustomerStateType) => void;
+  logout: () => void;
+
   setLanguage: (lang: LanguageCode) => void;
   setActiveTab: (tab: MainTabType) => void;
   switchCustomerState: (state: CustomerStateType) => Promise<void>;
@@ -925,6 +950,9 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
     setThemeMode: () => {},
 
     userPin: '8492',
+    savedMpin: '123456',
+    isAuthenticated: false,
+    dpdpConsent: { ...defaultDpdpConsent },
     biometricsEnabled: true,
     phoneNumber: '+91 98765 43210',
     authModal: null,
@@ -1673,6 +1701,74 @@ export const useCustomerStore = create<CustomerStateStore>((set, get) => {
       setTimeout(() => {
         set({ toastMessage: null });
       }, 3500);
+    },
+
+    // Authentication & DPDP Compliance Actions
+    sendMockOtp: (phone: string) => {
+      const otp = '482910';
+      get().pushBankingSms({
+        sender: 'VK-ABCBNK',
+        type: 'security',
+        body: `${otp} is your secret OTP for ABC Digital Banking login. Valid for 10 mins. Do not share OTP with anyone including bank staff.`,
+        referenceId: 'OTP-8492',
+      });
+      return { otp, isRegistered: true };
+    },
+
+    verifyMockOtp: (enteredOtp: string, expectedOtp: string) => {
+      return enteredOtp === expectedOtp || enteredOtp === '482910' || enteredOtp === '000000';
+    },
+
+    verifyMpin: (mpin: string) => {
+      const isValid = mpin === get().savedMpin || mpin === '123456' || mpin === '8492';
+      if (isValid) {
+        set({ isAuthenticated: true });
+        get().showToast('Welcome back! Biometric & session security verified.');
+      }
+      return isValid;
+    },
+
+    signupCustomer: (payload: SignupPayload) => {
+      set((state) => ({
+        isAuthenticated: true,
+        savedMpin: payload.mpin || '123456',
+        phoneNumber: payload.phone || state.phoneNumber,
+        profile: {
+          ...state.profile,
+          name: payload.fullName || state.profile.name,
+          phone: payload.phone || state.profile.phone,
+        },
+      }));
+      get().pushBankingSms({
+        sender: 'VK-ABCBNK',
+        type: 'regulatory',
+        body: `Welcome to ABC Digital Bank, ${payload.fullName}! Your ${payload.accountType} account setup is verified with DPDP consent.`,
+        referenceId: 'REG-NEWACT',
+      });
+      get().showToast(`Account successfully created for ${payload.fullName}!`);
+      return true;
+    },
+
+    updateDpdpConsent: (consent: Partial<DpdpConsentState>) => {
+      set((state) => ({
+        dpdpConsent: {
+          ...state.dpdpConsent,
+          ...consent,
+          acceptedTimestamp: new Date().toISOString(),
+        },
+      }));
+      get().showToast('DPDP 2023 consent preferences updated.');
+    },
+
+    loginWithPreset: (presetId: CustomerStateType) => {
+      get().switchCustomerState(presetId);
+      set({ isAuthenticated: true });
+      get().showToast(`Logged in as demo persona: ${presetId.toUpperCase()}`);
+    },
+
+    logout: () => {
+      set({ isAuthenticated: false });
+      get().showToast('You have been securely logged out per RBI digital session guidelines.');
     },
   };
 });
