@@ -1,6 +1,6 @@
 # Data Flow Architecture
 
-This document outlines the comprehensive data flow architecture for the VZEYA / ABC Bank system.
+This document outlines the comprehensive data flow architecture for the ABC Bank system.
 
 ## Key Data Flows
 

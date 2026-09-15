@@ -1,5 +1,5 @@
 """
-Database Seeding Script for ABC Bank (VZEYA).
+Database Seeding Script for ABC Bank.
 Connects to PostgreSQL, ensures schema is created and migrated,
 generates the deterministic large dataset (1,200 customers, 127k+ transactions),
 and bulk inserts in optimized batches.

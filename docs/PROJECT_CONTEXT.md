@@ -1,5 +1,26 @@
-# VZEYA - Project Context
-Team Neutron (Harsh Solanki, Panchal Lakshya, Ubaid Khan) | HackOut'26 @ DA-IICT
+# ABC Bank - Project Context
+Team Neutron / VZEYA (Harsh Solanki, Panchal Lakshya, Ubaid Khan) | HackOut'26 @ DA-IICT
+
+> 🏆 **Selected in Top 12 Teams at HackOut'26 (DA-IICT)**  
+> **Team Name:** VZEYA (Leader: Harsh Solanki) | **Demo / Project Name:** ABC Bank (Adaptive Banking for Bharat)
+
+## HackOut'26 — Top 12 Selected Finalist Teams
+📄 **[Download Official Shortlist PDF](assets/HackOut26_Top12_Shortlist.pdf)**
+
+| # | Team Name | Team Leader Name |
+|---|---|---|
+| 1 | Zero Sum | Patel Vedant |
+| 2 | Wowwsters | Kashyap Vadher |
+| 3 | Outliers | Jeevesh Bodhani |
+| 4 | Kinzz | Kinjal Rantanpara |
+| 5 | Foxbat | Viraj Patel |
+| 6 | ByteMe | Tanmay Kanani |
+| 7 | Tech Titans | Dhruvil Prajapati |
+| 8 | Tech Titans | Savaliya Saumil |
+| 9 | Tatva | Shaurya Doshi |
+| 10 | cosmiX | Vedant Bhatt |
+| 11 | Ctrl Freaks | Aum Pethani |
+| 12 | **VZEYA** *(Our Team)* | **Harsh Solanki** |
 
 ## HackOut Problem Statement
 **AI-Powered Hyper-Personalized Banking for Bharat**
@@ -7,7 +28,7 @@ Team Neutron (Harsh Solanki, Panchal Lakshya, Ubaid Khan) | HackOut'26 @ DA-IICT
 - **Core thesis:** "Instead of asking customers to learn their bank, make the bank learn the customer."
 
 ## Product Vision
-VZEYA is NOT a conventional fixed banking dashboard. 
+ABC Bank is NOT a conventional fixed banking dashboard. 
 The customer's banking experience dynamically adapts based on:
 - Transaction history
 - Spending behaviour
@@ -24,7 +45,7 @@ The system personalizes what information the customer sees, which actions are pr
 
 ## Three-Pronged Architecture
 
-*(For an in-depth breakdown, see [ARCHITECTURE.md](ARCHITECTURE.md))*
+*(For an in-depth breakdown, see [Architecture Overview](architecture/overview.md))*
 
 1. **Backend Banking Intelligence**
    - Handles Customer 360, feature extraction, behavioural segmentation, life-stage inference, financial-health analysis, anomaly/fraud detection, recommendation scoring, next-best-action, explanation generation, and customer-state generation.
@@ -39,7 +60,7 @@ The system personalizes what information the customer sees, which actions are pr
    - *Note:* The SLM is NOT the main financial decision-maker. The Backend AI understands the customer; the On-device AI understands how the customer wants to interact.
 
 ## Existing Banking Infrastructure Integration
-VZEYA is designed as an intelligence and experience layer OVER existing banking infrastructure.
+ABC Bank is designed as an intelligence and experience layer OVER existing banking infrastructure.
 Existing bank systems continue to handle accounts, balances, transactions, UPI, cards, loans, KYC, authentication, and core financial operations. Our system simply consumes secure APIs and data, adding intelligence and adaptive rendering on top.
 
 ## Privacy and Security Principles
@@ -66,6 +87,6 @@ The demo showcases how the SAME generic engine seamlessly adapts to radically di
 ## Current Tech Stack
 - **Backend:** Python, FastAPI, Pydantic
 - **Frontend:** React Native, Expo (SDK 57), TypeScript, Zustand
-- **AI:** Python (rule-based with placeholder for MiniCPM5)
+- **AI:** Python (Scikit-Learn LogisticRegression, XGBoost, KMeans clustering, LinUCB bandit, MiniCPM-5 ONNX model, and Neural SLM)
 - **Contracts:** JSON Schema (Draft-07)
 - **Infrastructure:** Docker Compose for containerization

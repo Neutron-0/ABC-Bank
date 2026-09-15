@@ -1,4 +1,4 @@
-# VZEYA — Ubaid AI Implementation Brief
+# ABC Bank — AI Implementation Brief
 
 ## Role
 
@@ -1017,7 +1017,7 @@ but also:
 
 because customer benefit, suitability and financial health come before commercial opportunity.
 
-That distinction is a major part of what makes VZEYA different.
+That distinction is a major part of what makes ABC Bank different.
 
 ---
 

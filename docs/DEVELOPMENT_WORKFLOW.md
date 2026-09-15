@@ -1,4 +1,4 @@
-# VZEYA Development Workflow
+# ABC Bank Development Workflow
 
 This documents the lightweight Git workflow for a 3-person hackathon team.
 
@@ -71,7 +71,7 @@ This order minimizes integration issues.
 Full validation sequence:
 ```bash
 # 1. Seed data check
-python scripts/seed-data.py
+python scripts/generate_seed_data.py
 
 # 2. AI pipeline
 python ai/intelligence/run.py --scenario normal

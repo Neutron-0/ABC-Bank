@@ -129,9 +129,9 @@ flowchart TD
     
     Handler --> T{"Event Type"}
     
-    T -->|"Transaction"| Txn["Update Balances"]
-    T -->|"Alert"| Alrt["Trigger Notifications"]
-    T -->|"Milestone"| Mils["Update Customer Profile"]
+    T -->|Transaction| Txn["Update Balances"]
+    T -->|Alert| Alrt["Trigger Notifications"]
+    T -->|Milestone| Mils["Update Customer Profile"]
     
     Txn --> AI["Update AI Signals"]
     Alrt --> AI
@@ -187,6 +187,21 @@ sequenceDiagram
 ---
 
 ### Authentication
+
+#### `POST /api/v1/auth/register`
+- **Purpose:** Registers a new customer profile and returns a JWT token.
+- **Request:** `{name, phone, email, password, monthly_income, language, city, state}`
+- **Response:** JWT access token.
+
+#### `POST /api/v1/auth/login`
+- **Purpose:** Authenticates customer via identifier and password.
+- **Request:** `{identifier, password}`
+- **Response:** JWT access token and active banking session summary.
+
+#### `GET /api/v1/auth/me`
+- **Purpose:** Protected endpoint returning authenticated customer profile.
+- **Auth:** Requires Bearer JWT.
+- **Response:** Customer profile & state details.
 
 #### `POST /api/v1/auth/pin/setup`
 - **Purpose:** Create cryptographic PIN.
@@ -254,6 +269,76 @@ sequenceDiagram
 - **Purpose:** Instant credit disbursement.
 - **Validation:** Max ₹1,50,000.
 - **Side effects:** Credits balance, emits event.
+
+#### `POST /api/v1/cards/dynamic-cvv`
+- **Purpose:** Generates a single-use 5-minute time-bound virtual dynamic CVV.
+- **Request:** `{customer_id, card_id}`
+- **Response:** Generated dynamic CVV string.
+
+---
+
+### Identity & KYC
+
+#### `POST /api/v1/kyc/submit`
+- **Purpose:** PAN/Aadhaar Video-KYC submission.
+- **Request:** `{customer_id, pan, aadhaar, latitude, longitude, selfie_verified}`
+- **Response:** Verification status and tier updates.
+
+---
+
+### Banking Relief Services & Mandates
+
+#### `POST /api/v1/claims/submit`
+- **Purpose:** TPA medical claim submission.
+- **Request:** `{customer_id, hospital, amount, notes}`
+- **Response:** Claim status and tracking id.
+
+#### `POST /api/v1/mandates/pause`
+- **Purpose:** e-Mandate subscription pause.
+- **Request:** `{customer_id, mandate_name, is_paused}`
+- **Response:** Status of mandate pause.
+
+#### `POST /api/v1/loans/grace`
+- **Purpose:** Grants a 10-day penalty-free EMI grace buffer.
+- **Request:** `{customer_id, loan_id, days}`
+- **Response:** Updated loan schedule.
+
+#### `POST /api/v1/loans/split`
+- **Purpose:** Splits upcoming monthly EMI into two equal 50% installments.
+- **Request:** `{customer_id, loan_id}`
+- **Response:** Modified EMI schedule.
+
+#### `POST /api/v1/loans/sweep-deficit`
+- **Purpose:** Partial auto-sweep deficit from fixed deposits/emergency buffer.
+- **Request:** `{customer_id, loan_id, amount}`
+- **Response:** Auto-sweep confirmation.
+
+#### `POST /api/v1/loans/cooling-off-cancel`
+- **Purpose:** Statutory 3-day cooling-off lookup cancellation without penalty.
+- **Request:** `{customer_id, contract_id}`
+- **Response:** Cancellation status.
+
+---
+
+### Investments & ASBA
+
+#### `POST /api/v1/investments/asba/bid`
+- **Purpose:** Places SEBI UPI ASBA lien blocking for IPO applications.
+- **Request:** `{customer_id, ipo_name, shares, amount, upi_id}`
+- **Response:** ASBA bid status and blocked amount.
+
+---
+
+### Insurance & Protection
+
+#### `GET /api/v1/insurance/plans/{customer_id}`
+- **Purpose:** Fetches pre-approved IRDAI standard health and term life insurance plans.
+- **Response:** List of eligible micro-insurance plans.
+
+#### `POST /api/v1/insurance/enroll`
+- **Purpose:** 1-Click Digital Insurance Enrollment under IRDAI guidelines.
+- **Request:** `{customer_id, plan_id, sum_insured, nominee_name, nominee_relation}`
+- **Response:** Enrollment confirmation and policy certificate.
 
 ---
 

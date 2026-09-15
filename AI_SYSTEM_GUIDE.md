@@ -168,8 +168,8 @@ cd apps/frontend && npx tsc --noEmit
 ```
 
 For complete architecture, mathematical scoring, cryptographic audits, and taxonomy, see:
-- [PERSONALIZATION_SYSTEM_GUIDE.md](file:///d:/Projects/ABC-Bank/PERSONALIZATION_SYSTEM_GUIDE.md)
-- [BHARAT_BANKING_SERVICES_MASTER_TAXONOMY.md](file:///d:/Projects/ABC-Bank/BHARAT_BANKING_SERVICES_MASTER_TAXONOMY.md)
+- [PERSONALIZATION_SYSTEM_GUIDE.md](file:///d:/Vault/dau/PERSONALIZATION_SYSTEM_GUIDE.md)
+- [BHARAT_BANKING_SERVICES_MASTER_TAXONOMY.md](file:///d:/Vault/dau/BHARAT_BANKING_SERVICES_MASTER_TAXONOMY.md)
 
 ---
 

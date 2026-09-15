@@ -1,4 +1,4 @@
-# VZEYA AI/ML Architecture
+# ABC Bank AI/ML Architecture
 
 **Owner:** Ubaid Khan
 
@@ -109,16 +109,29 @@ The SLM:
 - **DOES**: voice interaction, intent detection, vernacular understanding, conversational navigation
 - **DOES NOT**: make financial decisions, approve loans, assess creditworthiness, access raw financial data directly
 
+## Machine Learning Models
+The AI architecture utilizes several trained ML models to drive personalized intelligence. Detailed documentation for these will be in `docs/ml/`.
+- **MiniCPM-5 SLM**: A lightweight ONNX model (`ai/voice/model/minicpm5_slm_v1.onnx`, 38KB) integrated via `ai/voice/model/neural_slm.py` (28KB) for natural language understanding.
+- **Multi-turn Dialogue Manager**: Context-aware dialogue state tracking at `ai/voice/dialogue/manager.py` (36KB).
+- **Vernacular Autocorrect**: Contextual autocorrect at `ai/voice/intents/autocorrect.py`.
+- **XGBoost Propensity Models**: High-performance gradient boosting models (`gpu_propensity_models_v1.joblib`, 546KB) trained via `ai/intelligence/ml/gpu_trainer.py`.
+- **KMeans 7-Archetype Clustering**: Customer segmentation model (`kmeans_archetypes_v1.joblib`) via `ai/intelligence/ml/clustering.py`.
+- **LinUCB Contextual Bandit**: Real-time personalization engine (`linucb_bandit_prior_v1.json`) via `ai/intelligence/ml/bandit.py`.
+- **Logistic Regression Propensity**: Baseline propensity modeling (`propensity_models_v1.joblib`) via `ai/intelligence/ml/propensity.py`.
+- **Embeddings and Vectors**: A 32D Feature Vectorizer (`ai/intelligence/ml/vectorizer.py`) and Product Embedding Space (`ai/intelligence/ml/embeddings.py`).
+- **Database Training Pipeline**: Robust pipelines (`db_dataset_loader.py`, `dataset_trainer.py`, `train_on_db.py`) for automated retraining.
+
 ## Current Implementation Status
 | Component | Status | Notes |
 |---|---|---|
-| Feature Extraction | Implemented | Rule-based, from transaction data |
-| Signal Detection | Implemented | Rule-based, merges computed + scenario signals |
-| Customer State Generation | Implemented | Deterministic from signals |
-| Recommendation Ranking | Implemented | With ethical suppression |
+| Feature Extraction | Implemented | Includes 32D Feature Vectorizer and Embeddings |
+| Signal Detection | Implemented | Rule-based and ML-driven signals |
+| Customer State Generation | Implemented | Deterministic and Clustering (KMeans 7-Archetype) |
+| Recommendation Ranking | Implemented | Uses LinUCB Contextual Bandit and XGBoost |
 | Explanation Generation | Implemented | Basic template-based |
-| Voice Intent Classification | Implemented | Rule-based keyword matching |
-| Vernacular Responses | Implemented | EN, HI, GU templates |
-| MiniCPM5 Integration | NOT started | Planned for on-device SLM |
-| Real ML Models | NOT started | All logic is currently rule-based |
+| Voice Intent Classification | Implemented | Neural SLM driven |
+| Vernacular Responses | Implemented | EN, HI, GU templates with Autocorrect |
+| MiniCPM5 Integration | Implemented | ONNX format (38KB), Multi-turn dialogue (36KB) |
+| Real ML Models | Implemented | XGBoost, KMeans, LinUCB, Logistic Regression |
 | Schema Validation | Implemented | jsonschema validation in run.py |
+| Database Training | Implemented | End-to-end pipeline via `train_on_db.py` |

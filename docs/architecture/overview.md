@@ -1,4 +1,4 @@
-# VZEYA / ABC Bank: Architecture Overview
+# ABC Bank: Architecture Overview
 
 The Bharat Adaptive Banking platform is an AI-powered personalization and experience layer that sits on top of legacy core banking systems. The platform is built around a Server-Driven UI (SDUI) philosophy and deterministic AI decision-making.
 
@@ -49,7 +49,7 @@ flowchart TD
         App <--> SLM
     end
     
-    App -->|"REST API"| Backend["FastAPI Backend Server"]
+    App -->|REST API| Backend["FastAPI Backend Server"]
     
     subgraph "Backend Domain"
         Backend
@@ -65,7 +65,7 @@ flowchart TD
         AIPipeline --> StateGen
     end
     
-    StateGen -->|"customer-state.json"| Backend
+    StateGen -->|customer-state.json| Backend
     External[/"7 Data Sources (CBS, UPI, SMS, etc.)"/] --> AIPipeline
 ```
 
@@ -73,9 +73,9 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    AIEngine["AI Engine"] -->|"Determines Reality"| CState[/"contracts/customer-state.schema.json"/]
+    AIEngine["AI Engine"] -->|Determines Reality| CState[/"contracts/customer-state.schema.json"/]
     CState --> Backend["Backend Experience Composer"]
-    Backend -->|"Synthesizes"| ExpConfig[/"contracts/experience.schema.json"/]
+    Backend -->|Synthesizes| ExpConfig[/"contracts/experience.schema.json"/]
     ExpConfig --> Frontend["Frontend Renderer"]
 ```
 
@@ -127,17 +127,17 @@ flowchart TD
         DB[("Docker PostgreSQL 16 (Port 5432)")]
     end
     
-    App <-->|"HTTP/REST"| Backend
-    Backend <-->|"SQL/TCP"| DB
+    App <-->|HTTP or REST| Backend
+    Backend <-->|SQL or TCP| DB
 ```
 
 ### 5. Contract Boundaries
 
 ```mermaid
 flowchart TD
-    AI["AI Engine"] -->|"contracts/customer-state.schema.json"| Backend["FastAPI Backend"]
-    Backend -->|"contracts/experience.schema.json"| Frontend["React Native App"]
-    Voice["Voice Module / SLM"] -->|"contracts/voice-intent.schema.json"| Backend
+    AI["AI Engine"] -->|customer-state.json| Backend["FastAPI Backend"]
+    Backend -->|experience.json| Frontend["React Native App"]
+    Voice["Voice Module / SLM"] -->|voice-intent.json| Backend
 ```
 
 ### 6. Graceful Degradation
@@ -148,7 +148,7 @@ stateDiagram-v2
     NormalOperation --> DB_Offline: DB connection fails
     DB_Offline --> JSON_Fallback: Use local JSON state
     
-    NormalOperation --> Backend_Slow: Response > 2.5s
+    NormalOperation --> Backend_Slow: Response above 2.5s
     Backend_Slow --> Edge_Processing: Process on device
 ```
 
@@ -170,5 +170,5 @@ flowchart LR
         Math --> FinDec
     end
     
-    On-Device -.-|"Strict Boundary: No Financial Decisions on SLM"| Server
+    NLP -.-|Strict Boundary: No Financial Decisions on SLM| DetAI
 ```

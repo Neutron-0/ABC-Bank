@@ -1,14 +1,14 @@
 # Security Architecture Overview
 
-This document outlines the comprehensive security mechanisms implemented for the VZEYA / ABC Bank system.
+This document outlines the comprehensive security mechanisms implemented for the ABC Bank system.
 
 ## Authentication Mechanisms
-1. **PIN**: PBKDF2-HMAC-SHA256, 100k iterations, 16-byte salt, constant-time comparison, and rate limiting.
-2. **Biometrics**: Uses `expo-local-authentication` on the mobile client.
-3. **Tokens**: No JWT/OAuth/session tokens are used.
+1. **JWT Tokens**: Uses HS256 JWT tokens with a 24-hour expiration for secure API access.
+2. **PIN**: PBKDF2-HMAC-SHA256, 100k iterations, 16-byte salt, constant-time comparison, and rate limiting.
+3. **Biometrics**: Uses `expo-local-authentication` on the mobile client.
 
 ## Authorization
-- **Path Parameters**: Authorization is based on Customer ID path parameters (no token-based auth).
+- **JWT Claims**: Authorization is governed by validating JWT bearer tokens (using `get_current_customer_claims()`) rather than simple path parameters.
 - **Card Lock Gates**: The `is_locked` flag blocks payments and card-related activities.
 - **SafetyPolicyFilter**: Blocks credit recommendations for users identified as financially stressed.
 
@@ -34,7 +34,6 @@ This document outlines the comprehensive security mechanisms implemented for the
 - **Voice Prompts**: Designed with strict guidelines for zero-leakage translation.
 
 ## Known Limitations
-- No JWT/session tokens for API authentication.
 - PIN state is stored in-memory (lost upon server restart).
 - CORS is wide open (suitable for development only).
 - No HTTPS enforcement at the application level.
@@ -94,7 +93,7 @@ stateDiagram-v2
 ```mermaid
 flowchart LR
     Rec["Product Recommendation"]
-    DTI{"DTI > 0.40?"}
+    DTI{"DTI above 0.40?"}
     Stress{"Stress == 'stress'?"}
     Suppress["Suppress Product"]
     Allow["Allow Recommendation"]

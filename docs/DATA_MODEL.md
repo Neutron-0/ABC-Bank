@@ -1,7 +1,17 @@
 # Data Model
 
 ## Overview
-VZEYA uses synthetic data for the hackathon prototype. There is no persistent database — data is loaded from JSON files at runtime.
+ABC Bank uses a fully deployed PostgreSQL 16 database for persistence, integrating a robust multi-source ingestion architecture. A JSON seed fallback mechanism is maintained for local development when the DB is unavailable.
+
+## Multi-Source Ingestion Architecture
+The data model integrates 7 distinct banking data sources to build a comprehensive customer profile:
+- **CBS (Core Banking System)**: Base accounts and balances
+- **UPI**: Real-time peer-to-peer and merchant payments
+- **SMS**: Financial text parsing for external accounts
+- **Bureau**: Credit scores and external liabilities
+- **BBPS**: Bill payments and recurring mandates
+- **NCMC**: Transit and mobility card data
+- **KYC**: Verification and demographic data
 
 ## Conceptual Entities & Entity Relationships
 
@@ -96,8 +106,8 @@ erDiagram
 
 | Entity | Source | Format | Persisted? |
 |---|---|---|---|
-| Customer | data/seed/customers.json | JSON array | Yes (file) |
-| Transaction | data/seed/transactions.json | JSON array | Yes (file) |
+| Customer | PostgreSQL DB (fallback: `data/seed/customers.json`) | SQL Table / JSON | Yes |
+| Transaction | PostgreSQL DB (fallback: `data/seed/transactions.json`) | SQL Table / JSON | Yes |
 | Scenario | data/scenarios/*.json | JSON object | Yes (file) |
 | Feature | Runtime computation | Python dict | No |
 | Signal | Runtime computation | Python dict | No |
@@ -107,7 +117,8 @@ erDiagram
 | VoiceIntent | Voice pipeline output | JSON object | Written to voice-intent.json |
 
 ## Important Design Decisions
-- No database is used — all state is derived from seed data + scenario selection at runtime
-- This is intentional for a hackathon prototype
-- For production, Transactions and CustomerState would be stored in a database
-- Signals use generic key-value pairs, not hardcoded fields, to support arbitrary behavioral patterns
+- PostgreSQL 16 is fully deployed on an Ubuntu server (152.67.9.53, accessible via SSH tunnel) maintaining 127,689 transactions, 1,200 customers, and 1,384 accounts.
+- The backend utilizes SQLAlchemy ORM models (`apps/backend/app/db/models.py`) and Alembic migrations (`apps/backend/app/db/alembic/versions/`).
+- Prisma Studio is used for database introspection and administration.
+- A JSON seed fallback is implemented (`data/seed/`) for offline development or when the DB is unavailable.
+- Signals use generic key-value pairs, not hardcoded fields, to support arbitrary behavioral patterns.

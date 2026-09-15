@@ -1,6 +1,6 @@
 # Database Schema and Architecture
 
-This document provides exhaustive database documentation for the VZEYA / ABC Bank system.
+This document provides exhaustive database documentation for the ABC Bank system.
 
 ## Database Technology
 - **PostgreSQL 16 (Alpine)** running in Docker

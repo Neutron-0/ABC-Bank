@@ -1,5 +1,5 @@
 """
-Deterministic Large Synthetic Banking Dataset Generator for ABC Bank (VZEYA).
+Deterministic Large Synthetic Banking Dataset Generator for ABC Bank.
 Generates 1,200+ realistic customers across diverse Indian demographics and financial archetypes,
 2,500+ accounts, 65,000+ coherent transactions spanning up to 12 months, recurring obligations,
 and customer events.

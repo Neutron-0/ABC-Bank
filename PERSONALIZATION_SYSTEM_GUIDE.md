@@ -37,13 +37,13 @@ We built a **3-Tier Deterministic Personalization Engine**, completely decoupled
 ```mermaid
 flowchart TD
     subgraph RawSources["Disparate Unclean Multi-Source Feeds"]
-        S1["1. Core Banking Ledger (CBS)<br/>• CASA debits/credits<br/>• Negative/null balances<br/>• Overdrafts & Term Deposits"]
-        S2["2. UPI & NPCI Switch Logs<br/>• Mangled strings: UPI/CR/9812/MERCHANT@YBL<br/>• Truncated VPA & missing MCC"]
-        S3["3. SMS & Notification Scrapes<br/>• Android SMS dumps<br/>• Inconsistent timestamps & formats"]
-        S4["4. Bureau (CIBIL / Experian)<br/>• Tradelines, DPD (000/030/060)<br/>• Active inquiries & CC utilization"]
-        S5["5. BBPS & Utility Payloads<br/>• Telecom prepaid expiry days<br/>• FASTag balance & Electricity due"]
-        S6["6. Transit / NCMC Card Feeds<br/>• Metro card balance & tap times"]
-        S7["7. KYC & Demographics<br/>• Tier 1-4, age, declared occupation"]
+        S1["1. Core Banking Ledger (CBS)<br/>- CASA debits/credits<br/>- Negative/null balances<br/>- Overdrafts & Term Deposits"]
+        S2["2. UPI & NPCI Switch Logs<br/>- Mangled strings: UPI/CR/9812/MERCHANT@YBL<br/>- Truncated VPA & missing MCC"]
+        S3["3. SMS & Notification Scrapes<br/>- Android SMS dumps<br/>- Inconsistent timestamps & formats"]
+        S4["4. Bureau (CIBIL / Experian)<br/>- Tradelines, DPD (000/030/060)<br/>- Active inquiries & CC utilization"]
+        S5["5. BBPS & Utility Payloads<br/>- Telecom prepaid expiry days<br/>- FASTag balance & Electricity due"]
+        S6["6. Transit / NCMC Card Feeds<br/>- Metro card balance & tap times"]
+        S7["7. KYC & Demographics<br/>- Tier 1-4, age, declared occupation"]
     end
 
     subgraph Tier1["Tier 1: Multi-Source Ingestion & Harmonizer (ai/intelligence/ingestion/)"]
@@ -70,10 +70,16 @@ flowchart TD
     end
 
     subgraph Output["Contract-Compliant Customer State (customer-state.json)"]
-        State["Top 1-5 Recommendations<br/>• Safe-to-Spend Dial<br/>• 50/30/20 Budget Profile<br/>• Cryptographic Hash Proof Blocks"]
+        State["Top 1-5 Recommendations<br/>- Safe-to-Spend Dial<br/>- 50/30/20 Budget Profile<br/>- Cryptographic Hash Proof Blocks"]
     end
 
-    RawSources --> Cleaner
+    S1 --> Cleaner
+    S2 --> Cleaner
+    S3 --> Cleaner
+    S4 --> Cleaner
+    S5 --> Cleaner
+    S6 --> Cleaner
+    S7 --> Cleaner
     Cleaner --> Dedup
     Dedup --> DateParser
     DateParser --> ConflictResolver
@@ -126,24 +132,20 @@ A core architectural invariant of ABC Bank is the **complete decoupling of the P
 Real-world Indian banking data is notoriously fragmented, noisy, and dirty. The `MultiSourceDataHarmonizer` handles 7 disparate feeds:
 
 ### Supported Ingestion Sources:
-1. **Core Banking System (CBS) Ledger ([`CBSLedgerRecord`](file:///d:/Projects/ABC-Bank/ai/intelligence/ingestion/models.py))**:
-   - Debits, credits, balances, term deposits, and interest credits.
-   - Cleans dirty amount strings (e.g. `"₹ 85,000.00"`), negative numbers, and `NoneType` fields.
-2. **UPI Switch Logs ([`UPISwitchLog`](file:///d:/Projects/ABC-Bank/ai/intelligence/ingestion/models.py))**:
-   - NPCI wire reference strings (e.g. `UPI/CR/982347102938/DELHI METRO SMART CARD/METRO@DMRC/NA`).
-   - Extracts Retrieval Reference Numbers (RRN), resolves merchant entities, and handles missing Merchant Category Codes (MCCs).
-3. **SMS & App Notification Scrapes ([`SMSNotificationRecord`](file:///d:/Projects/ABC-Bank/ai/intelligence/ingestion/models.py))**:
-   - Unstructured Android SMS alerts (e.g. `"Acct XX123 debited by INR 620.00 on 10-01-2026 at BLINKIT. Avl Bal INR 98,400.00"`).
-   - Regex-based token extractors determine direction (debit vs credit), parsed amount, merchant name, and balance after transaction.
-4. **Credit Bureau Dumps ([`BureauCreditProfile`](file:///d:/Projects/ABC-Bank/ai/intelligence/ingestion/models.py))**:
-   - CIBIL, Experian, or CRIF High Mark credit pulls.
-   - Captures credit score (300–900), active tradelines, overdue amounts, Days Past Due status (`000/030/060`), and revolving credit utilization ratio.
-5. **BBPS & Utility Aggregator Feeds ([`BBPSUtilityRecord`](file:///d:/Projects/ABC-Bank/ai/intelligence/ingestion/models.py))**:
-   - Electricity bill due dates, telecom prepaid validity expiry (28-day/84-day cycles), LPG cylinder refills, and FASTag wallet balances.
-6. **NCMC Transit Smart Card Readers ([`NCMCTransitRecord`](file:///d:/Projects/ABC-Bank/ai/intelligence/ingestion/models.py))**:
-   - Card stored value, station tap-in/out gate timestamps, and recurring commute route detection.
-7. **Demographics & KYC Profile ([`CustomerDemographics`](file:///d:/Projects/ABC-Bank/ai/intelligence/ingestion/models.py))**:
-   - City Tier (Tier 1 to Tier 4 / Rural), declared occupation, age, and KYC Tier (Min KYC vs Full Video-KYC).
+1. **Core Banking System (CBS) Ledger ([`CBSLedgerRecord`](file:///d:/Vault/dau/ai/intelligence/ingestion/models.py))**:
+   - Captures intra-bank transfers, RTGS/NEFT batches, DD (Demand Draft) clearances, auto-debits (e-Mandates), and cash deposits at branches/ATMs. Features extraction captures velocity of transactions and cyclical salary deposit dates.
+2. **UPI Switch Logs ([`UPISwitchLog`](file:///d:/Vault/dau/ai/intelligence/ingestion/models.py))**:
+   - Captures high-frequency micro-payments via PhonePe, GPay, Paytm, and BHIM. Crucial for P2P network analysis, recurring merchant (P2M) discovery, and identifying split-bill behaviors and daily spending limits.
+3. **SMS & App Notification Scrapes ([`SMSNotificationRecord`](file:///d:/Vault/dau/ai/intelligence/ingestion/models.py))**:
+   - Parses incoming transactional SMS text (for users opting into deep profiling) using specialized regex models to capture external financial footprints: credit card bills from other banks, wallet recharges, and bounced cheques.
+4. **Credit Bureau Dumps ([`BureauCreditProfile`](file:///d:/Vault/dau/ai/intelligence/ingestion/models.py))**:
+   - CIBIL/Experian score extracts updated monthly. Provides structural macro-debt data: active loan accounts, total DPD (Days Past Due), secured vs unsecured exposure ratio, and recent credit inquiry velocities.
+5. **BBPS & Utility Aggregator Feeds ([`BBPSUtilityRecord`](file:///d:/Vault/dau/ai/intelligence/ingestion/models.py))**:
+   - Captures electricity, DTH, broadband, FASTag, and gas payments. This feed builds the deterministic recurring liabilities model (when and how much must be provisioned for monthly survival).
+6. **NCMC Transit Smart Card Readers ([`NCMCTransitRecord`](file:///d:/Vault/dau/ai/intelligence/ingestion/models.py))**:
+   - For users of the National Common Mobility Card. Maps geo-velocity and commute regularity, indicating employment stability.
+7. **Demographics & KYC Profile ([`CustomerDemographics`](file:///d:/Vault/dau/ai/intelligence/ingestion/models.py))**:
+   - Captures base features: age, tier-2/3 city mapping, language preferences (for vernacular UX adaptation), employment type (salaried/self-employed), PAN/Aadhaar linked status, City Tier (Tier 1 to Tier 4 / Rural), declared occupation, and KYC Tier (Min KYC vs Full Video-KYC).
 
 ### Data Harmonization & Integrity Mechanisms:
 * **Idempotency Deduplication**: Computes deterministic MD5 hash signatures (`merchant|amount|type|date_prefix`) to catch and drop duplicate webhook retries and network replays.
@@ -186,7 +188,7 @@ Every recommendation item in the output contracts carries:
 
 ## 6. Mathematical Scoring Engine & Calibrated Weights
 
-In [`ai/intelligence/personalization/scorer.py`](file:///d:/Projects/ABC-Bank/ai/intelligence/personalization/scorer.py), each recommendation is scored using a multi-factor mathematical formulation:
+In [`ai/intelligence/personalization/scorer.py`](file:///d:/Vault/dau/ai/intelligence/personalization/scorer.py), each recommendation is scored using a multi-factor mathematical formulation:
 
 $$\text{Weighted Index } W = 0.30 \cdot F_{\text{affordability}} + 0.30 \cdot F_{\text{lifecycle}} + 0.25 \cdot F_{\text{urgency}} + 0.15 \cdot F_{\text{archetype}}$$
 
@@ -203,7 +205,7 @@ Where:
 
 ## 7. Statistical Confidence Score Formula
 
-Implemented in [`ai/intelligence/personalization/compliance.py`](file:///d:/Projects/ABC-Bank/ai/intelligence/personalization/compliance.py), the statistical confidence score $CS \in [0.50, 0.99]$ quantifies data sufficiency before any decision is committed:
+Implemented in [`ai/intelligence/personalization/compliance.py`](file:///d:/Vault/dau/ai/intelligence/personalization/compliance.py), the statistical confidence score $CS \in [0.50, 0.99]$ quantifies data sufficiency before any decision is committed:
 
 $$\text{Confidence Score } CS = 0.35 \cdot S_{\text{density}} + 0.25 \cdot S_{\text{consistency}} + 0.20 \cdot S_{\text{tenure}} + 0.20 \cdot S_{\text{recency}}$$
 
@@ -250,7 +252,7 @@ Stored directly in `customer-state.json` under `personalization.audit_trail`:
 
 ## 9. Independent Voice Assistant (MiniCPM-5 Edge SLM — Decoupled from Recommendations)
 
-The voice intelligence subsystem ([`ai/voice/model/minicpm5_runner.py`](file:///d:/Projects/ABC-Bank/ai/voice/model/minicpm5_runner.py)) operates as an **independent conversational interface**. It does **NOT** generate, evaluate, filter, or touch financial recommendations. It is strictly invoked when a user speaks or submits an on-demand voice query (e.g. checking a balance or asking to pay a bill):
+The voice intelligence subsystem ([`ai/voice/model/minicpm5_runner.py`](file:///d:/Vault/dau/ai/voice/model/minicpm5_runner.py)) operates as an **independent conversational interface**. It does **NOT** generate, evaluate, filter, or touch financial recommendations. It is strictly invoked when a user speaks or submits an on-demand voice query (e.g. checking a balance or asking to pay a bill):
 
 ```text
                USER SPOKEN VERNACULAR VOICE
@@ -402,7 +404,7 @@ flowchart TD
         M4["Surface Top 1-to-5 recommendations instantly"]
     end
 
-    HeavyCadence -->|Fortnightly Refresh| M2
+    H5 -->|Fortnightly Refresh| M2
     M1 --> M2
     M2 --> M3
     M3 --> M4
@@ -441,7 +443,7 @@ flowchart TD
     CheckAffirmative -->|No: 'no', 'nahi', 'ना'| ClearClarification["Reset State: 'Understood. How else can I assist you?'"]
     
     CheckClarification -->|No| CheckAmbiguous{"Is query ambiguous? (e.g. 'score', 'mera score', 'સ્કોર')"}
-    CheckAmbiguous -->|Yes: Bare 'score'| AskClarification["Minimal Follow-Up: 'Do you mean your Credit Score (CIBIL)?'\nAction Chips: ['Yes, Credit Score', 'No']\nSet pending_clarification='CONFIRM_CREDIT_SCORE'"]
+    CheckAmbiguous -->|Yes: Bare 'score'| AskClarification["Minimal Follow-Up: 'Do you mean your Credit Score (CIBIL)?'<br/>Action Chips: Yes, Credit Score / No<br/>Set pending_clarification='CONFIRM_CREDIT_SCORE'"]
     CheckAmbiguous -->|No| CheckDirect{"Is query direct & unambiguous?"}
     
     CheckDirect -->|'debit card', 'atm card', 'ડેબિટ કાર્ડ'| NavDebitCard["Direct Auto-Navigate to Debit Card Management (Zero Follow-up)"]

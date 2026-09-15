@@ -10,6 +10,8 @@ apps/backend/
 ├── app/
 │   ├── main.py              # FastAPI app init, CORS, router mount
 │   ├── api/routes.py        # All REST endpoints
+│   ├── core/
+│   │   └── auth.py          # JWT Authentication layer
 │   ├── db/
 │   │   ├── session.py       # SQLAlchemy connection (auto WSL IP detection)
 │   │   ├── models.py        # ORM models
@@ -83,10 +85,11 @@ The core orchestrator responsible for managing application state and routing act
 - **`get_state()`**: Checks memory cache; falls back to DataLoader, then triggers the AI pipeline. Falls back to a safe generic state if pipeline fails.
 - **`switch_scenario()`**: Flushes the memory cache and switches context.
 - **`ingest_event()`**: Updates balances, tracks metadata, and embeds recommendation overrides.
-- **Auth**: `set_customer_pin()` and `verify_customer_pin()` handle PBKDF2-HMAC-SHA256 based authentication.
+- **Auth**: `set_customer_pin()` and `verify_customer_pin()` handle PBKDF2-HMAC-SHA256 based authentication. JWT Auth is managed via `register_customer` and `authenticate_customer` in `core/auth.py`.
 - **Transactions**: `execute_payment()` checks card locks and funds before crediting the mock ledger.
 - **Credit**: `disburse_loan()` offers up to ₹1,50,000 in instant credit.
-- **Other utilities**: `submit_kyc()`, `submit_medical_claim()`, `pause_mandate()`, `request_emi_grace()`, `split_emi()`, `sweep_deficit_for_emi()`.
+- **Relief Services**: `request_emi_grace()` (10-day buffer), `split_emi()` (50/50 split), `sweep_deficit_for_emi()` (auto-sweep shortfall), `cancel_loan_cooling_off()` (3-day RBI cancellation).
+- **Other utilities**: `submit_kyc()`, `submit_medical_claim()`, `pause_mandate()`.
 
 ### SafetyPolicyFilter ([safety_policy.py](file:///d:/Vault/dau/apps/backend/app/services/safety_policy.py))
 Guards against predatory lending and over-indebtedness.
@@ -103,6 +106,12 @@ Provides contextual, time-aware enhancements.
 Translates raw state into a UI configuration payload.
 - **`compose()`**: Takes customer state + AI recommendations and builds an `ExperienceConfigModel`.
 - **`_determine_layer()`**: Routes items to `DO`, `KNOW`, `PLAN`, or `CONSIDER` layers based on priority.
+
+### JWT Authentication Layer ([core/auth.py](file:///d:/Vault/dau/apps/backend/app/core/auth.py))
+Provides stateless, secure token-based authentication.
+- **`create_access_token()`**: Encodes customer identity, expiration (60 minutes), and custom claims into a secure JWT using `PyJWT`.
+- **`get_current_customer_claims()`**: Dependency injection method to decode JWTs, verify signature (`SECRET_KEY`), check expiration, and extract claims for protected routes like `/auth/me`.
+- **`verify_password()` & `get_password_hash()`**: Utilizes `passlib` (bcrypt) for robust one-way password hashing during registration and login.
 
 ---
 
@@ -250,7 +259,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start["Draft Configuration"] --> Stress{"Evaluate Financial Stress"}
-    Stress -- "DTI > 0.40 or EMI Pressure" --> Filter["Suppress Loan/Payday/Credit"]
+    Stress -- "DTI above 0.40 or EMI Pressure" --> Filter["Suppress Loan/Payday/Credit"]
     Stress -- "Healthy" --> Normal["Normal Recommendations"]
     Filter --> Policy["Apply Module Policies"]
     Normal --> Policy

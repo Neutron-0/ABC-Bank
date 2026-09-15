@@ -15,24 +15,24 @@ A modern, hyper-personalized banking engine must not merely offer high-margin lo
 quadrantChart
     title Banking Services Strategic Value Matrix
     x-axis Low Customer Friction --> High Customer Friction
-    y-axis Zero Direct Revenue (Trust/DAU) --> High Direct Revenue (Margin/NIM)
-    quadrant-1 High-Margin Assets (Personal Loans, Working Capital, Credit Cards)
-    quadrant-2 Fee & Interbank Income (Bancassurance, Forex, Mutual Funds)
-    quadrant-3 Core Daily Micro-Moments (NCMC Transit, FASTag, BBPS, UPI, CIBIL)
-    quadrant-4 Regulatory & Security Gates (Positive Pay, 15G/H, Card Freeze, Nominee)
+    y-axis Zero Direct Revenue --> High Direct Revenue
+    quadrant-1 High-Margin Assets
+    quadrant-2 Fee and Interbank Income
+    quadrant-3 Core Daily Micro-Moments
+    quadrant-4 Regulatory and Security Gates
     "NCMC Transit Auto-Load": [0.15, 0.25]
     "FASTag Threshold Recharge": [0.20, 0.28]
     "CIBIL 30-Day Free Refresh": [0.25, 0.15]
-    "BBPS Electricity/Water": [0.30, 0.32]
+    "BBPS Electricity and Water": [0.30, 0.32]
     "Mobile Prepaid Validity": [0.10, 0.22]
     "Biometric Card Freeze": [0.05, 0.08]
     "Form 15G/H Tax Filing": [0.45, 0.05]
-    "Positive Pay (>50k Cheque)": [0.55, 0.04]
+    "Positive Pay Cheque": [0.55, 0.04]
     "7.85% Smart FD Auto-Sweep": [0.35, 0.72]
     "Pre-Approved Personal Loan": [0.70, 0.92]
     "MSME Working Capital Line": [0.75, 0.88]
     "KCC Subvention Top-up": [0.65, 0.65]
-    "₹10/Day Sachet Insurance": [0.25, 0.58]
+    "Sachet Daily Insurance": [0.25, 0.58]
 ```
 
 ---

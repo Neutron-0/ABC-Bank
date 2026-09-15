@@ -2,7 +2,7 @@
   "name": "abc-bank",
   "version": "1.0.0",
   "private": true,
-  "description": "ABC Bank (VZEYA) — Database Tools & Prisma Studio",
+  "description": "ABC Bank — Database Tools & Prisma Studio",
   "scripts": {
     "db:studio": "dotenv -c -- prisma studio",
     "db:introspect": "dotenv -c -- prisma db pull",

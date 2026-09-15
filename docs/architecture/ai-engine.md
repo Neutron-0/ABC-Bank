@@ -144,11 +144,11 @@ stateDiagram-v2
         state "Macro Batch (14-day)" as Macro
         state "Micro Trigger (0.16ms)" as Micro
         
-        Macro --> UpdateBaseline: "Process Historical Data"
-        UpdateBaseline --> Macro: "Execute Every 14 Days"
+        Macro --> UpdateBaseline: Process Historical Data
+        UpdateBaseline --> Macro: Execute Every 14 Days
         
-        Micro --> EvaluateEvent: "Real-time Event Arrival"
-        EvaluateEvent --> Micro: "Sub 0.16ms Execution"
+        Micro --> EvaluateEvent: Real-time Event Arrival
+        EvaluateEvent --> Micro: Sub 0.16ms Execution
     }
 ```
 
@@ -158,7 +158,7 @@ Risk limits heavily guardrail recommendations. If the `financial_stress` detecto
 
 ```mermaid
 flowchart TD
-    Rec["Proposed Recommendation"] --> DTICheck{"DTI > 0.40?"}
+    Rec["Proposed Recommendation"] --> DTICheck{"DTI above 0.40?"}
     DTICheck -- Yes --> Stress["financial_stress Detected"]
     Stress --> CreditCheck{"Is Credit/Loan/Payday?"}
     CreditCheck -- Yes --> Suppress["suppressed = true"]
@@ -209,12 +209,12 @@ flowchart TD
     
     Speech --> Text
     Text --> SLM
-    SLM -->|"VoiceIntent JSON (Intent, Entities)"| Facts
-    Facts -->|"Approved Facts ONLY"| SLM
+    SLM -->|VoiceIntent JSON - Intent and Entities| Facts
+    Facts -->|Approved Facts ONLY| SLM
     SLM --> Verbal
     
-    History -.->|"NEVER EXPOSED"| SLM
-    Balances -.->|"NEVER EXPOSED"| SLM
+    History -.->|NEVER EXPOSED| SLM
+    Balances -.->|NEVER EXPOSED| SLM
 ```
 
 ### 3.2 End-to-End Voice Processing Pipeline

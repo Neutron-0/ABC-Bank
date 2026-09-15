@@ -96,9 +96,9 @@ stateDiagram-v2
         MoreViewScreen
     }
     
-    AdaptiveHomeScreen --> PaymentsScreen : "setActiveTab('payments')"
-    AdaptiveHomeScreen --> TransactionsScreen : "setActiveTab('transactions')"
-    PaymentsScreen --> AdaptiveHomeScreen : "setActiveTab('home')"
+    AdaptiveHomeScreen --> PaymentsScreen : setActiveTab(payments)
+    AdaptiveHomeScreen --> TransactionsScreen : setActiveTab(transactions)
+    PaymentsScreen --> AdaptiveHomeScreen : setActiveTab(home)
     
     state JourneyModals {
         KycModal
@@ -107,8 +107,8 @@ stateDiagram-v2
         OnboardingModal
     }
     
-    TabNavigation --> JourneyModals : "openJourney('id')"
-    JourneyModals --> TabNavigation : "closeJourney()"
+    TabNavigation --> JourneyModals : openJourney(id)
+    JourneyModals --> TabNavigation : closeJourney()
 ```
 
 ### 3.3 Data Fetching & Fallback Mechanism
@@ -182,7 +182,7 @@ sequenceDiagram
     participant Auth as expo-local-authentication
     participant API
     
-    User->>UI: Tap "Pay Routine Mandate"
+    User->>UI: Tap Pay Routine Mandate
     UI->>Store: requestPaymentAuth()
     Store->>Auth: Prompt Biometrics/PIN
     

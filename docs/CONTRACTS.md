@@ -17,10 +17,23 @@ graph LR
 - **Purpose**: Complete financial, behavioral, and psychological state of the customer
 - **Validation**: AI pipeline validates with jsonschema before outputting
 
-**Required fields**: customer_id, financial_health, signals
-**Optional fields**: customer_name, state_type, life_stage, balance, recommendations
+**Required fields**: `customer_id`, `financial_health`, `signals`
+**Optional fields**: `customer_name`, `state_type`, `life_stage`, `balance`, `recommendations`
 
-**Example payload**:
+**Extended Runtime Fields**:
+In production, the AI output (`customer-state.json`) enriches this schema dynamically with complex objects:
+- `cash_flow_forecast`: Predicts liquidity runway, deficits, and next income dates.
+- `spend_profile`: Provides 50/30/20 budget allocations, top spend categories, and leakage alerts.
+- `bharat_archetype`: Categorizes the user (e.g., `urban_commuter`).
+- `cryptographic_ledger`: An immutable SHA-256 block chain recording every recommendation decision and suppression (e.g., hiding loans due to high DTI) for RBI compliance.
+- `budget_allocation_50_30_20`: Inside `signals`, tracks Needs/Wants/Savings splits precisely.
+
+**Field Type Constraints**:
+- `state_type`: Enum (`normal`, `life_change`, `financial_stress`, `medical_event`, `fraud_alert`, `surplus`)
+- `financial_health`: Enum (`thriving`, `stable`, `tight`, `stress`)
+- `signals`: Object (`additionalProperties: true`). Used for open-ended flags like `commute_detected` (bool), `debt_to_income_ratio` (number).
+
+**Example payload (Normal)**:
 ```json
 {
   "customer_id": "cust_bharat_001",
@@ -31,7 +44,10 @@ graph LR
     "commute_detected": true,
     "savings_trend": "positive",
     "debt_to_income_ratio": 0.18,
-    "anomaly_score": 4
+    "anomaly_score": 4,
+    "budget_allocation_50_30_20": {
+      "rule_status": "optimal"
+    }
   },
   "life_stage": ["early_career", "metro_commuter"],
   "balance": {
@@ -64,10 +80,13 @@ graph LR
 - **Consumer**: Lakshya (apps/frontend/)
 - **Purpose**: Instructs the mobile UI how to compose its screen
 
-**Required fields**: primary_actions, priority_modules
-**Optional fields**: customer_id, secondary_actions, deprioritized_modules, hero_card, context_cards, language, interaction_mode
+**Required fields**: `primary_actions`, `priority_modules`
+**Optional fields**: `customer_id`, `secondary_actions`, `deprioritized_modules`, `hero_card`, `context_cards`, `language`, `interaction_mode`
 
-**Example payload (normal state)**:
+**Field Type Constraints**:
+- `context_cards[].layer`: Enum (`DO`, `KNOW`, `PLAN`, `CONSIDER`)
+
+**Example payload (Normal state)**:
 ```json
 {
   "customer_id": "cust_bharat_001",
@@ -106,7 +125,7 @@ graph LR
 }
 ```
 
-**Example payload (financial stress)**:
+**Example payload (Financial Stress)**:
 ```json
 {
   "customer_id": "cust_bharat_001",
@@ -129,6 +148,51 @@ graph LR
 }
 ```
 
+**Example payload (Fraud Alert)**:
+```json
+{
+  "customer_id": "cust_bharat_001",
+  "primary_actions": ["lock_card", "dispute_tx"],
+  "secondary_actions": ["call_support"],
+  "priority_modules": ["security_center", "recent_tx_review"],
+  "deprioritized_modules": ["all_marketing", "investments"],
+  "hero_card": {
+    "id": "hero_fraud",
+    "title": "Unusual Activity Detected",
+    "subtitle": "\u20b931,800 debited at 2:14 AM. Was this you?",
+    "action_label": "Secure Account",
+    "action_type": "LOCKDOWN_FLOW",
+    "badge": "SECURITY ALERT",
+    "accent": "#DC2626",
+    "why": "Transaction pattern severely deviates from history"
+  },
+  "language": "en",
+  "interaction_mode": "alert"
+}
+```
+
+**Example payload (Medical Event)**:
+```json
+{
+  "customer_id": "cust_bharat_001",
+  "primary_actions": ["claim_insurance", "request_emr"],
+  "secondary_actions": [],
+  "priority_modules": ["insurance_dashboard", "medical_loans"],
+  "deprioritized_modules": ["discretionary_spend"],
+  "hero_card": {
+    "id": "hero_medical",
+    "title": "Medical Claim Assistance",
+    "subtitle": "We noticed a large hospital bill. Need help?",
+    "action_label": "View Options",
+    "action_type": "OPEN_MEDICAL_MODAL",
+    "badge": "SUPPORT",
+    "accent": "#0D9488",
+    "why": "Detected ₹48,200 transaction at Apollo Hospitals"
+  },
+  "language": "en"
+}
+```
+
 **Key design decisions**:
 - `context_cards[].layer` enum (DO/KNOW/PLAN/CONSIDER) creates an attention hierarchy
 - `deprioritized_modules` explicitly lists what was removed (auditable)
@@ -140,8 +204,13 @@ graph LR
 - **Consumer**: Harsh (apps/backend/) and Lakshya (MitraChatScreen)
 - **Purpose**: Normalized multi-lingual voice intents
 
-**Required fields**: intent, language
-**Optional fields**: confidence, entities, response_text, suggested_actions
+**Required fields**: `intent`, `language`
+**Optional fields**: `confidence`, `entities`, `response_text`, `suggested_actions`
+
+**Field Type Constraints**:
+- `language`: Enum (`en`, `hi`, `gu`)
+- `intent`: Enum (`PAY_METRO`, `CHECK_BALANCE`, `CHECK_EMI`, `PAY_BILL`, `MEDICAL_CLAIM_HELP`, `SAVE_SURPLUS`, `REVIEW_COMMITMENTS`, `LOCK_CARD`, `GENERAL_QUERY`)
+- `confidence`: Number (between 0 and 1)
 
 **Example payload**:
 ```json
@@ -175,3 +244,4 @@ graph LR
 3. Corresponding Pydantic models (backend) and TypeScript types (frontend) must be updated simultaneously
 4. All tests must pass before merge
 5. Update mock files in frontend to match new schema
+

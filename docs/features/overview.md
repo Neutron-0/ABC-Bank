@@ -1,6 +1,6 @@
-# VZEYA / ABC Bank Platform - Feature Inventory
+# ABC Bank Platform - Feature Inventory
 
-This document details the major features of the VZEYA / ABC Bank platform, including their implementation details, technical components, and dependencies.
+This document details the major features of the ABC Bank platform, including their implementation details, technical components, and dependencies.
 
 ## Diagrams
 
@@ -40,10 +40,10 @@ flowchart TD
         Inspector["Inspector Dashboards"]
     end
 
-    Frontend --> Intelligence
-    Frontend --> Backend
-    Intelligence --> Backend
-    Backend --> Tooling
+    SDUIRender --> MitraAI
+    SDUIRender --> SDUIComposer
+    EthicalAI --> SDUIComposer
+    Degradation --> Inspector
 ```
 
 ### 2. Adaptive Home Screen Flow
@@ -51,8 +51,8 @@ flowchart TD
 ```mermaid
 flowchart TD
     A["Customer State Detection"] --> B{"Financial Health?"}
-    B -->|Normal/Surplus| C["Show Investment & Growth Cards"]
-    B -->|Tight/Stress| D["Hide Utility Widgets"]
+    B -->|Normal or Surplus| C["Show Investment & Growth Cards"]
+    B -->|Tight or Stress| D["Hide Utility Widgets"]
     B -->|Medical Event| E["Surface Medical Assistance"]
     
     C --> F["Generate Primary Actions"]
@@ -76,14 +76,14 @@ sequenceDiagram
     participant SLM as MiniCPM-5 SLM
     participant B as Backend Services
     
-    U->>F: "Mera balance kitna hai?"
+    U->>F: Mera balance kitna hai?
     F->>SLM: Forward prompt (On-Device)
     Note over SLM: No banking data leakage
     SLM-->>F: Intent: CHECK_BALANCE
     F->>B: POST /assistant/intent
     B-->>F: Fetch balance info securely
     F->>SLM: Contextualize response
-    SLM-->>F: "Aapka balance ₹X hai."
+    SLM-->>F: Aapka balance Rs. X hai.
     F-->>U: Read out / Display response
 ```
 
@@ -95,7 +95,7 @@ flowchart TD
     Score --> |Affordability, Lifecycle, Urgency, Archetype| Prelist["Candidate List"]
     Prelist --> Guard["SafetyPolicyFilter"]
     
-    Guard --> C1{"DTI > 0.40?"}
+    Guard --> C1{"DTI above 0.40?"}
     C1 --> |Yes| Sup1["Suppress Credit Offers"]
     C1 --> |No| C2{"Financial Stress?"}
     
@@ -121,8 +121,8 @@ flowchart LR
         dep["deprioritized_modules"]
     end
     
-    Comp -.-> Config
-    Config -.-> Front
+    Comp -.-> hero
+    hero -.-> Front
 ```
 
 ### 6. Graceful Degradation
@@ -131,16 +131,16 @@ flowchart LR
 stateDiagram-v2
     [*] --> Online
     
-    Online --> Offline : "Network Failure (2.5s Timeout)"
-    Online --> Offline : "Backend Down"
+    Online --> Offline : Network Failure (2.5s Timeout)
+    Online --> Offline : Backend Down
     
     state Offline {
         [*] --> EdgeProcessing
-        EdgeProcessing --> FallbackState : "Generate safe_fallback_state"
-        EdgeProcessing --> LocalJSON : "Use JSON seed files"
+        EdgeProcessing --> FallbackState : Generate safe_fallback_state
+        EdgeProcessing --> LocalJSON : Use JSON seed files
     }
     
-    Offline --> Online : "Connection Restored"
+    Offline --> Online : Connection Restored
 ```
 
 ## Feature Inventory
@@ -288,3 +288,27 @@ stateDiagram-v2
 - **Data/DB**: Real-time read replicas / telemetry data
 - **Dependencies**: Dev server environment
 - **Edge cases**: Disabled automatically in production builds.
+
+### 19. Banking Relief Services
+- **What**: Emergency financial relief tools (10-day grace buffer, 50/50 split EMI, auto-sweep deficit, cooling-off cancellation)
+- **Implementation**: `apps/backend/app/api/routes.py` (relief endpoints)
+- **APIs**: `POST /api/v1/loans/grace`, `POST /api/v1/loans/split`, `POST /api/v1/loans/sweep-deficit`, `POST /api/v1/loans/cooling-off-cancel`
+- **Data/DB**: Loan state and account ledgers
+- **Dependencies**: Core banking mocked backend, Experience Composer
+- **Edge cases**: Ineligible customers are gracefully denied with explanations.
+
+### 20. Specialized Journey Modals
+- **What**: Interactive micro-frontend journeys for niche banking tasks (Digital Rupee CBDC, ASBA IPO Bidding, Positive Pay Cheque, Forex Travel Card, Relationship Manager)
+- **Implementation**: `apps/frontend/src/features/journeys/` (React Native Modals)
+- **APIs**: Various specialized endpoints (e.g., `/api/v1/investments/asba/bid`)
+- **Data/DB**: Integration with specific domain services
+- **Dependencies**: SDUI actions triggering deep links to modals
+- **Edge cases**: Network failures within modal gracefully prompt retry or fallback to call center.
+
+### 21. JWT Authentication
+- **What**: Stateless token-based security for customer sessions
+- **Implementation**: `apps/backend/app/core/auth.py`
+- **APIs**: `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, `GET /api/v1/auth/me`
+- **Data/DB**: Customers table with hashed passwords
+- **Dependencies**: `PyJWT`, `passlib`
+- **Edge cases**: Expired tokens trigger automatic silent refresh or prompt re-login.

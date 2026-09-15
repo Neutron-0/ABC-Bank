@@ -1,6 +1,6 @@
 # Repository Structure and Ownership
 
-This document defines the repository structure, folder ownership, and merge-conflict avoidance strategy for the VZEYA 3-person hackathon team.
+This document defines the repository structure, folder ownership, and merge-conflict avoidance strategy for the ABC Bank 3-person hackathon team.
 
 ## Directory Layout
 
@@ -29,6 +29,22 @@ This document defines the repository structure, folder ownership, and merge-conf
 │   │       ├── animations/            # UI transitions
 │   │       ├── components/            # Reusable UI components
 │   │       ├── features/              # Screen-level features
+│   │       │   └── journeys/          # Specialized Journey Modals
+│   │       │       ├── ChequeServicesModal.tsx
+│   │       │       ├── CreditScoreModal.tsx
+│   │       │       ├── DebitCardModal.tsx
+│   │       │       ├── DigitalRupeeModal.tsx
+│   │       │       ├── FastagRechargeModal.tsx
+│   │       │       ├── FinancialStressModal.tsx
+│   │       │       ├── ForexTravelCardModal.tsx
+│   │       │       ├── FraudAlertModal.tsx
+│   │       │       ├── InsuranceModal.tsx
+│   │       │       ├── IpoBiddingModal.tsx
+│   │       │       ├── KycModal.tsx
+│   │       │       ├── MedicalAssistanceModal.tsx
+│   │       │       ├── RelationshipManagerModal.tsx
+│   │       │       ├── ResponsibleLoanModal.tsx
+│   │       │       └── SavingsInvestModal.tsx
 │   │       ├── hooks/                 # React hooks
 │   │       ├── i18n/                  # Localization
 │   │       ├── mock/                  # Offline mock data
@@ -44,6 +60,8 @@ This document defines the repository structure, folder ownership, and merge-conf
 │       ├── app/
 │       │   ├── main.py                # FastAPI entrypoint
 │       │   ├── api/routes.py          # REST endpoints
+│       │   ├── core/                  # Core modules
+│       │   │   └── auth.py            # JWT Authentication
 │       │   ├── models/                # Pydantic models
 │       │   ├── services/              # Business logic
 │       │   ├── experience/            # Experience composer
@@ -53,6 +71,8 @@ This document defines the repository structure, folder ownership, and merge-conf
 │
 ├── ai/                                # UBAID ONLY
 │   ├── intelligence/
+│   │   ├── ml/                        # ML Models
+│   │   │   └── checkpoints/           # Trained models
 │   │   ├── features/extractor.py      # Feature extraction
 │   │   ├── signals/detector.py        # Signal detection
 │   │   ├── customer_state/generator.py# State generation
@@ -82,7 +102,7 @@ This document defines the repository structure, folder ownership, and merge-conf
 ├── docs/                              # SHARED — documentation only
 │
 └── scripts/                           # SHARED — automation
-    ├── seed-data.py
+    ├── generate_seed_data.py
     ├── run-demo.sh
     └── run-demo.ps1
 ```
